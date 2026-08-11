@@ -2,12 +2,12 @@ import os, glob
 from dotenv import load_dotenv
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_community.embeddings import FastEmbedEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from supabase import create_client
 
 load_dotenv()
-supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_KEY"))
-embeddings = FastEmbedEmbeddings(model_name="paraphrase-multilingual-MiniLM-L12-v2")
+supabase = create_client(os.getenv("SUPABASE_URL").strip(), os.getenv("SUPABASE_SERVICE_KEY").strip())
+embeddings = FastEmbedEmbeddings()
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 
 files = glob.glob("knowledge/*.txt")

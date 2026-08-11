@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>AI Coach Test</title></head>
+<body>
+<h1>AI Coach Test</h1>
+<button onclick="ping()">1. Ping</button>
+<button onclick="ask('How do I define my unique mechanism?')">2. EN Question</button>
+<button onclick="ask('ما هي معادلة الثقة؟')">3. AR Question</button>
+<pre id="out">Waiting...</pre>
+<script>
+async function ping(){
+  const r=await fetch('/');
+  const d=await r.json();
+  document.getElementById('out').textContent=JSON.stringify(d,null,2);
+}
+async function ask(q){
+  document.getElementById('out').textContent='Thinking...';
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+  const d=await r.json();
+  document.getElementById('out').textContent=JSON.stringify(d,null,2);
+}
+</script>
+</body>
+</html>
