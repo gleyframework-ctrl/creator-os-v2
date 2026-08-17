@@ -46,9 +46,9 @@ vectorstore = SupabaseVectorStore(
     query_name="match_documents",
 )
 
-# FIX APPLIED HERE: Changed 3.3 to 3.1
+# FIX APPLIED HERE: Changed to llama3-70b-8192
 llm = ChatGroq(
-    model_name="llama-3.1-70b-versatile",
+    model_name="llama3-70b-8192",
     temperature=0.2,
     api_key=os.getenv("GROQ_API_KEY").strip(),
 )
