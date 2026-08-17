@@ -1,0 +1,25 @@
+SOURCE: E5 C.A.M.P. Masterclass — Module 6 (Arabic Voice Layer: Scientific MVF Testing & Math)
+FRAMEWORK: الاختبار العلمي للقمع الأدنى (Scientific MVF Testing & The Decision Tree)
+WHEN TO USE: When a member is launching a new funnel, asking "how much should I spend on ads?", "how do I know if my funnel works?", or "should I scale or kill this campaign?"
+
+CORE METAPHORS & PRINCIPLES (Use these to teach members):
+1. بوليصة التأمين المالي (Financial Insurance Policy): CPCmos is not just a metric; it is a strict financial fence. If CPC crosses the upper bound (e.g., $1.46 for a $97 product), kill the campaign immediately. Do not let ad platforms eat the budget.
+2. اختبار الأم (The Mother Test / House List Test): Testing on your warm list is the ultimate stress test for the message. If your most loyal fans won't convert at >2%, the core offer or Big Idea is dead. Do not blame the traffic source; the engine is broken.
+3. وسادة الأمان للتوسع (The Scaling Buffer): Why demand 60% ROI on cold traffic? Because as you scale, ad costs rise and audience quality drops. A 60% initial ROI provides the mathematical buffer to survive the inevitable friction of scaling.
+4. التسويق كعلم لا كفن (Marketing as Science, not Art): Guessing burns budgets. The 3 Pillars (Economics, Stage Performance, Consumption) turn launching into a clinical trial. 
+
+THE 4 STAGES OF CONSUMPTION (Where the leak is):
+If a funnel fails, the leak is ALWAYS in one of these 4 psychological stages:
+1. Big Idea (Failed to grab attention)
+2. Lead (Failed to build curiosity)
+3. Argument (Failed to provide proof/desire)
+4. Offer (Failed to compel action)
+DECISION RULE: Do not change ad targeting if the consumption is broken. Find the exact stage where they dropped off and fix that specific element.
+
+THE DECISION TREE (Enhance vs. Re-Engineer):
+- House List Conversion < 2%: RE-ENGINEER. The core message/offer is flawed.
+- Cold Traffic ROI < 60%: RE-ENGINEER. The economics cannot survive scaling.
+- Cold Traffic ROI > 60% + Opt-in > 20% + Conversion > 2%: ENHANCE. The engine works; now tweak headlines, buttons, and upsells to multiply profits.
+
+ARABIC TERMINOLOGY:
+Scientific Testing = الاختبار العلمي / السريري | 100-Person Test = اختبار المئة شخص | Financial Insurance = بوليصة التأمين المالي | Scaling Buffer = وسادة الأمان للتوسع | The Mother Test = اختبار الأم / اختبار القائمة الدافئة | Re-Engineer = إعادة هندسة (هدم وبناء) | Enhance = تحسين (تلميع وتعديل) | Consumption Stages = مراحل الاستهلاك النفسي.
