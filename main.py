@@ -1,8 +1,8 @@
 import os
+import httpx
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from langchain_community.vectorstores import SupabaseVectorStore
@@ -15,24 +15,53 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-12-aicoach-slice2-memory-v4"
+APP_VERSION = "2026-08-18-aicoach-v7-selfhealing"
+
+# ---------- SELF-HEALING MODEL DISCOVERY ----------
+GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
+
+PREFERRED_MODELS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3-32b",
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
+]
+
+def pick_live_model() -> str:
+    try:
+        r = httpx.get(
+            "https://api.groq.com/openai/v1/models",
+            headers={"Authorization": f"Bearer {GROQ_KEY}"},
+            timeout=10,
+        )
+        available = {m["id"] for m in r.json().get("data", [])}
+        for model in PREFERRED_MODELS:
+            if model in available:
+                print(f"🔥 DISCOVERED LIVE MODEL: {model}")
+                return model
+        if available:
+            fallback = sorted(available)[0]
+            print(f"🔥 NO PREFERRED MODEL LIVE. USING FIRST AVAILABLE: {fallback}")
+            return fallback
+        print("⚠️ MODEL LIST EMPTY. USING DEFAULT.")
+        return PREFERRED_MODELS[0]
+    except Exception as e:
+        print(f"⚠️ MODEL DISCOVERY FAILED: {e}")
+        return PREFERRED_MODELS[0]
+
+CHOSEN_MODEL = pick_live_model()
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"], allow_credentials=True,
+    allow_methods=["*"], allow_headers=["*"],
 )
 
 @app.get("/")
 def health():
-    return {"status": "ok", "version": APP_VERSION}
-
-@app.get("/test")
-def test_page():
-    return FileResponse("chat_test.html")
+    return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL}
 
 # ---------- CLIENTS ----------
 supabase = create_client(
@@ -46,11 +75,10 @@ vectorstore = SupabaseVectorStore(
     query_name="match_documents",
 )
 
-# FIX APPLIED HERE: Changed to llama3-70b-8192
 llm = ChatGroq(
-    model_name="llama3-70b-8192",
+    model_name=CHOSEN_MODEL,
     temperature=0.2,
-    api_key=os.getenv("GROQ_API_KEY").strip(),
+    api_key=GROQ_KEY,
 )
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
@@ -92,30 +120,16 @@ class MemberProfile(BaseModel):
 
 # ---------- MEMORY HELPERS ----------
 def ensure_member(member_id: str):
-    existing = (
-        supabase.table("members")
-        .select("member_id")
-        .eq("member_id", member_id)
-        .execute()
-    )
+    existing = supabase.table("members").select("member_id").eq("member_id", member_id).execute()
     if not existing.data:
         supabase.table("members").insert({"member_id": member_id}).execute()
 
 def build_memory_block(member_id: str) -> str:
     try:
-        prof = (
-            supabase.table("members").select("*").eq("member_id", member_id).execute()
-        )
-        hist = (
-            supabase.table("chat_history")
-            .select("question, answer, created_at")
-            .eq("member_id", member_id)
-            .order("created_at", desc=True)
-            .limit(3)
-            .execute()
-        )
+        prof = supabase.table("members").select("*").eq("member_id", member_id).execute()
+        hist = (supabase.table("chat_history").select("question, answer, created_at")
+                .eq("member_id", member_id).order("created_at", desc=True).limit(3).execute())
     except Exception as e:
-        print(f"⚠️ MEMORY READ FAILED: {e}")
         return "MEMBER MEMORY: (unavailable)"
 
     if not prof.data:
@@ -123,31 +137,21 @@ def build_memory_block(member_id: str) -> str:
 
     p = prof.data[0]
     lines = ["MEMBER MEMORY (use this to personalize):"]
-    if p.get("name"):
-        lines.append(f"- Name: {p['name']}")
-    if p.get("niche"):
-        lines.append(f"- Niche/Business: {p['niche']}")
-    if p.get("current_stage"):
-        lines.append(f"- Current funnel stage: {p['current_stage']}")
-    if p.get("struggles"):
-        lines.append(f"- Known struggles: {p['struggles']}")
+    if p.get("name"): lines.append(f"- Name: {p['name']}")
+    if p.get("niche"): lines.append(f"- Niche/Business: {p['niche']}")
+    if p.get("current_stage"): lines.append(f"- Current funnel stage: {p['current_stage']}")
+    if p.get("struggles"): lines.append(f"- Known struggles: {p['struggles']}")
     if hist.data:
         lines.append("- Recent coaching sessions:")
         for h in reversed(hist.data):
-            lines.append(
-                f'  * Member asked: "{(h["question"] or "")[:150]}" -> You advised: "{(h["answer"] or "")[:150]}"'
-            )
+            lines.append(f'  * Member asked: "{(h["question"] or "")[:150]}" -> You advised: "{(h["answer"] or "")[:150]}"')
     return "\n".join(lines)
 
 def save_memory(member_id: str, question: str, answer: str):
     try:
-        supabase.table("chat_history").insert(
-            {
-                "member_id": member_id,
-                "question": question,
-                "answer": answer,
-            }
-        ).execute()
+        supabase.table("chat_history").insert({
+            "member_id": member_id, "question": question, "answer": answer,
+        }).execute()
         supabase.table("members").update(
             {"updated_at": datetime.now(timezone.utc).isoformat()}
         ).eq("member_id", member_id).execute()
@@ -159,17 +163,13 @@ def save_memory(member_id: str, question: str, answer: str):
 async def register_member(profile: MemberProfile):
     try:
         row = {
-            "member_id": profile.member_id,
-            "name": profile.name,
-            "niche": profile.niche,
-            "current_stage": profile.current_stage,
-            "struggles": profile.struggles,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "member_id": profile.member_id, "name": profile.name,
+            "niche": profile.niche, "current_stage": profile.current_stage,
+            "struggles": profile.struggles, "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         supabase.table("members").upsert(row, on_conflict="member_id").execute()
         return {"status": "success", "member_id": profile.member_id}
     except Exception as e:
-        print(f"❌ REGISTER FAILURE: {e}")
         raise HTTPException(status_code=500, detail=f"Register failed: {e}")
 
 @app.post("/api/chat")
@@ -184,13 +184,9 @@ async def chat(req: ChatRequest):
 
         docs = retriever.invoke(req.question)
         context = format_docs(docs)
-        answer = (prompt | llm | StrOutputParser()).invoke(
-            {
-                "memory": memory_block,
-                "context": context,
-                "question": req.question,
-            }
-        )
+        answer = (prompt | llm | StrOutputParser()).invoke({
+            "memory": memory_block, "context": context, "question": req.question,
+        })
 
         if req.member_id:
             save_memory(req.member_id, req.question, answer)
@@ -201,5 +197,6 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=500, detail=f"RAG failed: {e}")
 
 if __name__ == "__main__":
+    print(f"🔥 SERVER STARTING WITH MODEL: {CHOSEN_MODEL}")
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
