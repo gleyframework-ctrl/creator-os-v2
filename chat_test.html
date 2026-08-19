@@ -10,6 +10,7 @@
   body{background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;}
   header{background:var(--panel);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--gold);}
   header h1{font-size:17px;letter-spacing:.5px;}
+  #coachSelect{background:#0e1628;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:5px 12px;font-size:12px;outline:none;cursor:pointer;}
   header .tag{margin-left:auto;font-size:11px;color:var(--gold);border:1px solid var(--gold);padding:3px 8px;border-radius:20px;}
   #onboarding{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
   .card{background:var(--panel);border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.4);}
@@ -33,15 +34,19 @@
 </head>
 <body>
 <header>
-  <span style="font-size:22px">🧠</span>
-  <h1>E5 AI COACH</h1>
+  <span style="font-size:22px" id="coachEmoji">🧠</span>
+  <h1 id="coachTitle">E5 AI COACH</h1>
+  <select id="coachSelect" onchange="switchCoach()">
+    <option value="e5">E5 Coach</option>
+    <option value="builder">The Builder</option>
+  </select>
   <span class="tag" id="memberTag">GUEST</span>
 </header>
 
 <div id="onboarding">
   <div class="card">
     <h2>Welcome, Future Empire Builder 👋</h2>
-    <p>I'm your personal E5 C.A.M.P. AI Coach. I remember your niche, your stage, and every session we have together.</p>
+    <p>I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.</p>
     <label>YOUR NAME</label>
     <input id="nameInput" placeholder="e.g. Ahmed">
     <label>YOUR NICHE / BUSINESS</label>
@@ -68,9 +73,22 @@ window.addEventListener('load',()=>{
   if(localStorage.getItem('e5_member_id')){
     $('memberTag').textContent=localStorage.getItem('e5_name')||'MEMBER';
     showChat();
-    addMsg('coach','Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! I remember you. Where shall we continue your empire today?');
+    addMsg('coach','Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! I remember you. Pick your coach above and let\'s continue your empire.');
   }
 });
+
+function switchCoach(){
+  const c=$('coachSelect').value;
+  if(c==='builder'){
+    $('coachTitle').textContent='THE BUILDER';
+    $('coachEmoji').textContent='🏗️';
+    addMsg('coach','🏗️ <strong>The Builder here.</strong> Offer first, audience second. Stop overthinking — do the work. Tell me: what are you building, and who exactly is it for?');
+  }else{
+    $('coachTitle').textContent='E5 AI COACH';
+    $('coachEmoji').textContent='🧠';
+    addMsg('coach','🧠 <strong>E5 Coach here.</strong> Let\'s sharpen your marketing with the E5 frameworks. What\'s blocking your empire today?');
+  }
+}
 
 function startCoaching(){
   const name=$('nameInput').value.trim();
@@ -84,7 +102,7 @@ function startCoaching(){
     body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
   $('memberTag').textContent=name;
   showChat();
-  addMsg('coach','It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! I am your E5 AI Coach. I will remember your niche and every session we have. Tell me: what is the biggest marketing struggle blocking your empire right now?');
+  addMsg('coach','It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Pick your coach above — or just ask me anything right now. What is the biggest struggle blocking your empire?');
 }
 
 function showChat(){$('onboarding').style.display='none';$('chatScreen').style.display='flex';}
@@ -106,11 +124,11 @@ async function send(){
   const t=addMsg('coach','🧠 <em>Coach is thinking…</em>');
   try{
     const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,member_id:localStorage.getItem('e5_member_id')})});
+      body:JSON.stringify({question:q,member_id:localStorage.getItem('e5_member_id'),coach_id:$('coachSelect').value})});
     const d=await r.json();
     t.innerHTML=md(d.answer||'I could not process that. Please try again.');
   }catch(e){
-    t.innerHTML='⚠️ Connection error. The server may be sleeping — wake it up in Replit and try again.';
+    t.innerHTML='⚠️ Connection error. Please try again.';
   }
   $('messages').scrollTop=$('messages').scrollHeight;
 }
