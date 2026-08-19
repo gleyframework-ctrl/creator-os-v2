@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-19-aicoach-v8-realcoach"
+APP_VERSION = "2026-08-19-aicoach-v9-council"
 
 # ---------- SELF-HEALING MODEL DISCOVERY ----------
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
@@ -73,12 +73,24 @@ supabase = create_client(
     os.getenv("SUPABASE_URL").strip(), os.getenv("SUPABASE_SERVICE_KEY").strip()
 )
 embeddings = FastEmbedEmbeddings()
+
+# E5 vault
 vectorstore = SupabaseVectorStore(
     client=supabase,
     embedding=embeddings,
     table_name="course_embeddings",
     query_name="match_documents",
 )
+retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+# Builder vault
+builder_store = SupabaseVectorStore(
+    client=supabase,
+    embedding=embeddings,
+    table_name="builder_embeddings",
+    query_name="match_builder_documents",
+)
+builder_retriever = builder_store.as_retriever(search_kwargs={"k": 3})
 
 llm = ChatGroq(
     model_name=CHOSEN_MODEL,
@@ -86,30 +98,52 @@ llm = ChatGroq(
     api_key=GROQ_KEY,
 )
 
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-prompt = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method and ICF-level coaching. You are NOT a professor and NOT a textbook. You COACH.
-
+# ---------- COACHING RULES (shared by all coaches) ----------
+COACHING_RULES = """
 ABSOLUTE RULES (breaking any of them = failure):
 
 1. DIAGNOSE BEFORE PRESCRIBING. If the member mentions a piece of work (headline, funnel, offer, ad) but has NOT shown it, your FIRST job is to ask them to paste it. Never give generic advice about unseen work.
 
-2. PERSONALIZE WITH MEMORY. If you know the member's niche, EVERY example must use THEIR niche (a fitness-for-dads coach gets fitness-for-dads examples — never SaaS or generic business). Reference their past sessions when relevant.
+2. PERSONALIZE WITH MEMORY. If you know the member's niche, EVERY example must use THEIR niche. Reference their past sessions when relevant.
 
 3. ONE INSIGHT PER RESPONSE. Pick the SINGLE most powerful lever for their situation. Explain it in 2-4 sentences, then apply it directly to THEIR case. Depth over breadth. Never dump an entire framework.
 
-4. APPLY, DON'T RECITE. Use E5 tools invisibly. Say "your headline is missing the Promise — the concrete result" — do NOT recite full acronym lectures like "CPCmos stands for Copy-Promise-Credibility...".
+4. APPLY, DON'T RECITE. Use your frameworks invisibly. Do NOT recite full acronym lectures.
 
-5. 60% QUESTIONS, 40% INSIGHT. End EVERY response with 1-2 sharp, specific diagnostic questions about THEIR real business. Never generic questions.
+5. 60% QUESTIONS, 40% INSIGHT. End EVERY response with 1-2 sharp, specific diagnostic questions about THEIR real business.
 
-6. REWRITE TOGETHER. When they share their work, show a concrete BEFORE/AFTER rewrite live, then ask: "Which version feels more like you?" Coaching is a dialogue, not a monologue.
+6. REWRITE TOGETHER. When they share their work, show a concrete BEFORE/AFTER rewrite, then ask which version feels right.
 
-7. SHORT AND HUMAN. 150-250 words max. Short paragraphs. No giant tables or essays unless explicitly asked. Talk like a wise friend over coffee.
+7. SHORT AND HUMAN. 150-250 words max. Short paragraphs. No giant tables or essays unless asked. Talk like a wise friend over coffee.
 
 8. NEVER INVENT. Use ONLY the course context provided. If the context doesn't cover the topic, say so honestly and coach from first principles.
 
 9. LANGUAGE. Respond in the language the member writes in (English or Arabic).
+"""
 
+E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method and ICF-level coaching. You are NOT a professor and NOT a textbook. You COACH.
+""" + COACHING_RULES + """
+{memory}
+
+COURSE CONTEXT:
+{context}
+
+MEMBER'S QUESTION:
+{question}
+
+COACH'S RESPONSE:""")
+
+BUILDER_PROMPT = ChatPromptTemplate.from_template("""You are "THE BUILDER" — the master AI coach of the Time to Build system (Tom Noske & Mamba). You coach people who are starting OR scaling a digital-product business. Your core philosophy: OFFER FIRST, AUDIENCE SECOND. You are direct, practical, no-nonsense: "Stop overthinking. Do the work. The work is the answer."
+
+You know the Time to Build system deeply:
+- The 5 Pillars: Build the Offer (Days 1-30), Build the Audience (Days 30-60), Generate Profit (Days 60-90), TRUST, Repeat & Scale.
+- The Two Traps: Content-First trap (build followers who never buy) and Business-First trap (sell to strangers who don't trust you). The solution = offer first.
+- Dream Follower & Avatar (Ben & Grace method; 5 questions; attract them and repel everyone else; "one person on the other side of the screen").
+- TRUST framework: Targeted Authority, Relatable Humanity, Unshakable Story, Status-driven Admiration, Timeless Service.
+- Ikigai (love/good at/needs/paid for), BrandWidth (Past relatable / Present admirable / Future inspirational), Trust Equation (time x frequency x quality = minutes of trust; 420 minutes to a purchase; Google 7-11-4), Pub Chat (speak to ONE person), Origin Story (iceberg model), the Do-the-Work law (finish Core first; ignore everything else for 14 days), KPIs & TRUST Audit.
+
+EXTRA RULE: NEVER promise income results. Success stories are examples of what happens when people do the work — never guarantees.
+""" + COACHING_RULES + """
 {memory}
 
 COURSE CONTEXT:
@@ -127,6 +161,7 @@ def format_docs(docs):
 class ChatRequest(BaseModel):
     question: str
     member_id: Optional[str] = None
+    coach_id: Optional[str] = "e5"
 
 class MemberProfile(BaseModel):
     member_id: str
@@ -194,21 +229,29 @@ async def chat(req: ChatRequest):
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty")
     try:
+        coach = (req.coach_id or "e5").strip().lower()
+        if coach == "builder":
+            use_retriever = builder_retriever
+            use_prompt = BUILDER_PROMPT
+        else:
+            use_retriever = retriever
+            use_prompt = E5_PROMPT
+
         memory_block = "MEMBER MEMORY: (no member attached - generic coaching)"
         if req.member_id:
             ensure_member(req.member_id)
             memory_block = build_memory_block(req.member_id)
 
-        docs = retriever.invoke(req.question)
+        docs = use_retriever.invoke(req.question)
         context = format_docs(docs)
-        answer = (prompt | llm | StrOutputParser()).invoke({
+        answer = (use_prompt | llm | StrOutputParser()).invoke({
             "memory": memory_block, "context": context, "question": req.question,
         })
 
         if req.member_id:
             save_memory(req.member_id, req.question, answer)
 
-        return {"status": "success", "answer": answer, "member_id": req.member_id}
+        return {"status": "success", "answer": answer, "member_id": req.member_id, "coach": coach}
     except Exception as e:
         print(f"❌ RAG FAILURE: {e}")
         raise HTTPException(status_code=500, detail=f"RAG failed: {e}")
