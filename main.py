@@ -3,6 +3,7 @@ import httpx
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 from langchain_community.vectorstores import SupabaseVectorStore
@@ -62,6 +63,10 @@ app.add_middleware(
 @app.get("/")
 def health():
     return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL}
+
+@app.get("/test")
+def test_page():
+    return FileResponse("chat_test.html")
 
 # ---------- CLIENTS ----------
 supabase = create_client(
