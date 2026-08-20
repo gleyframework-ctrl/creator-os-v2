@@ -42,10 +42,11 @@
   .bizCard label{font-size:11px;color:var(--muted);display:block;margin:10px 0 5px;}
   .bizCard select,.bizCard input,.bizCard textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
   .bizCard select:focus,.bizCard input:focus,.bizCard textarea:focus{border-color:var(--gold);}
-  .bizCard textarea{height:200px;resize:vertical;}
+  .bizCard textarea{height:180px;resize:vertical;}
   #assetsList{margin-top:14px;display:flex;flex-wrap:wrap;}
-  .bizBtns{display:flex;gap:10px;margin-top:18px;}
-  .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;}
+  .bizBtns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+  .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;min-width:120px;}
+  #wizardBar{display:none;background:#0e1628;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:12px;color:var(--gold);font-size:13px;}
 </style>
 </head>
 <body>
@@ -83,21 +84,25 @@
   </div>
 </div>
 
-<!-- BUSINESS SECTIONS MODAL -->
+<!-- BUSINESS X-RAY MODAL -->
 <div id="businessModal">
   <div class="bizCard">
-    <h2 id="bizTitle">📋 My Business Sections</h2>
-    <p id="bizDesc">Add your business section by section. The coach reads every section and will ask for what's missing.</p>
+    <h2 id="bizTitle">📋 Business X-Ray</h2>
+    <p id="bizDesc">The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.</p>
+    <div id="wizardBar"></div>
     <label id="lblSection">SECTION</label>
     <select id="assetType"></select>
     <label id="lblTitle">TITLE (OPTIONAL)</label>
     <input id="assetTitle" placeholder="e.g. Main sales page v2">
     <label id="lblUrl">LINK / URL (OPTIONAL)</label>
     <input id="assetUrl" placeholder="https://…">
+    <label id="lblMetrics">KEY METRIC (OPTIONAL)</label>
+    <input id="assetMetrics" placeholder="e.g. opt-in 8%">
     <label id="lblCopy">PASTE THE COPY / CONTENT</label>
     <textarea id="businessInput" placeholder="Paste the full copy of this section here…"></textarea>
     <div id="assetsList"></div>
     <div class="bizBtns">
+      <button id="xrayBtn" onclick="startXray()" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">🩺 Guided X-Ray</button>
       <button id="bizSave" onclick="saveBusinessContext()" style="background:var(--gold);color:#10131a;">💾 Save Section</button>
       <button id="bizCancel" onclick="closeBusinessModal()" style="background:#233047;color:var(--text);">Close</button>
     </div>
@@ -112,24 +117,47 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',biz:'📋 My Business',bizTitle:'📋 My Business Sections',bizDesc:"Add your business section by section. The coach reads every section and will ask for what's missing.",lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',bizCancel:'Close',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Add your first one above.'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',biz:'📋 أعمالي',bizTitle:'📋 أقسام أعمالي',bizDesc:'أضف عملك قسماً قسماً. يقرأ المدرب كل قسم وسيطلب ما ينقص.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',bizCancel:'إغلاق',bizSaved:'✅ تم حفظ القسم! يمكن للمدرب مراجعته الآن.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد. أضف أول قسم من الأعلى.'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',biz:'📋 My Business',bizTitle:'📋 Business X-Ray',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel — ask it: "Where is my funnel leaking?"'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',biz:'📋 أعمالي',bizTitle:'📋 فحص الأعمال',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم! يمكن للمدرب مراجعته الآن.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد. شغّل الفحص الموجّه أو أضف قسماً يدوياً.',xrayDone:'🎉 اكتمل الفحص! المدرب يرى قمعك كاملاً — اسأله: "أين يسرب قمعي؟"'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
 
 const ASSETS={
- sales_page:['🛒 Sales Page','🛒 صفحة البيع'],
- squeeze_page:['🧲 Squeeze Page','🧲 صفحة الالتقاط'],
- quiz_page:['❓ Quiz Page','❓ صفحة الاختبار'],
- thank_you_page:['🙏 Thank-You Page','🙏 صفحة الشكر'],
- email_copy:['✉️ Email Copy','✉️ نسخ الرسائل'],
- social_channel:['📺 Social / YouTube','📺 قناة اجتماعية / يوتيوب'],
- customer_avatar:['👤 Customer Avatar','👤 العميل المثالي'],
- business_details:['🏢 Business Details','🏢 تفاصيل العمل'],
- other:['📎 Other',' أخرى']
+ offer:['🎯 The Offer','🎯 العرض'],
+ avatar:['👤 Avatar & Awareness','👤 العميل والوعي'],
+ customer_voice:['🗣️ Customer Voice','🗣️ صوت العميل'],
+ traffic:['📢 Traffic',' الزيارات'],
+ capture:['🧲 Capture (Squeeze/Quiz)','🧲 الالتقاط'],
+ nurture:['✉️ Nurture (Emails)','✉️ الرسائل'],
+ convert:['💰 Convert (Sales Page)','💰 صفحة البيع'],
+ retain:['🤝 Retain (Thank-you/Upsell)','🤝 الاحتفاظ'],
+ numbers:['📊 Numbers & Goal','📊 الأرقام والهدف'],
+ story:['🧬 Story & Brand Voice','🧬 القصة والنبرة'],
+ sales_page:['🛒 Sales Page (old)','🛒 صفحة البيع (قديم)'],
+ squeeze_page:['🧲 Squeeze (old)','🧲 التقاط (قديم)'],
+ quiz_page:['❓ Quiz (old)','❓ اختبار (قديم)'],
+ thank_you_page:['🙏 Thank-you (old)','🙏 شكر (قديم)'],
+ email_copy:['✉️ Emails (old)','✉️ رسائل (قديم)'],
+ social_channel:['📺 Social (old)','📺 اجتماعي (قديم)'],
+ customer_avatar:['👤 Avatar (old)','👤 عميل (قديم)'],
+ business_details:['🏢 Details (old)','🏢 تفاصيل (قديم)'],
+ other:['📎 Other','📎 أخرى']
 };
-let assetsCache=[];
+
+const XRAY_STEPS=[
+ {k:'offer',q:['What do you sell? Promise, price, guarantee, delivery model.','ماذا تبيع؟ الوعد، السعر، الضمان، نموذج التوصيل.'],m:['Price point','نقطة السعر']},
+ {k:'avatar',q:['Who exactly is your customer? Beliefs, fears, what they already tried.','من عميلك بالضبط؟ معتقداته، مخاوفه، وما جرّبه سابقاً.'],m:['Awareness level','مستوى الوعي']},
+ {k:'customer_voice',q:['Paste 3-5 REAL customer messages / testimonials / reviews (exact words).','الصق 3-5 رسائل/شهادات حقيقية من عملائك (بنصها).'],m:['','']},
+ {k:'traffic',q:['Where does traffic come from? Paste ad copy or describe social/YouTube.','من أين تأتي الزيارات؟ الصق نص إعلان أو صف قنواتك.'],m:['Followers & clicks/mo','متابعون ونقرات/شهر']},
+ {k:'capture',q:['Paste your squeeze/quiz page copy (headline + bullets).','الصق نص صفحة الالتقاط/الاختبار (العنوان + النقاط).'],m:['Opt-in %','نسبة الالتقاط %']},
+ {k:'nurture',q:['Paste your email sequence or your best email.','الصق تسلسل رسائلك أو أفضل رسالة لديك.'],m:['Open % / Click %','فتح % / نقر %']},
+ {k:'convert',q:['Paste your sales page (headline + first sections).','الصق صفحة البيع (العنوان + الأقسام الأولى).'],m:['Conversion %','نسبة التحويل %']},
+ {k:'retain',q:['Paste thank-you / onboarding / upsell copy.','الصق نص صفحة الشكر/التهيئة/البيع الإضافي.'],m:['Refund %','نسبة الاسترداد %']},
+ {k:'numbers',q:['Current monthly revenue? Your 90-day goal?','إيرادك الشهري الحالي؟ هدفك في 90 يوماً؟'],m:['Revenue now → goal','الإيراد الآن → الهدف']},
+ {k:'story',q:['Your origin story in 3-5 sentences + your brand tone.','قصتك الأصل في 3-5 جمل + نبرة علامتك.'],m:['','']}
+];
+let assetsCache=[], wizardMode=false, xrayIndex=-1;
 
 function applyLang(){
   document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
@@ -149,10 +177,10 @@ function applyLang(){
 }
 function setLang(l){LANG=l;applyLang();}
 
-/* ---------- BUSINESS SECTIONS ---------- */
+/* ---------- X-RAY PANEL ---------- */
 function fillAssetOptions(){
   const sel=$('assetType'); sel.innerHTML='';
-  Object.keys(ASSETS).forEach(k=>{
+  Object.keys(ASSETS).slice(0,10).forEach(k=>{
     const o=document.createElement('option');
     o.value=k;
     o.textContent=(ASSETS[k])[LANG==='ar'?1:0];
@@ -170,11 +198,12 @@ function renderAssets(){
     const chip=document.createElement('button');
     chip.className='langBtn';
     chip.style.margin='3px';
-    chip.textContent='✏️ '+label;
+    chip.textContent='✏️ '+label+(a.metrics?' ('+a.metrics+')':'');
     chip.onclick=()=>{
       $('assetType').value=a.asset_type;
       $('assetTitle').value=a.title||'';
       $('assetUrl').value=a.url||'';
+      $('assetMetrics').value=a.metrics||'';
       $('businessInput').value=a.content||'';
     };
     box.appendChild(chip);
@@ -198,15 +227,45 @@ function openBusinessModal(){
   $('lblSection').textContent=s.lblSection;
   $('lblTitle').textContent=s.lblTitle;
   $('lblUrl').textContent=s.lblUrl;
+  $('lblMetrics').textContent=s.lblMetrics;
   $('lblCopy').textContent=s.lblCopy;
   $('businessInput').placeholder=s.bizPh;
   $('bizSave').textContent=s.bizSave;
   $('bizCancel').textContent=s.bizCancel;
+  $('xrayBtn').textContent=s.xray;
+  wizardMode=false; xrayIndex=-1;
+  $('wizardBar').style.display='none';
+  $('assetType').disabled=false;
   fillAssetOptions();
   loadAssets();
   $('businessModal').style.display='block';
 }
 function closeBusinessModal(){$('businessModal').style.display='none';}
+function startXray(){
+  wizardMode=true; xrayIndex=0;
+  $('assetType').disabled=true;
+  $('xrayBtn').style.display='none';
+  showStep();
+}
+function showStep(){
+  if(xrayIndex>=XRAY_STEPS.length){
+    wizardMode=false; xrayIndex=-1;
+    $('wizardBar').style.display='none';
+    $('assetType').disabled=false;
+    $('xrayBtn').style.display='';
+    $('bizSave').textContent=S().bizSave;
+    alert(S().xrayDone);
+    loadAssets();
+    return;
+  }
+  const st=XRAY_STEPS[xrayIndex];
+  $('wizardBar').style.display='block';
+  $('wizardBar').textContent='🩺 '+(xrayIndex+1)+' / '+XRAY_STEPS.length+' — '+st.q[LANG==='ar'?1:0];
+  $('assetType').value=st.k;
+  $('assetMetrics').placeholder=st.m[LANG==='ar'?1:0];
+  $('bizSave').textContent=S().saveNext;
+  $('businessInput').value=''; $('assetTitle').value=''; $('assetUrl').value=''; $('assetMetrics').value='';
+}
 async function saveBusinessContext(){
   const mid=localStorage.getItem('e5_member_id');
   try{
@@ -216,11 +275,15 @@ async function saveBusinessContext(){
         asset_type:$('assetType').value,
         title:$('assetTitle').value.trim()||null,
         content:$('businessInput').value.trim()||null,
-        url:$('assetUrl').value.trim()||null
+        url:$('assetUrl').value.trim()||null,
+        metrics:$('assetMetrics').value.trim()||null
       })});
     if(!r.ok) throw 0;
-    alert(S().bizSaved);
-    $('businessInput').value=''; $('assetUrl').value=''; $('assetTitle').value='';
+    if(wizardMode){ xrayIndex++; showStep(); }
+    else{
+      alert(S().bizSaved);
+      $('businessInput').value=''; $('assetUrl').value=''; $('assetTitle').value=''; $('assetMetrics').value='';
+    }
     await loadAssets();
   }catch(e){alert(S().bizFail);}
 }
@@ -292,7 +355,7 @@ window.addEventListener('load',()=>{
   if(localStorage.getItem('e5_member_id')){
     $('memberTag').textContent=localStorage.getItem('e5_name')||'MEMBER';
     showChat();
-    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! I remember you. Pick your coach above and let\'s continue your empire.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! أتذكرك جيداً. اختر مدربك من الأعلى ولْنُكمل إمبراطوريتك.'));
+    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Run the 🩺 Guided X-Ray in 📋 My Business so I can diagnose your funnel like a hired consultant.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! شغّل 🩺 الفحص الموجّه داخل 📋 أعمالي حتى أشخّص قمعك كمستشار معين.'));
     attachTTS(d);
   }
 });
@@ -324,7 +387,7 @@ function startCoaching(){
     body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
   $('memberTag').textContent=name;
   showChat();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Open 📋 My Business and add your sections (sales page, emails, avatar…) so I can coach your REAL business.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! افتح 📋 أعمالي وأضف أقسامك (صفحة البيع، الرسائل، العميل المثالي…) حتى أدرب عملك الفعلي.'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Open 📋 My Business → 🩺 Guided X-Ray and answer 10 quick questions. Then ask me: "Where is my funnel leaking?"','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! افتح 📋 أعمالي → 🩺 فحص موجّه وأجب عن 10 أسئلة سريعة. ثم اسألني: "أين يسرب قمعي؟"'));
   attachTTS(d);
 }
 
