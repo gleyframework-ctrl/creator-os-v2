@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v9.4-push2talk"
+APP_VERSION = "2026-08-20-aicoach-v9.5-saudi-voice"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -254,7 +254,7 @@ async def text_to_speech(req: dict):
                 raise HTTPException(status_code=500, detail="Voice generation failed")
             return Response(content=r.content, media_type="audio/mpeg")
 
-    voice = "ar-EG-ShakirNeural" if lang.startswith("ar") else "en-US-ChristopherNeural"
+    voice = "ar-SA-HamedNeural" if lang.startswith("ar") else "en-US-ChristopherNeural"
     try:
         buf = io.BytesIO()
         communicate = edge_tts.Communicate(text, voice)
