@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v9.5-saudi-voice"
+APP_VERSION = "2026-08-20-aicoach-v9.6-business-context"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -150,6 +150,7 @@ class MemberProfile(BaseModel):
     niche: Optional[str] = None
     current_stage: Optional[str] = None
     struggles: Optional[str] = None
+    business_context: Optional[str] = None
 
 # ---------- MEMORY ----------
 def ensure_member(member_id: str):
@@ -172,6 +173,9 @@ def build_memory_block(member_id: str) -> str:
     if p.get("niche"): lines.append(f"- Niche/Business: {p['niche']}")
     if p.get("current_stage"): lines.append(f"- Current stage: {p['current_stage']}")
     if p.get("struggles"): lines.append(f"- Known struggles: {p['struggles']}")
+    if p.get("business_context"):
+        lines.append("- MEMBER BUSINESS CONTEXT (their actual copy/offers/materials):")
+        lines.append(p["business_context"][:2000])
     if hist.data:
         lines.append("- Recent coaching sessions:")
         for h in reversed(hist.data):
@@ -196,7 +200,8 @@ async def register_member(profile: MemberProfile):
         row = {
             "member_id": profile.member_id, "name": profile.name,
             "niche": profile.niche, "current_stage": profile.current_stage,
-            "struggles": profile.struggles, "updated_at": datetime.now(timezone.utc).isoformat(),
+            "struggles": profile.struggles, "business_context": profile.business_context,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         supabase.table("members").upsert(row, on_conflict="member_id").execute()
         return {"status": "success", "member_id": profile.member_id}
