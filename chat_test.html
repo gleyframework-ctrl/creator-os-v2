@@ -29,11 +29,12 @@
   .msg.coach strong{color:var(--gold);}
   .tts-btn{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;margin-top:8px;padding:0;opacity:.85;}
   .tts-btn:hover{opacity:1;}
+  #imgChip{display:none;margin:8px 14px 0;padding:6px 12px;background:#233047;border:1px dashed var(--gold);border-radius:12px;color:var(--gold);font-size:12px;cursor:pointer;}
   #inputBar{display:flex;gap:10px;padding:14px;background:var(--panel);border-top:1px solid #2e3b55;}
   #userInput{flex:1;padding:13px;border-radius:12px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
   #userInput:focus{border-color:var(--gold);}
-  #micBtn{padding:0 16px;border:none;border-radius:12px;background:#233047;border:1px solid #33405a;font-size:16px;cursor:pointer;}
-  #micBtn.rec{background:#dc2626;border-color:#dc2626;}
+  .toolBtn{padding:0 14px;border:none;border-radius:12px;background:#233047;border:1px solid #33405a;font-size:16px;cursor:pointer;}
+  .toolBtn.rec{background:#dc2626;border-color:#dc2626;}
   #sendBtn{padding:0 22px;border:none;border-radius:12px;background:var(--gold);font-weight:700;cursor:pointer;color:#10131a;}
   #businessModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;}
   .bizCard{background:#1c2333;max-width:640px;margin:40px auto;padding:28px;border-radius:16px;border:2px solid var(--gold);}
@@ -77,11 +78,14 @@
 
 <div id="chatScreen">
   <div id="messages"></div>
+  <div id="imgChip" onclick="clearImage()"></div>
   <div id="inputBar">
     <input id="userInput" placeholder="Ask your coach anything…">
-    <button id="micBtn" onclick="toggleMic()">🎤</button>
+    <button class="toolBtn" id="imgBtn" onclick="pickImage()">📷</button>
+    <button class="toolBtn" id="micBtn" onclick="toggleMic()">🎤</button>
     <button id="sendBtn" onclick="send()">➤</button>
   </div>
+  <input type="file" id="imgFile" accept="image/*" style="display:none">
 </div>
 
 <!-- BUSINESS X-RAY MODAL -->
@@ -117,8 +121,8 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',biz:'📋 My Business',bizTitle:'📋 Business X-Ray',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel — ask it: "Where is my funnel leaking?"'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',biz:'📋 أعمالي',bizTitle:'📋 فحص الأعمال',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم! يمكن للمدرب مراجعته الآن.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد. شغّل الفحص الموجّه أو أضف قسماً يدوياً.',xrayDone:'🎉 اكتمل الفحص! المدرب يرى قمعك كاملاً — اسأله: "أين يسرب قمعي؟"'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',biz:'📋 My Business',bizTitle:'📋 Business X-Ray',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel — ask it: "Where is my funnel leaking?"'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',biz:'📋 أعمالي',bizTitle:'📋 فحص الأعمال',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم! يمكن للمدرب مراجعته الآن.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد. شغّل الفحص الموجّه أو أضف قسماً يدوياً.',xrayDone:'🎉 اكتمل الفحص! المدرب يرى قمعك كاملاً — اسأله: "أين يسرب قمعي؟"'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
@@ -127,7 +131,7 @@ const ASSETS={
  offer:['🎯 The Offer','🎯 العرض'],
  avatar:['👤 Avatar & Awareness','👤 العميل والوعي'],
  customer_voice:['🗣️ Customer Voice','🗣️ صوت العميل'],
- traffic:['📢 Traffic',' الزيارات'],
+ traffic:['📢 Traffic','📢 الزيارات'],
  capture:['🧲 Capture (Squeeze/Quiz)','🧲 الالتقاط'],
  nurture:['✉️ Nurture (Emails)','✉️ الرسائل'],
  convert:['💰 Convert (Sales Page)','💰 صفحة البيع'],
@@ -148,7 +152,7 @@ const ASSETS={
 const XRAY_STEPS=[
  {k:'offer',q:['What do you sell? Promise, price, guarantee, delivery model.','ماذا تبيع؟ الوعد، السعر، الضمان، نموذج التوصيل.'],m:['Price point','نقطة السعر']},
  {k:'avatar',q:['Who exactly is your customer? Beliefs, fears, what they already tried.','من عميلك بالضبط؟ معتقداته، مخاوفه، وما جرّبه سابقاً.'],m:['Awareness level','مستوى الوعي']},
- {k:'customer_voice',q:['Paste 3-5 REAL customer messages / testimonials / reviews (exact words).','الصق 3-5 رسائل/شهادات حقيقية من عملائك (بنصها).'],m:['','']},
+ {k:'customer_voice',q:['Paste 3-5 REAL customer messages / testimonials (exact words).','الصق 3-5 رسائل/شهادات حقيقية من عملائك (بنصها).'],m:['','']},
  {k:'traffic',q:['Where does traffic come from? Paste ad copy or describe social/YouTube.','من أين تأتي الزيارات؟ الصق نص إعلان أو صف قنواتك.'],m:['Followers & clicks/mo','متابعون ونقرات/شهر']},
  {k:'capture',q:['Paste your squeeze/quiz page copy (headline + bullets).','الصق نص صفحة الالتقاط/الاختبار (العنوان + النقاط).'],m:['Opt-in %','نسبة الالتقاط %']},
  {k:'nurture',q:['Paste your email sequence or your best email.','الصق تسلسل رسائلك أو أفضل رسالة لديك.'],m:['Open % / Click %','فتح % / نقر %']},
@@ -158,6 +162,7 @@ const XRAY_STEPS=[
  {k:'story',q:['Your origin story in 3-5 sentences + your brand tone.','قصتك الأصل في 3-5 جمل + نبرة علامتك.'],m:['','']}
 ];
 let assetsCache=[], wizardMode=false, xrayIndex=-1;
+let pendingImage=null;
 
 function applyLang(){
   document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
@@ -176,6 +181,22 @@ function applyLang(){
   localStorage.setItem('e5_lang',LANG);
 }
 function setLang(l){LANG=l;applyLang();}
+
+/* ---------- SCREENSHOT VISION ---------- */
+function pickImage(){$('imgFile').click();}
+function clearImage(){pendingImage=null;$('imgFile').value='';$('imgChip').style.display='none';}
+$('imgFile').addEventListener('change',e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  if(f.size>4*1024*1024){alert(S().imgBig);$('imgFile').value='';return;}
+  const rd=new FileReader();
+  rd.onload=()=>{
+    pendingImage=rd.result.split(',')[1];
+    $('imgChip').style.display='inline-block';
+    $('imgChip').textContent='🖼️ '+f.name+' ✕';
+  };
+  rd.readAsDataURL(f);
+});
 
 /* ---------- X-RAY PANEL ---------- */
 function fillAssetOptions(){
@@ -236,6 +257,7 @@ function openBusinessModal(){
   wizardMode=false; xrayIndex=-1;
   $('wizardBar').style.display='none';
   $('assetType').disabled=false;
+  $('xrayBtn').style.display='';
   fillAssetOptions();
   loadAssets();
   $('businessModal').style.display='block';
@@ -355,7 +377,7 @@ window.addEventListener('load',()=>{
   if(localStorage.getItem('e5_member_id')){
     $('memberTag').textContent=localStorage.getItem('e5_name')||'MEMBER';
     showChat();
-    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Run the 🩺 Guided X-Ray in 📋 My Business so I can diagnose your funnel like a hired consultant.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! شغّل 🩺 الفحص الموجّه داخل 📋 أعمالي حتى أشخّص قمعك كمستشار معين.'));
+    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! You can now attach a 📷 screenshot of any page and I will SEE it and analyze it like a top consultant.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! يمكنك الآن إرفاق 📷 لقطة لأي صفحة وسأراها وأحللها كمستشار خبير.'));
     attachTTS(d);
   }
 });
@@ -387,7 +409,7 @@ function startCoaching(){
     body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
   $('memberTag').textContent=name;
   showChat();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Open 📋 My Business → 🩺 Guided X-Ray and answer 10 quick questions. Then ask me: "Where is my funnel leaking?"','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! افتح 📋 أعمالي → 🩺 فحص موجّه وأجب عن 10 أسئلة سريعة. ثم اسألني: "أين يسرب قمعي؟"'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Attach a 📷 screenshot of your page, or open 📋 My Business → 🩺 Guided X-Ray.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! أرفق 📷 لقطة لصفحتك، أو افتح 📋 أعمالي → 🩺 فحص موجّه.'));
   attachTTS(d);
 }
 
@@ -404,13 +426,26 @@ function addMsg(who,html){
 
 async function send(){
   const q=$('userInput').value.trim();
-  if(!q)return;
+  if(!q && !pendingImage)return;
   $('userInput').value='';
-  addMsg('user',esc(q));
+  addMsg('user',(pendingImage?'🖼️ ':'')+esc(q||T('Analyze this screenshot.','حلّل هذه اللقطة.')));
   const t=addMsg('coach',T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>'));
   try{
+    let visionAnalysis=null;
+    if(pendingImage){
+      t.innerHTML=S().looking;
+      try{
+        const vr=await fetch('/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({image_b64:pendingImage,context:localStorage.getItem('e5_niche')||''})});
+        if(vr.ok){ const vd=await vr.json(); visionAnalysis=vd.analysis; }
+      }catch(e){}
+      clearImage();
+      t.innerHTML=T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>');
+    }
     const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,member_id:localStorage.getItem('e5_member_id'),coach_id:$('coachSelect').value,language:LANG})});
+      body:JSON.stringify({question:q||T('Analyze this screenshot of my page — what should I fix?','حلّل هذه اللقطة لصفحتي — ماذا يجب أن أصلح؟'),
+        member_id:localStorage.getItem('e5_member_id'),coach_id:$('coachSelect').value,language:LANG,
+        vision_analysis:visionAnalysis})});
     const d=await r.json();
     t.innerHTML=md(d.answer||T('I could not process that. Please try again.','لم أستطع معالجة ذلك. حاول مجدداً.'));
     attachTTS(t);
