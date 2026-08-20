@@ -36,12 +36,15 @@
   #micBtn.rec{background:#dc2626;border-color:#dc2626;}
   #sendBtn{padding:0 22px;border:none;border-radius:12px;background:var(--gold);font-weight:700;cursor:pointer;color:#10131a;}
   #businessModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;}
-  .bizCard{background:#1c2333;max-width:600px;margin:50px auto;padding:30px;border-radius:16px;border:2px solid var(--gold);}
-  .bizCard h2{color:var(--gold);margin-bottom:10px;}
-  .bizCard p{color:var(--muted);font-size:13px;margin-bottom:20px;}
-  .bizCard textarea{width:100%;height:280px;padding:12px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;resize:vertical;}
-  .bizCard textarea:focus{border-color:var(--gold);}
-  .bizBtns{display:flex;gap:10px;margin-top:20px;}
+  .bizCard{background:#1c2333;max-width:640px;margin:40px auto;padding:28px;border-radius:16px;border:2px solid var(--gold);}
+  .bizCard h2{color:var(--gold);margin-bottom:8px;}
+  .bizCard p{color:var(--muted);font-size:13px;margin-bottom:16px;}
+  .bizCard label{font-size:11px;color:var(--muted);display:block;margin:10px 0 5px;}
+  .bizCard select,.bizCard input,.bizCard textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
+  .bizCard select:focus,.bizCard input:focus,.bizCard textarea:focus{border-color:var(--gold);}
+  .bizCard textarea{height:200px;resize:vertical;}
+  #assetsList{margin-top:14px;display:flex;flex-wrap:wrap;}
+  .bizBtns{display:flex;gap:10px;margin-top:18px;}
   .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;}
 </style>
 </head>
@@ -80,15 +83,23 @@
   </div>
 </div>
 
-<!-- BUSINESS CONTEXT MODAL -->
+<!-- BUSINESS SECTIONS MODAL -->
 <div id="businessModal">
   <div class="bizCard">
-    <h2 id="bizTitle">📋 My Business Context</h2>
-    <p id="bizDesc">Paste your sales copy, headlines, offers, emails, or any business materials. The coach will use this to give advice based on YOUR actual business.</p>
-    <textarea id="businessInput" placeholder="Paste your sales page copy, headlines, emails, offer descriptions…"></textarea>
+    <h2 id="bizTitle">📋 My Business Sections</h2>
+    <p id="bizDesc">Add your business section by section. The coach reads every section and will ask for what's missing.</p>
+    <label id="lblSection">SECTION</label>
+    <select id="assetType"></select>
+    <label id="lblTitle">TITLE (OPTIONAL)</label>
+    <input id="assetTitle" placeholder="e.g. Main sales page v2">
+    <label id="lblUrl">LINK / URL (OPTIONAL)</label>
+    <input id="assetUrl" placeholder="https://…">
+    <label id="lblCopy">PASTE THE COPY / CONTENT</label>
+    <textarea id="businessInput" placeholder="Paste the full copy of this section here…"></textarea>
+    <div id="assetsList"></div>
     <div class="bizBtns">
-      <button id="bizSave" onclick="saveBusinessContext()" style="background:var(--gold);color:#10131a;">💾 Save</button>
-      <button id="bizCancel" onclick="closeBusinessModal()" style="background:#233047;color:var(--text);">Cancel</button>
+      <button id="bizSave" onclick="saveBusinessContext()" style="background:var(--gold);color:#10131a;">💾 Save Section</button>
+      <button id="bizCancel" onclick="closeBusinessModal()" style="background:#233047;color:var(--text);">Close</button>
     </div>
   </div>
 </div>
@@ -101,11 +112,24 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',biz:'📋 My Business',bizTitle:'📋 My Business Context',bizDesc:'Paste your sales copy, headlines, offers, emails, or any business materials. The coach will use this to give advice based on YOUR actual business.',bizPh:'Paste your sales page copy, headlines, emails, offer descriptions…',bizSave:'💾 Save',bizCancel:'Cancel',bizSaved:'✅ Business context saved! The coach now knows your business.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',biz:'📋 أعمالي',bizTitle:'📋 سياق أعمالي',bizDesc:'الصق نسخ صفحات البيع، العناوين، العروض، الرسائل، أو أي مواد لعملك. سيستخدمها المدرب لتقديم نصائح مبنية على عملك الفعلي.',bizPh:'الصق هنا نسخ صفحات البيع، العناوين، الرسائل، وصف العروض…',bizSave:'💾 حفظ',bizCancel:'إلغاء',bizSaved:'✅ تم حفظ سياق أعمالك! المدرب الآن يعرف عملك.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',biz:'📋 My Business',bizTitle:'📋 My Business Sections',bizDesc:"Add your business section by section. The coach reads every section and will ask for what's missing.",lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',bizCancel:'Close',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Add your first one above.'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',biz:'📋 أعمالي',bizTitle:'📋 أقسام أعمالي',bizDesc:'أضف عملك قسماً قسماً. يقرأ المدرب كل قسم وسيطلب ما ينقص.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',bizCancel:'إغلاق',bizSaved:'✅ تم حفظ القسم! يمكن للمدرب مراجعته الآن.',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد. أضف أول قسم من الأعلى.'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
+
+const ASSETS={
+ sales_page:['🛒 Sales Page','🛒 صفحة البيع'],
+ squeeze_page:['🧲 Squeeze Page','🧲 صفحة الالتقاط'],
+ quiz_page:['❓ Quiz Page','❓ صفحة الاختبار'],
+ thank_you_page:['🙏 Thank-You Page','🙏 صفحة الشكر'],
+ email_copy:['✉️ Email Copy','✉️ نسخ الرسائل'],
+ social_channel:['📺 Social / YouTube','📺 قناة اجتماعية / يوتيوب'],
+ customer_avatar:['👤 Customer Avatar','👤 العميل المثالي'],
+ business_details:['🏢 Business Details','🏢 تفاصيل العمل'],
+ other:['📎 Other',' أخرى']
+};
+let assetsCache=[];
 
 function applyLang(){
   document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
@@ -125,28 +149,79 @@ function applyLang(){
 }
 function setLang(l){LANG=l;applyLang();}
 
-/* ---------- BUSINESS CONTEXT ---------- */
+/* ---------- BUSINESS SECTIONS ---------- */
+function fillAssetOptions(){
+  const sel=$('assetType'); sel.innerHTML='';
+  Object.keys(ASSETS).forEach(k=>{
+    const o=document.createElement('option');
+    o.value=k;
+    o.textContent=(ASSETS[k])[LANG==='ar'?1:0];
+    sel.appendChild(o);
+  });
+}
+function renderAssets(){
+  const box=$('assetsList'); box.innerHTML='';
+  if(!assetsCache.length){
+    box.innerHTML='<p style="color:var(--muted);font-size:12px;width:100%;">'+S().noAssets+'</p>';
+    return;
+  }
+  assetsCache.forEach(a=>{
+    const label=(ASSETS[a.asset_type]||['📎 '+a.asset_type,'📎 '+a.asset_type])[LANG==='ar'?1:0];
+    const chip=document.createElement('button');
+    chip.className='langBtn';
+    chip.style.margin='3px';
+    chip.textContent='✏️ '+label;
+    chip.onclick=()=>{
+      $('assetType').value=a.asset_type;
+      $('assetTitle').value=a.title||'';
+      $('assetUrl').value=a.url||'';
+      $('businessInput').value=a.content||'';
+    };
+    box.appendChild(chip);
+  });
+}
+async function loadAssets(){
+  const mid=localStorage.getItem('e5_member_id');
+  if(!mid) return;
+  try{
+    const r=await fetch('/api/assets?member_id='+encodeURIComponent(mid));
+    const d=await r.json();
+    assetsCache=d.assets||[];
+    renderAssets();
+  }catch(e){}
+}
 function openBusinessModal(){
   if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
   const s=S();
   $('bizTitle').textContent=s.bizTitle;
   $('bizDesc').textContent=s.bizDesc;
+  $('lblSection').textContent=s.lblSection;
+  $('lblTitle').textContent=s.lblTitle;
+  $('lblUrl').textContent=s.lblUrl;
+  $('lblCopy').textContent=s.lblCopy;
   $('businessInput').placeholder=s.bizPh;
   $('bizSave').textContent=s.bizSave;
   $('bizCancel').textContent=s.bizCancel;
-  $('businessInput').value=localStorage.getItem('e5_biz_ctx')||'';
+  fillAssetOptions();
+  loadAssets();
   $('businessModal').style.display='block';
 }
 function closeBusinessModal(){$('businessModal').style.display='none';}
 async function saveBusinessContext(){
-  const ctx=$('businessInput').value.trim();
+  const mid=localStorage.getItem('e5_member_id');
   try{
-    const r=await fetch('/api/member/register',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({member_id:localStorage.getItem('e5_member_id'),name:localStorage.getItem('e5_name'),niche:localStorage.getItem('e5_niche'),business_context:ctx})});
+    const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        member_id:mid,
+        asset_type:$('assetType').value,
+        title:$('assetTitle').value.trim()||null,
+        content:$('businessInput').value.trim()||null,
+        url:$('assetUrl').value.trim()||null
+      })});
     if(!r.ok) throw 0;
-    localStorage.setItem('e5_biz_ctx',ctx);
     alert(S().bizSaved);
-    closeBusinessModal();
+    $('businessInput').value=''; $('assetUrl').value=''; $('assetTitle').value='';
+    await loadAssets();
   }catch(e){alert(S().bizFail);}
 }
 
@@ -246,10 +321,10 @@ function startCoaching(){
   localStorage.setItem('e5_name',name);
   localStorage.setItem('e5_niche',niche);
   fetch('/api/member/register',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({member_id:mid,name:name,niche:niche,business_context:localStorage.getItem('e5_biz_ctx')||null})}).catch(()=>{});
+    body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
   $('memberTag').textContent=name;
   showChat();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Pick your coach above — or just ask me anything right now. Tip: press 📋 My Business to share your sales copy so I can coach your REAL business.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! اختر مدربك من الأعلى — أو اسألني أي شيء الآن. نصيحة: اضغط 📋 أعمالي لمشاركة نسخ بيعك حتى أدرب عملك الفعلي.'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Open 📋 My Business and add your sections (sales page, emails, avatar…) so I can coach your REAL business.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! افتح 📋 أعمالي وأضف أقسامك (صفحة البيع، الرسائل، العميل المثالي…) حتى أدرب عملك الفعلي.'));
   attachTTS(d);
 }
 
