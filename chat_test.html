@@ -437,8 +437,13 @@ async function send(){
       try{
         const vr=await fetch('/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({image_b64:pendingImage,context:localStorage.getItem('e5_niche')||''})});
-        if(vr.ok){ const vd=await vr.json(); visionAnalysis=vd.analysis; }
-        else { alert(S().visionErr); }
+        if(vr.ok){ 
+          const vd=await vr.json(); 
+          visionAnalysis=vd.analysis; 
+        } else { 
+          const ed=await vr.json().catch(()=>null); 
+          alert(S().visionErr+(ed&&ed.detail?'\n\n'+ed.detail:'')); 
+        }
       }catch(e){ alert(S().visionErr); }
       clearImage();
       t.innerHTML=T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>');
