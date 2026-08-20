@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Response, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_groq import ChatGroq
@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v11.0-operator"
+APP_VERSION = "2026-08-21-aicoach-v12-team"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -32,7 +32,7 @@ PREFERRED_MODELS = [
 ASSET_TYPES = ["offer", "avatar", "customer_voice", "traffic", "capture",
                "nurture", "convert", "retain", "numbers", "story",
                "sales_page", "squeeze_page", "quiz_page", "thank_you_page",
-               "email_copy", "social_channel", "customer_avatar", "business_details", "other"]
+               "email_copy", "social_channel", "customer_avatar", "business_details", "competitor", "other"]
 
 ASSET_KEYWORDS = [
     (["convert", "sales_page"], ["sales page", "salespage", "صفحة البيع"]),
@@ -124,13 +124,7 @@ ABSOLUTE RULES (breaking any of them = failure):
 
 21. 90-DAY PLAN MINDSET. Think in 3 TTB phases (Offer 1-30, Audience 30-60, Profit 60-90). Every answer should map to the member's current phase and move them toward the next milestone.
 
-22. FUNNEL HACK MODE. When the member asks to hack/analyze a competitor, run a 5-part structural teardown:
-   - HOOK (first 3 seconds / headline pattern)
-   - MECHANISM (the unique angle)
-   - OFFER (what's promised)
-   - PROOF (testimonials, numbers, logos)
-   - CTA (the exact ask)
-   Then translate ONE structural element into THEIR own business (use their avatar + niche + existing assets). Never copy words — copy structures.
+22. FUNNEL HACK MODE. When the member asks to hack/analyze a competitor, run a 5-part structural teardown (HOOK / MECHANISM / OFFER / PROOF / CTA) plus a DESIGN HACK (hierarchy, colors, typography, trust placement, mobile), then translate the best stolen structure into THEIR business using their X-Ray. Never copy words — copy structures.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — an OPERATING PARTNER, not just an advisor. You COACH, you don't lecture.
@@ -159,7 +153,7 @@ class ChatRequest(BaseModel):
     coach_id: Optional[str] = "e5"
     language: Optional[str] = "en"
     vision_analysis: Optional[str] = None
-    mode: Optional[str] = None  # "normal", "hack", "checkin"
+    mode: Optional[str] = None
 
 class MemberProfile(BaseModel):
     member_id: str
@@ -180,16 +174,57 @@ class AssetSave(BaseModel):
 class VisionRequest(BaseModel):
     image_b64: str
     context: Optional[str] = None
+    member_id: Optional[str] = None
 
 class PlanRequest(BaseModel):
     member_id: str
-    context: str  # full plan generation prompt
+    context: str
 
 class TaskUpdate(BaseModel):
     member_id: str
     task_id: str
-    status: str  # "done", "blocked", "skipped"
+    status: str
     evidence: Optional[str] = None
+
+class UnlockRequest(BaseModel):
+    member_id: str
+    code: str
+
+def get_tier(member_id: str) -> str:
+    try:
+        row = supabase.table("members").select("tier").eq("member_id", member_id).execute()
+        if row.data:
+            return row.data[0].get("tier") or "free"
+    except Exception:
+        pass
+    return "free"
+
+@app.post("/api/unlock")
+async def unlock(req: UnlockRequest):
+    try:
+        code_row = supabase.table("access_codes").select("*").eq("code", req.code.strip().upper()).execute()
+        if not code_row.data:
+            raise HTTPException(status_code=404, detail="Invalid code")
+        c = code_row.data[0]
+        if c.get("used_by") and c["used_by"] != req.member_id:
+            raise HTTPException(status_code=409, detail="Code already used")
+        ensure_member(req.member_id)
+        supabase.table("access_codes").update({
+            "used_by": req.member_id, "used_at": datetime.now(timezone.utc).isoformat()
+        }).eq("code", req.code.strip().upper()).execute()
+        supabase.table("members").update({
+            "premium": True, "tier": c["tier"],
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }).eq("member_id", req.member_id).execute()
+        return {"status": "success", "tier": c["tier"]}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unlock failed: {e}")
+
+@app.get("/api/member/tier")
+async def member_tier(member_id: str):
+    return {"tier": get_tier(member_id)}
 
 def ensure_member(member_id: str):
     existing = supabase.table("members").select("member_id").eq("member_id", member_id).execute()
@@ -308,6 +343,8 @@ async def list_assets(member_id: str):
 @app.post("/api/plan/generate")
 async def generate_plan(req: PlanRequest):
     try:
+        if get_tier(req.member_id) != "partner":
+            raise HTTPException(status_code=403, detail="PARTNER tier required")
         existing = supabase.table("member_plan").select("id").eq("member_id", req.member_id).execute()
         if existing.data:
             return {"status": "exists", "count": len(existing.data)}
@@ -387,14 +424,13 @@ VISION_PROMPT = ("You are a top-tier direct-response funnel analyst. "
                  "1) page type; 2) exact headline; 3) promise/offer; 4) CTA; "
                  "5) trust elements; 6) top 3 weaknesses. Max 250 words.")
 
-HACK_PROMPT = ("You are a top-tier direct-response funnel hacker (a $10K/month consultant). "
-               "This screenshot is a COMPETITOR's funnel. Run a 5-part structural teardown: "
-               "1) HOOK — first 3 seconds / headline pattern; "
-               "2) MECHANISM — the unique angle they use; "
-               "3) OFFER — what's promised and how it's packaged; "
-               "4) PROOF — testimonials, numbers, logos, guarantees; "
-               "5) CTA — the exact ask and urgency. "
-               "Quote exactly what you see. Max 300 words.")
+HACK_PROMPT = ("You are a top-tier direct-response funnel hacker AND conversion designer (a $10K/month consultant). "
+               "This screenshot is a COMPETITOR's funnel. Produce: "
+               "A) FUNNEL HACK — 5-part structural teardown: 1) HOOK (first 3 seconds / headline pattern); 2) MECHANISM (unique angle); 3) OFFER (promise + packaging); 4) PROOF (testimonials, numbers, guarantees); 5) CTA (exact ask + urgency). "
+               "B) DESIGN HACK — visual analysis: above-the-fold clarity, visual hierarchy (what the eye sees 1st/2nd/3rd), color & contrast psychology, typography vibe, trust-signal placement, mobile readability. "
+               "C) ADAPT — using the MEMBER's own X-Ray (niche, avatar, offer, metrics, current plan phase), translate the best stolen structure + design move into THEIR business: a rewritten headline, a mechanism name, and one concrete design change. "
+               "Quote exactly what you see in the competitor. Max 400 words. "
+               "End with EXACTLY one final line starting with 'TASK: ' containing the single concrete action the member should do this week.")
 
 async def gemini_list_vision_models() -> list:
     try:
@@ -435,6 +471,8 @@ async def gemini_vision(b64: str, prompt: str) -> str:
 
 @app.post("/api/vision")
 async def vision_analyze(req: VisionRequest):
+    if req.member_id and get_tier(req.member_id) == "free":
+        raise HTTPException(status_code=403, detail="LEAD or PARTNER tier required")
     prompt = VISION_PROMPT + (f"\nMember context: {req.context}" if req.context else "")
     vision_model = VISION_CHOSEN or pick_vision_model()
     if vision_model:
@@ -494,8 +532,7 @@ async def chat(req: ChatRequest):
                 except Exception: pass
         question_text = req.question
         if mode == "hack":
-            question_text = (req.question + "\n\n[MODE: FUNNEL HACK — Run a 5-part structural teardown "
-                            "(HOOK/MECHANISM/OFFER/PROOF/CTA) then translate ONE structure for the member's own business.]")
+            question_text = (req.question + "\n\n[MODE: FUNNEL HACK — " + HACK_PROMPT + "]")
         elif mode == "checkin" and req.vision_analysis:
             question_text = (req.question + f"\n\n[MODE: TASK CHECKIN — They claim they did the task. "
                             f"VISION ANALYSIS of their evidence: {req.vision_analysis[:3000]}. "
@@ -505,6 +542,36 @@ async def chat(req: ChatRequest):
         answer = (use_prompt | llm | StrOutputParser()).invoke({
             "memory": memory_block, "context": context, "question": question_text + lang_note,
         })
+        if req.member_id and mode == "hack":
+            try:
+                supabase.table("member_assets").insert({
+                    "member_id": req.member_id, "asset_type": "competitor",
+                    "title": "Competitor hack", "content": (req.vision_analysis or answer)[:6000],
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }).execute()
+            except Exception as e:
+                print(f"⚠️ HACK ASSET SAVE FAILED: {e}")
+            for line in answer.splitlines():
+                if line.strip().upper().startswith("TASK:"):
+                    task_title = line.strip()[5:].strip()[:120]
+                    if task_title:
+                        try:
+                            pend = (supabase.table("member_plan").select("week,phase")
+                                    .eq("member_id", req.member_id).eq("status", "pending")
+                                    .order("week").limit(1).execute())
+                            wk = pend.data[0]["week"] if pend.data else 1
+                            ph = pend.data[0]["phase"] if pend.data else 1
+                            supabase.table("member_plan").insert({
+                                "member_id": req.member_id, "phase": ph, "week": wk,
+                                "task_id": f"hack{int(datetime.now(timezone.utc).timestamp())}",
+                                "title": task_title,
+                                "description": "Proposed by your coach from a competitor funnel hack.",
+                                "status": "pending",
+                            }).execute()
+                            answer += f"\n\n✅ Added to your plan (Week {wk}): {task_title}"
+                        except Exception as e:
+                            print(f"⚠️ HACK TASK SAVE FAILED: {e}")
+                    break
         if req.member_id: save_memory(req.member_id, req.question, answer)
         return {"status": "success", "answer": answer, "member_id": req.member_id, "coach": coach}
     except Exception as e:
