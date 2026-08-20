@@ -9,3 +9,4 @@ pydantic
 fastembed
 httpx
 edge-tts
+python-multipart
