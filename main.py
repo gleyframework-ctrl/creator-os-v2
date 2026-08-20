@@ -3,7 +3,7 @@ import io
 import httpx
 import edge_tts
 from datetime import datetime, timezone
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v9.3-voice-free"
+APP_VERSION = "2026-08-20-aicoach-v9.4-push2talk"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -59,7 +59,7 @@ app.add_middleware(
 
 @app.get("/")
 def health():
-    return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL, "tts": "elevenlabs" if ELEVEN_KEY else "edge-free"}
+    return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL, "tts": "elevenlabs" if ELEVEN_KEY else "edge-free", "stt": "groq-whisper-free"}
 
 @app.get("/test")
 def test_page():
@@ -233,7 +233,7 @@ async def chat(req: ChatRequest):
         print(f"❌ RAG FAILURE: {e}")
         raise HTTPException(status_code=500, detail=f"RAG failed: {e}")
 
-# ---------- VOICE PIPE (FREE EDGE ENGINE + ELEVENLABS UPGRADE SWITCH) ----------
+# ---------- VOICE OUT (TTS): FREE EDGE + ELEVENLABS UPGRADE SWITCH ----------
 @app.post("/api/tts")
 async def text_to_speech(req: dict):
     text = (req.get("text") or "").strip()
@@ -241,7 +241,6 @@ async def text_to_speech(req: dict):
     if not text:
         raise HTTPException(status_code=400, detail="Empty text")
 
-    # ENGINE A: ElevenLabs (only if key exists — premium upgrade path)
     if ELEVEN_KEY:
         voice_id = "pNInz6obpgDQGcFmaJgB"
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -255,7 +254,6 @@ async def text_to_speech(req: dict):
                 raise HTTPException(status_code=500, detail="Voice generation failed")
             return Response(content=r.content, media_type="audio/mpeg")
 
-    # ENGINE B: Microsoft Edge Neural TTS — FREE, no key
     voice = "ar-EG-ShakirNeural" if lang.startswith("ar") else "en-US-ChristopherNeural"
     try:
         buf = io.BytesIO()
@@ -267,6 +265,31 @@ async def text_to_speech(req: dict):
     except Exception as e:
         print(f"❌ TTS FAILURE: {e}")
         raise HTTPException(status_code=500, detail="Voice generation failed")
+
+# ---------- VOICE IN (STT): FREE GROQ WHISPER ----------
+@app.post("/api/stt")
+async def speech_to_text(file: UploadFile = File(...), language: str = Form("en")):
+    audio_bytes = await file.read()
+    files = {"file": (file.filename or "voice.webm", audio_bytes, file.content_type or "audio/webm")}
+    data = {"model": "whisper-large-v3"}
+    if (language or "en").lower().startswith("ar"):
+        data["language"] = "ar"
+    headers = {"Authorization": f"Bearer {GROQ_KEY}"}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            r = await client.post(
+                "https://api.groq.com/openai/v1/audio/transcriptions",
+                headers=headers, files=files, data=data,
+            )
+            if r.status_code != 200:
+                print(f"Whisper error: {r.text}")
+                raise HTTPException(status_code=500, detail="Transcription failed")
+            return {"text": r.json().get("text", "")}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ STT FAILURE: {e}")
+        raise HTTPException(status_code=500, detail="Transcription failed")
 
 if __name__ == "__main__":
     print(f"🔥 SERVER STARTING WITH MODEL: {CHOSEN_MODEL}")
