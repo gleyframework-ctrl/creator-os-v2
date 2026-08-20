@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v9.6-business-context"
+APP_VERSION = "2026-08-20-aicoach-v9.7-asset-sections"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -29,6 +29,20 @@ PREFERRED_MODELS = [
     "qwen/qwen3-32b",
     "llama-3.1-8b-instant",
     "mixtral-8x7b-32768",
+]
+
+ASSET_TYPES = ["sales_page", "squeeze_page", "quiz_page", "thank_you_page",
+               "email_copy", "social_channel", "customer_avatar", "business_details", "other"]
+
+ASSET_KEYWORDS = [
+    ("sales_page", ["sales page", "salespage", "صفحة البيع"]),
+    ("squeeze_page", ["squeeze", "lead magnet page", "صفحة الالتقاط"]),
+    ("quiz_page", ["quiz", "اختبار"]),
+    ("thank_you_page", ["thank you", "thankyou", "صفحة الشكر"]),
+    ("email_copy", ["email", "e-mail", "الرسائل", "رسالة"]),
+    ("social_channel", ["youtube", "instagram", "tiktok", "social", "channel", "يوتيوب", "انستغرام", "قناة"]),
+    ("customer_avatar", ["avatar", "العميل"]),
+    ("business_details", ["business details", "my offer", "تفاصيل"]),
 ]
 
 def pick_live_model() -> str:
@@ -104,6 +118,8 @@ ABSOLUTE RULES (breaking any of them = failure):
 7. SHORT AND HUMAN. 150-250 words. No essays/tables unless asked.
 
 8. NEVER INVENT. Only course context. Admit gaps honestly.
+
+9. USE THE ASSET INVENTORY. The memory lists the member's business sections on file. If their question needs a section that is MISSING (e.g. they ask about emails but no email_copy is on file), tell them to open the business panel and add it before you advise. If a "MEMBER ASSET UNDER REVIEW" is attached, analyze it deeply and specifically — quote its exact lines in your BEFORE/AFTER.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method. You COACH, you don't lecture.
@@ -152,6 +168,13 @@ class MemberProfile(BaseModel):
     struggles: Optional[str] = None
     business_context: Optional[str] = None
 
+class AssetSave(BaseModel):
+    member_id: str
+    asset_type: str
+    title: Optional[str] = None
+    content: Optional[str] = None
+    url: Optional[str] = None
+
 # ---------- MEMORY ----------
 def ensure_member(member_id: str):
     existing = supabase.table("members").select("member_id").eq("member_id", member_id).execute()
@@ -163,6 +186,7 @@ def build_memory_block(member_id: str) -> str:
         prof = supabase.table("members").select("*").eq("member_id", member_id).execute()
         hist = (supabase.table("chat_history").select("question, answer, created_at")
                 .eq("member_id", member_id).order("created_at", desc=True).limit(3).execute())
+        assets = supabase.table("member_assets").select("asset_type,title").eq("member_id", member_id).execute()
     except Exception:
         return "MEMBER MEMORY: (unavailable)"
     if not prof.data:
@@ -176,11 +200,31 @@ def build_memory_block(member_id: str) -> str:
     if p.get("business_context"):
         lines.append("- MEMBER BUSINESS CONTEXT (their actual copy/offers/materials):")
         lines.append(p["business_context"][:2000])
+    if assets.data:
+        types = sorted({a["asset_type"] for a in assets.data})
+        lines.append("- MEMBER BUSINESS SECTIONS ON FILE: " + ", ".join(types))
     if hist.data:
         lines.append("- Recent coaching sessions:")
         for h in reversed(hist.data):
             lines.append(f'  * Member asked: "{(h["question"] or "")[:150]}" -> You advised: "{(h["answer"] or "")[:150]}"')
     return "\n".join(lines)
+
+def find_asset_review(member_id: str, question: str) -> str:
+    try:
+        q = question.lower()
+        for atype, kws in ASSET_KEYWORDS:
+            if any(k in q for k in kws):
+                row = (supabase.table("member_assets").select("content,title,asset_type")
+                       .eq("member_id", member_id).eq("asset_type", atype).execute())
+                if row.data and (row.data[0].get("content") or "").strip():
+                    title = row.data[0].get("title") or ""
+                    return (f"\n- MEMBER ASSET UNDER REVIEW ({atype}"
+                            + (f": {title}" if title else "")
+                            + f"):\n{row.data[0]['content'][:6000]}")
+                break
+    except Exception as e:
+        print(f"⚠️ ASSET REVIEW FAILED: {e}")
+    return ""
 
 def save_memory(member_id: str, question: str, answer: str):
     try:
@@ -208,6 +252,36 @@ async def register_member(profile: MemberProfile):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Register failed: {e}")
 
+@app.post("/api/assets")
+async def save_asset(a: AssetSave):
+    if a.asset_type not in ASSET_TYPES:
+        raise HTTPException(status_code=400, detail="Unknown asset type")
+    try:
+        existing = (supabase.table("member_assets").select("id")
+                    .eq("member_id", a.member_id).eq("asset_type", a.asset_type).execute())
+        row = {
+            "member_id": a.member_id, "asset_type": a.asset_type,
+            "title": a.title, "content": a.content, "url": a.url,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        if existing.data:
+            supabase.table("member_assets").update(row).eq("id", existing.data[0]["id"]).execute()
+        else:
+            supabase.table("member_assets").insert(row).execute()
+        return {"status": "success", "asset_type": a.asset_type}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Asset save failed: {e}")
+
+@app.get("/api/assets")
+async def list_assets(member_id: str):
+    try:
+        rows = (supabase.table("member_assets")
+                .select("asset_type,title,url,content,updated_at")
+                .eq("member_id", member_id).execute())
+        return {"assets": rows.data or []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Asset list failed: {e}")
+
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
     if not req.question.strip():
@@ -225,6 +299,7 @@ async def chat(req: ChatRequest):
         if req.member_id:
             ensure_member(req.member_id)
             memory_block = build_memory_block(req.member_id)
+            memory_block += find_asset_review(req.member_id, req.question)
 
         docs = use_retriever.invoke(req.question)
         context = format_docs(docs)
