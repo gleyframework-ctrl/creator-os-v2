@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v10-vision"
+APP_VERSION = "2026-08-20-aicoach-v10.1-vision-fix"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -29,12 +29,6 @@ PREFERRED_MODELS = [
     "qwen/qwen3-32b",
     "llama-3.1-8b-instant",
     "mixtral-8x7b-32768",
-]
-
-VISION_MODELS = [
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "llama-3.2-90b-vision-preview",
-    "llama-3.2-11b-vision-preview",
 ]
 
 ASSET_TYPES = ["offer", "avatar", "customer_voice", "traffic", "capture",
@@ -70,16 +64,18 @@ def pick_live_model() -> str:
         return PREFERRED_MODELS[0]
 
 def pick_vision_model() -> str:
+    """Auto-detect ANY vision-capable model Groq currently offers."""
     try:
         r = httpx.get(
             "https://api.groq.com/openai/v1/models",
             headers={"Authorization": f"Bearer {GROQ_KEY}"},
             timeout=10,
         )
-        available = {m["id"] for m in r.json().get("data", [])}
-        for model in VISION_MODELS:
-            if model in available:
-                return model
+        available = [m["id"] for m in r.json().get("data", [])]
+        for pattern in ["llama-4-scout", "llama-4-maverick", "vision"]:
+            for mid in available:
+                if pattern in mid:
+                    return mid
         return ""
     except Exception:
         return ""
@@ -171,7 +167,7 @@ ABSOLUTE RULES (breaking any of them = failure):
 - CONVERT: "What is the ONE belief this page must change for the sale to happen?"
 - RETAIN: "What is the customer's first win within 48 hours?"
 
-19. VISION ANALYSIS. If a "MEMBER SCREENSHOT UNDER REVIEW" is attached, treat it as the source of truth: quote the exact headline you see, judge hook/clarity/avatar-match/hierarchy, and give ONE rewritten headline plus the single highest-impact visual fix.
+19. VISION ANALYSIS. If a "MEMBER SCREENSHOT UNDER REVIEW" is attached, treat it as the SOURCE OF TRUTH — even if it shows a different offer or audience than the member's file. Quote the exact headline you see, judge hook/clarity/avatar-match/hierarchy, and give ONE rewritten headline plus the single highest-impact fix.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method. You COACH, you don't lecture.
@@ -352,16 +348,17 @@ async def list_assets(member_id: str):
 # ---------- VISION (coach SEES screenshots) ----------
 @app.post("/api/vision")
 async def vision_analyze(req: VisionRequest):
-    if not VISION_CHOSEN:
+    vision_model = VISION_CHOSEN or pick_vision_model()
+    if not vision_model:
         raise HTTPException(status_code=500, detail="No vision model available")
     prompt = ("You are a top-tier direct-response funnel analyst (a $10K/month consultant). "
-              "This screenshot is a member's marketing/funnel page. Analyze: "
+              "This screenshot is a member's marketing/funnel page (it may be in Arabic — read it as-is and quote it as-is). Analyze: "
               "1) page type; 2) exact headline text visible; 3) the promise/offer; 4) the CTA; "
               "5) visible trust/proof elements; 6) the 3 most concrete weaknesses (hook, clarity, avatar match, hierarchy, mobile readability). "
               "Quote exactly what you see. Max 250 words."
               + (f"\nMember business context: {req.context}" if req.context else ""))
     payload = {
-        "model": VISION_CHOSEN,
+        "model": vision_model,
         "messages": [{"role": "user", "content": [
             {"type": "text", "text": prompt},
             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{req.image_b64}"}},
