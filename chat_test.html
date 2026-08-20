@@ -32,6 +32,8 @@
   #inputBar{display:flex;gap:10px;padding:14px;background:var(--panel);border-top:1px solid #2e3b55;}
   #userInput{flex:1;padding:13px;border-radius:12px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
   #userInput:focus{border-color:var(--gold);}
+  #micBtn{padding:0 16px;border:none;border-radius:12px;background:#233047;border:1px solid #33405a;font-size:16px;cursor:pointer;}
+  #micBtn.rec{background:#dc2626;border-color:#dc2626;}
   #sendBtn{padding:0 22px;border:none;border-radius:12px;background:var(--gold);font-weight:700;cursor:pointer;color:#10131a;}
 </style>
 </head>
@@ -64,6 +66,7 @@
   <div id="messages"></div>
   <div id="inputBar">
     <input id="userInput" placeholder="Ask your coach anything…">
+    <button id="micBtn" onclick="toggleMic()">🎤</button>
     <button id="sendBtn" onclick="send()">➤</button>
   </div>
 </div>
@@ -76,8 +79,8 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
@@ -119,6 +122,46 @@ function attachTTS(d){
     }catch(e){btn.innerHTML='❌';}
   };
   d.appendChild(btn);
+}
+
+/* ---------- PUSH-TO-TALK (FREE GROQ WHISPER) ---------- */
+let mediaRecorder=null, audioChunks=[], recording=false;
+async function toggleMic(){
+  if(!recording){
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder=new MediaRecorder(stream);
+      audioChunks=[];
+      mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+      mediaRecorder.onstop=async()=>{
+        stream.getTracks().forEach(t=>t.stop());
+        const blob=new Blob(audioChunks,{type:mediaRecorder.mimeType||'audio/webm'});
+        $('micBtn').textContent='⏳';
+        const fd=new FormData();
+        fd.append('file',blob,'voice.webm');
+        fd.append('language',LANG);
+        try{
+          const r=await fetch('/api/stt',{method:'POST',body:fd});
+          const d=await r.json();
+          $('micBtn').textContent='🎤';
+          if(d.text){ $('userInput').value=d.text; send(); }
+        }catch(e){
+          $('micBtn').textContent='🎤';
+          alert(S().voiceErr);
+        }
+      };
+      mediaRecorder.start();
+      recording=true;
+      $('micBtn').textContent='⏺️';
+      $('micBtn').classList.add('rec');
+    }catch(e){
+      alert(S().micErr);
+    }
+  }else{
+    mediaRecorder.stop();
+    recording=false;
+    $('micBtn').classList.remove('rec');
+  }
 }
 
 window.addEventListener('load',()=>{
