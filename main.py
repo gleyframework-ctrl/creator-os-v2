@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v9.7-asset-sections"
+APP_VERSION = "2026-08-20-aicoach-v9.8-xray"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -31,18 +31,19 @@ PREFERRED_MODELS = [
     "mixtral-8x7b-32768",
 ]
 
-ASSET_TYPES = ["sales_page", "squeeze_page", "quiz_page", "thank_you_page",
+ASSET_TYPES = ["offer", "avatar", "customer_voice", "traffic", "capture",
+               "nurture", "convert", "retain", "numbers", "story",
+               "sales_page", "squeeze_page", "quiz_page", "thank_you_page",
                "email_copy", "social_channel", "customer_avatar", "business_details", "other"]
 
 ASSET_KEYWORDS = [
-    ("sales_page", ["sales page", "salespage", "صفحة البيع"]),
-    ("squeeze_page", ["squeeze", "lead magnet page", "صفحة الالتقاط"]),
-    ("quiz_page", ["quiz", "اختبار"]),
-    ("thank_you_page", ["thank you", "thankyou", "صفحة الشكر"]),
-    ("email_copy", ["email", "e-mail", "الرسائل", "رسالة"]),
-    ("social_channel", ["youtube", "instagram", "tiktok", "social", "channel", "يوتيوب", "انستغرام", "قناة"]),
-    ("customer_avatar", ["avatar", "العميل"]),
-    ("business_details", ["business details", "my offer", "تفاصيل"]),
+    (["convert", "sales_page"], ["sales page", "salespage", "صفحة البيع"]),
+    (["capture", "squeeze_page", "quiz_page"], ["squeeze", "quiz", "lead magnet", "التقاط", "اختبار"]),
+    (["retain", "thank_you_page"], ["thank you", "thankyou", "شكر"]),
+    (["nurture", "email_copy"], ["email", "e-mail", "رسائل", "رسالة"]),
+    (["traffic", "social_channel"], ["youtube", "instagram", "tiktok", "social", "traffic", "ads", "يوتيوب", "قناة", "إعلان"]),
+    (["avatar", "customer_avatar"], ["avatar", "عميل"]),
+    (["offer"], ["offer", "عرض"]),
 ]
 
 def pick_live_model() -> str:
@@ -119,7 +120,11 @@ ABSOLUTE RULES (breaking any of them = failure):
 
 8. NEVER INVENT. Only course context. Admit gaps honestly.
 
-9. USE THE ASSET INVENTORY. The memory lists the member's business sections on file. If their question needs a section that is MISSING (e.g. they ask about emails but no email_copy is on file), tell them to open the business panel and add it before you advise. If a "MEMBER ASSET UNDER REVIEW" is attached, analyze it deeply and specifically — quote its exact lines in your BEFORE/AFTER.
+9. USE THE ASSET INVENTORY. The memory lists the member's business sections on file. If their question needs a section that is MISSING, tell them to open the business panel and add it before you advise. If a "MEMBER ASSET UNDER REVIEW" is attached, analyze it deeply — quote its exact lines in your BEFORE/AFTER.
+
+10. FUNNEL X-RAY. When the member's metrics exist, compare them to these benchmarks: opt-in rate 20-40% healthy / below 10% weak; email open 40-60% / below 25% weak; email click 5-15% / below 2% weak; sales page conversion (warm traffic) 2-5% / below 1% weak; refund rate below 10% healthy / above 15% weak. Name the SINGLE weakest stage first, then deep-dive that stage's copy. If metrics are missing, ask for the one number that matters most right now.
+
+11. CUSTOMER VOICE. If customer_voice is on file, use the customer's EXACT words when rewriting copy — their language converts better than the member's guesses.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method. You COACH, you don't lecture.
@@ -174,6 +179,7 @@ class AssetSave(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     url: Optional[str] = None
+    metrics: Optional[str] = None
 
 # ---------- MEMORY ----------
 def ensure_member(member_id: str):
@@ -186,7 +192,7 @@ def build_memory_block(member_id: str) -> str:
         prof = supabase.table("members").select("*").eq("member_id", member_id).execute()
         hist = (supabase.table("chat_history").select("question, answer, created_at")
                 .eq("member_id", member_id).order("created_at", desc=True).limit(3).execute())
-        assets = supabase.table("member_assets").select("asset_type,title").eq("member_id", member_id).execute()
+        assets = supabase.table("member_assets").select("asset_type,title,metrics").eq("member_id", member_id).execute()
     except Exception:
         return "MEMBER MEMORY: (unavailable)"
     if not prof.data:
@@ -201,8 +207,13 @@ def build_memory_block(member_id: str) -> str:
         lines.append("- MEMBER BUSINESS CONTEXT (their actual copy/offers/materials):")
         lines.append(p["business_context"][:2000])
     if assets.data:
-        types = sorted({a["asset_type"] for a in assets.data})
-        lines.append("- MEMBER BUSINESS SECTIONS ON FILE: " + ", ".join(types))
+        parts = []
+        for a in assets.data:
+            s = a["asset_type"]
+            if a.get("metrics"):
+                s += f" [metric: {a['metrics']}]"
+            parts.append(s)
+        lines.append("- MEMBER BUSINESS X-RAY ON FILE: " + " | ".join(parts))
     if hist.data:
         lines.append("- Recent coaching sessions:")
         for h in reversed(hist.data):
@@ -212,15 +223,18 @@ def build_memory_block(member_id: str) -> str:
 def find_asset_review(member_id: str, question: str) -> str:
     try:
         q = question.lower()
-        for atype, kws in ASSET_KEYWORDS:
+        for types, kws in ASSET_KEYWORDS:
             if any(k in q for k in kws):
-                row = (supabase.table("member_assets").select("content,title,asset_type")
-                       .eq("member_id", member_id).eq("asset_type", atype).execute())
-                if row.data and (row.data[0].get("content") or "").strip():
-                    title = row.data[0].get("title") or ""
-                    return (f"\n- MEMBER ASSET UNDER REVIEW ({atype}"
-                            + (f": {title}" if title else "")
-                            + f"):\n{row.data[0]['content'][:6000]}")
+                for atype in types:
+                    row = (supabase.table("member_assets").select("content,title,asset_type,metrics")
+                           .eq("member_id", member_id).eq("asset_type", atype).execute())
+                    if row.data and (row.data[0].get("content") or "").strip():
+                        a = row.data[0]
+                        head = f"\n- MEMBER ASSET UNDER REVIEW ({a['asset_type']}"
+                        if a.get("title"): head += f": {a['title']}"
+                        if a.get("metrics"): head += f" | metric: {a['metrics']}"
+                        head += "):\n"
+                        return head + (a["content"] or "")[:6000]
                 break
     except Exception as e:
         print(f"⚠️ ASSET REVIEW FAILED: {e}")
@@ -262,6 +276,7 @@ async def save_asset(a: AssetSave):
         row = {
             "member_id": a.member_id, "asset_type": a.asset_type,
             "title": a.title, "content": a.content, "url": a.url,
+            "metrics": a.metrics,
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         if existing.data:
@@ -276,7 +291,7 @@ async def save_asset(a: AssetSave):
 async def list_assets(member_id: str):
     try:
         rows = (supabase.table("member_assets")
-                .select("asset_type,title,url,content,updated_at")
+                .select("asset_type,title,url,content,metrics,updated_at")
                 .eq("member_id", member_id).execute())
         return {"assets": rows.data or []}
     except Exception as e:
