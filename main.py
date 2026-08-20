@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-19-aicoach-v9-council"
+APP_VERSION = "2026-08-19-aicoach-v9.1-bilingual"
 
 # ---------- SELF-HEALING MODEL DISCOVERY ----------
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
@@ -74,7 +74,6 @@ supabase = create_client(
 )
 embeddings = FastEmbedEmbeddings()
 
-# E5 vault
 vectorstore = SupabaseVectorStore(
     client=supabase,
     embedding=embeddings,
@@ -83,7 +82,6 @@ vectorstore = SupabaseVectorStore(
 )
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-# Builder vault
 builder_store = SupabaseVectorStore(
     client=supabase,
     embedding=embeddings,
@@ -117,8 +115,6 @@ ABSOLUTE RULES (breaking any of them = failure):
 7. SHORT AND HUMAN. 150-250 words max. Short paragraphs. No giant tables or essays unless asked. Talk like a wise friend over coffee.
 
 8. NEVER INVENT. Use ONLY the course context provided. If the context doesn't cover the topic, say so honestly and coach from first principles.
-
-9. LANGUAGE. Respond in the language the member writes in (English or Arabic).
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — a world-class business coach trained in the Socratic method and ICF-level coaching. You are NOT a professor and NOT a textbook. You COACH.
@@ -162,6 +158,7 @@ class ChatRequest(BaseModel):
     question: str
     member_id: Optional[str] = None
     coach_id: Optional[str] = "e5"
+    language: Optional[str] = "en"
 
 class MemberProfile(BaseModel):
     member_id: str
@@ -230,6 +227,13 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=400, detail="Question cannot be empty")
     try:
         coach = (req.coach_id or "e5").strip().lower()
+        lang = (req.language or "en").strip().lower()
+
+        if lang.startswith("ar"):
+            lang_note = "\n\n[SYSTEM LANGUAGE DIRECTIVE: The member chose ARABIC. You MUST respond ENTIRELY in Arabic — warm, clear, professional coaching tone. Keep framework names like TRUST and Dream Avatar in English where natural.]"
+        else:
+            lang_note = "\n\n[SYSTEM LANGUAGE DIRECTIVE: Respond in English.]"
+
         if coach == "builder":
             use_retriever = builder_retriever
             use_prompt = BUILDER_PROMPT
@@ -245,7 +249,7 @@ async def chat(req: ChatRequest):
         docs = use_retriever.invoke(req.question)
         context = format_docs(docs)
         answer = (use_prompt | llm | StrOutputParser()).invoke({
-            "memory": memory_block, "context": context, "question": req.question,
+            "memory": memory_block, "context": context, "question": req.question + lang_note,
         })
 
         if req.member_id:
