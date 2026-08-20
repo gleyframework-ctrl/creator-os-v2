@@ -27,6 +27,8 @@
   .msg.user{align-self:flex-end;background:var(--user);border-bottom-right-radius:4px;}
   .msg.coach{align-self:flex-start;background:var(--coach);border:1px solid #2e3b55;border-bottom-left-radius:4px;}
   .msg.coach strong{color:var(--gold);}
+  .tts-btn{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;margin-top:8px;padding:0;opacity:.85;}
+  .tts-btn:hover{opacity:1;}
   #inputBar{display:flex;gap:10px;padding:14px;background:var(--panel);border-top:1px solid #2e3b55;}
   #userInput{flex:1;padding:13px;border-radius:12px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
   #userInput:focus{border-color:var(--gold);}
@@ -74,14 +76,15 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Coach. I remember your niche, your stage, and every session we have together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا مدربك الشخصي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وكل جلسة نخوضها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
+const S=()=>STR[LANG];
 
 function applyLang(){
   document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
-  const s=STR[LANG];
+  const s=S();
   $('onboardTitle').textContent=s.onTitle;
   $('onboardDesc').textContent=s.onDesc;
   $('lblName').textContent=s.lblName;
@@ -96,26 +99,51 @@ function applyLang(){
 }
 function setLang(l){LANG=l;applyLang();}
 
+function attachTTS(d){
+  const btn=document.createElement('button');
+  btn.className='tts-btn';
+  btn.innerHTML=S().listen;
+  btn.onclick=async()=>{
+    btn.innerHTML='⏳';
+    try{
+      const plainText=d.innerText.replace(/🔊[^]*?(?=\n|$)/g,'').replace(/🔉[^]*?(?=\n|$)/g,'').replace(/⏳/g,'').trim();
+      const r=await fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({text:plainText,language:LANG})});
+      if(!r.ok) throw 0;
+      const blob=await r.blob();
+      const a=new Audio(URL.createObjectURL(blob));
+      btn.innerHTML=S().playing;
+      a.onended=()=>{btn.innerHTML=S().listen;};
+      a.onerror=()=>{btn.innerHTML='❌';};
+      await a.play();
+    }catch(e){btn.innerHTML='❌';}
+  };
+  d.appendChild(btn);
+}
+
 window.addEventListener('load',()=>{
   applyLang();
   if(localStorage.getItem('e5_member_id')){
     $('memberTag').textContent=localStorage.getItem('e5_name')||'MEMBER';
     showChat();
-    addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! I remember you. Pick your coach above and let\'s continue your empire.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! أتذكرك جيداً. اختر مدربك من الأعلى ولْنُكمل إمبراطوريتك.'));
+    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! I remember you. Pick your coach above and let\'s continue your empire.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! أتذكرك جيداً. اختر مدربك من الأعلى ولْنُكمل إمبراطوريتك.'));
+    attachTTS(d);
   }
 });
 
 function switchCoach(){
   const c=$('coachSelect').value;
+  let d;
   if(c==='builder'){
     $('coachTitle').textContent='THE BUILDER';
     $('coachEmoji').textContent='🏗️';
-    addMsg('coach',T('🏗️ <strong>The Builder here.</strong> Offer first, audience second. Stop overthinking — do the work. Tell me: what are you building, and who exactly is it for?','🏗️ <strong>الباني هنا.</strong> العرض أولاً، الجمهور ثانياً. توقّف عن التفكير الزائد — اعمل. أخبرني: ماذا تبني، ولمن بالضبط؟'));
+    d=addMsg('coach',T('🏗️ <strong>The Builder here.</strong> Offer first, audience second. Stop overthinking — do the work. Tell me: what are you building, and who exactly is it for?','🏗️ <strong>الباني هنا.</strong> العرض أولاً، الجمهور ثانياً. توقّف عن التفكير الزائد — اعمل. أخبرني: ماذا تبني، ولمن بالضبط؟'));
   }else{
     $('coachTitle').textContent='E5 AI COACH';
     $('coachEmoji').textContent='🧠';
-    addMsg('coach',T('🧠 <strong>E5 Coach here.</strong> Let\'s sharpen your marketing with the E5 frameworks. What\'s blocking your empire today?','🧠 <strong>مدرب E5 هنا.</strong> لنصقل تسويقك بأطر E5. ما الذي يعيق إمبراطوريتك اليوم؟'));
+    d=addMsg('coach',T('🧠 <strong>E5 Coach here.</strong> Let\'s sharpen your marketing with the E5 frameworks. What\'s blocking your empire today?','🧠 <strong>مدرب E5 هنا.</strong> لنصقل تسويقك بأطر E5. ما الذي يعيق إمبراطوريتك اليوم؟'));
   }
+  attachTTS(d);
 }
 
 function startCoaching(){
@@ -130,7 +158,8 @@ function startCoaching(){
     body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
   $('memberTag').textContent=name;
   showChat();
-  addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Pick your coach above — or just ask me anything right now. What is the biggest struggle blocking your empire?','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! اختر مدربك من الأعلى — أو اسألني أي شيء الآن. ما أكبر عائق يقف أمام إمبراطوريتك؟'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Pick your coach above — or just ask me anything right now. What is the biggest struggle blocking your empire?','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! اختر مدربك من الأعلى — أو اسألني أي شيء الآن. ما أكبر عائق يقف أمام إمبراطوريتك؟'));
+  attachTTS(d);
 }
 
 function showChat(){$('onboarding').style.display='none';$('chatScreen').style.display='flex';}
@@ -155,6 +184,7 @@ async function send(){
       body:JSON.stringify({question:q,member_id:localStorage.getItem('e5_member_id'),coach_id:$('coachSelect').value,language:LANG})});
     const d=await r.json();
     t.innerHTML=md(d.answer||T('I could not process that. Please try again.','لم أستطع معالجة ذلك. حاول مجدداً.'));
+    attachTTS(t);
   }catch(e){
     t.innerHTML=T('⚠️ Connection error. Please try again.','⚠️ خطأ في الاتصال. حاول مجدداً.');
   }
