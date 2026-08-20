@@ -18,10 +18,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-20-aicoach-v10.1-vision-fix"
+APP_VERSION = "2026-08-20-aicoach-v10.2-gemini-vision"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
+GEMINI_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 
 PREFERRED_MODELS = [
     "openai/gpt-oss-120b",
@@ -64,7 +65,6 @@ def pick_live_model() -> str:
         return PREFERRED_MODELS[0]
 
 def pick_vision_model() -> str:
-    """Auto-detect ANY vision-capable model Groq currently offers."""
     try:
         r = httpx.get(
             "https://api.groq.com/openai/v1/models",
@@ -93,7 +93,7 @@ app.add_middleware(
 @app.get("/")
 def health():
     return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL,
-            "vision": VISION_CHOSEN or "none",
+            "vision": VISION_CHOSEN or ("gemini-free" if GEMINI_KEY else "none"),
             "tts": "elevenlabs" if ELEVEN_KEY else "edge-free", "stt": "groq-whisper-free"}
 
 @app.get("/test")
@@ -345,39 +345,60 @@ async def list_assets(member_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Asset list failed: {e}")
 
-# ---------- VISION (coach SEES screenshots) ----------
+# ---------- VISION ENGINES ----------
+VISION_PROMPT = ("You are a top-tier direct-response funnel analyst (a $10K/month consultant). "
+                 "This screenshot is a member's marketing/funnel page (it may be in Arabic — read it as-is and quote it as-is). Analyze: "
+                 "1) page type; 2) exact headline text visible; 3) the promise/offer; 4) the CTA; "
+                 "5) visible trust/proof elements; 6) the 3 most concrete weaknesses (hook, clarity, avatar match, hierarchy, mobile readability). "
+                 "Quote exactly what you see. Max 250 words.")
+
+async def gemini_vision(b64: str, prompt: str) -> str:
+    for model in ["gemini-2.5-flash", "gemini-2.0-flash"]:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        headers = {"x-goog-api-key": GEMINI_KEY, "Content-Type": "application/json"}
+        payload = {
+            "contents": [{"parts": [
+                {"text": prompt},
+                {"inline_data": {"mime_type": "image/png", "data": b64}},
+            ]}],
+            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 600},
+        }
+        try:
+            async with httpx.AsyncClient(timeout=45.0) as client:
+                r = await client.post(url, json=payload, headers=headers)
+                if r.status_code == 200:
+                    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                print(f"Gemini {model} error: {r.text}")
+        except Exception as e:
+            print(f"Gemini {model} failure: {e}")
+    raise HTTPException(status_code=500, detail="Gemini vision failed")
+
 @app.post("/api/vision")
 async def vision_analyze(req: VisionRequest):
+    prompt = VISION_PROMPT + (f"\nMember business context: {req.context}" if req.context else "")
     vision_model = VISION_CHOSEN or pick_vision_model()
-    if not vision_model:
-        raise HTTPException(status_code=500, detail="No vision model available")
-    prompt = ("You are a top-tier direct-response funnel analyst (a $10K/month consultant). "
-              "This screenshot is a member's marketing/funnel page (it may be in Arabic — read it as-is and quote it as-is). Analyze: "
-              "1) page type; 2) exact headline text visible; 3) the promise/offer; 4) the CTA; "
-              "5) visible trust/proof elements; 6) the 3 most concrete weaknesses (hook, clarity, avatar match, hierarchy, mobile readability). "
-              "Quote exactly what you see. Max 250 words."
-              + (f"\nMember business context: {req.context}" if req.context else ""))
-    payload = {
-        "model": vision_model,
-        "messages": [{"role": "user", "content": [
-            {"type": "text", "text": prompt},
-            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{req.image_b64}"}},
-        ]}],
-        "temperature": 0.3,
-    }
-    headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
-    try:
-        async with httpx.AsyncClient(timeout=45.0) as client:
-            r = await client.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers)
-            if r.status_code != 200:
+    if vision_model:
+        payload = {
+            "model": vision_model,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{req.image_b64}"}},
+            ]}],
+            "temperature": 0.3,
+        }
+        headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
+        try:
+            async with httpx.AsyncClient(timeout=45.0) as client:
+                r = await client.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers)
+                if r.status_code == 200:
+                    return {"analysis": r.json()["choices"][0]["message"]["content"]}
                 print(f"Vision error: {r.text}")
-                raise HTTPException(status_code=500, detail="Vision analysis failed")
-            return {"analysis": r.json()["choices"][0]["message"]["content"]}
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"❌ VISION FAILURE: {e}")
-        raise HTTPException(status_code=500, detail="Vision analysis failed")
+        except Exception as e:
+            print(f"❌ VISION FAILURE: {e}")
+    if GEMINI_KEY:
+        analysis = await gemini_vision(req.image_b64, prompt)
+        return {"analysis": analysis}
+    raise HTTPException(status_code=500, detail="No vision engine available")
 
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
@@ -489,6 +510,6 @@ async def speech_to_text(file: UploadFile = File(...), language: str = Form("en"
         raise HTTPException(status_code=500, detail="Transcription failed")
 
 if __name__ == "__main__":
-    print(f"🔥 SERVER STARTING WITH MODEL: {CHOSEN_MODEL} | VISION: {VISION_CHOSEN or 'none'}")
+    print(f"🔥 SERVER STARTING WITH MODEL: {CHOSEN_MODEL} | VISION: {VISION_CHOSEN or ('gemini' if GEMINI_KEY else 'none')}")
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
