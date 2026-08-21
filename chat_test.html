@@ -39,8 +39,8 @@
   .toolBtn{padding:0 14px;border:none;border-radius:12px;background:#233047;border:1px solid #33405a;font-size:16px;cursor:pointer;}
   .toolBtn.rec{background:#dc2626;border-color:#dc2626;}
   #sendBtn{padding:0 22px;border:none;border-radius:12px;background:var(--gold);font-weight:700;cursor:pointer;color:#10131a;}
-  #businessModal,#planModal,#unlockModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;}
-  .bizCard{background:#1c2333;max-width:700px;margin:40px auto;padding:28px;border-radius:16px;border:2px solid var(--gold);}
+  #businessModal,#planModal,#unlockModal,#funnelModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;}
+  .bizCard{background:#1c2333;max-width:760px;margin:40px auto;padding:28px;border-radius:16px;border:2px solid var(--gold);}
   .bizCard h2{color:var(--gold);margin-bottom:8px;}
   .bizCard p{color:var(--muted);font-size:13px;margin-bottom:16px;}
   .bizCard label{font-size:11px;color:var(--muted);display:block;margin:10px 0 5px;}
@@ -66,6 +66,11 @@
   .taskActions button:hover{color:var(--text);}
   .progressBar{height:8px;background:#0e1628;border-radius:4px;overflow:hidden;margin-bottom:16px;}
   .progressFill{height:100%;background:var(--gold);transition:width .3s;}
+  #funnelPreview{display:flex;align-items:center;overflow-x:auto;padding:12px 4px;}
+  .fStage{background:#0e1628;border:2px solid #33405a;border-radius:10px;padding:8px 12px;min-width:110px;text-align:center;font-size:12px;flex-shrink:0;}
+  .fArrow{color:var(--gold);font-size:18px;padding:0 8px;flex-shrink:0;}
+  .fRow{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+  .fRow input,.fRow select{padding:9px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:13px;outline:none;}
 </style>
 </head>
 <body>
@@ -79,6 +84,7 @@
   <button class="langBtn" id="langEn" onclick="setLang('en')">EN</button>
   <button class="langBtn" id="langAr" onclick="setLang('ar')">عربي</button>
   <button class="langBtn" id="bizBtn" onclick="openBusinessModal()">📋 My Business</button>
+  <button class="langBtn" id="mapBtn" onclick="openFunnelModal()">🗺️ Funnel Map</button>
   <button class="langBtn" id="planBtn" onclick="openPlanModal()">📊 My Plan</button>
   <button class="langBtn" id="unlockBtn" onclick="openUnlockModal()">🔓 Unlock</button>
   <span class="tag" id="memberTag">GUEST</span>
@@ -129,6 +135,21 @@
   </div>
 </div>
 
+<!-- FUNNEL MAP MODAL -->
+<div id="funnelModal">
+  <div class="bizCard">
+    <h2>🗺️ Funnel Map</h2>
+    <p>Design your funnel stage by stage. The coach sees this exact map and diagnoses the weakest link against benchmarks.</p>
+    <div id="funnelPreview"></div>
+    <div id="funnelStages"></div>
+    <div class="bizBtns">
+      <button onclick="funnelNodes.push({name:'',type:'other',metric:''});renderFunnel();" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">➕ Add Stage</button>
+      <button onclick="saveFunnelMap()" style="background:var(--gold);color:#10131a;">💾 Save Map</button>
+      <button onclick="closeFunnelModal()" style="background:#233047;color:var(--text);">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- BUSINESS X-RAY MODAL -->
 <div id="businessModal">
   <div class="bizCard">
@@ -170,15 +191,16 @@
 
 <script>
 const $=id=>document.getElementById(id);
-const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const q=s=>String(s==null?'':s).replace(/"/g,'&quot;');
 const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^#{1,3}\s?(.*)$/gm,'<strong>📌 $1</strong>').replace(/\n/g,'<br>');
 const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').replace(/^_|_$/g,'');
 
 let LANG=localStorage.getItem('e5_lang')||'en';
 let currentMode='normal';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',visionErr:'⚠️ Vision engine error — the coach could not see the image',biz:'📋 My Business',plan:'📊 My Plan',bizTitle:'📋 Business X-Ray',planTitle:'📊 My 90-Day Plan',planDesc:'Your Operating Partner\'s weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel.',phase1:'🎯 PHASE 1: OFFER (Weeks 1-4)',phase2:'👥 PHASE 2: AUDIENCE (Weeks 5-8)',phase3:'💰 PHASE 3: PROFIT (Weeks 9-12)',genBtn:'🎯 Generate My Plan',planGenerating:'Generating your 90-day plan…',planGenerated:'Plan generated! Check the tasks below.',taskDone:'✅ Task marked done. Show the coach your evidence!',taskBlocked:'Task marked blocked. Ask the coach for help.',noPlan:'No plan yet. Click "Generate My Plan" to build your 90-day Operating Partner plan from your X-Ray.',checkinFirst:'Attach a screenshot of the work you did for the current task, then send in Check In mode.'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا شريكك التشغيلي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وأتابع تقدّمك في خطة الـ 90 يوم التي نبنيها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',visionErr:'⚠️ خطأ في محرك الرؤية — لم يستطع المدرب رؤية الصورة',biz:'📋 أعمالي',plan:'📊 خطتي',bizTitle:'📋 فحص الأعمال',planTitle:'📊 خطتي لـ 90 يوم',planDesc:'مهام أسبوعية من شريكك التشغيلي، مبنية من فحص أعمالك. أنجز كل مهمة وأثبتها بلقطة.',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم!',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد.',xrayDone:'🎉 اكتمل الفحص!',phase1:'🎯 المرحلة 1: العرض (الأسابيع 1-4)',phase2:'👥 المرحلة 2: الجمهور (الأسابيع 5-8)',phase3:'💰 المرحلة 3: الربح (الأسابيع 9-12)',genBtn:'🎯 ولّد خطتي',planGenerating:'أولّد خطتك لـ 90 يوم…',planGenerated:'تم إنشاء الخطة!',taskDone:'✅ تم وضع المهمة كمكتملة. أرِ المدرب الدليل!',taskBlocked:'تم وضع المهمة كمحظورة. اسأل المدرب المساعدة.',noPlan:'لا خطة بعد. اضغط "ولّد خطتي".',checkinFirst:'أرفق لقطة لعملك الحالي، ثم أرسل في وضع Check In.'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',visionErr:'⚠️ Vision engine error — the coach could not see the image',biz:'📋 My Business',plan:'📊 My Plan',bizTitle:'📋 Business X-Ray',planTitle:'📊 My 90-Day Plan',planDesc:'Your Operating Partner\'s weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel.',phase1:'🎯 PHASE 1: OFFER (Weeks 1-4)',phase2:'👥 PHASE 2: AUDIENCE (Weeks 5-8)',phase3:'💰 PHASE 3: PROFIT (Weeks 9-12)',genBtn:'🎯 Generate My Plan',planGenerating:'Generating your 90-day plan…',planGenerated:'Plan generated! Check the tasks below.',taskDone:'✅ Task marked done. Show the coach your evidence!',taskBlocked:'Task marked blocked. Ask the coach for help.',noPlan:'No plan yet. Click "Generate My Plan" to build your 90-day Operating Partner plan from your X-Ray.',checkinFirst:'Attach a screenshot of the work you did for the current task, then send in Check In mode.',mapSaved:'✅ Funnel Map saved! The coach can now see your whole funnel.',mapEmpty:'Add at least one stage first.'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا شريكك التشغيلي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وأتابع تقدّمك في خطة الـ 90 يوم التي نبنيها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',visionErr:'⚠️ خطأ في محرك الرؤية — لم يستطع المدرب رؤية الصورة',biz:'📋 أعمالي',plan:'📊 خطتي',bizTitle:'📋 فحص الأعمال',planTitle:'📊 خطتي لـ 90 يوم',planDesc:'مهام أسبوعية من شريكك التشغيلي، مبنية من فحص أعمالك. أنجز كل مهمة وأثبتها بلقطة.',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم!',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد.',xrayDone:'🎉 اكتمل الفحص!',phase1:'🎯 المرحلة 1: العرض (الأسابيع 1-4)',phase2:'👥 المرحلة 2: الجمهور (الأسابيع 5-8)',phase3:'💰 المرحلة 3: الربح (الأسابيع 9-12)',genBtn:'🎯 ولّد خطتي',planGenerating:'أولّد خطتك لـ 90 يوم…',planGenerated:'تم إنشاء الخطة!',taskDone:'✅ تم وضع المهمة كمكتملة. أرِ المدرب الدليل!',taskBlocked:'تم وضع المهمة كمحظورة. اسأل المدرب المساعدة.',noPlan:'لا خطة بعد. اضغط "ولّد خطتي".',checkinFirst:'أرفق لقطة لعملك الحالي، ثم أرسل في وضع Check In.',mapSaved:'✅ تم حفظ خريطة القمع! المدرب يرى الآن قمعك كاملاً.',mapEmpty:'أضف مرحلة واحدة على الأقل أولاً.'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
@@ -194,7 +216,7 @@ const ASSETS={
  email_copy:['✉️ Emails (old)','✉️ رسائل (قديم)'],social_channel:['📺 Social (old)','📺 اجتماعي (قديم)'],
  customer_avatar:['👤 Avatar (old)','👤 عميل (قديم)'],business_details:['🏢 Details (old)','🏢 تفاصيل (قديم)'],
  competitor:['🕵️ Competitor Hack','🕵️ تحليل منافس'],
- other:['📎 Other','📎 أخرى']
+ other:['📎 Other',' أخرى']
 };
 
 const XRAY_STEPS=[
@@ -212,6 +234,79 @@ const XRAY_STEPS=[
 let assetsCache=[], wizardMode=false, xrayIndex=-1;
 let pendingImage=null, planTasks=[], currentTaskId=null;
 let memberTier='free';
+let funnelNodes=[];
+
+/* ---------- FUNNEL MAP ---------- */
+function healthColor(type, metric){
+  const m=parseFloat(String(metric||'').replace(/[^\d.]/g,''));
+  if(isNaN(m)) return '#33405a';
+  if(type==='retain') return m<=10?'#22c55e':(m<=15?'#f5b942':'#ef4444');
+  const bench={capture:[20,40],nurture:[40,60],convert:[2,5],traffic:[0,0]};
+  const b=bench[type];
+  if(!b||type==='traffic') return '#33405a';
+  if(m>=b[0]) return '#22c55e';
+  if(m>=b[0]/2) return '#f5b942';
+  return '#ef4444';
+}
+function renderFunnel(){
+  const box=$('funnelStages'); box.innerHTML='';
+  funnelNodes.forEach((n,i)=>{
+    const row=document.createElement('div');
+    row.className='fRow';
+    row.innerHTML=`
+      <input value="${q(n.name)}" placeholder="Stage name (e.g. Squeeze Page)" style="flex:2" oninput="funnelNodes[${i}].name=this.value;renderFunnelPreview()">
+      <select style="flex:1" onchange="funnelNodes[${i}].type=this.value;renderFunnelPreview()">
+        ${['traffic','capture','nurture','convert','retain','other'].map(t=>`<option value="${t}" ${t===n.type?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <input value="${q(n.metric)}" placeholder="metric e.g. 8%" style="flex:1" oninput="funnelNodes[${i}].metric=this.value;renderFunnelPreview()">
+      <button class="langBtn" onclick="funnelNodes.splice(${i},1);renderFunnel();">✕</button>`;
+    box.appendChild(row);
+  });
+  renderFunnelPreview();
+}
+function renderFunnelPreview(){
+  const pv=$('funnelPreview'); pv.innerHTML='';
+  funnelNodes.forEach((n,i)=>{
+    const card=document.createElement('div');
+    card.className='fStage';
+    card.style.borderColor=healthColor(n.type,n.metric);
+    card.innerHTML='<strong>'+esc(n.name||'Stage')+'</strong><br><span style="color:var(--muted)">'+esc(n.type)+'</span>'+(n.metric?'<br><span style="color:var(--gold)">'+esc(n.metric)+'</span>':'');
+    pv.appendChild(card);
+    if(i<funnelNodes.length-1){
+      const ar=document.createElement('div');
+      ar.className='fArrow'; ar.textContent='→';
+      pv.appendChild(ar);
+    }
+  });
+}
+async function openFunnelModal(){
+  if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
+  funnelNodes=[];
+  try{
+    const r=await fetch('/api/assets?member_id='+encodeURIComponent(localStorage.getItem('e5_member_id')));
+    const d=await r.json();
+    const fm=(d.assets||[]).find(a=>a.asset_type==='funnel_map');
+    if(fm&&fm.content){ funnelNodes=JSON.parse(fm.content); }
+  }catch(e){}
+  if(!funnelNodes.length) funnelNodes=[{name:'Traffic',type:'traffic',metric:''},{name:'Squeeze Page',type:'capture',metric:''},{name:'Emails',type:'nurture',metric:''},{name:'Sales Page',type:'convert',metric:''}];
+  renderFunnel();
+  $('funnelModal').style.display='block';
+}
+function closeFunnelModal(){$('funnelModal').style.display='none';}
+async function saveFunnelMap(){
+  const mid=localStorage.getItem('e5_member_id');
+  if(!mid){alert(S().bizFirst);return;}
+  const clean=funnelNodes.filter(n=>(n.name||'').trim());
+  if(!clean.length){alert(S().mapEmpty);return;}
+  try{
+    const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({member_id:mid,asset_type:'funnel_map',title:'Funnel Map',content:JSON.stringify(clean),url:null,metrics:null})});
+    if(!r.ok) throw 0;
+    alert(S().mapSaved);
+    closeFunnelModal();
+    loadAssets();
+  }catch(e){alert(S().bizFail);}
+}
 
 /* ---------- UNLOCK / TIERS ---------- */
 function openUnlockModal(){$('unlockModal').style.display='block';}
@@ -562,7 +657,7 @@ window.addEventListener('load',()=>{
     setMode('normal');
     loadPlan();
     loadTier();
-    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Open 📊 My Plan to see your 90-day tasks. When you finish one, come back in ✅ Check In mode with the screenshot — I\'ll verify your work.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! افتح 📊 خطتي لرؤية مهام الـ 90 يوم. عندما تنهي إحداها، عد في وضع ✅ Check In مع اللقطة — سأتأكد من عملك.'));
+    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Open 🗺️ Funnel Map to design your funnel, or 📊 My Plan to see your 90-day tasks.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! افتح 🗺️ خريطة القمع لتصميم قمعك، أو 📊 خطتي لرؤية مهام الـ 90 يوم.'));
     attachTTS(d);
   }
 });
@@ -597,7 +692,7 @@ function startCoaching(){
   setMode('normal');
   loadPlan();
   loadTier();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Let\'s build your 90-day Operating Partner plan. Open 📊 My Plan → Generate My Plan. Then come back here and ask me anything.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! لنبني خطة شريكك التشغيلي لـ 90 يوم. افتح 📊 خطتي → ولّد خطتي. ثم عد هنا واسألني أي شيء.'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Start with 🗺️ Funnel Map so I can see your whole business flow, then 📊 My Plan → Generate My Plan.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! ابدأ بـ 🗺️ خريطة القمع حتى أرى تدفق عملك كاملاً، ثم 📊 خطتي → ولّد خطتي.'));
   attachTTS(d);
 }
 
