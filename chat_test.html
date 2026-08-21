@@ -103,6 +103,7 @@
   <div id="modeBar">
     <button id="modeNormal" onclick="setMode('normal')">💬 Normal</button>
     <button id="modeHack" onclick="setMode('hack')">🕵️ Hack Funnel</button>
+    <button id="modeAlchemy" onclick="setMode('alchemy')">🎬 Alchemy</button>
     <button id="modeCheckin" onclick="setMode('checkin')">✅ Check In</button>
   </div>
   <div id="inputBar">
@@ -193,7 +194,7 @@ const ASSETS={
  email_copy:['✉️ Emails (old)','✉️ رسائل (قديم)'],social_channel:['📺 Social (old)','📺 اجتماعي (قديم)'],
  customer_avatar:['👤 Avatar (old)','👤 عميل (قديم)'],business_details:['🏢 Details (old)','🏢 تفاصيل (قديم)'],
  competitor:['🕵️ Competitor Hack','🕵️ تحليل منافس'],
- other:['📎 Other',' أخرى']
+ other:['📎 Other','📎 أخرى']
 };
 
 const XRAY_STEPS=[
@@ -269,6 +270,7 @@ function setMode(m){
   const s=S();
   if(m==='normal') $('userInput').placeholder=s.ph;
   else if(m==='hack') $('userInput').placeholder=T('Attach competitor screenshot + ask: "Hack this funnel — what can I steal?"','أرفق لقطة منافس + اسأل: "حلّل هذا القمع — ماذا يمكنني أن أسرق؟"');
+  else if(m==='alchemy') $('userInput').placeholder=T('Paste your raw transcript / voice notes — I\'ll turn them into paced slide chunks + a recording script','الصق نصك الخام / ملاحظاتك الصوتية — سأحوّلها إلى شرائح موقوتة + سكربت تسجيل');
   else if(m==='checkin') $('userInput').placeholder=T('Attach screenshot of your work + describe what you did','أرفق لقطة عملك + صف ما فعلته');
 }
 
@@ -445,7 +447,7 @@ function renderPlan(){
         </div>
         ${!isDone?`<div class="taskActions">
           <button onclick="markTask('${t.task_id}','done')">${T('✅ Done','✅ تم')}</button>
-          <button onclick="markTask('${t.task_id}','blocked')">${T('🆘 Blocked','🆘 محظور')}</button>
+          <button onclick="markTask('${t.task_id}','blocked')">${T('🆘 Blocked',' محظور')}</button>
         </div>`:''}`;
       box.appendChild(row);
     });
@@ -615,7 +617,7 @@ async function send(){
   if(!q && !pendingImage)return;
   if(currentMode==='checkin' && !pendingImage){alert(S().checkinFirst);return;}
   $('userInput').value='';
-  const modeLabel=currentMode==='hack'?'🕵️ ':currentMode==='checkin'?'✅ ':'';
+  const modeLabel=currentMode==='hack'?'🕵️ ':currentMode==='checkin'?'✅ ':currentMode==='alchemy'?'🎬 ':'';
   addMsg('user',modeLabel+(pendingImage?'🖼️ ':'')+esc(q||T('Analyze this screenshot.','حلّل هذه اللقطة.')));
   const t=addMsg('coach',T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>'));
   try{
