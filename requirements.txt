@@ -10,3 +10,4 @@ fastembed
 httpx
 edge-tts
 python-multipart
+openai
