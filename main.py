@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-21-aicoach-v15-final"
+APP_VERSION = "2026-08-21-aicoach-v16-funnel-map"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -34,7 +34,7 @@ PREFERRED_MODELS = [
 ASSET_TYPES = ["offer", "avatar", "customer_voice", "traffic", "capture",
                "nurture", "convert", "retain", "numbers", "story",
                "sales_page", "squeeze_page", "quiz_page", "thank_you_page",
-               "email_copy", "social_channel", "customer_avatar", "business_details", "competitor", "other"]
+               "email_copy", "social_channel", "customer_avatar", "business_details", "competitor", "funnel_map", "other"]
 
 ASSET_KEYWORDS = [
     (["convert", "sales_page"], ["sales page", "salespage", "صفحة البيع"]),
@@ -110,7 +110,7 @@ ABSOLUTE RULES (breaking any of them = failure):
 7. SHORT AND HUMAN. 150-250 words.
 8. NEVER INVENT.
 9. USE THE ASSET INVENTORY.
-10. FUNNEL X-RAY. Compare metrics to benchmarks.
+10. FUNNEL X-RAY. Compare metrics to benchmarks. If a FUNNEL MAP is on file, walk it stage by stage (Traffic → Capture → Nurture → Convert → Retain), name the single weakest link vs benchmarks, and propose the fix for that stage only.
 11. CUSTOMER VOICE. Use their exact words.
 12. READ BEFORE ASKING.
 13. HYPOTHESIS FIRST.
@@ -241,7 +241,7 @@ def build_memory_block(member_id: str) -> str:
         prof = supabase.table("members").select("*").eq("member_id", member_id).execute()
         hist = (supabase.table("chat_history").select("question, answer, created_at")
                 .eq("member_id", member_id).order("created_at", desc=True).limit(3).execute())
-        assets = supabase.table("member_assets").select("asset_type,title,metrics").eq("member_id", member_id).execute()
+        assets = supabase.table("member_assets").select("asset_type,title,metrics,content").eq("member_id", member_id).execute()
         plan_rows = (supabase.table("member_plan").select("*")
                      .eq("member_id", member_id).order("week").execute())
     except Exception: return "MEMBER MEMORY: (unavailable)"
@@ -256,8 +256,24 @@ def build_memory_block(member_id: str) -> str:
         lines.append("- BUSINESS CONTEXT:")
         lines.append(p["business_context"][:2000])
     if assets.data:
-        parts = [a["asset_type"] + (f" [{a['metrics']}]" if a.get("metrics") else "") for a in assets.data]
-        lines.append("- X-RAY ON FILE: " + " | ".join(parts))
+        parts = []
+        for a in assets.data:
+            if a["asset_type"] == "funnel_map":
+                continue
+            parts.append(a["asset_type"] + (f" [{a['metrics']}]" if a.get("metrics") else ""))
+        if parts:
+            lines.append("- X-RAY ON FILE: " + " | ".join(parts))
+        fm = next((a for a in assets.data if a["asset_type"] == "funnel_map"), None)
+        if fm and fm.get("content"):
+            try:
+                import json as _json
+                nodes = _json.loads(fm["content"])
+                chain = " → ".join(
+                    f"{n.get('name') or n.get('type')} ({n.get('type')}" + (f", {n.get('metric')}" if n.get('metric') else "") + ")"
+                    for n in nodes)
+                lines.append("- MEMBER FUNNEL MAP (designed by member — source of truth for leak diagnosis): " + chain)
+            except Exception:
+                pass
     if plan_rows.data:
         lines.append("- 90-DAY PLAN:")
         pending = []
