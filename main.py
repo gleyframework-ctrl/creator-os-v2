@@ -1,7 +1,6 @@
 """
-E5 AI COACH - main.py (FINAL CCC BRAIN EDITION)
-FastAPI backend. Uses ONLY standard library for LLM calls (no openai package).
-Providers: Groq (primary) -> Gemini (fallback). Voice: Fish Audio.
+E5 AI COACH - main.py (FINAL MERGED - CCC BRAIN EDITION)
+No openai package. Uses Groq (primary) + Gemini (fallback) via stdlib.
 """
 
 import json
@@ -11,6 +10,7 @@ from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
 # ------------------------- CONFIG -------------------------
@@ -300,14 +300,13 @@ def tts(req: TTSRequest):
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest):
     return tts(req)
-# ------------------------- LEGACY UI + STARTUP (ADDITIVE FIX) -------------------------
-from fastapi.responses import FileResponse, HTMLResponse
 
+# ------------------------- LEGACY UI + STARTUP -------------------------
 @app.get("/test")
 def test_page():
     if os.path.exists("chat_test.html"):
         return FileResponse("chat_test.html")
-    return HTMLResponse("<h3>chat_test.html not found in repo root - upload it via GitHub Add File.</h3>")
+    return HTMLResponse("<h3>chat_test.html not found in repo root.</h3>")
 
 if __name__ == "__main__":
     import uvicorn
