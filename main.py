@@ -1,28 +1,36 @@
 """
-=========================================================
-E5 AI COACH — main.py  (CCC BRAIN EDITION / DROP 1)
-FastAPI backend for the AI Business Coach for Whop creators.
-Contains: CCC Operating Brain + all coach modes.
-ADDITIVE RULE: never delete existing endpoints — merge only.
-=========================================================
+E5 AI COACH - main.py (FINAL CCC BRAIN EDITION)
+FastAPI backend. Uses ONLY standard library for LLM calls (no openai package).
+Providers: Groq (primary) -> Gemini (fallback). Voice: Fish Audio.
 """
 
+import json
 import os
+import urllib.request
 from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from openai import OpenAI
 
 # ------------------------- CONFIG -------------------------
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-MODEL = os.environ.get("COACH_MODEL", "gpt-4o-mini")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
+FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 
-client = OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_BASE_URL)
+LLM_ENDPOINTS = [
+    {"name": "groq",
+     "url": "https://api.groq.com/openai/v1/chat/completions",
+     "key": GROQ_API_KEY,
+     "model": os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")},
+    {"name": "gemini",
+     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+     "key": GEMINI_API_KEY,
+     "model": os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")},
+]
 
-app = FastAPI(title="E5 AI Coach", version="2.0-ccc")
+app = FastAPI(title="E5 AI Coach", version="2.1-ccc")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,11 +41,11 @@ app.add_middleware(
 # ------------------------- CCC OPERATING BRAIN -------------------------
 CCC_BRAIN = """
 You are the CCC Strategist layer of the E5 AI Coach: a $10K-level community-business
-operator trained on the Flip Moss & Nate Ryan Community Conversion Operating System.
+operator trained on the Flip Moss and Nate Ryan Community Conversion Operating System.
 
 PRIME DIRECTIVE
 Run every answer through the Straight Line:
-Attention -> One Group Hub -> Demonstration (workshop/doc) -> Zoomless Conversion.
+Attention -> One Group Hub -> Demonstration -> Zoomless Conversion.
 If a part does not feed the next part, flag it: "maintenance, not building."
 
 CORE DOCTRINES (enforce in every reply)
@@ -61,12 +69,12 @@ DIAGNOSTIC TREE (run BEFORE prescribing anything)
 N1 TRAFFIC: anti-viral short-form? VAGEL rotation? -> hooks + one-video SOP.
 N2 HUB: one group? welcome post + honesty statement? max 3 pins?
 N3 NURTURE: quick win present? proof visible? promo/value balanced?
-N4 CONVERSION: >=1 offer/day? offer doc on 10 pillars? buyer signals read?
+N4 CONVERSION: at least 1 offer/day? offer doc on 10 pillars? buyer signals read?
 RULE: fix the EARLIEST broken layer first. Never skip ahead.
 
-DM & CONVERSION RULES
+DM AND CONVERSION RULES
 - Never pitch without a signal (High-Intent / Belief-Based / stacked Medium).
-- Low-intent (likes only, new joins) = do NOT DM yet.
+- Low-intent (likes only, brand new joins) = do NOT DM yet. Nurture first.
 - Salt-in-the-cut: agitate the pain, then show the bridge. Polarize the plan,
   not the person.
 - Emotionless detachment: we have the solution, they have the problem.
@@ -75,12 +83,12 @@ DM & CONVERSION RULES
 CONTENT RULES
 - Spicy specificity: paint real-world pictures ("Walmart parking lot on Black
   Friday"), never vague promises.
-- Anti-viral: targeted buyers over vanity views. $1 per follower per month.
+- Anti-viral: targeted buyers over vanity views. About $1 per follower per month.
 - Profile teases, group converts. Rarely offer on the profile.
 - Documentation beats conversation: journal the journey, don't fake guru status.
 
 OFFER RULES
-- Offer Doc = 10 Pillars + 14 Building Blocks. Google Doc replaces the sales call.
+- Offer Doc = 10 Pillars + 14 Building Blocks. The Google Doc replaces the call.
 - Price must be lower than the cost of missed opportunity.
 - De-risk: payment plans, "I work with you until X", guarantees.
 
@@ -101,29 +109,29 @@ MODE_PROMPTS = {
 "coach": """
 MODE: DAILY OPERATOR COACH.
 Run the 90-minute rhythm: 30 min content / 20 min community / 30-40 min conversations.
-Prioritize the inbox: buyers -> offer follow-ups -> hot convos -> old convos -> new engagers.
+Inbox priority: buyers -> offer follow-ups -> hot convos -> old convos -> new engagers.
 End most replies with ONE concrete next action.
 """,
 "xray": """
 MODE: BUSINESS X-RAY.
-Interview the member in short batches (max 3 questions per message) covering:
+Interview in short batches (max 3 questions per message) covering:
 offer, traffic, hub/community, nurture, conversion, backend/LTV, mindset.
 Then output a scored audit: each node RED/YELLOW/GREEN, the earliest broken layer,
 and the top 3 fixes in priority order. Be blunt.
 """,
 "funnel": """
 MODE: FUNNEL MAP.
-Map their flow stage by stage (Attention -> Hub -> Demonstration -> Conversion -> Ascension).
+Map the flow stage by stage: Attention -> Hub -> Demonstration -> Conversion -> Ascension.
 Mark each stage HEALTHY / LEAKY / MISSING, name the single biggest leak,
 and prescribe the one fix that moves money fastest.
 """,
 "community": """
 MODE: COMMUNITY OS.
 Start with the One-Group decision and a Fragmentation Audit (count groups, cost of split attention).
-Then install the MVC 6 non-negotiables: Single Job, Clear Entry Frame, Visible Proof,
+Install the MVC 6 non-negotiables: Single Job, Clear Entry Frame, Visible Proof,
 Journal-Style Content, Conversation Triggers, Simple Linear Flow.
 Generate on request: welcome post (with honesty statement + DM pre-frame),
-3 pins max, guide-section outline, weekly welcome post.
+max 3 pins, guide-section outline, weekly welcome post.
 """,
 "dm": """
 MODE: DM DOCTOR.
@@ -149,10 +157,11 @@ Build the 6-day belief arc: Day1 Origin, Day2 Opportunity (old way vs new way),
 Day3 Internal shift + tactical win, Day4 External shift (remove the excuse),
 Day5 Timing + second win, Day6 Invitation (next-step frame).
 Install the 4 beliefs: opportunity real, vehicle right, they are capable, now is the time.
+Live first, evergreen later.
 """,
 "content": """
 MODE: CONTENT ENGINE.
-Generate on request: VAGEL weekly calendar, 7-framework posts (Connection, Authority,
+Generate on request: VAGEL weekly calendar, the 7 frameworks (Connection, Authority,
 Results, Value, Polarizing, Thought Leadership, Lead Gen), one-video SOP
 (read questions out loud -> clip), Multiplier (1 idea -> 5-6 formats),
 Triple-Threat comment CTA. Rewrite bland copy with spicy specificity.
@@ -180,59 +189,114 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = ""
+    prompt: str = ""
+    user_message: str = ""
     history: List[ChatMessage] = []
     mode: str = "coach"
     member_context: Optional[str] = None
 
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: Optional[str] = None
+
 # ------------------------- HELPERS -------------------------
-def build_system(mode: str, member_context: Optional[str]) -> str:
+def call_llm(messages, temperature=0.5, max_tokens=1500):
+    last_err = "no providers configured"
+    for ep in LLM_ENDPOINTS:
+        if not ep["key"]:
+            continue
+        body = json.dumps({
+            "model": ep["model"],
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            ep["url"],
+            data=body,
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + ep["key"],
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            return data["choices"][0]["message"]["content"] or ""
+        except Exception as e:
+            last_err = ep["name"] + ": " + str(e)
+            continue
+    raise Exception("All LLM providers failed. " + last_err)
+
+def build_system(mode, member_context):
     m = mode if mode in MODE_PROMPTS else "coach"
     system = CCC_BRAIN + "\n" + MODE_PROMPTS[m]
     if member_context:
         system += "\nMEMBER CONTEXT (from X-Ray / plan):\n" + member_context
     return system
 
-def post_process(text: str) -> str:
-    # formatting guard: no em dashes
-    return text.replace("—", "-")
+def post_process(text):
+    return text.replace("—", "-").replace("–", "-")
 
 # ------------------------- ROUTES -------------------------
 @app.get("/")
 def root():
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v1", "modes": list(MODE_PROMPTS.keys())}
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v1",
+            "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
 def health():
     return {"ok": True}
 
+@app.get("/api/modes")
+def modes():
+    return {"modes": list(MODE_PROMPTS.keys())}
+
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    if not OPENAI_API_KEY:
-        raise HTTPException(500, "OPENAI_API_KEY missing")
+    text = req.message or req.prompt or req.user_message
+    if not text:
+        raise HTTPException(400, "empty message")
     messages = [{"role": "system", "content": build_system(req.mode, req.member_context)}]
     for m in req.history[-16:]:
         messages.append({"role": m.role, "content": m.content})
-    messages.append({"role": "user", "content": req.message})
+    messages.append({"role": "user", "content": text})
     try:
-        r = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
-            temperature=0.5,
-            max_tokens=1500,
-        )
-        reply = r.choices[0].message.content or ""
-        return {"reply": post_process(reply), "mode": req.mode}
+        clean = post_process(call_llm(messages))
+        return {"reply": clean, "response": clean, "message": clean, "mode": req.mode}
     except Exception as e:
-        raise HTTPException(500, f"LLM error: {e}")
+        raise HTTPException(500, "LLM error: " + str(e))
 
-# alias in case your frontend calls /chat
 @app.post("/chat")
 def chat_alias(req: ChatRequest):
     return chat(req)
 
-# ------------------------- OPTIONAL STUBS -------------------------
-# If your CURRENT main.py has Fish voice / Whop webhook / Supabase auth,
-# KEEP those functions. Paste them to me and I will merge them into this file.
-# @app.post("/api/tts")  -> your existing Fish voice implementation
-# @app.post("/api/whop") -> your existing Whop webhook
+@app.post("/api/tts")
+def tts(req: TTSRequest):
+    if not FISH_API_KEY:
+        raise HTTPException(503, "FISH_API_KEY missing")
+    voice = req.voice_id or FISH_VOICE_ID
+    payload = {"text": req.text, "format": "mp3"}
+    if voice:
+        payload["reference_id"] = voice
+    req_obj = urllib.request.Request(
+        "https://api.fish.audio/v1/tts",
+        data=json.dumps(payload).encode("utf-8"),
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + FISH_API_KEY,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req_obj, timeout=120) as resp:
+            audio = resp.read()
+        return Response(content=audio, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(502, "TTS error: " + str(e))
+
+@app.post("/api/voice")
+def voice_alias(req: TTSRequest):
+    return tts(req)
