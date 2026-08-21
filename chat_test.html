@@ -46,10 +46,10 @@
   .bizCard label{font-size:11px;color:var(--muted);display:block;margin:10px 0 5px;}
   .bizCard select,.bizCard input,.bizCard textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
   .bizCard select:focus,.bizCard input:focus,.bizCard textarea:focus{border-color:var(--gold);}
-  .bizCard textarea{height:180px;resize:vertical;}
+  .bizCard textarea{height:150px;resize:vertical;}
   #assetsList{margin-top:14px;display:flex;flex-wrap:wrap;}
   .bizBtns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
-  .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;min-width:120px;}
+  .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;min-width:110px;}
   #wizardBar{display:none;background:#0e1628;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:12px;color:var(--gold);font-size:13px;}
   .phaseHeader{color:var(--gold);font-weight:700;font-size:14px;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #33405a;}
   .taskRow{display:flex;align-items:center;gap:12px;padding:12px;background:#0e1628;border-radius:10px;margin-bottom:8px;border:1px solid #33405a;}
@@ -71,6 +71,7 @@
   .fArrow{color:var(--gold);font-size:18px;padding:0 8px;flex-shrink:0;}
   .fRow{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
   .fRow input,.fRow select{padding:9px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:13px;outline:none;}
+  #funnelTemplates{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -139,7 +140,14 @@
 <div id="funnelModal">
   <div class="bizCard">
     <h2>🗺️ Funnel Map</h2>
-    <p>Design your funnel stage by stage. The coach sees this exact map and diagnoses the weakest link against benchmarks.</p>
+    <p>Design your funnel stage by stage — pick a template or build your own. The coach sees this exact map and diagnoses the weakest link.</p>
+    <div id="funnelTemplates">
+      <button class="langBtn" onclick="loadTemplate('classic')">🎯 Classic</button>
+      <button class="langBtn" onclick="loadTemplate('ig_quiz')">📸 IG→Quiz→Community</button>
+      <button class="langBtn" onclick="loadTemplate('yt_free')">📺 YT→Free Community</button>
+      <button class="langBtn" onclick="loadTemplate('yt_tripwire')">🪝 YT→Tripwire</button>
+      <button class="langBtn" onclick="loadTemplate('yt_telegram')">📞 YT→Telegram→Call→Paid</button>
+    </div>
     <div id="funnelPreview"></div>
     <div id="funnelStages"></div>
     <div class="bizBtns">
@@ -150,11 +158,11 @@
   </div>
 </div>
 
-<!-- BUSINESS X-RAY MODAL -->
+<!-- BUSINESS X-RAY + COMMUNITY OS MODAL -->
 <div id="businessModal">
   <div class="bizCard">
     <h2 id="bizTitle">📋 Business X-Ray</h2>
-    <p id="bizDesc">The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.</p>
+    <p id="bizDesc">The coach reads every section + your numbers + your community engine, finds the weakest stage, and deep-dives it.</p>
     <div id="wizardBar"></div>
     <label id="lblSection">SECTION</label>
     <select id="assetType"></select>
@@ -169,6 +177,7 @@
     <div id="assetsList"></div>
     <div class="bizBtns">
       <button id="xrayBtn" onclick="startXray()" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">🩺 Guided X-Ray</button>
+      <button id="cosBtn" onclick="startCos()" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">🏛️ Community OS</button>
       <button id="bizSave" onclick="saveBusinessContext()" style="background:var(--gold);color:#10131a;">💾 Save Section</button>
       <button id="bizCancel" onclick="closeBusinessModal()" style="background:#233047;color:var(--text);">Close</button>
     </div>
@@ -199,8 +208,8 @@ const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').rep
 let LANG=localStorage.getItem('e5_lang')||'en';
 let currentMode='normal';
 const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',visionErr:'⚠️ Vision engine error — the coach could not see the image',biz:'📋 My Business',plan:'📊 My Plan',bizTitle:'📋 Business X-Ray',planTitle:'📊 My 90-Day Plan',planDesc:'Your Operating Partner\'s weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.',bizDesc:'The coach reads every section + your numbers, finds the weakest funnel stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel.',phase1:'🎯 PHASE 1: OFFER (Weeks 1-4)',phase2:'👥 PHASE 2: AUDIENCE (Weeks 5-8)',phase3:'💰 PHASE 3: PROFIT (Weeks 9-12)',genBtn:'🎯 Generate My Plan',planGenerating:'Generating your 90-day plan…',planGenerated:'Plan generated! Check the tasks below.',taskDone:'✅ Task marked done. Show the coach your evidence!',taskBlocked:'Task marked blocked. Ask the coach for help.',noPlan:'No plan yet. Click "Generate My Plan" to build your 90-day Operating Partner plan from your X-Ray.',checkinFirst:'Attach a screenshot of the work you did for the current task, then send in Check In mode.',mapSaved:'✅ Funnel Map saved! The coach can now see your whole funnel.',mapEmpty:'Add at least one stage first.'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا شريكك التشغيلي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وأتابع تقدّمك في خطة الـ 90 يوم التي نبنيها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',visionErr:'⚠️ خطأ في محرك الرؤية — لم يستطع المدرب رؤية الصورة',biz:'📋 أعمالي',plan:'📊 خطتي',bizTitle:'📋 فحص الأعمال',planTitle:'📊 خطتي لـ 90 يوم',planDesc:'مهام أسبوعية من شريكك التشغيلي، مبنية من فحص أعمالك. أنجز كل مهمة وأثبتها بلقطة.',bizDesc:'يقرأ المدرب كل قسم + أرقامك، يجد أضعف مرحلة في القمع، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',bizSaved:'✅ تم حفظ القسم!',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد.',xrayDone:'🎉 اكتمل الفحص!',phase1:'🎯 المرحلة 1: العرض (الأسابيع 1-4)',phase2:'👥 المرحلة 2: الجمهور (الأسابيع 5-8)',phase3:'💰 المرحلة 3: الربح (الأسابيع 9-12)',genBtn:'🎯 ولّد خطتي',planGenerating:'أولّد خطتك لـ 90 يوم…',planGenerated:'تم إنشاء الخطة!',taskDone:'✅ تم وضع المهمة كمكتملة. أرِ المدرب الدليل!',taskBlocked:'تم وضع المهمة كمحظورة. اسأل المدرب المساعدة.',noPlan:'لا خطة بعد. اضغط "ولّد خطتي".',checkinFirst:'أرفق لقطة لعملك الحالي، ثم أرسل في وضع Check In.',mapSaved:'✅ تم حفظ خريطة القمع! المدرب يرى الآن قمعك كاملاً.',mapEmpty:'أضف مرحلة واحدة على الأقل أولاً.'}
+ en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',visionErr:'⚠️ Vision engine error — the coach could not see the image',biz:'📋 My Business',plan:'📊 My Plan',bizTitle:'📋 Business X-Ray',planTitle:'📊 My 90-Day Plan',planDesc:'Your Operating Partner\'s weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.',bizDesc:'The coach reads every section + your numbers + your community engine, finds the weakest stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',cos:'🏛️ Community OS',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel.',cosDone:'🏛️ Community OS saved! The coach now knows exactly how your community runs.',phase1:'🎯 PHASE 1: OFFER (Weeks 1-4)',phase2:'👥 PHASE 2: AUDIENCE (Weeks 5-8)',phase3:'💰 PHASE 3: PROFIT (Weeks 9-12)',genBtn:'🎯 Generate My Plan',planGenerating:'Generating your 90-day plan…',planGenerated:'Plan generated! Check the tasks below.',taskDone:'✅ Task marked done. Show the coach your evidence!',taskBlocked:'Task marked blocked. Ask the coach for help.',noPlan:'No plan yet. Click "Generate My Plan" to build your 90-day Operating Partner plan from your X-Ray.',checkinFirst:'Attach a screenshot of the work you did for the current task, then send in Check In mode.',mapSaved:'✅ Funnel Map saved! The coach can now see your whole funnel.',mapEmpty:'Add at least one stage first.'},
+ ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا شريكك التشغيلي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وأتابع تقدّمك في خطة الـ 90 يوم التي نبنيها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',visionErr:'⚠️ خطأ في محرك الرؤية — لم يستطع المدرب رؤية الصورة',biz:'📋 أعمالي',plan:'📊 خطتي',bizTitle:'📋 فحص الأعمال',planTitle:'📊 خطتي لـ 90 يوم',planDesc:'مهام أسبوعية من شريكك التشغيلي، مبنية من فحص أعمالك. أنجز كل مهمة وأثبتها بلقطة.',bizDesc:'يقرأ المدرب كل قسم + أرقامك + محرك مجتمعك، يجد أضعف مرحلة، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',cos:'🏛️ نظام المجتمع',bizSaved:'✅ تم حفظ القسم!',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد.',xrayDone:'🎉 اكتمل الفحص!',cosDone:'🏛️ تم حفظ نظام تشغيل المجتمع! المدرب يعرف الآن كيف يعمل مجتمعك تماماً.',phase1:'🎯 المرحلة 1: العرض (الأسابيع 1-4)',phase2:'👥 المرحلة 2: الجمهور (الأسابيع 5-8)',phase3:'💰 المرحلة 3: الربح (الأسابيع 9-12)',genBtn:'🎯 ولّد خطتي',planGenerating:'أولّد خطتك لـ 90 يوم…',planGenerated:'تم إنشاء الخطة!',taskDone:'✅ تم وضع المهمة كمكتملة. أرِ المدرب الدليل!',taskBlocked:'تم وضع المهمة كمحظورة. اسأل المدرب المساعدة.',noPlan:'لا خطة بعد. اضغط "ولّد خطتي".',checkinFirst:'أرفق لقطة لعملك الحالي، ثم أرسل في وضع Check In.',mapSaved:'✅ تم حفظ خريطة القمع!',mapEmpty:'أضف مرحلة واحدة على الأقل أولاً.'}
 };
 const T=(en,ar)=>LANG==='ar'?ar:en;
 const S=()=>STR[LANG];
@@ -211,10 +220,7 @@ const ASSETS={
  capture:['🧲 Capture',' الالتقاط'],nurture:['✉️ Nurture (Emails)','✉️ الرسائل'],
  convert:['💰 Convert (Sales)','💰 صفحة البيع'],retain:['🤝 Retain','🤝 الاحتفاظ'],
  numbers:['📊 Numbers & Goal','📊 الأرقام والهدف'],story:['🧬 Story & Brand','🧬 القصة والنبرة'],
- sales_page:['🛒 Sales Page (old)','🛒 بيع (قديم)'],squeeze_page:['🧲 Squeeze (old)','🧲 التقاط (قديم)'],
- quiz_page:['❓ Quiz (old)','❓ اختبار (قديم)'],thank_you_page:['🙏 Thank-you (old)','🙏 شكر (قديم)'],
- email_copy:['✉️ Emails (old)','✉️ رسائل (قديم)'],social_channel:['📺 Social (old)','📺 اجتماعي (قديم)'],
- customer_avatar:['👤 Avatar (old)','👤 عميل (قديم)'],business_details:['🏢 Details (old)','🏢 تفاصيل (قديم)'],
+ community_os:['🏛️ Community OS','🏛️ نظام المجتمع'],
  competitor:['🕵️ Competitor Hack','🕵️ تحليل منافس'],
  other:['📎 Other',' أخرى']
 };
@@ -231,19 +237,42 @@ const XRAY_STEPS=[
  {k:'numbers',q:['Current revenue? 90-day goal?','الإيراد الحالي؟ هدف 90 يوم؟'],m:['Revenue → goal','الإيراد → الهدف']},
  {k:'story',q:['Origin story + brand tone.','قصتك الأصل + نبرة العلامة.'],m:['','']}
 ];
-let assetsCache=[], wizardMode=false, xrayIndex=-1;
+
+const COS_STEPS=[
+ {k:'platform',q:['Where does your community live? (Skool / Whop / Telegram / Facebook / Discord)','أين يعيش مجتمعك؟ (Skool / Whop / Telegram / Facebook / Discord)']},
+ {k:'onboarding',q:['What happens in a new member\'s first 48 hours? (welcome post, DM, checklist…)','ماذا يحدث للعضو الجديد في أول 48 ساعة؟ (ترحيب، رسالة، قائمة…)']},
+ {k:'content',q:['Your weekly content cadence? (posts/week + types: wins, lessons, prompts…)','إيقاع المحتوى الأسبوعي؟ (منشورات/أسبوع + أنواع: انتصارات، دروس، أسئلة…)']},
+ {k:'events',q:['Live events? (weekly call, AMA, challenges, meetings…)','الفعاليات المباشرة؟ (مكالمة أسبوعية، AMA، تحديات، لقاءات…)']},
+ {k:'ladder',q:['Your offer ladder? (free → low-ticket → high-ticket, with prices)','سلّم عروضك؟ (مجاني → منخفض → مرتفع، مع الأسعار)']},
+ {k:'retention',q:['Retention rituals? (wins wall, badges, streaks, shout-outs…)','طقوس الاحتفاظ؟ (جدار انتصارات، شارات، سلاسل، تكريم…)']},
+ {k:'team',q:['Who runs it? (you, moderators, coaches, AI…)','من يديره؟ (أنت، مشرفون، مدربون، ذكاء اصطناعي…)']}
+];
+
+const FUNNEL_TEMPLATES={
+ classic:[['Traffic','traffic',''],['Squeeze Page','capture',''],['Emails','nurture',''],['Sales Page','convert','']],
+ ig_quiz:[['Instagram','traffic',''],['Quiz Page','capture',''],['Community','community','']],
+ yt_free:[['YouTube','traffic',''],['Free Community','community',''],['Upsell','convert','']],
+ yt_tripwire:[['YouTube','traffic',''],['Tripwire Sales Page','convert',''],['Onboarding','retain','']],
+ yt_telegram:[['YouTube','traffic',''],['Telegram Group','nurture',''],['Live Call','call',''],['Paid Community','community','']]
+};
+
+let assetsCache=[], wizardMode=false, wizardKind='xray', xrayIndex=-1, cosData={};
 let pendingImage=null, planTasks=[], currentTaskId=null;
 let memberTier='free';
 let funnelNodes=[];
 
 /* ---------- FUNNEL MAP ---------- */
+function loadTemplate(key){
+  funnelNodes=FUNNEL_TEMPLATES[key].map(t=>({name:t[0],type:t[1],metric:t[2]}));
+  renderFunnel();
+}
 function healthColor(type, metric){
   const m=parseFloat(String(metric||'').replace(/[^\d.]/g,''));
   if(isNaN(m)) return '#33405a';
   if(type==='retain') return m<=10?'#22c55e':(m<=15?'#f5b942':'#ef4444');
-  const bench={capture:[20,40],nurture:[40,60],convert:[2,5],traffic:[0,0]};
+  const bench={capture:[20,40],nurture:[40,60],convert:[2,5]};
   const b=bench[type];
-  if(!b||type==='traffic') return '#33405a';
+  if(!b) return '#33405a';
   if(m>=b[0]) return '#22c55e';
   if(m>=b[0]/2) return '#f5b942';
   return '#ef4444';
@@ -256,7 +285,7 @@ function renderFunnel(){
     row.innerHTML=`
       <input value="${q(n.name)}" placeholder="Stage name (e.g. Squeeze Page)" style="flex:2" oninput="funnelNodes[${i}].name=this.value;renderFunnelPreview()">
       <select style="flex:1" onchange="funnelNodes[${i}].type=this.value;renderFunnelPreview()">
-        ${['traffic','capture','nurture','convert','retain','other'].map(t=>`<option value="${t}" ${t===n.type?'selected':''}>${t}</option>`).join('')}
+        ${['traffic','capture','nurture','convert','retain','community','call','other'].map(t=>`<option value="${t}" ${t===n.type?'selected':''}>${t}</option>`).join('')}
       </select>
       <input value="${q(n.metric)}" placeholder="metric e.g. 8%" style="flex:1" oninput="funnelNodes[${i}].metric=this.value;renderFunnelPreview()">
       <button class="langBtn" onclick="funnelNodes.splice(${i},1);renderFunnel();">✕</button>`;
@@ -288,7 +317,7 @@ async function openFunnelModal(){
     const fm=(d.assets||[]).find(a=>a.asset_type==='funnel_map');
     if(fm&&fm.content){ funnelNodes=JSON.parse(fm.content); }
   }catch(e){}
-  if(!funnelNodes.length) funnelNodes=[{name:'Traffic',type:'traffic',metric:''},{name:'Squeeze Page',type:'capture',metric:''},{name:'Emails',type:'nurture',metric:''},{name:'Sales Page',type:'convert',metric:''}];
+  if(!funnelNodes.length) loadTemplate('classic');
   renderFunnel();
   $('funnelModal').style.display='block';
 }
@@ -385,7 +414,7 @@ $('imgFile').addEventListener('change',e=>{
   rd.readAsDataURL(f);
 });
 
-/* ---------- X-RAY PANEL ---------- */
+/* ---------- X-RAY + COMMUNITY OS PANEL ---------- */
 function fillAssetOptions(){
   const sel=$('assetType'); sel.innerHTML='';
   Object.keys(ASSETS).slice(0,10).forEach(k=>{
@@ -427,6 +456,9 @@ async function loadAssets(){
     renderAssets();
   }catch(e){}
 }
+function showExtraFields(show){
+  ['lblTitle','assetTitle','lblUrl','assetUrl','lblMetrics','assetMetrics'].forEach(id=>{ $(id).style.display=show?'':'none'; });
+}
 function openBusinessModal(){
   if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
   const s=S();
@@ -441,43 +473,96 @@ function openBusinessModal(){
   $('bizSave').textContent=s.bizSave;
   $('bizCancel').textContent=s.bizCancel;
   $('xrayBtn').textContent=s.xray;
-  wizardMode=false; xrayIndex=-1;
+  $('cosBtn').textContent=s.cos;
+  wizardMode=false; wizardKind='xray'; xrayIndex=-1;
   $('wizardBar').style.display='none';
   $('assetType').disabled=false;
   $('xrayBtn').style.display='';
+  $('cosBtn').style.display='';
+  showExtraFields(true);
   fillAssetOptions();
   loadAssets();
   $('businessModal').style.display='block';
 }
 function closeBusinessModal(){$('businessModal').style.display='none';}
 function startXray(){
-  wizardMode=true; xrayIndex=0;
+  wizardMode=true; wizardKind='xray'; xrayIndex=0;
   $('assetType').disabled=true;
   $('xrayBtn').style.display='none';
+  $('cosBtn').style.display='none';
+  showExtraFields(true);
+  showStep();
+}
+function startCos(){
+  wizardMode=true; wizardKind='cos'; xrayIndex=0; cosData={};
+  $('assetType').disabled=true;
+  $('xrayBtn').style.display='none';
+  $('cosBtn').style.display='none';
+  showExtraFields(false);
   showStep();
 }
 function showStep(){
-  if(xrayIndex>=XRAY_STEPS.length){
+  const steps=wizardKind==='cos'?COS_STEPS:XRAY_STEPS;
+  if(xrayIndex>=steps.length){
     wizardMode=false; xrayIndex=-1;
     $('wizardBar').style.display='none';
     $('assetType').disabled=false;
     $('xrayBtn').style.display='';
+    $('cosBtn').style.display='';
     $('bizSave').textContent=S().bizSave;
-    alert(S().xrayDone);
+    showExtraFields(true);
+    if(wizardKind==='xray') alert(S().xrayDone);
+    wizardKind='xray';
     loadAssets();
     return;
   }
-  const st=XRAY_STEPS[xrayIndex];
+  const st=steps[xrayIndex];
   $('wizardBar').style.display='block';
-  $('wizardBar').textContent='🩺 '+(xrayIndex+1)+' / '+XRAY_STEPS.length+' — '+st.q[LANG==='ar'?1:0];
-  $('assetType').value=st.k;
-  $('assetMetrics').placeholder=st.m[LANG==='ar'?1:0];
+  $('wizardBar').textContent=(wizardKind==='cos'?'🏛️ ':'🩺 ')+(xrayIndex+1)+' / '+steps.length+' — '+st.q[LANG==='ar'?1:0];
+  if(wizardKind==='cos'){
+    $('assetType').value='community_os';
+    $('businessInput').value=cosData[st.k]||'';
+  } else {
+    $('assetType').value=st.k;
+    $('assetMetrics').placeholder=st.m[LANG==='ar'?1:0];
+    $('businessInput').value='';
+    $('assetMetrics').value='';
+  }
   $('bizSave').textContent=S().saveNext;
-  $('businessInput').value=''; $('assetTitle').value=''; $('assetUrl').value=''; $('assetMetrics').value='';
+  $('assetTitle').value=''; $('assetUrl').value='';
 }
 async function saveBusinessContext(){
   const mid=localStorage.getItem('e5_member_id');
   try{
+    if(wizardMode && wizardKind==='cos'){
+      const st=COS_STEPS[xrayIndex];
+      cosData[st.k]=$('businessInput').value.trim();
+      xrayIndex++;
+      if(xrayIndex>=COS_STEPS.length){
+        const content='COMMUNITY OPERATIONS OS:\n'
+          +'- PLATFORM: '+(cosData.platform||'-')+'\n'
+          +'- ONBOARDING (first 48h): '+(cosData.onboarding||'-')+'\n'
+          +'- CONTENT CADENCE: '+(cosData.content||'-')+'\n'
+          +'- LIVE EVENTS: '+(cosData.events||'-')+'\n'
+          +'- OFFER LADDER: '+(cosData.ladder||'-')+'\n'
+          +'- RETENTION RITUALS: '+(cosData.retention||'-')+'\n'
+          +'- TEAM: '+(cosData.team||'-');
+        const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({member_id:mid,asset_type:'community_os',title:'Community OS',content:content,url:null,metrics:null})});
+        if(!r.ok) throw 0;
+        wizardMode=false; xrayIndex=-1; wizardKind='xray';
+        $('wizardBar').style.display='none';
+        $('assetType').disabled=false;
+        $('xrayBtn').style.display=''; $('cosBtn').style.display='';
+        $('bizSave').textContent=S().bizSave;
+        showExtraFields(true);
+        alert(S().cosDone);
+        loadAssets();
+        return;
+      }
+      showStep();
+      return;
+    }
     const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         member_id:mid,
@@ -657,7 +742,7 @@ window.addEventListener('load',()=>{
     setMode('normal');
     loadPlan();
     loadTier();
-    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Open 🗺️ Funnel Map to design your funnel, or 📊 My Plan to see your 90-day tasks.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! افتح 🗺️ خريطة القمع لتصميم قمعك، أو 📊 خطتي لرؤية مهام الـ 90 يوم.'));
+    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Design your 🗺️ Funnel Map, run the 🏛️ Community OS, and I\'ll coach you like I work inside your business.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! صمّم 🗺️ خريطة القمع وشغّل 🏛️ نظام المجتمع، وسأدربك وكأنني أعمل داخل عملك.'));
     attachTTS(d);
   }
 });
@@ -692,7 +777,7 @@ function startCoaching(){
   setMode('normal');
   loadPlan();
   loadTier();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Start with 🗺️ Funnel Map so I can see your whole business flow, then 📊 My Plan → Generate My Plan.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! ابدأ بـ 🗺️ خريطة القمع حتى أرى تدفق عملك كاملاً، ثم 📊 خطتي → ولّد خطتي.'));
+  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Start with 🗺️ Funnel Map (pick your archetype), then 🏛️ Community OS, then 📊 My Plan.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! ابدأ بـ 🗺️ خريطة القمع (اختر نموذجك)، ثم 🏛️ نظام المجتمع، ثم 📊 خطتي.'));
   attachTTS(d);
 }
 
