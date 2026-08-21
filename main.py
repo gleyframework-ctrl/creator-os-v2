@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-21-aicoach-v16-funnel-map"
+APP_VERSION = "2026-08-21-aicoach-v17-community-os"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -34,7 +34,8 @@ PREFERRED_MODELS = [
 ASSET_TYPES = ["offer", "avatar", "customer_voice", "traffic", "capture",
                "nurture", "convert", "retain", "numbers", "story",
                "sales_page", "squeeze_page", "quiz_page", "thank_you_page",
-               "email_copy", "social_channel", "customer_avatar", "business_details", "competitor", "funnel_map", "other"]
+               "email_copy", "social_channel", "customer_avatar", "business_details",
+               "competitor", "funnel_map", "community_os", "other"]
 
 ASSET_KEYWORDS = [
     (["convert", "sales_page"], ["sales page", "salespage", "صفحة البيع"]),
@@ -42,6 +43,7 @@ ASSET_KEYWORDS = [
     (["retain", "thank_you_page"], ["thank you", "thankyou", "شكر"]),
     (["nurture", "email_copy"], ["email", "e-mail", "رسائل", "رسالة"]),
     (["traffic", "social_channel"], ["youtube", "instagram", "tiktok", "social", "traffic", "ads", "يوتيوب", "قناة", "إعلان"]),
+    (["community_os"], ["community", "مجتمع"]),
     (["avatar", "customer_avatar"], ["avatar", "عميل"]),
     (["offer"], ["offer", "عرض"]),
 ]
@@ -110,7 +112,7 @@ ABSOLUTE RULES (breaking any of them = failure):
 7. SHORT AND HUMAN. 150-250 words.
 8. NEVER INVENT.
 9. USE THE ASSET INVENTORY.
-10. FUNNEL X-RAY. Compare metrics to benchmarks. If a FUNNEL MAP is on file, walk it stage by stage (Traffic → Capture → Nurture → Convert → Retain), name the single weakest link vs benchmarks, and propose the fix for that stage only.
+10. FUNNEL X-RAY. Compare metrics to benchmarks. If a FUNNEL MAP is on file, walk it stage by stage, name the single weakest link vs benchmarks, and propose the fix for that stage only. NEVER re-ask for numbers already present in the map — use them immediately and state your hypothesis first.
 11. CUSTOMER VOICE. Use their exact words.
 12. READ BEFORE ASKING.
 13. HYPOTHESIS FIRST.
@@ -130,6 +132,8 @@ ABSOLUTE RULES (breaking any of them = failure):
 22. FUNNEL HACK MODE. When the member asks to hack/analyze a competitor, run a 5-part structural teardown (HOOK / MECHANISM / OFFER / PROOF / CTA) plus a DESIGN HACK (hierarchy, colors, typography, trust placement, mobile), then translate the best stolen structure into THEIR business using their X-Ray. Never copy words — copy structures. End with EXACTLY one line starting with 'TASK: '.
 
 23. ALCHEMY MODE. When in alchemy mode, treat the member's input as raw material (not a question). Run THE CLEANSER (remove duplicates/filler/noise, no bullets or hard stops), THE PACER (continuous conversational paragraphs), and THE CONSTRAINT (numbered SLIDE CHUNKS of ~140 words = one 1-minute slide). Output 'SLIDE 1: …' etc., then 'RECORDING CHOREOGRAPHY:' with the Zoom zero-edit steps (share WINDOW only, check Share Sound, downbeat/catch/breath/release). Override the accountability opening in this mode. Remind: never start from scratch — duplicate the Master HTML Template.
+
+24. COMMUNITY OS AWARENESS. If a COMMUNITY OPERATIONS OS is on file, treat it as the member's business engine. When they share ANY work (a post, a call, an onboarding message, an offer), review it against their OWN OS — cadence, events, offer ladder, retention rituals — and point out exactly what is missing or broken vs their own design. Also respect their funnel archetype from the FUNNEL MAP (community-led, tripwire, telegram-call, etc.) — never force a funnel shape they don't run.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — an OPERATING PARTNER, not just an advisor. You COACH, you don't lecture.
@@ -258,7 +262,7 @@ def build_memory_block(member_id: str) -> str:
     if assets.data:
         parts = []
         for a in assets.data:
-            if a["asset_type"] == "funnel_map":
+            if a["asset_type"] in ("funnel_map", "community_os"):
                 continue
             parts.append(a["asset_type"] + (f" [{a['metrics']}]" if a.get("metrics") else ""))
         if parts:
@@ -274,6 +278,10 @@ def build_memory_block(member_id: str) -> str:
                 lines.append("- MEMBER FUNNEL MAP (designed by member — source of truth for leak diagnosis): " + chain)
             except Exception:
                 pass
+        cos = next((a for a in assets.data if a["asset_type"] == "community_os"), None)
+        if cos and cos.get("content"):
+            lines.append("- COMMUNITY OPERATIONS OS (how the member's community actually runs — review their work against this):")
+            lines.append((cos["content"] or "")[:2500])
     if plan_rows.data:
         lines.append("- 90-DAY PLAN:")
         pending = []
@@ -379,7 +387,7 @@ OUTPUT: Return ONLY a JSON array of 12 week objects (one per week, weeks 1-12). 
 {{"week": 1, "phase": 1, "title": "short task title", "description": "one concrete, specific action"}}
 
 Phase 1 = Offer (weeks 1-4), Phase 2 = Audience (weeks 5-8), Phase 3 = Profit (weeks 9-12).
-Make each task CONCRETE and SPECIFIC to their niche — never generic. 1 task per week.
+Make each task CONCRETE and SPECIFIC to their niche and their funnel archetype (community-led, tripwire, telegram-call, etc.) — never generic. 1 task per week.
 Return ONLY the JSON array, no commentary."""
         headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
         payload = {
@@ -619,7 +627,6 @@ async def text_to_speech(req: dict):
     text = (req.get("text") or "").strip()
     lang = (req.get("language") or "en").strip().lower()
     if not text: raise HTTPException(status_code=400, detail="Empty text")
-    # ENGINE 1: Fish Audio cloned voice (YOUR voice)
     if FISH_KEY and FISH_VOICE_ID:
         try:
             headers = {"Authorization": f"Bearer {FISH_KEY}"}
@@ -631,7 +638,6 @@ async def text_to_speech(req: dict):
                 print(f"Fish error: {r.status_code} {r.text[:200]}")
         except Exception as e:
             print(f"❌ FISH TTS FAILURE: {e}")
-    # ENGINE 2: ElevenLabs
     if ELEVEN_KEY:
         voice_id = "pNInz6obpgDQGcFmaJgB"
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -642,7 +648,6 @@ async def text_to_speech(req: dict):
             r = await client.post(url, json=payload, headers=headers)
             if r.status_code != 200: raise HTTPException(status_code=500, detail="Voice failed")
             return Response(content=r.content, media_type="audio/mpeg")
-    # ENGINE 3: Free Edge neural
     voice = "ar-SA-HamedNeural" if lang.startswith("ar") else "en-US-ChristopherNeural"
     try:
         buf = io.BytesIO()
