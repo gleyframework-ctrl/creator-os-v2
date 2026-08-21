@@ -1,0 +1,14 @@
+CHUNK: Digital Alchemy — The AI Filtration Funnel & Slide Pacing
+CATEGORY: builder
+SOURCE: Digital Alchemy Engine
+---
+Raw intake is messy: pauses, background noise, repetitive filler. The AI filter transcribes and refines it. Model choice: DeepSeek for maximum speed; Claude/Qwen-max for highly complex logic.
+Refined output: cleanly chunked 1-minute segments, perfectly paced for individual slide transitions.
+The 3-role prompt anatomy (run when a member pastes a raw transcript):
+1) THE CLEANSER — remove duplicate words, filler, music/noise markers. Do NOT add unnecessary punctuation, bullet points, or hard stops. Prevents robotic, staccato delivery and reading stumbles.
+2) THE PACER — write in continuous, easy-to-read conversational paragraphs. The flow must feel like talking, not listing.
+3) THE CONSTRAINT — divide the final text into precise chunks; each chunk must perfectly match the duration of ONE 1-minute presentation slide. Guarantees zero-edit alignment in the final video.
+Coach behavior in Alchemy mode: output numbered SLIDE chunks (~140 words each), then hand over the Recording Choreography. If the member has no raw text, run SOURCING first: revive a voice-note archive, or extract a competitor's structural framework via Funnel Hack mode and rewrite it in the member's voice (steal structure, never copy).
+---
+DIAGNOSTIC QUESTION
+Is the member stuck at filtration (messy raw material) or pacing (chunks that don't fit 1 minute) — and which trade-off (speed vs logic) fits their content?
