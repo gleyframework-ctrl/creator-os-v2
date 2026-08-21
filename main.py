@@ -300,3 +300,16 @@ def tts(req: TTSRequest):
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest):
     return tts(req)
+# ------------------------- LEGACY UI + STARTUP (ADDITIVE FIX) -------------------------
+from fastapi.responses import FileResponse, HTMLResponse
+
+@app.get("/test")
+def test_page():
+    if os.path.exists("chat_test.html"):
+        return FileResponse("chat_test.html")
+    return HTMLResponse("<h3>chat_test.html not found in repo root - upload it via GitHub Add File.</h3>")
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
