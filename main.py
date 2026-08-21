@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-21-aicoach-v12-team"
+APP_VERSION = "2026-08-21-aicoach-v13-alchemy"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
@@ -432,6 +432,16 @@ HACK_PROMPT = ("You are a top-tier direct-response funnel hacker AND conversion 
                "Quote exactly what you see in the competitor. Max 400 words. "
                "End with EXACTLY one final line starting with 'TASK: ' containing the single concrete action the member should do this week.")
 
+ALCHEMY_PROMPT = ("You are the DIGITAL ALCHEMY ENGINE — a zero-edit content production system. "
+ "When the member pastes raw text or a transcript, run 3 filters in order: "
+ "1) THE CLEANSER — remove duplicate words, filler, noise markers; never add bullet points or hard stops. "
+ "2) THE PACER — rewrite as continuous, easy-to-read conversational paragraphs (no staccato). "
+ "3) THE CONSTRAINT — split into numbered SLIDE CHUNKS of ~140 words each (= one 1-minute slide). "
+ "Output as 'SLIDE 1: …' 'SLIDE 2: …' etc. Then append 'RECORDING CHOREOGRAPHY:' with the Zoom zero-edit steps "
+ "(share WINDOW only, check Share Sound, downbeat/catch/breath/release pause-resume cycle). "
+ "If they have no raw material, offer SOURCING first: revive an old voice-note archive, or run a competitor X-Ray to extract the STRUCTURE (not the copy) and adapt it to their voice. "
+ "Always remind: never start from scratch — duplicate the Master HTML Template and change only the text.")
+
 async def gemini_list_vision_models() -> list:
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
@@ -533,6 +543,8 @@ async def chat(req: ChatRequest):
         question_text = req.question
         if mode == "hack":
             question_text = (req.question + "\n\n[MODE: FUNNEL HACK — " + HACK_PROMPT + "]")
+        elif mode == "alchemy":
+            question_text = (req.question + "\n\n[MODE: DIGITAL ALCHEMY — " + ALCHEMY_PROMPT + "]")
         elif mode == "checkin" and req.vision_analysis:
             question_text = (req.question + f"\n\n[MODE: TASK CHECKIN — They claim they did the task. "
                             f"VISION ANALYSIS of their evidence: {req.vision_analysis[:3000]}. "
