@@ -1,837 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E5 AI Coach</title>
-<style>
-  :root{--bg:#0e1628;--panel:#1c2333;--gold:#f5b942;--text:#f5f9fc;--muted:#8a94a6;--user:#2563eb;--coach:#233047;}
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
-  body{background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;}
-  header{background:var(--panel);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--gold);flex-wrap:wrap;}
-  header h1{font-size:17px;letter-spacing:.5px;}
-  #coachSelect{background:#0e1628;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:5px 12px;font-size:12px;outline:none;cursor:pointer;}
-  .langBtn{background:none;border:1px solid #33405a;color:var(--muted);border-radius:12px;padding:3px 9px;font-size:11px;cursor:pointer;}
-  header .tag{margin-left:auto;font-size:11px;color:var(--gold);border:1px solid var(--gold);padding:3px 8px;border-radius:20px;}
-  #onboarding{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .card{background:var(--panel);border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.4);}
-  .card h2{color:var(--gold);margin-bottom:6px;}
-  .card p{color:var(--muted);font-size:13px;margin-bottom:18px;}
-  .card label{font-size:12px;color:var(--muted);display:block;margin:12px 0 6px;}
-  .card input{width:100%;padding:12px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
-  .card input:focus{border-color:var(--gold);}
-  .card button{width:100%;margin-top:20px;padding:13px;border:none;border-radius:10px;background:var(--gold);color:#10131a;font-weight:700;font-size:15px;cursor:pointer;}
-  #chatScreen{flex:1;display:none;flex-direction:column;height:100%;}
-  #messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;}
-  .msg{max-width:82%;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.55;}
-  .msg.user{align-self:flex-end;background:var(--user);border-bottom-right-radius:4px;}
-  .msg.coach{align-self:flex-start;background:var(--coach);border:1px solid #2e3b55;border-bottom-left-radius:4px;}
-  .msg.coach strong{color:var(--gold);}
-  .tts-btn{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;margin-top:8px;padding:0;opacity:.85;}
-  .tts-btn:hover{opacity:1;}
-  #imgChip{display:none;margin:8px 14px 0;padding:6px 12px;background:#233047;border:1px dashed var(--gold);border-radius:12px;color:var(--gold);font-size:12px;cursor:pointer;}
-  #modeBar{display:none;margin:8px 14px 0;}
-  #modeBar button{margin-right:8px;padding:5px 12px;border-radius:12px;border:1px solid #33405a;background:#233047;color:var(--muted);font-size:11px;cursor:pointer;}
-  #modeBar button.active{background:var(--gold);color:#10131a;border-color:var(--gold);font-weight:700;}
-  #inputBar{display:flex;gap:10px;padding:14px;background:var(--panel);border-top:1px solid #2e3b55;}
-  #userInput{flex:1;padding:13px;border-radius:12px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
-  #userInput:focus{border-color:var(--gold);}
-  .toolBtn{padding:0 14px;border:none;border-radius:12px;background:#233047;border:1px solid #33405a;font-size:16px;cursor:pointer;}
-  .toolBtn.rec{background:#dc2626;border-color:#dc2626;}
-  #sendBtn{padding:0 22px;border:none;border-radius:12px;background:var(--gold);font-weight:700;cursor:pointer;color:#10131a;}
-  #businessModal,#planModal,#unlockModal,#funnelModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:9999;overflow-y:auto;}
-  .bizCard{background:#1c2333;max-width:760px;margin:40px auto;padding:28px;border-radius:16px;border:2px solid var(--gold);}
-  .bizCard h2{color:var(--gold);margin-bottom:8px;}
-  .bizCard p{color:var(--muted);font-size:13px;margin-bottom:16px;}
-  .bizCard label{font-size:11px;color:var(--muted);display:block;margin:10px 0 5px;}
-  .bizCard select,.bizCard input,.bizCard textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:14px;outline:none;}
-  .bizCard select:focus,.bizCard input:focus,.bizCard textarea:focus{border-color:var(--gold);}
-  .bizCard textarea{height:150px;resize:vertical;}
-  #assetsList{margin-top:14px;display:flex;flex-wrap:wrap;}
-  .bizBtns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
-  .bizBtns button{flex:1;padding:13px;border:none;border-radius:10px;font-weight:700;cursor:pointer;min-width:110px;}
-  #wizardBar{display:none;background:#0e1628;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:12px;color:var(--gold);font-size:13px;}
-  .phaseHeader{color:var(--gold);font-weight:700;font-size:14px;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #33405a;}
-  .taskRow{display:flex;align-items:center;gap:12px;padding:12px;background:#0e1628;border-radius:10px;margin-bottom:8px;border:1px solid #33405a;}
-  .taskRow.current{border-color:var(--gold);}
-  .taskRow.done{opacity:.6;}
-  .taskCheck{width:22px;height:22px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
-  .taskCheck.done{background:var(--gold);border-color:var(--gold);color:#10131a;}
-  .taskCheck.current{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,185,66,.3);}
-  .taskBody{flex:1;}
-  .taskTitle{font-size:14px;font-weight:600;}
-  .taskDesc{font-size:12px;color:var(--muted);margin-top:4px;}
-  .taskActions{display:flex;gap:6px;}
-  .taskActions button{padding:6px 12px;border-radius:8px;border:1px solid #33405a;background:#233047;color:var(--muted);font-size:11px;cursor:pointer;}
-  .taskActions button:hover{color:var(--text);}
-  .progressBar{height:8px;background:#0e1628;border-radius:4px;overflow:hidden;margin-bottom:16px;}
-  .progressFill{height:100%;background:var(--gold);transition:width .3s;}
-  #funnelPreview{display:flex;align-items:center;overflow-x:auto;padding:12px 4px;}
-  .fStage{background:#0e1628;border:2px solid #33405a;border-radius:10px;padding:8px 12px;min-width:110px;text-align:center;font-size:12px;flex-shrink:0;}
-  .fArrow{color:var(--gold);font-size:18px;padding:0 8px;flex-shrink:0;}
-  .fRow{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
-  .fRow input,.fRow select{padding:9px;border-radius:10px;border:1px solid #33405a;background:#0e1628;color:var(--text);font-size:13px;outline:none;}
-  #funnelTemplates{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E5 AI Coach - CCC Brain</title>
+    <style>
+        :root {
+            --bg-main: #0f1115;
+            --bg-chat: #181b21;
+            --bg-user: #2563eb;
+            --bg-ai: #22252a;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent: #10b981;
+            --border: #2d3139;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Header */
+        header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #13151a; }
+        header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        header h1 span { color: var(--accent); }
+        .controls { display: flex; gap: 12px; align-items: center; }
+        select, button { background: var(--bg-ai); color: var(--text-main); border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        select:hover, button:hover { border-color: var(--accent); }
+        button.clear-btn { background: transparent; color: #ef4444; border: 1px solid #7f1d1d; font-size: 12px; padding: 6px 10px; }
+        button.clear-btn:hover { background: #7f1d1d; color: white; }
+
+        /* Chat Area */
+        #chat-container { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; max-width: 900px; width: 100%; margin: 0 auto; }
+        .message { max-width: 85%; padding: 14px 18px; border-radius: 12px; line-height: 1.6; font-size: 15px; white-space: pre-wrap; word-wrap: break-word; }
+        .message.user { align-self: flex-end; background: var(--bg-user); color: white; border-bottom-right-radius: 2px; }
+        .message.ai { align-self: flex-start; background: var(--bg-ai); border: 1px solid var(--border); border-bottom-left-radius: 2px; }
+        .message.ai strong { color: var(--accent); }
+        .message.ai code { background: #000; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px; color: #f87171; }
+        .message.ai pre { background: #000; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
+        .message.ai pre code { background: transparent; color: #e5e7eb; padding: 0; }
+        
+        /* Typing Indicator */
+        .typing { display: flex; gap: 4px; padding: 14px 18px; align-self: flex-start; }
+        .typing span { width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing span:nth-child(1) { animation-delay: -0.32s; }
+        .typing span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Input Area */
+        footer { padding: 20px 24px; border-top: 1px solid var(--border); background: #13151a; }
+        .input-wrapper { max-width: 900px; margin: 0 auto; display: flex; gap: 12px; }
+        textarea { flex: 1; background: var(--bg-chat); border: 1px solid var(--border); color: var(--text-main); padding: 14px; border-radius: 8px; font-size: 15px; resize: none; height: 56px; outline: none; transition: 0.2s; }
+        textarea:focus { border-color: var(--accent); }
+        button.send-btn { background: var(--accent); color: #000; font-weight: 600; border: none; width: 80px; }
+        button.send-btn:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+    </style>
 </head>
 <body>
-<header>
-  <span style="font-size:22px" id="coachEmoji">🧠</span>
-  <h1 id="coachTitle">E5 AI COACH</h1>
-  <select id="coachSelect" onchange="switchCoach()">
-    <option value="e5" id="optE5">E5 Coach</option>
-    <option value="builder" id="optB">The Builder</option>
-  </select>
-  <button class="langBtn" id="langEn" onclick="setLang('en')">EN</button>
-  <button class="langBtn" id="langAr" onclick="setLang('ar')">عربي</button>
-  <button class="langBtn" id="bizBtn" onclick="openBusinessModal()">📋 My Business</button>
-  <button class="langBtn" id="mapBtn" onclick="openFunnelModal()">🗺️ Funnel Map</button>
-  <button class="langBtn" id="planBtn" onclick="openPlanModal()">📊 My Plan</button>
-  <button class="langBtn" id="unlockBtn" onclick="openUnlockModal()">🔓 Unlock</button>
-  <span class="tag" id="memberTag">GUEST</span>
-  <span class="tag" id="tierTag">FREE</span>
-</header>
 
-<div id="onboarding">
-  <div class="card">
-    <h2 id="onboardTitle">Welcome, Future Empire Builder 👋</h2>
-    <p id="onboardDesc">I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.</p>
-    <label id="lblName">YOUR NAME</label>
-    <input id="nameInput" placeholder="e.g. Ahmed">
-    <label id="lblNiche">YOUR NICHE / BUSINESS</label>
-    <input id="nicheInput" placeholder="e.g. Fitness coaching for busy dads">
-    <button id="startBtn" onclick="startCoaching()">🚀 START COACHING</button>
-  </div>
-</div>
-
-<div id="chatScreen">
-  <div id="messages"></div>
-  <div id="imgChip" onclick="clearImage()"></div>
-  <div id="modeBar">
-    <button id="modeNormal" onclick="setMode('normal')">💬 Normal</button>
-    <button id="modeHack" onclick="setMode('hack')">🕵️ Hack Funnel</button>
-    <button id="modeAlchemy" onclick="setMode('alchemy')">🎬 Alchemy</button>
-    <button id="modeCheckin" onclick="setMode('checkin')">✅ Check In</button>
-  </div>
-  <div id="inputBar">
-    <input id="userInput" placeholder="Ask your coach anything…">
-    <button class="toolBtn" id="imgBtn" onclick="pickImage()">📷</button>
-    <button class="toolBtn" id="micBtn" onclick="toggleMic()">🎤</button>
-    <button id="sendBtn" onclick="send()">➤</button>
-  </div>
-  <input type="file" id="imgFile" accept="image/*" style="display:none">
-</div>
-
-<!-- UNLOCK MODAL -->
-<div id="unlockModal">
-  <div class="bizCard" style="max-width:440px;">
-    <h2>🔓 Unlock Premium</h2>
-    <p>Enter the access code you received after joining on Whop.</p>
-    <label>ACCESS CODE</label>
-    <input id="codeInput" placeholder="e.g. BUILDER-97-ALPHA">
-    <div class="bizBtns">
-      <button onclick="submitCode()" style="background:var(--gold);color:#10131a;">🚀 Unlock</button>
-      <button onclick="closeUnlockModal()" style="background:#233047;color:var(--text);">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- FUNNEL MAP MODAL -->
-<div id="funnelModal">
-  <div class="bizCard">
-    <h2>🗺️ Funnel Map</h2>
-    <p>Design your funnel stage by stage — pick a template or build your own. The coach sees this exact map and diagnoses the weakest link.</p>
-    <div id="funnelTemplates">
-      <button class="langBtn" onclick="loadTemplate('classic')">🎯 Classic</button>
-      <button class="langBtn" onclick="loadTemplate('ig_quiz')">📸 IG→Quiz→Community</button>
-      <button class="langBtn" onclick="loadTemplate('yt_free')">📺 YT→Free Community</button>
-      <button class="langBtn" onclick="loadTemplate('yt_tripwire')">🪝 YT→Tripwire</button>
-      <button class="langBtn" onclick="loadTemplate('yt_telegram')">📞 YT→Telegram→Call→Paid</button>
-    </div>
-    <div id="funnelPreview"></div>
-    <div id="funnelStages"></div>
-    <div class="bizBtns">
-      <button onclick="funnelNodes.push({name:'',type:'other',metric:''});renderFunnel();" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">➕ Add Stage</button>
-      <button onclick="saveFunnelMap()" style="background:var(--gold);color:#10131a;">💾 Save Map</button>
-      <button onclick="closeFunnelModal()" style="background:#233047;color:var(--text);">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- BUSINESS X-RAY + COMMUNITY OS MODAL -->
-<div id="businessModal">
-  <div class="bizCard">
-    <h2 id="bizTitle">📋 Business X-Ray</h2>
-    <p id="bizDesc">The coach reads every section + your numbers + your community engine, finds the weakest stage, and deep-dives it.</p>
-    <div id="wizardBar"></div>
-    <label id="lblSection">SECTION</label>
-    <select id="assetType"></select>
-    <label id="lblTitle">TITLE (OPTIONAL)</label>
-    <input id="assetTitle" placeholder="e.g. Main sales page v2">
-    <label id="lblUrl">LINK / URL (OPTIONAL)</label>
-    <input id="assetUrl" placeholder="https://…">
-    <label id="lblMetrics">KEY METRIC (OPTIONAL)</label>
-    <input id="assetMetrics" placeholder="e.g. opt-in 8%">
-    <label id="lblCopy">PASTE THE COPY / CONTENT</label>
-    <textarea id="businessInput" placeholder="Paste the full copy of this section here…"></textarea>
-    <div id="assetsList"></div>
-    <div class="bizBtns">
-      <button id="xrayBtn" onclick="startXray()" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">🩺 Guided X-Ray</button>
-      <button id="cosBtn" onclick="startCos()" style="background:#233047;color:var(--gold);border:1px solid var(--gold);">🏛️ Community OS</button>
-      <button id="bizSave" onclick="saveBusinessContext()" style="background:var(--gold);color:#10131a;">💾 Save Section</button>
-      <button id="bizCancel" onclick="closeBusinessModal()" style="background:#233047;color:var(--text);">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- PLAN MODAL -->
-<div id="planModal">
-  <div class="bizCard">
-    <h2 id="planTitle">📊 My 90-Day Plan</h2>
-    <p id="planDesc">Your Operating Partner's weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.</p>
-    <div class="progressBar"><div class="progressFill" id="progressFill" style="width:0%"></div></div>
-    <div id="planContent"></div>
-    <div class="bizBtns">
-      <button id="planGenerate" onclick="generatePlan()" style="background:var(--gold);color:#10131a;">🎯 Generate My Plan</button>
-      <button onclick="closePlanModal()" style="background:#233047;color:var(--text);">Close</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const q=s=>String(s==null?'':s).replace(/"/g,'&quot;');
-const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^#{1,3}\s?(.*)$/gm,'<strong>📌 $1</strong>').replace(/\n/g,'<br>');
-const slug=s=>s.toLowerCase().trim().replace(/[^a-z0-9\u0600-\u06FF]+/g,'_').replace(/^_|_$/g,'');
-
-let LANG=localStorage.getItem('e5_lang')||'en';
-let currentMode='normal';
-const STR={
- en:{onTitle:'Welcome, Future Empire Builder 👋',onDesc:"I'm your personal AI Operating Partner. I remember your niche, your stage, and track your progress on the 90-day plan we build together.",lblName:'YOUR NAME',lblNiche:'YOUR NICHE / BUSINESS',btn:'🚀 START COACHING',ph:'Ask your coach anything…',optE5:'E5 Coach',optB:'The Builder',listen:'🔊 Listen',playing:'🔉 Playing…',micErr:'Microphone access denied',voiceErr:'Voice error — try again',imgBig:'Image too big (max 4MB)',looking:'👁️ <em>Coach is looking at your screenshot…</em>',visionErr:'⚠️ Vision engine error — the coach could not see the image',biz:'📋 My Business',plan:'📊 My Plan',bizTitle:'📋 Business X-Ray',planTitle:'📊 My 90-Day Plan',planDesc:'Your Operating Partner\'s weekly tasks, co-built from your X-Ray. Complete each one and prove it with a screenshot.',bizDesc:'The coach reads every section + your numbers + your community engine, finds the weakest stage, and deep-dives it.',lblSection:'SECTION',lblTitle:'TITLE (OPTIONAL)',lblUrl:'LINK / URL (OPTIONAL)',lblMetrics:'KEY METRIC (OPTIONAL)',lblCopy:'PASTE THE COPY / CONTENT',bizPh:'Paste the full copy of this section here…',bizSave:'💾 Save Section',saveNext:'💾 Save & Next',bizCancel:'Close',xray:'🩺 Guided X-Ray',cos:'🏛️ Community OS',bizSaved:'✅ Section saved! The coach can now review it.',bizFail:'⚠️ Failed to save. Try again.',bizFirst:'Start coaching first!',noAssets:'No sections saved yet. Run the Guided X-Ray or add one manually.',xrayDone:'🎉 X-Ray complete! The coach now sees your whole funnel.',cosDone:'🏛️ Community OS saved! The coach now knows exactly how your community runs.',phase1:'🎯 PHASE 1: OFFER (Weeks 1-4)',phase2:'👥 PHASE 2: AUDIENCE (Weeks 5-8)',phase3:'💰 PHASE 3: PROFIT (Weeks 9-12)',genBtn:'🎯 Generate My Plan',planGenerating:'Generating your 90-day plan…',planGenerated:'Plan generated! Check the tasks below.',taskDone:'✅ Task marked done. Show the coach your evidence!',taskBlocked:'Task marked blocked. Ask the coach for help.',noPlan:'No plan yet. Click "Generate My Plan" to build your 90-day Operating Partner plan from your X-Ray.',checkinFirst:'Attach a screenshot of the work you did for the current task, then send in Check In mode.',mapSaved:'✅ Funnel Map saved! The coach can now see your whole funnel.',mapEmpty:'Add at least one stage first.'},
- ar:{onTitle:'مرحباً بك، باني الإمبراطورية المستقبلي 👋',onDesc:'أنا شريكك التشغيلي بالذكاء الاصطناعي. أتذكّر مجالك ومرحلتك وأتابع تقدّمك في خطة الـ 90 يوم التي نبنيها معاً.',lblName:'اسمك',lblNiche:'مجالك / عملك',btn:'🚀 ابدأ التدريب',ph:'اسأل مدربك أي شيء…',optE5:'مدرب E5',optB:'الباني 🏗️',listen:'🔊 استمع',playing:'🔉 يشغل…',micErr:'تم رفض الوصول إلى الميكروفون',voiceErr:'خطأ في الصوت — حاول مجدداً',imgBig:'الصورة كبيرة جداً (4MB كحد أقصى)',looking:'👁️ <em>المدرب ينظر إلى لقطتك…</em>',visionErr:'⚠️ خطأ في محرك الرؤية — لم يستطع المدرب رؤية الصورة',biz:'📋 أعمالي',plan:'📊 خطتي',bizTitle:'📋 فحص الأعمال',planTitle:'📊 خطتي لـ 90 يوم',planDesc:'مهام أسبوعية من شريكك التشغيلي، مبنية من فحص أعمالك. أنجز كل مهمة وأثبتها بلقطة.',bizDesc:'يقرأ المدرب كل قسم + أرقامك + محرك مجتمعك، يجد أضعف مرحلة، ويتعمق فيها.',lblSection:'القسم',lblTitle:'العنوان (اختياري)',lblUrl:'رابط (اختياري)',lblMetrics:'المؤشر الرئيسي (اختياري)',lblCopy:'الصق النص / المحتوى',bizPh:'الصق نص هذا القسم كاملاً هنا…',bizSave:'💾 حفظ القسم',saveNext:'💾 حفظ والتالي',bizCancel:'إغلاق',xray:'🩺 فحص موجّه',cos:'🏛️ نظام المجتمع',bizSaved:'✅ تم حفظ القسم!',bizFail:'⚠️ فشل الحفظ. حاول مجدداً.',bizFirst:'ابدأ التدريب أولاً!',noAssets:'لا أقسام محفوظة بعد.',xrayDone:'🎉 اكتمل الفحص!',cosDone:'🏛️ تم حفظ نظام تشغيل المجتمع! المدرب يعرف الآن كيف يعمل مجتمعك تماماً.',phase1:'🎯 المرحلة 1: العرض (الأسابيع 1-4)',phase2:'👥 المرحلة 2: الجمهور (الأسابيع 5-8)',phase3:'💰 المرحلة 3: الربح (الأسابيع 9-12)',genBtn:'🎯 ولّد خطتي',planGenerating:'أولّد خطتك لـ 90 يوم…',planGenerated:'تم إنشاء الخطة!',taskDone:'✅ تم وضع المهمة كمكتملة. أرِ المدرب الدليل!',taskBlocked:'تم وضع المهمة كمحظورة. اسأل المدرب المساعدة.',noPlan:'لا خطة بعد. اضغط "ولّد خطتي".',checkinFirst:'أرفق لقطة لعملك الحالي، ثم أرسل في وضع Check In.',mapSaved:'✅ تم حفظ خريطة القمع!',mapEmpty:'أضف مرحلة واحدة على الأقل أولاً.'}
-};
-const T=(en,ar)=>LANG==='ar'?ar:en;
-const S=()=>STR[LANG];
-
-const ASSETS={
- offer:['🎯 The Offer','🎯 العرض'],avatar:['👤 Avatar & Awareness','👤 العميل والوعي'],
- customer_voice:['🗣️ Customer Voice','🗣️ صوت العميل'],traffic:['📢 Traffic',' الزيارات'],
- capture:['🧲 Capture',' الالتقاط'],nurture:['✉️ Nurture (Emails)','✉️ الرسائل'],
- convert:['💰 Convert (Sales)','💰 صفحة البيع'],retain:['🤝 Retain','🤝 الاحتفاظ'],
- numbers:['📊 Numbers & Goal','📊 الأرقام والهدف'],story:['🧬 Story & Brand','🧬 القصة والنبرة'],
- community_os:['🏛️ Community OS','🏛️ نظام المجتمع'],
- competitor:['🕵️ Competitor Hack','🕵️ تحليل منافس'],
- other:['📎 Other',' أخرى']
-};
-
-const XRAY_STEPS=[
- {k:'offer',q:['What do you sell? Promise, price, guarantee, delivery.','ماذا تبيع؟ الوعد، السعر، الضمان، التوصيل.'],m:['Price point','نقطة السعر']},
- {k:'avatar',q:['Who exactly is your customer? Beliefs, fears, tried-befores.','من عميلك بالضبط؟ معتقداته، مخاوفه، ما جرّبه.'],m:['Awareness level','مستوى الوعي']},
- {k:'customer_voice',q:['Paste 3-5 REAL customer messages / testimonials.','الصق 3-5 رسائل/شهادات حقيقية.'],m:['','']},
- {k:'traffic',q:['Where does traffic come from?','من أين تأتي الزيارات؟'],m:['Followers & clicks/mo','متابعون ونقرات/شهر']},
- {k:'capture',q:['Paste your squeeze/quiz page copy.','الصق نص صفحة الالتقاط/الاختبار.'],m:['Opt-in %','نسبة الالتقاط %']},
- {k:'nurture',q:['Paste your email sequence.','الصق تسلسل رسائلك.'],m:['Open % / Click %','فتح % / نقر %']},
- {k:'convert',q:['Paste your sales page.','الصق صفحة البيع.'],m:['Conversion %','نسبة التحويل %']},
- {k:'retain',q:['Paste thank-you / onboarding copy.','الصق نص صفحة الشكر/التهيئة.'],m:['Refund %','نسبة الاسترداد %']},
- {k:'numbers',q:['Current revenue? 90-day goal?','الإيراد الحالي؟ هدف 90 يوم؟'],m:['Revenue → goal','الإيراد → الهدف']},
- {k:'story',q:['Origin story + brand tone.','قصتك الأصل + نبرة العلامة.'],m:['','']}
-];
-
-const COS_STEPS=[
- {k:'platform',q:['Where does your community live? (Skool / Whop / Telegram / Facebook / Discord)','أين يعيش مجتمعك؟ (Skool / Whop / Telegram / Facebook / Discord)']},
- {k:'onboarding',q:['What happens in a new member\'s first 48 hours? (welcome post, DM, checklist…)','ماذا يحدث للعضو الجديد في أول 48 ساعة؟ (ترحيب، رسالة، قائمة…)']},
- {k:'content',q:['Your weekly content cadence? (posts/week + types: wins, lessons, prompts…)','إيقاع المحتوى الأسبوعي؟ (منشورات/أسبوع + أنواع: انتصارات، دروس، أسئلة…)']},
- {k:'events',q:['Live events? (weekly call, AMA, challenges, meetings…)','الفعاليات المباشرة؟ (مكالمة أسبوعية، AMA، تحديات، لقاءات…)']},
- {k:'ladder',q:['Your offer ladder? (free → low-ticket → high-ticket, with prices)','سلّم عروضك؟ (مجاني → منخفض → مرتفع، مع الأسعار)']},
- {k:'retention',q:['Retention rituals? (wins wall, badges, streaks, shout-outs…)','طقوس الاحتفاظ؟ (جدار انتصارات، شارات، سلاسل، تكريم…)']},
- {k:'team',q:['Who runs it? (you, moderators, coaches, AI…)','من يديره؟ (أنت، مشرفون، مدربون، ذكاء اصطناعي…)']}
-];
-
-const FUNNEL_TEMPLATES={
- classic:[['Traffic','traffic',''],['Squeeze Page','capture',''],['Emails','nurture',''],['Sales Page','convert','']],
- ig_quiz:[['Instagram','traffic',''],['Quiz Page','capture',''],['Community','community','']],
- yt_free:[['YouTube','traffic',''],['Free Community','community',''],['Upsell','convert','']],
- yt_tripwire:[['YouTube','traffic',''],['Tripwire Sales Page','convert',''],['Onboarding','retain','']],
- yt_telegram:[['YouTube','traffic',''],['Telegram Group','nurture',''],['Live Call','call',''],['Paid Community','community','']]
-};
-
-let assetsCache=[], wizardMode=false, wizardKind='xray', xrayIndex=-1, cosData={};
-let pendingImage=null, planTasks=[], currentTaskId=null;
-let memberTier='free';
-let funnelNodes=[];
-
-/* ---------- FUNNEL MAP ---------- */
-function loadTemplate(key){
-  funnelNodes=FUNNEL_TEMPLATES[key].map(t=>({name:t[0],type:t[1],metric:t[2]}));
-  renderFunnel();
-}
-function healthColor(type, metric){
-  const m=parseFloat(String(metric||'').replace(/[^\d.]/g,''));
-  if(isNaN(m)) return '#33405a';
-  if(type==='retain') return m<=10?'#22c55e':(m<=15?'#f5b942':'#ef4444');
-  const bench={capture:[20,40],nurture:[40,60],convert:[2,5]};
-  const b=bench[type];
-  if(!b) return '#33405a';
-  if(m>=b[0]) return '#22c55e';
-  if(m>=b[0]/2) return '#f5b942';
-  return '#ef4444';
-}
-function renderFunnel(){
-  const box=$('funnelStages'); box.innerHTML='';
-  funnelNodes.forEach((n,i)=>{
-    const row=document.createElement('div');
-    row.className='fRow';
-    row.innerHTML=`
-      <input value="${q(n.name)}" placeholder="Stage name (e.g. Squeeze Page)" style="flex:2" oninput="funnelNodes[${i}].name=this.value;renderFunnelPreview()">
-      <select style="flex:1" onchange="funnelNodes[${i}].type=this.value;renderFunnelPreview()">
-        ${['traffic','capture','nurture','convert','retain','community','call','other'].map(t=>`<option value="${t}" ${t===n.type?'selected':''}>${t}</option>`).join('')}
-      </select>
-      <input value="${q(n.metric)}" placeholder="metric e.g. 8%" style="flex:1" oninput="funnelNodes[${i}].metric=this.value;renderFunnelPreview()">
-      <button class="langBtn" onclick="funnelNodes.splice(${i},1);renderFunnel();">✕</button>`;
-    box.appendChild(row);
-  });
-  renderFunnelPreview();
-}
-function renderFunnelPreview(){
-  const pv=$('funnelPreview'); pv.innerHTML='';
-  funnelNodes.forEach((n,i)=>{
-    const card=document.createElement('div');
-    card.className='fStage';
-    card.style.borderColor=healthColor(n.type,n.metric);
-    card.innerHTML='<strong>'+esc(n.name||'Stage')+'</strong><br><span style="color:var(--muted)">'+esc(n.type)+'</span>'+(n.metric?'<br><span style="color:var(--gold)">'+esc(n.metric)+'</span>':'');
-    pv.appendChild(card);
-    if(i<funnelNodes.length-1){
-      const ar=document.createElement('div');
-      ar.className='fArrow'; ar.textContent='→';
-      pv.appendChild(ar);
-    }
-  });
-}
-async function openFunnelModal(){
-  if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
-  funnelNodes=[];
-  try{
-    const r=await fetch('/api/assets?member_id='+encodeURIComponent(localStorage.getItem('e5_member_id')));
-    const d=await r.json();
-    const fm=(d.assets||[]).find(a=>a.asset_type==='funnel_map');
-    if(fm&&fm.content){ funnelNodes=JSON.parse(fm.content); }
-  }catch(e){}
-  if(!funnelNodes.length) loadTemplate('classic');
-  renderFunnel();
-  $('funnelModal').style.display='block';
-}
-function closeFunnelModal(){$('funnelModal').style.display='none';}
-async function saveFunnelMap(){
-  const mid=localStorage.getItem('e5_member_id');
-  if(!mid){alert(S().bizFirst);return;}
-  const clean=funnelNodes.filter(n=>(n.name||'').trim());
-  if(!clean.length){alert(S().mapEmpty);return;}
-  try{
-    const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({member_id:mid,asset_type:'funnel_map',title:'Funnel Map',content:JSON.stringify(clean),url:null,metrics:null})});
-    if(!r.ok) throw 0;
-    alert(S().mapSaved);
-    closeFunnelModal();
-    loadAssets();
-  }catch(e){alert(S().bizFail);}
-}
-
-/* ---------- UNLOCK / TIERS ---------- */
-function openUnlockModal(){$('unlockModal').style.display='block';}
-function closeUnlockModal(){$('unlockModal').style.display='none';}
-async function submitCode(){
-  const mid=localStorage.getItem('e5_member_id');
-  if(!mid){alert(S().bizFirst);return;}
-  const code=$('codeInput').value.trim();
-  if(!code)return;
-  try{
-    const r=await fetch('/api/unlock',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({member_id:mid,code:code})});
-    const d=await r.json();
-    if(r.ok){
-      memberTier=d.tier;
-      $('tierTag').textContent=d.tier.toUpperCase();
-      alert(T('🎉 Unlocked! Welcome to '+d.tier.toUpperCase()+' tier.','🎉 تم الفتح! مرحباً بك في مستوى '+d.tier.toUpperCase()));
-      closeUnlockModal();
-    } else { alert('⚠️ '+(d.detail||'Invalid code')); }
-  }catch(e){alert(S().bizFail);}
-}
-async function loadTier(){
-  const mid=localStorage.getItem('e5_member_id');
-  if(!mid) return;
-  try{
-    const r=await fetch('/api/member/tier?member_id='+encodeURIComponent(mid));
-    const d=await r.json();
-    memberTier=d.tier||'free';
-    $('tierTag').textContent=memberTier.toUpperCase();
-  }catch(e){}
-}
-
-function applyLang(){
-  document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
-  const s=S();
-  $('onboardTitle').textContent=s.onTitle;
-  $('onboardDesc').textContent=s.onDesc;
-  $('lblName').textContent=s.lblName;
-  $('lblNiche').textContent=s.lblNiche;
-  $('startBtn').textContent=s.btn;
-  $('userInput').placeholder=s.ph;
-  $('optE5').textContent=s.optE5;
-  $('optB').textContent=s.optB;
-  $('bizBtn').textContent=s.biz;
-  $('planBtn').textContent=s.plan;
-  $('langEn').style.opacity=LANG==='en'?1:.4;
-  $('langAr').style.opacity=LANG==='ar'?1:.4;
-  localStorage.setItem('e5_lang',LANG);
-}
-function setLang(l){LANG=l;applyLang();}
-
-function setMode(m){
-  currentMode=m;
-  document.querySelectorAll('#modeBar button').forEach(b=>b.classList.remove('active'));
-  $('mode'+m.charAt(0).toUpperCase()+m.slice(1)).classList.add('active');
-  const s=S();
-  if(m==='normal') $('userInput').placeholder=s.ph;
-  else if(m==='hack') $('userInput').placeholder=T('Attach competitor screenshot + ask: "Hack this funnel — what can I steal?"','أرفق لقطة منافس + اسأل: "حلّل هذا القمع — ماذا يمكنني أن أسرق؟"');
-  else if(m==='alchemy') $('userInput').placeholder=T('Paste your raw transcript / voice notes — I\'ll turn them into paced slide chunks + a recording script','الصق نصك الخام / ملاحظاتك الصوتية — سأحوّلها إلى شرائح موقوتة + سكربت تسجيل');
-  else if(m==='checkin') $('userInput').placeholder=T('Attach screenshot of your work + describe what you did','أرفق لقطة عملك + صف ما فعلته');
-}
-
-/* ---------- SCREENSHOT VISION ---------- */
-function pickImage(){$('imgFile').click();}
-function clearImage(){pendingImage=null;$('imgFile').value='';$('imgChip').style.display='none';}
-$('imgFile').addEventListener('change',e=>{
-  const f=e.target.files[0];
-  if(!f)return;
-  if(f.size>4*1024*1024){alert(S().imgBig);$('imgFile').value='';return;}
-  const rd=new FileReader();
-  rd.onload=()=>{
-    pendingImage=rd.result.split(',')[1];
-    $('imgChip').style.display='inline-block';
-    $('imgChip').textContent='🖼️ '+f.name+' ✕';
-  };
-  rd.readAsDataURL(f);
-});
-
-/* ---------- X-RAY + COMMUNITY OS PANEL ---------- */
-function fillAssetOptions(){
-  const sel=$('assetType'); sel.innerHTML='';
-  Object.keys(ASSETS).slice(0,10).forEach(k=>{
-    const o=document.createElement('option');
-    o.value=k;
-    o.textContent=(ASSETS[k])[LANG==='ar'?1:0];
-    sel.appendChild(o);
-  });
-}
-function renderAssets(){
-  const box=$('assetsList'); box.innerHTML='';
-  if(!assetsCache.length){
-    box.innerHTML='<p style="color:var(--muted);font-size:12px;width:100%;">'+S().noAssets+'</p>';
-    return;
-  }
-  assetsCache.forEach(a=>{
-    const label=(ASSETS[a.asset_type]||['📎 '+a.asset_type,'📎 '+a.asset_type])[LANG==='ar'?1:0];
-    const chip=document.createElement('button');
-    chip.className='langBtn';
-    chip.style.margin='3px';
-    chip.textContent='✏️ '+label+(a.metrics?' ('+a.metrics+')':'');
-    chip.onclick=()=>{
-      $('assetType').value=a.asset_type;
-      $('assetTitle').value=a.title||'';
-      $('assetUrl').value=a.url||'';
-      $('assetMetrics').value=a.metrics||'';
-      $('businessInput').value=a.content||'';
-    };
-    box.appendChild(chip);
-  });
-}
-async function loadAssets(){
-  const mid=localStorage.getItem('e5_member_id');
-  if(!mid) return;
-  try{
-    const r=await fetch('/api/assets?member_id='+encodeURIComponent(mid));
-    const d=await r.json();
-    assetsCache=d.assets||[];
-    renderAssets();
-  }catch(e){}
-}
-function showExtraFields(show){
-  ['lblTitle','assetTitle','lblUrl','assetUrl','lblMetrics','assetMetrics'].forEach(id=>{ $(id).style.display=show?'':'none'; });
-}
-function openBusinessModal(){
-  if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
-  const s=S();
-  $('bizTitle').textContent=s.bizTitle;
-  $('bizDesc').textContent=s.bizDesc;
-  $('lblSection').textContent=s.lblSection;
-  $('lblTitle').textContent=s.lblTitle;
-  $('lblUrl').textContent=s.lblUrl;
-  $('lblMetrics').textContent=s.lblMetrics;
-  $('lblCopy').textContent=s.lblCopy;
-  $('businessInput').placeholder=s.bizPh;
-  $('bizSave').textContent=s.bizSave;
-  $('bizCancel').textContent=s.bizCancel;
-  $('xrayBtn').textContent=s.xray;
-  $('cosBtn').textContent=s.cos;
-  wizardMode=false; wizardKind='xray'; xrayIndex=-1;
-  $('wizardBar').style.display='none';
-  $('assetType').disabled=false;
-  $('xrayBtn').style.display='';
-  $('cosBtn').style.display='';
-  showExtraFields(true);
-  fillAssetOptions();
-  loadAssets();
-  $('businessModal').style.display='block';
-}
-function closeBusinessModal(){$('businessModal').style.display='none';}
-function startXray(){
-  wizardMode=true; wizardKind='xray'; xrayIndex=0;
-  $('assetType').disabled=true;
-  $('xrayBtn').style.display='none';
-  $('cosBtn').style.display='none';
-  showExtraFields(true);
-  showStep();
-}
-function startCos(){
-  wizardMode=true; wizardKind='cos'; xrayIndex=0; cosData={};
-  $('assetType').disabled=true;
-  $('xrayBtn').style.display='none';
-  $('cosBtn').style.display='none';
-  showExtraFields(false);
-  showStep();
-}
-function showStep(){
-  const steps=wizardKind==='cos'?COS_STEPS:XRAY_STEPS;
-  if(xrayIndex>=steps.length){
-    wizardMode=false; xrayIndex=-1;
-    $('wizardBar').style.display='none';
-    $('assetType').disabled=false;
-    $('xrayBtn').style.display='';
-    $('cosBtn').style.display='';
-    $('bizSave').textContent=S().bizSave;
-    showExtraFields(true);
-    if(wizardKind==='xray') alert(S().xrayDone);
-    wizardKind='xray';
-    loadAssets();
-    return;
-  }
-  const st=steps[xrayIndex];
-  $('wizardBar').style.display='block';
-  $('wizardBar').textContent=(wizardKind==='cos'?'🏛️ ':'🩺 ')+(xrayIndex+1)+' / '+steps.length+' — '+st.q[LANG==='ar'?1:0];
-  if(wizardKind==='cos'){
-    $('assetType').value='community_os';
-    $('businessInput').value=cosData[st.k]||'';
-  } else {
-    $('assetType').value=st.k;
-    $('assetMetrics').placeholder=st.m[LANG==='ar'?1:0];
-    $('businessInput').value='';
-    $('assetMetrics').value='';
-  }
-  $('bizSave').textContent=S().saveNext;
-  $('assetTitle').value=''; $('assetUrl').value='';
-}
-async function saveBusinessContext(){
-  const mid=localStorage.getItem('e5_member_id');
-  try{
-    if(wizardMode && wizardKind==='cos'){
-      const st=COS_STEPS[xrayIndex];
-      cosData[st.k]=$('businessInput').value.trim();
-      xrayIndex++;
-      if(xrayIndex>=COS_STEPS.length){
-        const content='COMMUNITY OPERATIONS OS:\n'
-          +'- PLATFORM: '+(cosData.platform||'-')+'\n'
-          +'- ONBOARDING (first 48h): '+(cosData.onboarding||'-')+'\n'
-          +'- CONTENT CADENCE: '+(cosData.content||'-')+'\n'
-          +'- LIVE EVENTS: '+(cosData.events||'-')+'\n'
-          +'- OFFER LADDER: '+(cosData.ladder||'-')+'\n'
-          +'- RETENTION RITUALS: '+(cosData.retention||'-')+'\n'
-          +'- TEAM: '+(cosData.team||'-');
-        const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({member_id:mid,asset_type:'community_os',title:'Community OS',content:content,url:null,metrics:null})});
-        if(!r.ok) throw 0;
-        wizardMode=false; xrayIndex=-1; wizardKind='xray';
-        $('wizardBar').style.display='none';
-        $('assetType').disabled=false;
-        $('xrayBtn').style.display=''; $('cosBtn').style.display='';
-        $('bizSave').textContent=S().bizSave;
-        showExtraFields(true);
-        alert(S().cosDone);
-        loadAssets();
-        return;
-      }
-      showStep();
-      return;
-    }
-    const r=await fetch('/api/assets',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        member_id:mid,
-        asset_type:$('assetType').value,
-        title:$('assetTitle').value.trim()||null,
-        content:$('businessInput').value.trim()||null,
-        url:$('assetUrl').value.trim()||null,
-        metrics:$('assetMetrics').value.trim()||null
-      })});
-    if(!r.ok) throw 0;
-    if(wizardMode){ xrayIndex++; showStep(); }
-    else{
-      alert(S().bizSaved);
-      $('businessInput').value=''; $('assetUrl').value=''; $('assetTitle').value=''; $('assetMetrics').value='';
-    }
-    await loadAssets();
-  }catch(e){alert(S().bizFail);}
-}
-
-/* ---------- PLAN MODAL ---------- */
-async function loadPlan(){
-  const mid=localStorage.getItem('e5_member_id');
-  if(!mid) return;
-  try{
-    const r=await fetch('/api/plan?member_id='+encodeURIComponent(mid));
-    const d=await r.json();
-    planTasks=d.tasks||[];
-    renderPlan();
-  }catch(e){}
-}
-function renderPlan(){
-  const s=S();
-  const box=$('planContent'); box.innerHTML='';
-  if(!planTasks.length){
-    box.innerHTML='<p style="color:var(--muted);font-size:13px;">'+s.noPlan+'</p>';
-    $('progressFill').style.width='0%';
-    return;
-  }
-  const done=planTasks.filter(t=>t.status==='done').length;
-  $('progressFill').style.width=(done/planTasks.length*100)+'%';
-  currentTaskId=null;
-  const phases={1:[],2:[],3:[]};
-  planTasks.forEach(t=>phases[t.phase].push(t));
-  [1,2,3].forEach(p=>{
-    if(!phases[p].length) return;
-    const h=document.createElement('div');
-    h.className='phaseHeader';
-    h.textContent=s['phase'+p];
-    box.appendChild(h);
-    phases[p].forEach(t=>{
-      const row=document.createElement('div');
-      const isDone=t.status==='done';
-      const isCurrent=t.status==='pending' && !currentTaskId;
-      if(isCurrent) currentTaskId=t.task_id;
-      row.className='taskRow'+(isDone?' done':'')+(isCurrent?' current':'');
-      row.innerHTML=`
-        <div class="taskCheck ${isDone?'done':''} ${isCurrent?'current':''}">${isDone?'✓':''}</div>
-        <div class="taskBody">
-          <div class="taskTitle">${T('Week','أسبوع')} ${t.week}: ${esc(t.title)}</div>
-          <div class="taskDesc">${esc(t.description||'')}</div>
-          ${isDone&&t.evidence?'<div class="taskDesc" style="color:var(--gold);margin-top:4px;">📎 '+esc(t.evidence.slice(0,80))+'</div>':''}
+    <header>
+        <h1>🧠 E5 AI Coach <span>| CCC Brain</span></h1>
+        <div class="controls">
+            <select id="mode-select" title="Select Strategist Mode">
+                <option value="coach">🧭 Daily Operator (Coach)</option>
+                <option value="xray">🩺 Business X-Ray (Audit)</option>
+                <option value="funnel">🌊 Funnel Map</option>
+                <option value="community">🏛️ Community OS</option>
+                <option value="dm">💬 DM Doctor</option>
+                <option value="offer">📄 Offer Doc Builder</option>
+                <option value="workshop">🎪 Workshop Architect</option>
+                <option value="content">✍️ Content Engine</option>
+                <option value="launch">🚀 Launch Planner</option>
+                <option value="alchemy">🎬 Alchemy (Video)</option>
+            </select>
+            <button class="clear-btn" onclick="clearChat()">Clear Chat</button>
         </div>
-        ${!isDone?`<div class="taskActions">
-          <button onclick="markTask('${t.task_id}','done')">${T('✅ Done','✅ تم')}</button>
-          <button onclick="markTask('${t.task_id}','blocked')">${T('🆘 Blocked',' محظور')}</button>
-        </div>`:''}`;
-      box.appendChild(row);
-    });
-  });
-}
-async function markTask(taskId, status){
-  const mid=localStorage.getItem('e5_member_id');
-  let evidence=null;
-  if(status==='done'){
-    evidence=prompt(T('Paste link to your work or describe what you built:','الصق رابط عملك أو صف ما بنيته:'),'');
-    if(!evidence) return;
-  }
-  try{
-    await fetch('/api/task/complete',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({member_id:mid,task_id:taskId,status:status,evidence:evidence})});
-    alert(status==='done'?S().taskDone:S().taskBlocked);
-    loadPlan();
-  }catch(e){}
-}
-function openPlanModal(){
-  if(!localStorage.getItem('e5_member_id')){alert(S().bizFirst);return;}
-  const s=S();
-  $('planTitle').textContent=s.planTitle;
-  $('planDesc').textContent=s.planDesc;
-  $('planGenerate').textContent=s.genBtn;
-  loadPlan();
-  $('planModal').style.display='block';
-}
-function closePlanModal(){$('planModal').style.display='none';}
-async function generatePlan(){
-  const mid=localStorage.getItem('e5_member_id');
-  const s=S();
-  const niche=localStorage.getItem('e5_niche')||'';
-  const ctx='Member niche: '+niche+'. Their assets: '+JSON.stringify(assetsCache.map(a=>({type:a.asset_type,metrics:a.metrics})));
-  $('planGenerate').textContent=s.planGenerating;
-  try{
-    const r=await fetch('/api/plan/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({member_id:mid,context:ctx})});
-    if(r.status===403){ alert(T('🔒 The 90-Day Operating Partner is a PARTNER-tier feature. Unlock with your $97 code!','🔒 خطة الشريك التشغيلي ميزة PARTNER. افتحها بكود الـ $97!')); $('planGenerate').textContent=s.genBtn; return; }
-    if(!r.ok) throw 0;
-    alert(s.planGenerated);
-    loadPlan();
-  }catch(e){alert(S().bizFail);}
-  $('planGenerate').textContent=s.genBtn;
-}
+    </header>
 
-function attachTTS(d){
-  const btn=document.createElement('button');
-  btn.className='tts-btn';
-  btn.innerHTML=S().listen;
-  btn.onclick=async()=>{
-    btn.innerHTML='⏳';
-    try{
-      const plainText=d.innerText.replace(/🔊[^]*?(?=\n|$)/g,'').replace(/🔉[^]*?(?=\n|$)/g,'').replace(/⏳/g,'').trim();
-      const r=await fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({text:plainText,language:LANG})});
-      if(!r.ok) throw 0;
-      const blob=await r.blob();
-      const a=new Audio(URL.createObjectURL(blob));
-      btn.innerHTML=S().playing;
-      a.onended=()=>{btn.innerHTML=S().listen;};
-      a.onerror=()=>{btn.innerHTML='❌';};
-      await a.play();
-    }catch(e){btn.innerHTML='❌';}
-  };
-  d.appendChild(btn);
-}
+    <div id="chat-container">
+        <div class="message ai">Welcome to the CCC Diagnostic Brain. I am your $10K-level Strategist. Tell me about the current state of your ecosystem, or select a specific mode from the top right to begin.</div>
+    </div>
 
-/* ---------- PUSH-TO-TALK ---------- */
-let mediaRecorder=null, audioChunks=[], recording=false;
-async function toggleMic(){
-  if(!recording){
-    try{
-      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      mediaRecorder=new MediaRecorder(stream);
-      audioChunks=[];
-      mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
-      mediaRecorder.onstop=async()=>{
-        stream.getTracks().forEach(t=>t.stop());
-        const blob=new Blob(audioChunks,{type:mediaRecorder.mimeType||'audio/webm'});
-        $('micBtn').textContent='⏳';
-        const fd=new FormData();
-        fd.append('file',blob,'voice.webm');
-        fd.append('language',LANG);
-        try{
-          const r=await fetch('/api/stt',{method:'POST',body:fd});
-          const d=await r.json();
-          $('micBtn').textContent='🎤';
-          if(d.text){ $('userInput').value=d.text; send(); }
-        }catch(e){
-          $('micBtn').textContent='🎤';
-          alert(S().voiceErr);
+    <footer>
+        <div class="input-wrapper">
+            <textarea id="user-input" placeholder="Ask a question, paste a post for review, or describe your bottleneck..." onkeydown="handleKey(event)"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </footer>
+
+    <script>
+        // ⚠️ IMPORTANT: If you are opening this HTML file directly in your browser, 
+        // paste your Railway backend URL here. Example: "https://e5-ai-coach.up.railway.app"
+        // If this HTML is hosted on the SAME domain as your backend, leave it as "".
+        const API_URL = ""; 
+
+        let history = [];
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modeSelect = document.getElementById('mode-select');
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            // Basic formatting for AI responses
+            if (sender === 'ai') {
+                text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+                text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            }
+            div.innerHTML = text;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return div;
         }
-      };
-      mediaRecorder.start();
-      recording=true;
-      $('micBtn').textContent='⏺️';
-      $('micBtn').classList.add('rec');
-    }catch(e){ alert(S().micErr); }
-  }else{
-    mediaRecorder.stop();
-    recording=false;
-    $('micBtn').classList.remove('rec');
-  }
-}
 
-window.addEventListener('load',()=>{
-  applyLang();
-  if(localStorage.getItem('e5_member_id')){
-    $('memberTag').textContent=localStorage.getItem('e5_name')||'MEMBER';
-    showChat();
-    setMode('normal');
-    loadPlan();
-    loadTier();
-    const d=addMsg('coach',T('Welcome back, <strong>'+esc(localStorage.getItem('e5_name')||'friend')+'</strong>! Design your 🗺️ Funnel Map, run the 🏛️ Community OS, and I\'ll coach you like I work inside your business.','<strong>'+esc(localStorage.getItem('e5_name')||'صديقي')+'</strong>، مرحباً بعودتك! صمّم 🗺️ خريطة القمع وشغّل 🏛️ نظام المجتمع، وسأدربك وكأنني أعمل داخل عملك.'));
-    attachTTS(d);
-  }
-});
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'typing';
+            div.id = 'typing-indicator';
+            div.innerHTML = '<span></span><span></span><span></span>';
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-function switchCoach(){
-  const c=$('coachSelect').value;
-  let d;
-  if(c==='builder'){
-    $('coachTitle').textContent='THE BUILDER';
-    $('coachEmoji').textContent='🏗️';
-    d=addMsg('coach',T('🏗️ <strong>The Builder here.</strong> Offer first, audience second. Stop overthinking — do the work. Tell me: what are you building, and who exactly is it for?','🏗️ <strong>الباني هنا.</strong> العرض أولاً، الجمهور ثانياً. توقّف عن التفكير الزائد — اعمل. أخبرني: ماذا تبني، ولمن بالضبط؟'));
-  }else{
-    $('coachTitle').textContent='E5 AI COACH';
-    $('coachEmoji').textContent='🧠';
-    d=addMsg('coach',T('🧠 <strong>E5 Coach here.</strong> Let\'s sharpen your marketing with the E5 frameworks. What\'s blocking your empire today?','🧠 <strong>مدرب E5 هنا.</strong> لنصقل تسويقك بأطر E5. ما الذي يعيق إمبراطوريتك اليوم؟'));
-  }
-  attachTTS(d);
-}
+        function removeTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
 
-function startCoaching(){
-  const name=$('nameInput').value.trim();
-  const niche=$('nicheInput').value.trim();
-  if(!name){alert(T('Please tell me your name first!','أخبرني اسمك أولاً!'));return;}
-  const mid=slug(name)+'_'+Math.random().toString(36).slice(2,6);
-  localStorage.setItem('e5_member_id',mid);
-  localStorage.setItem('e5_name',name);
-  localStorage.setItem('e5_niche',niche);
-  fetch('/api/member/register',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({member_id:mid,name:name,niche:niche})}).catch(()=>{});
-  $('memberTag').textContent=name;
-  showChat();
-  setMode('normal');
-  loadPlan();
-  loadTier();
-  const d=addMsg('coach',T('It\'s an honor to meet you, <strong>'+esc(name)+'</strong>! Start with 🗺️ Funnel Map (pick your archetype), then 🏛️ Community OS, then 📊 My Plan.','شرفٌ كبير أن ألتقيك يا <strong>'+esc(name)+'</strong>! ابدأ بـ 🗺️ خريطة القمع (اختر نموذجك)، ثم 🏛️ نظام المجتمع، ثم 📊 خطتي.'));
-  attachTTS(d);
-}
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
 
-function showChat(){$('onboarding').style.display='none';$('chatScreen').style.display='flex';$('modeBar').style.display='flex';}
+            addMessage(text, 'user');
+            history.push({ role: 'user', content: text });
+            userInput.value = '';
+            sendBtn.disabled = true;
+            showTyping();
 
-function addMsg(who,html){
-  const d=document.createElement('div');
-  d.className='msg '+who;
-  d.innerHTML=html;
-  $('messages').appendChild(d);
-  $('messages').scrollTop=$('messages').scrollHeight;
-  return d;
-}
+            try {
+                const response = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        history: history.slice(-16), // Keep last 16 messages for context limit
+                        mode: modeSelect.value
+                    })
+                });
 
-async function send(){
-  const q=$('userInput').value.trim();
-  if(!q && !pendingImage)return;
-  if(currentMode==='checkin' && !pendingImage){alert(S().checkinFirst);return;}
-  $('userInput').value='';
-  const modeLabel=currentMode==='hack'?'🕵️ ':currentMode==='checkin'?'✅ ':currentMode==='alchemy'?'🎬 ':'';
-  addMsg('user',modeLabel+(pendingImage?'🖼️ ':'')+esc(q||T('Analyze this screenshot.','حلّل هذه اللقطة.')));
-  const t=addMsg('coach',T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>'));
-  try{
-    let visionAnalysis=null;
-    if(pendingImage){
-      t.innerHTML=S().looking;
-      try{
-        const vr=await fetch('/api/vision',{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({image_b64:pendingImage,context:localStorage.getItem('e5_niche')||'',member_id:localStorage.getItem('e5_member_id')})});
-        if(vr.ok){ const vd=await vr.json(); visionAnalysis=vd.analysis; }
-        else { const ed=await vr.json().catch(()=>null); alert(S().visionErr+(ed&&ed.detail?'\n\n'+ed.detail:'')); }
-      }catch(e){ alert(S().visionErr); }
-      clearImage();
-      t.innerHTML=T('🧠 <em>Coach is thinking…</em>','🧠 <em>المدرب يفكر…</em>');
-    }
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        question:q||T('Analyze this screenshot.','حلّل هذه اللقطة.'),
-        member_id:localStorage.getItem('e5_member_id'),
-        coach_id:$('coachSelect').value,
-        language:LANG,
-        vision_analysis:visionAnalysis,
-        mode:currentMode
-      })});
-    const d=await r.json();
-    t.innerHTML=md(d.answer||T('I could not process that. Please try again.','لم أستطع معالجة ذلك. حاول مجدداً.'));
-    attachTTS(t);
-  }catch(e){
-    t.innerHTML=T('⚠️ Connection error. Please try again.','⚠️ خطأ في الاتصال. حاول مجدداً.');
-  }
-  $('messages').scrollTop=$('messages').scrollHeight;
-}
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                
+                const data = await response.json();
+                removeTyping();
+                
+                // Handle flexible response keys from main.py
+                const aiReply = data.reply || data.response || data.message || "I encountered an error processing that.";
+                
+                addMessage(aiReply, 'ai');
+                history.push({ role: 'assistant', content: aiReply });
 
-$('userInput').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
-</script>
+            } catch (error) {
+                removeTyping();
+                addMessage(`⚠️ Connection Error: ${error.message}. Check your API_URL in the HTML or your Railway logs.`, 'ai');
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function clearChat() {
+            if (confirm("Clear conversation and reset brain?")) {
+                history = [];
+                chatContainer.innerHTML = '<div class="message ai">Chat cleared. CCC Brain reset. What are we working on?</div>';
+            }
+        }
+    </script>
 </body>
 </html>
