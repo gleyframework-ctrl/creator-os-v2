@@ -18,11 +18,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APP_VERSION = "2026-08-21-aicoach-v13-alchemy"
+APP_VERSION = "2026-08-21-aicoach-v15-final"
 
 GROQ_KEY = os.getenv("GROQ_API_KEY").strip()
 ELEVEN_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
 GEMINI_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+FISH_KEY = os.getenv("FISH_API_KEY", "").strip()
+FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "").strip()
 
 PREFERRED_MODELS = [
     "openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3-32b",
@@ -79,7 +81,8 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
 def health():
     return {"status": "ok", "version": APP_VERSION, "model": CHOSEN_MODEL,
             "vision": VISION_CHOSEN or ("gemini-free" if GEMINI_KEY else "none"),
-            "tts": "elevenlabs" if ELEVEN_KEY else "edge-free", "stt": "groq-whisper-free"}
+            "tts": "fish-clone" if (FISH_KEY and FISH_VOICE_ID) else ("elevenlabs" if ELEVEN_KEY else "edge-free"),
+            "stt": "groq-whisper-free"}
 
 @app.get("/test")
 def test_page(): return FileResponse("chat_test.html")
@@ -124,7 +127,9 @@ ABSOLUTE RULES (breaking any of them = failure):
 
 21. 90-DAY PLAN MINDSET. Think in 3 TTB phases (Offer 1-30, Audience 30-60, Profit 60-90). Every answer should map to the member's current phase and move them toward the next milestone.
 
-22. FUNNEL HACK MODE. When the member asks to hack/analyze a competitor, run a 5-part structural teardown (HOOK / MECHANISM / OFFER / PROOF / CTA) plus a DESIGN HACK (hierarchy, colors, typography, trust placement, mobile), then translate the best stolen structure into THEIR business using their X-Ray. Never copy words — copy structures.
+22. FUNNEL HACK MODE. When the member asks to hack/analyze a competitor, run a 5-part structural teardown (HOOK / MECHANISM / OFFER / PROOF / CTA) plus a DESIGN HACK (hierarchy, colors, typography, trust placement, mobile), then translate the best stolen structure into THEIR business using their X-Ray. Never copy words — copy structures. End with EXACTLY one line starting with 'TASK: '.
+
+23. ALCHEMY MODE. When in alchemy mode, treat the member's input as raw material (not a question). Run THE CLEANSER (remove duplicates/filler/noise, no bullets or hard stops), THE PACER (continuous conversational paragraphs), and THE CONSTRAINT (numbered SLIDE CHUNKS of ~140 words = one 1-minute slide). Output 'SLIDE 1: …' etc., then 'RECORDING CHOREOGRAPHY:' with the Zoom zero-edit steps (share WINDOW only, check Share Sound, downbeat/catch/breath/release). Override the accountability opening in this mode. Remind: never start from scratch — duplicate the Master HTML Template.
 """
 
 E5_PROMPT = ChatPromptTemplate.from_template("""You are the Master AI Coach for the E5 C.A.M.P. Masterclass — an OPERATING PARTNER, not just an advisor. You COACH, you don't lecture.
@@ -544,7 +549,9 @@ async def chat(req: ChatRequest):
         if mode == "hack":
             question_text = (req.question + "\n\n[MODE: FUNNEL HACK — " + HACK_PROMPT + "]")
         elif mode == "alchemy":
-            question_text = (req.question + "\n\n[MODE: DIGITAL ALCHEMY — " + ALCHEMY_PROMPT + "]")
+            question_text = (req.question + "\n\n[MODE: DIGITAL ALCHEMY — " + ALCHEMY_PROMPT +
+                            " OVERRIDE: For this message SKIP the accountability opening. The member's input IS raw material. "
+                            "Run THE CLEANSER, THE PACER and THE CONSTRAINT now, then output SLIDE chunks + RECORDING CHOREOGRAPHY.]")
         elif mode == "checkin" and req.vision_analysis:
             question_text = (req.question + f"\n\n[MODE: TASK CHECKIN — They claim they did the task. "
                             f"VISION ANALYSIS of their evidence: {req.vision_analysis[:3000]}. "
@@ -590,11 +597,25 @@ async def chat(req: ChatRequest):
         print(f"❌ RAG FAILURE: {e}")
         raise HTTPException(status_code=500, detail=f"RAG failed: {e}")
 
+# ---------- VOICE OUT (TTS): FISH CLONE → ELEVENLABS → EDGE ----------
 @app.post("/api/tts")
 async def text_to_speech(req: dict):
     text = (req.get("text") or "").strip()
     lang = (req.get("language") or "en").strip().lower()
     if not text: raise HTTPException(status_code=400, detail="Empty text")
+    # ENGINE 1: Fish Audio cloned voice (YOUR voice)
+    if FISH_KEY and FISH_VOICE_ID:
+        try:
+            headers = {"Authorization": f"Bearer {FISH_KEY}"}
+            payload = {"text": text, "reference_id": FISH_VOICE_ID, "format": "mp3"}
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                r = await client.post("https://api.fish.audio/v1/tts", json=payload, headers=headers)
+                if r.status_code == 200 and len(r.content) > 1000:
+                    return Response(content=r.content, media_type="audio/mpeg")
+                print(f"Fish error: {r.status_code} {r.text[:200]}")
+        except Exception as e:
+            print(f"❌ FISH TTS FAILURE: {e}")
+    # ENGINE 2: ElevenLabs
     if ELEVEN_KEY:
         voice_id = "pNInz6obpgDQGcFmaJgB"
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -605,6 +626,7 @@ async def text_to_speech(req: dict):
             r = await client.post(url, json=payload, headers=headers)
             if r.status_code != 200: raise HTTPException(status_code=500, detail="Voice failed")
             return Response(content=r.content, media_type="audio/mpeg")
+    # ENGINE 3: Free Edge neural
     voice = "ar-SA-HamedNeural" if lang.startswith("ar") else "en-US-ChristopherNeural"
     try:
         buf = io.BytesIO()
@@ -616,6 +638,7 @@ async def text_to_speech(req: dict):
         print(f"❌ TTS FAILURE: {e}")
         raise HTTPException(status_code=500, detail="Voice failed")
 
+# ---------- VOICE IN (STT): GROQ WHISPER ----------
 @app.post("/api/stt")
 async def speech_to_text(file: UploadFile = File(...), language: str = Form("en")):
     audio_bytes = await file.read()
@@ -635,6 +658,6 @@ async def speech_to_text(file: UploadFile = File(...), language: str = Form("en"
         raise HTTPException(status_code=500, detail="Transcription failed")
 
 if __name__ == "__main__":
-    print(f"🔥 MODEL: {CHOSEN_MODEL} | VISION: {VISION_CHOSEN or ('gemini' if GEMINI_KEY else 'none')}")
+    print(f"🔥 MODEL: {CHOSEN_MODEL} | VISION: {VISION_CHOSEN or ('gemini' if GEMINI_KEY else 'none')} | VOICE: {'fish-clone' if (FISH_KEY and FISH_VOICE_ID) else 'edge-free'}")
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
