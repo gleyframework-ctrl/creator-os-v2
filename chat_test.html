@@ -561,4 +561,112 @@ function renderChatEmpty(){
 }
 function fmt(text){
   let s=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  s=s.replace(/```([\s\S]*?)
+  s=s.replace(/```([\s\S]*?)```/g,function(m,c){return "<pre>"+c+"</pre>";});
+  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/^###?\s?(.+)$/gm,"<span class='h'>$1</span>");
+  s=s.replace(/^[-*]\s+(.+)$/gm,"<span class='li'>• $1</span>");
+  return s;
+}
+function showTyping(){ const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="typing"; d.id="typing"; d.innerHTML="<span></span><span></span><span></span>"; c.appendChild(d); c.scrollTop=c.scrollHeight; }
+function hideTyping(){ const t=document.getElementById("typing"); if(t) t.remove(); }
+function addMsg(text,who){
+  const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="msg "+who;
+  const s=document.createElement("span"); if(who==="ai") s.innerHTML=fmt(text); else s.textContent=text; d.appendChild(s);
+  if(who==="ai"){ const b=document.createElement("button"); b.className="speak"; b.textContent="▶ VOX"; b.setAttribute("aria-label","Play voice"); b.onclick=()=>speak(text); d.appendChild(b); }
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
+}
+function speak(text){
+  fetch(API_URL+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text.slice(0,600),member_id:memberId})})
+  .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
+  .then(b=>{ const a=new Audio(URL.createObjectURL(b)); a.play(); })
+  .catch(e=>addMsg("Voice failed: "+e.message+". Retry.","ai"));
+}
+function exportChat(){
+  const lines=[]; document.querySelectorAll("#chat .msg").forEach(m=>{ lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n")+m.querySelector("span").textContent); });
+  const b=new Blob([lines.join("\n\n")],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="income-engine-session.txt"; a.click();
+}
+async function send(){
+  const inp=document.getElementById("input"); const text=inp.value.trim(); if(!text) return;
+  const q=document.getElementById("qwrap"); if(q) q.remove();
+  addMsg(text,"user"); history.push({role:"user",content:text}); inp.value=""; showTyping();
+  const wire=(lang==="ar")?("[Respond fully in Arabic] "+text):text;
+  try{
+    const r=await fetch(API_URL+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:wire,history:history.slice(-16),mode:mode,member_id:memberId})});
+    hideTyping();
+    if(r.status===403){ addMsg("Locked for your tier. Unlock with your Whop license key.","ai"); return; }
+    if(r.status===429){ addMsg("Rate limit reached. Retry in a few minutes.","ai"); return; }
+    const d=await r.json(); const reply=d.reply||d.response||d.message||"Error.";
+    addMsg(reply,"ai"); history.push({role:"assistant",content:reply}); updateDoneBar();
+  }catch(e){ hideTyping(); addMsg("Connection error: "+e.message+". Retry.","ai"); }
+}
+async function unlock(){
+  const key=document.getElementById("lic").value.trim(); if(!key) return;
+  try{
+    const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:key})});
+    const d=await r.json(); if(!r.ok) throw new Error(d.detail||"invalid license");
+    tier=d.tier; localStorage.setItem("tier",tier); renderModes(); renderHome();
+    toast("Unlocked: "+tier.toUpperCase()+" plan",true);
+    addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
+  }catch(e){ toast("Unlock failed: "+e.message,false); addMsg("Unlock failed: "+e.message,"ai"); }
+}
+function unlockPrompt(){ const k=prompt("Paste your Whop license key:"); if(k){ const i=document.getElementById("lic"); if(i){ i.value=k; unlock(); } else { showView("home"); setTimeout(()=>{ const j=document.getElementById("lic"); if(j){ j.value=k; unlock(); } },100); } } }
+async function loadTier(){ try{ const r=await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId)); const d=await r.json(); if(d.tier){ tier=d.tier; localStorage.setItem("tier",tier);} }catch(e){} renderModes(); }
+function toggleH(k){ habit[k]=!habit[k]; renderH(); }
+function renderH(){ const a=document.getElementById("hC"),b=document.getElementById("hCom"),c=document.getElementById("hConv"); if(a){a.classList.toggle("on",habit.c);} if(b){b.classList.toggle("on",habit.com);} if(c){c.classList.toggle("on",habit.conv);} }
+function dayKey(d){ return d.toISOString().slice(0,10); }
+function calcStreak(){ const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); let s=0; const d=new Date(); if(!log[dayKey(d)]) d.setDate(d.getDate()-1); while(log[dayKey(d)]){s++;d.setDate(d.getDate()-1);} return s; }
+function renderStreak(){ const el=document.getElementById("streak"); if(el) el.textContent=calcStreak()+"d"; }
+function logDay(){
+  const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); log[dayKey(new Date())]={c:habit.c,com:habit.com,conv:habit.conv}; localStorage.setItem("habit_log",JSON.stringify(log));
+  const s=calcStreak();
+  const msg="DAILY CHECK-IN - Content: "+(habit.c?"YES":"NO")+" | Community: "+(habit.com?"YES":"NO")+" | Conversations: "+(habit.conv?"YES":"NO")+" | Streak: "+s+" days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy, and give me ONE focus for tomorrow. Update my memory with this check-in and streak.";
+  habit={c:false,com:false,conv:false}; renderH(); showView("chat");
+  const q=document.getElementById("qwrap"); if(q) q.remove();
+  document.getElementById("input").value=msg; send();
+}
+function clearChat(){
+  const n=document.querySelectorAll("#chat .msg").length;
+  if(!confirm("Clear this session? "+n+" messages will be removed.")) return;
+  history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); renderChatEmpty();
+}
+const TOUR=[
+ {view:"home", sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
+ {view:"home", sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
+ {view:"home", sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
+ {view:"map", sel:"#mapView", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
+ {view:"autopsy", sel:"#autopsyView", en:"Revenue Autopsy: drag your numbers, see the money on the table, send it to the coach.", ar:"تشريح الأرباح: اسحب أرقامك، شاهد المال على الطاولة، وأرسله إلى المدرب."},
+ {view:"chat", sel:"#chatfoot", en:"The Coach answers with typing dots, rich text and voice playback. Press ⌘K anywhere for the command palette.", ar:"المدرب يجيب مع نقاط كتابة ونص منسق وتشغيل صوتي. اضغط ⌘K في أي مكان للوحة الأوامر."},
+];
+let tourI=0;
+function showTour(){
+  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
+  if(tourI>=TOUR.length){ endTour(); return; }
+  const s=TOUR[tourI];
+  showView(s.view);
+  setTimeout(()=>{ const el=document.querySelector(s.sel); if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); } },80);
+  document.getElementById("tourCard").style.display="block";
+  document.getElementById("tourTxt").textContent=(lang==="ar")?s.ar:s.en;
+  document.getElementById("tourStep").textContent=(tourI+1)+"/"+TOUR.length;
+}
+function nextTour(){ tourI++; showTour(); }
+function endTour(){ localStorage.setItem("tour_"+memberId,"1"); document.getElementById("tourCard").style.display="none"; document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl")); }
+document.addEventListener("keydown",e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){ e.preventDefault(); openPal(); return; }
+  if(document.getElementById("pal").style.display==="block"){
+    const v=document.getElementById("palIn").value;
+    if(e.key==="Escape") closePal();
+    else if(e.key==="ArrowDown"){ e.preventDefault(); palSel=Math.min(palSel+1,Math.max(palFiltered.length-1,0)); renderPal(v); }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); palSel=Math.max(palSel-1,0); renderPal(v); }
+    else if(e.key==="Enter"){ e.preventDefault(); palRun(palSel); }
+  }
+});
+loadTier(); applyLang(); showView("home");
+document.getElementById("main").addEventListener("scroll",function(){
+  const mb=document.getElementById("minibar"); const sb=document.getElementById("pipebar");
+  if(mb&&sb){ mb.classList.toggle("show", this.scrollTop > (sb.offsetTop+sb.offsetHeight-60)); }
+});
+if(!localStorage.getItem("tour_"+memberId)) setTimeout(()=>{tourI=0;showTour();},800);
+addMsg(C().welcome,"ai"); renderChatEmpty();
+</script>
+</body>
+</html>
