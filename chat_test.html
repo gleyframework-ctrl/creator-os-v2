@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map and AI coach in one command center.">
+<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map, Revenue Autopsy and AI coach in one command center.">
 <title>Income Engine — CCC Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -167,6 +167,16 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 .ringfg{fill:none;stroke:var(--gold);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
 .leak{background:var(--error-faint);border:1px solid var(--error);border-radius:var(--r-card);padding:14px 18px;font-size:13px;color:var(--text-secondary);margin:16px 0;}
 .leak b{color:var(--error);}
+/* AUTOPSY */
+.autogrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+@media (max-width:1100px){.autogrid{grid-template-columns:1fr;}}
+.slider{margin-bottom:18px;}
+.slider .mt{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.slider .mt .mono{color:var(--text-primary);}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--bg-elevated);border-radius:9999px;outline:none;border:none;padding:0;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);box-shadow:0 0 0 1px var(--gold);}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);}
+.bigdelta{font:700 34px var(--font-mono);color:var(--gold);}
 .pal{position:fixed;top:76px;left:50%;transform:translateX(-50%);width:560px;max-width:92%;z-index:99;background:var(--bg-surface);border:1px solid var(--border-hover);border-radius:12px;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.85);animation:fadeUp .18s ease-out;}
 .pal input{width:100%;background:var(--bg-input);border:none;border-bottom:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:14px;}
 .pal input:focus{box-shadow:none;border-color:var(--border-active);}
@@ -223,11 +233,13 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
     <div class="ritem on" id="tabHome" onclick="showView('home')"><span class="ric">01</span><span class="lbl" id="lbHome">Journey</span></div>
     <div class="ritem" id="tabMap" onclick="showView('map')"><span class="ric">02</span><span class="lbl" id="lbMap">Business Map</span></div>
     <div class="ritem" id="tabChat" onclick="showView('chat')"><span class="ric">03</span><span class="lbl" id="lbChat">Coach</span></div>
-    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v11</span></div>
+    <div class="ritem" id="tabAutopsy" onclick="showView('autopsy')"><span class="ric">04</span><span class="lbl" id="lbAutopsy">Autopsy</span></div>
+    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v12</span></div>
   </div>
   <div id="main">
     <div id="homeView"></div>
     <div id="mapView" style="display:none"></div>
+    <div id="autopsyView" style="display:none"></div>
     <div id="chatView" style="display:none">
       <h1 class="vsr">Coach</h1>
       <div id="modes"></div>
@@ -249,8 +261,8 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 const API_URL = "";
 let lang = localStorage.getItem("lang") || "en";
 const CH = {
- en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v11",pipe:"Pipeline Health",answered:" answered"},
- ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v11",pipe:"صحة المسار",answered:" مُجاب"}
+ en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",lbAutopsy:"Autopsy",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v12",pipe:"Pipeline Health",answered:" answered",autoEyebrow:"04 · REVENUE AUTOPSY",autoTitle:"See the money on your broken Straight Line.",autoSub:"Drag your real numbers. The doctrine shows what fixing the earliest leak pays.",sReach:"Targeted strangers / week",sJoin:"Join rate %",sMembers:"Current members",sOffer:"Members offered / month %",sPrice:"Offer price $",sClose:"Close rate %",rCurrent:"CURRENT · 90 DAYS",rFixed:"FIXED · 90 DAYS",rDelta:"LEFT ON THE TABLE",sendAutopsy:"Send my autopsy to the coach"},
+ ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",lbAutopsy:"التشريح",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v12",pipe:"صحة المسار",answered:" مُجاب",autoEyebrow:"04 · تشريح الأرباح",autoTitle:"شاهد الأموال على خطك المستقيم المكسور.",autoSub:"اسحب أرقامك الحقيقية. يُظهر النظام ما يدفعه إصلاح أضعف حلقة.",sReach:"غرباء مستهدفون / أسبوع",sJoin:"نسبة الانضمام %",sMembers:"الأعضاء حالياً",sOffer:"يُقدَّم لهم العرض شهرياً %",sPrice:"سعر العرض $",sClose:"نسبة الإغلاق %",rCurrent:"الحالي · 90 يوماً",rFixed:"بعد الإصلاح · 90 يوماً",rDelta:"مال متروك على الطاولة",sendAutopsy:"أرسل تشريحي إلى المدرب"}
 };
 const MODES = [
  {id:"coach", tier:"free", t:"Daily Operator", d:"90-min rhythm", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة"},
@@ -294,6 +306,7 @@ const QUIZ = [
 const CMDS = [
  {en:"Go to Journey", ar:"اذهب إلى الرحلة", run:()=>showView("home")},
  {en:"Go to Business Map", ar:"اذهب إلى خريطة العمل", run:()=>showView("map")},
+ {en:"Run Revenue Autopsy", ar:"شغّل تشريح الأرباح", run:()=>showView("autopsy")},
  {en:"Go to Coach", ar:"اذهب إلى المدرب", run:()=>showView("chat")},
  {en:"Start next step", ar:"ابدأ الخطوة التالية", run:()=>startNext()},
  {en:"Log Daily Pulse", ar:"سجّل النبض اليومي", run:()=>logDay()},
@@ -312,10 +325,13 @@ let done = JSON.parse(localStorage.getItem("journey_" + memberId) || "{}");
 let activeTask = null;
 let answers = [null,null,null,null,null,null];
 let palSel = 0, palFiltered = CMDS.slice();
+let auto = JSON.parse(localStorage.getItem("auto_" + memberId) || "null") || {reach:2000, join:2, members:150, offer:5, price:97, close:10};
 
 function C(){ return CH[lang]; }
 function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
 function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
+function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+function num(n){ return Math.round(n).toLocaleString("en-US"); }
 function toggleSb(){ document.getElementById("shell").classList.toggle("railwide"); }
 function setLang(l){ lang=l; localStorage.setItem("lang",l); document.documentElement.lang=l; document.documentElement.dir=(l==="ar")?"rtl":"ltr"; applyLang(); }
 function applyLang(){
@@ -324,6 +340,7 @@ function applyLang(){
   document.getElementById("lbHome").textContent=c.lbHome;
   document.getElementById("lbMap").textContent=c.lbMap;
   document.getElementById("lbChat").textContent=c.lbChat;
+  document.getElementById("lbAutopsy").textContent=c.lbAutopsy;
   document.getElementById("crumbSec").textContent=c.crumb;
   document.getElementById("langBtn").textContent=(lang==="ar")?"EN":"ع";
   document.getElementById("markBtn").textContent=c.mark;
@@ -332,6 +349,7 @@ function applyLang(){
   document.getElementById("send").textContent=c.send;
   document.getElementById("sysTxt").textContent=c.sys;
   renderModes(); renderHome(); renderH(); renderStreak(); renderMap();
+  if(document.getElementById("autopsyView").style.display!=="none") renderAutopsy();
 }
 function doneCount(){ return JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0); }
 function savedMap(){ return JSON.parse(localStorage.getItem("map_"+memberId) || "null"); }
@@ -339,15 +357,18 @@ function leakName(k){ const c=C(); return {t:c.lTraffic,h:c.lHub,n:c.lNurture,c:
 function showView(v){
   document.getElementById("homeView").style.display=(v==="home")?"block":"none";
   document.getElementById("mapView").style.display=(v==="map")?"block":"none";
+  document.getElementById("autopsyView").style.display=(v==="autopsy")?"block":"none";
   document.getElementById("chatView").style.display=(v==="chat")?"block":"none";
   document.getElementById("tabHome").classList.toggle("on",v==="home");
   document.getElementById("tabMap").classList.toggle("on",v==="map");
+  document.getElementById("tabAutopsy").classList.toggle("on",v==="autopsy");
   document.getElementById("tabChat").classList.toggle("on",v==="chat");
   document.getElementById("doneBar").style.display="none";
   document.getElementById("ctaBtn").className=(v==="home")?"btn-gold":"btn-ghost";
-  document.getElementById("crumbSec").textContent=(v==="home")?CH[lang].crumb:(v==="map")?CH[lang].lbMap:CH[lang].lbChat;
+  document.getElementById("crumbSec").textContent=(v==="home")?CH[lang].crumb:(v==="map")?CH[lang].lbMap:(v==="autopsy")?CH[lang].lbAutopsy:CH[lang].lbChat;
   if(v==="home") renderHome();
   if(v==="map") renderMap();
+  if(v==="autopsy") renderAutopsy();
   if(v==="chat"){ updateDoneBar(); renderChatEmpty(); }
 }
 function startNext(){ const n=nextTask(); if(n) startTaskById(n.id); else showView("chat"); }
@@ -387,9 +408,10 @@ function renderPal(q){
   document.getElementById("palList").innerHTML = palFiltered.map((c,i)=>'<div class="palitem'+(i===palSel?' sel':'')+'" onmousedown="event.preventDefault();palRun('+i+')">'+(lang==="ar"?c.ar:c.en)+'</div>').join("") || '<div class="palitem" style="opacity:.5">No matches</div>';
 }
 function palRun(i){ const c=palFiltered[i]; if(c){ closePal(); c.run(); } }
+/* ---------- HOME ---------- */
 function renderHome(){
   const c=C(); const total=JOURNEY.reduce((a,p)=>a+p.tasks.length,0); const dc=doneCount(); const sm=savedMap(); const next=nextTask();
-  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V11</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num '+(sm?'':'mut')+'">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num '+(calcStreak()>0?'gr':'mut')+'" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
+  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V12</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button><button class="btn-ghost" onclick="showView(\'autopsy\')">'+c.lbAutopsy+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num '+(sm?'':'mut')+'">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num '+(calcStreak()>0?'gr':'mut')+'" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
   h+='<div class="minibar" id="minibar"><span class="mono" style="color:var(--gold);font-weight:700">IE</span>'+JOURNEY.map((p,i)=>{const pd=p.tasks.filter(t=>done[t.id]).length;const on=pd===p.tasks.length||(next&&p.tasks.some(t=>t.id===next.id));return '<span class="mstep'+(on?' on':'')+'">0'+(i+1)+' '+T(p,"name")+'</span>';}).join('')+'<span class="mstep" style="margin-left:auto">'+dc+'/'+total+'</span></div>';
   h+='<div class="stickybar" id="pipebar"><div class="shead" style="margin-bottom:10px"><h3>'+c.pipe+'</h3><small>'+c.prog+' · <span class="mono">'+dc+'/'+total+'</span></small></div><div class="steps">';
   JOURNEY.forEach((p,i)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const st=pd===p.tasks.length?"done":(next&&p.tasks.some(t=>t.id===next.id)?"active":""); h+='<div class="step '+st+'"><span class="n">'+(pd===p.tasks.length?"✓":"0"+(i+1))+'</span><span class="t">'+T(p,"name")+'</span></div>'; if(i<JOURNEY.length-1) h+='<div class="swire"></div>'; });
@@ -427,6 +449,7 @@ function planHTML(){
   const c=C();
   return '<div class="shead" style="margin-bottom:12px"><h3>'+c.plan+'</h3><span class="pill ok" id="memBadge">MEM</span></div><input id="lic" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.lic+'"><button class="btn-ghost" style="width:100%" onclick="unlock()">'+c.unlock+'</button>';
 }
+/* ---------- MAP ---------- */
 function ans(qi,oi){ answers[qi]=oi; renderMap(); }
 function buildMap(){
   if(answers.some(a=>a===null)){ toast(C().answerAll,false); return; }
@@ -463,6 +486,58 @@ function renderMap(){
   document.getElementById("mapView").innerHTML=h;
   if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
 }
+/* ---------- AUTOPSY ---------- */
+function setAuto(k,v){ auto[k]=+v; localStorage.setItem("auto_"+memberId, JSON.stringify(auto)); computeAutopsy(); }
+function renderAutopsy(){
+  const c=C();
+  let h='<div class="mapwrap"><div class="eyebrow"><i></i>'+c.autoEyebrow+'</div><h1 style="font-size:24px">'+c.autoTitle+'</h1><p class="hsub">'+c.autoSub+'</p>';
+  h+='<div class="autogrid"><div class="card">';
+  h+=sliderHTML("reach",c.sReach,100,50000,100,auto.reach,num(auto.reach));
+  h+=sliderHTML("join",c.sJoin,0.5,10,0.5,auto.join,auto.join+"%");
+  h+=sliderHTML("members",c.sMembers,0,5000,10,auto.members,num(auto.members));
+  h+=sliderHTML("offer",c.sOffer,0,60,1,auto.offer,auto.offer+"%");
+  h+=sliderHTML("price",c.sPrice,10,2000,10,auto.price,"$"+auto.price);
+  h+=sliderHTML("close",c.sClose,1,50,1,auto.close,auto.close+"%");
+  h+='</div><div style="display:grid;gap:16px">';
+  h+='<div class="card"><div class="shead" style="margin-bottom:8px"><h3>'+c.rCurrent+'</h3></div><div class="num mut" id="aCur" style="font:600 26px var(--font-mono);color:var(--text-muted)">$0</div></div>';
+  h+='<div class="card" style="border-color:var(--border-active)"><div class="shead" style="margin-bottom:8px"><h3>'+c.rFixed+'</h3></div><div class="num" id="aFix" style="font:600 26px var(--font-mono);color:var(--gold)">$0</div></div>';
+  h+='<div class="card"><div class="shead" style="margin-bottom:8px"><h3>'+c.rDelta+'</h3><span class="pill ok" id="aPct">+0%</span></div><div class="bigdelta" id="aDelta">$0</div>';
+  h+='<div style="margin-top:14px"><button class="btn-gold" style="width:100%" onclick="sendAutopsyToCoach()">'+c.sendAutopsy+'</button></div></div>';
+  h+='</div></div></div>';
+  document.getElementById("autopsyView").innerHTML=h;
+  computeAutopsy();
+}
+function sliderHTML(k,label,min,max,step,val,disp){
+  return '<div class="slider"><div class="mt"><span>'+label+'</span><span class="mono" id="v_'+k+'">'+disp+'</span></div><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'" oninput="setAuto(\''+k+'\',this.value)" aria-label="'+label+'"></div>';
+}
+function computeAutopsy(){
+  const reach=auto.reach, join=auto.join, members=auto.members, offer=auto.offer, price=auto.price, close=auto.close;
+  const joinsWk = reach * join/100;
+  const m90 = members + joinsWk*13;
+  const curMonthly = members * (offer/100) * (close/100) * price;
+  const offerF = Math.min(offer*2, 60);
+  const closeF = Math.min(close*1.5, 60);
+  const m90F = members + (reach*1.5)*(join/100)*13*1.2;
+  const fixMonthly = m90F * (offerF/100) * (closeF/100) * price;
+  const cur90 = curMonthly*3, fix90 = fixMonthly*3;
+  const delta = fix90 - cur90;
+  const pct = cur90>0 ? Math.round(delta/cur90*100) : (fix90>0?100:0);
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  set("v_reach",num(reach)); set("v_join",join+"%"); set("v_members",num(members));
+  set("v_offer",offer+"%"); set("v_price","$"+num(price)); set("v_close",close+"%");
+  set("aCur",money(cur90)); set("aFix",money(fix90)); set("aDelta","+"+money(delta).slice(1)? "+"+money(delta):money(delta));
+  const d=document.getElementById("aDelta"); if(d) d.textContent = "+"+money(delta);
+  set("aPct","+"+num(pct)+"%");
+}
+function sendAutopsyToCoach(){
+  mode="xray"; renderModes(); showView("chat");
+  const q=document.getElementById("qwrap"); if(q) q.remove();
+  document.getElementById("input").value="REVENUE AUTOPSY - reach "+auto.reach+"/wk | join "+auto.join+"% | members "+auto.members+" | offered "+auto.offer+"%/mo | price $"+auto.price+" | close "+auto.close+"%. Current 90d "+money(computeCur90())+" vs fixed "+money(computeFix90())+". Coach me on the single biggest lever first. Update my memory with these numbers.";
+  send();
+}
+function computeCur90(){ return auto.members*(auto.offer/100)*(auto.close/100)*auto.price*3; }
+function computeFix90(){ const m90F=auto.members+(auto.reach*1.5)*(auto.join/100)*13*1.2; return m90F*(Math.min(auto.offer*2,60)/100)*(Math.min(auto.close*1.5,60)/100)*auto.price*3; }
+/* ---------- CHAT ---------- */
 function renderModes(){
   const box=document.getElementById("modes"); box.innerHTML="";
   MODES.forEach((m,i)=>{ const locked=RANK[tier]<RANK[m.tier];
@@ -486,112 +561,4 @@ function renderChatEmpty(){
 }
 function fmt(text){
   let s=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  s=s.replace(/```([\s\S]*?)```/g,function(m,c){return "<pre>"+c+"</pre>";});
-  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-  s=s.replace(/^###?\s?(.+)$/gm,"<span class='h'>$1</span>");
-  s=s.replace(/^[-*]\s+(.+)$/gm,"<span class='li'>• $1</span>");
-  return s;
-}
-function showTyping(){ const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="typing"; d.id="typing"; d.innerHTML="<span></span><span></span><span></span>"; c.appendChild(d); c.scrollTop=c.scrollHeight; }
-function hideTyping(){ const t=document.getElementById("typing"); if(t) t.remove(); }
-function addMsg(text,who){
-  const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="msg "+who;
-  const s=document.createElement("span"); if(who==="ai") s.innerHTML=fmt(text); else s.textContent=text; d.appendChild(s);
-  if(who==="ai"){ const b=document.createElement("button"); b.className="speak"; b.textContent="▶ VOX"; b.setAttribute("aria-label","Play voice"); b.onclick=()=>speak(text); d.appendChild(b); }
-  c.appendChild(d); c.scrollTop=c.scrollHeight;
-}
-function speak(text){
-  fetch(API_URL+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text.slice(0,600),member_id:memberId})})
-  .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
-  .then(b=>{ const a=new Audio(URL.createObjectURL(b)); a.play(); })
-  .catch(e=>addMsg("Voice failed: "+e.message+". Retry.","ai"));
-}
-function exportChat(){
-  const lines=[]; document.querySelectorAll("#chat .msg").forEach(m=>{ lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n")+m.querySelector("span").textContent); });
-  const b=new Blob([lines.join("\n\n")],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="income-engine-session.txt"; a.click();
-}
-async function send(){
-  const inp=document.getElementById("input"); const text=inp.value.trim(); if(!text) return;
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  addMsg(text,"user"); history.push({role:"user",content:text}); inp.value=""; showTyping();
-  const wire=(lang==="ar")?("[Respond fully in Arabic] "+text):text;
-  try{
-    const r=await fetch(API_URL+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:wire,history:history.slice(-16),mode:mode,member_id:memberId})});
-    hideTyping();
-    if(r.status===403){ addMsg("Locked for your tier. Unlock with your Whop license key.","ai"); return; }
-    if(r.status===429){ addMsg("Rate limit reached. Retry in a few minutes.","ai"); return; }
-    const d=await r.json(); const reply=d.reply||d.response||d.message||"Error.";
-    addMsg(reply,"ai"); history.push({role:"assistant",content:reply}); updateDoneBar();
-  }catch(e){ hideTyping(); addMsg("Connection error: "+e.message+". Retry.","ai"); }
-}
-async function unlock(){
-  const key=document.getElementById("lic").value.trim(); if(!key) return;
-  try{
-    const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:key})});
-    const d=await r.json(); if(!r.ok) throw new Error(d.detail||"invalid license");
-    tier=d.tier; localStorage.setItem("tier",tier); renderModes(); renderHome();
-    toast("Unlocked: "+tier.toUpperCase()+" plan",true);
-    addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
-  }catch(e){ toast("Unlock failed: "+e.message,false); addMsg("Unlock failed: "+e.message,"ai"); }
-}
-function unlockPrompt(){ const k=prompt("Paste your Whop license key:"); if(k){ const i=document.getElementById("lic"); if(i){ i.value=k; unlock(); } else { showView("home"); setTimeout(()=>{ const j=document.getElementById("lic"); if(j){ j.value=k; unlock(); } },100); } } }
-async function loadTier(){ try{ const r=await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId)); const d=await r.json(); if(d.tier){ tier=d.tier; localStorage.setItem("tier",tier);} }catch(e){} renderModes(); }
-function toggleH(k){ habit[k]=!habit[k]; renderH(); }
-function renderH(){ const a=document.getElementById("hC"),b=document.getElementById("hCom"),c=document.getElementById("hConv"); if(a){a.classList.toggle("on",habit.c);} if(b){b.classList.toggle("on",habit.com);} if(c){c.classList.toggle("on",habit.conv);} }
-function dayKey(d){ return d.toISOString().slice(0,10); }
-function calcStreak(){ const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); let s=0; const d=new Date(); if(!log[dayKey(d)]) d.setDate(d.getDate()-1); while(log[dayKey(d)]){s++;d.setDate(d.getDate()-1);} return s; }
-function renderStreak(){ const el=document.getElementById("streak"); if(el) el.textContent=calcStreak()+"d"; }
-function logDay(){
-  const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); log[dayKey(new Date())]={c:habit.c,com:habit.com,conv:habit.conv}; localStorage.setItem("habit_log",JSON.stringify(log));
-  const s=calcStreak();
-  const msg="DAILY CHECK-IN - Content: "+(habit.c?"YES":"NO")+" | Community: "+(habit.com?"YES":"NO")+" | Conversations: "+(habit.conv?"YES":"NO")+" | Streak: "+s+" days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy, and give me ONE focus for tomorrow. Update my memory with this check-in and streak.";
-  habit={c:false,com:false,conv:false}; renderH(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value=msg; send();
-}
-function clearChat(){
-  const n=document.querySelectorAll("#chat .msg").length;
-  if(!confirm("Clear this session? "+n+" messages will be removed.")) return;
-  history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); renderChatEmpty();
-}
-const TOUR=[
- {view:"home", sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
- {view:"home", sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
- {view:"home", sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
- {view:"map", sel:"#mapView", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
- {view:"chat", sel:"#modes", en:"Operating modes. LOCK pills open with your Whop plan.", ar:"الأوضاع. شارات LOCK تُفتح بخطتك."},
- {view:"chat", sel:"#chatfoot", en:"The Coach answers with typing dots, rich text and voice playback. Press ⌘K anywhere for the command palette.", ar:"المدرب يجيب مع نقاط كتابة ونص منسق وتشغيل صوتي. اضغط ⌘K في أي مكان للوحة الأوامر."},
-];
-let tourI=0;
-function showTour(){
-  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
-  if(tourI>=TOUR.length){ endTour(); return; }
-  const s=TOUR[tourI];
-  showView(s.view);
-  setTimeout(()=>{ const el=document.querySelector(s.sel); if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); } },80);
-  document.getElementById("tourCard").style.display="block";
-  document.getElementById("tourTxt").textContent=(lang==="ar")?s.ar:s.en;
-  document.getElementById("tourStep").textContent=(tourI+1)+"/"+TOUR.length;
-}
-function nextTour(){ tourI++; showTour(); }
-function endTour(){ localStorage.setItem("tour_"+memberId,"1"); document.getElementById("tourCard").style.display="none"; document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl")); }
-document.addEventListener("keydown",e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){ e.preventDefault(); openPal(); return; }
-  if(document.getElementById("pal").style.display==="block"){
-    const v=document.getElementById("palIn").value;
-    if(e.key==="Escape") closePal();
-    else if(e.key==="ArrowDown"){ e.preventDefault(); palSel=Math.min(palSel+1,Math.max(palFiltered.length-1,0)); renderPal(v); }
-    else if(e.key==="ArrowUp"){ e.preventDefault(); palSel=Math.max(palSel-1,0); renderPal(v); }
-    else if(e.key==="Enter"){ e.preventDefault(); palRun(palSel); }
-  }
-});
-loadTier(); applyLang(); showView("home");
-document.getElementById("main").addEventListener("scroll",function(){
-  const mb=document.getElementById("minibar"); const sb=document.getElementById("pipebar");
-  if(mb&&sb){ mb.classList.toggle("show", this.scrollTop > (sb.offsetTop+sb.offsetHeight-60)); }
-});
-if(!localStorage.getItem("tour_"+memberId)) setTimeout(()=>{tourI=0;showTour();},800);
-addMsg(C().welcome,"ai"); renderChatEmpty();
-</script>
-</body>
-</html>
+  s=s.replace(/```([\s\S]*?)
