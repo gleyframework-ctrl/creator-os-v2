@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Income Engine — the AI coach that remembers you, reads your real numbers, and rebuilds your funnel. Answer 3 taps, enter your engine.">
+<title>Income Engine — Your Community, Fully Orchestrated</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080C1A;--sf:#0F1529;--el:#192045;--bd:#192045;--bdh:#2A3A6A;--gold:#F5A623;--gold-dim:#D48C1A;--gold-faint:rgba(245,166,35,.08);--cy:#00D4FF;--ok:#00E599;--tx:#fff;--tx2:#8892B0;--tx3:#4A5578;--sans:Inter,system-ui,sans-serif;--mono:"JetBrains Mono",monospace;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx2);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono)}
+header{height:52px;display:flex;align-items:center;gap:10px;padding:0 24px;border-bottom:1px solid var(--bd)}
+.tile{width:28px;height:28px;border-radius:6px;background:var(--gold);color:var(--bg);font:700 11px var(--mono);display:flex;align-items:center;justify-content:center}
+header b{color:var(--tx);font-size:14px;letter-spacing:.02em}
+header .sp{flex:1}
+header a{color:var(--tx2);font-size:12px;text-decoration:none;border:1px solid var(--bdh);border-radius:6px;padding:6px 12px}
+header a.gold{background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg);border:none;font-weight:600}
+.hero{position:relative;max-width:980px;margin:0 auto;padding:72px 24px 40px;text-align:left;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--bd) 1px,transparent 1px),linear-gradient(90deg,var(--bd) 1px,transparent 1px);background-size:44px 44px;opacity:.22;mask-image:radial-gradient(ellipse at 50% 0%,black,transparent 75%);pointer-events:none}
+.ey{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);border:1px solid var(--bd);border-radius:9999px;padding:4px 12px;margin-bottom:18px}
+.ey i{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+h1{font-size:34px;font-weight:700;letter-spacing:-.02em;color:var(--tx);margin-bottom:12px}
+h1 span{color:var(--gold)}
+.sub{max-width:620px;margin-bottom:24px;font-size:15px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn-gold{background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg);border:none;border-radius:6px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid var(--bdh);color:var(--tx);border-radius:6px;padding:11px 18px;font-size:13px;cursor:pointer}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 20px;min-width:140px}
+.kpi small{display:block;font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.kpi .num{font:600 24px var(--mono);color:var(--gold)}
+.kpi .num.cy{color:var(--cy)} .kpi .num.gr{color:var(--ok)}
+section{max-width:980px;margin:0 auto;padding:32px 24px}
+h3{color:var(--tx);font-size:16px;margin-bottom:16px}
+.video{border:1px solid var(--bd);border-radius:16px;overflow:hidden;background:var(--sf);aspect-ratio:16/9}
+.video iframe{width:100%;height:100%;border:none;display:block}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px 24px}
+.card .n{font:600 12px var(--mono);color:var(--gold)}
+.card b{display:block;color:var(--tx);font-size:14px;margin:8px 0 6px}
+.card p{font-size:12px}
+.quiz{background:var(--sf);border:1px solid var(--bdh);border-radius:16px;padding:28px}
+.q{margin-bottom:18px}
+.q label{display:block;font-size:12px;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{background:var(--bg);border:1px solid var(--bd);color:var(--tx2);border-radius:9999px;padding:8px 16px;font-size:12px;cursor:pointer}
+.opt.on{background:var(--gold-faint);border-color:var(--gold);color:var(--gold);font-weight:600}
+footer{max-width:980px;margin:0 auto;padding:24px;color:var(--tx3);font-size:12px;border-top:1px solid var(--bd)}
+@media(max-width:800px){.grid3{grid-template-columns:1fr}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<header><div class="tile">IE</div><b>Income Engine</b><div class="sp"></div><a href="/test">Open app</a><a class="gold" href="#quiz">Start 3-tap setup ↗</a></header>
+
+<div class="hero">
+ <div class="ey"><i></i>INCOME ENGINE · AI COACH + WHITE LABEL</div>
+ <h1>Your community, <span>fully orchestrated.</span></h1>
+ <p class="sub">An AI business coach that remembers you, reads your real Whop numbers, and rebuilds your funnel on the $10K Community Conversion operating system. Three taps below and it knows your business before you type a word.</p>
+ <div class="cta"><button class="btn-gold" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Personalize my engine ↗</button><a class="btn-ghost" href="/test" style="text-decoration:none">Skip — open the app</a></div>
+ <div class="kpis">
+  <div class="kpi"><small>MODES</small><div class="num">11</div></div>
+  <div class="kpi"><small>STEPS</small><div class="num cy">11</div></div>
+  <div class="kpi"><small>MEMORY</small><div class="num gr">∞</div></div>
+  <div class="kpi"><small>LANGUAGES</small><div class="num">AR·EN</div></div>
+ </div>
+</div>
+
+<section>
+ <h3>Watch the 90-second tour</h3>
+ <div class="video">
+  <!-- ✏️ REPLACE VIDEO_ID with your YouTube embed ID when ready -->
+  <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Income Engine tour" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+ </div>
+</section>
+
+<section>
+ <h3>How it works</h3>
+ <div class="grid3">
+  <div class="card"><span class="n">01</span><b>It sees your truth</b><p>Connect Whop or build your Map. Live members, joins, revenue — no guessing.</p></div>
+  <div class="card"><span class="n">02</span><b>It shows the money</b><p>Revenue Autopsy: current vs fixed 90-day revenue, and the single leak to fix first.</p></div>
+  <div class="card"><span class="n">03</span><b>It writes your words</b><p>DM scripts, welcome posts, offer docs, launch plans — in your voice, AR or EN, with voice playback.</p></div>
+ </div>
+</section>
+
+<section id="quiz">
+ <div class="quiz">
+  <h3 style="margin-bottom:20px">Three taps. The coach knows you.</h3>
+  <div class="q"><label>1 · Your niche</label><div class="opts" id="qNiche"></div></div>
+  <div class="q"><label>2 · Audience size</label><div class="opts" id="qSize"></div></div>
+  <div class="q"><label>3 · Biggest leak</label><div class="opts" id="qLeak"></div></div>
+  <button class="btn-gold" style="width:100%" onclick="enterEngine()">Enter my engine ↗</button>
+ </div>
+</section>
+
+<footer>Income Engine · trained on the Flip Moss & Nate Ryan operating system · Free / Insider $17 / Partner $47 · white-label available</footer>
+
+<script>
+const Q={
+ niche:["Fitness coach","Business coach","E-com","Education","Real estate","Other"],
+ size:["0-100","100-500","500-2000","2000+"],
+ leak:["Dead DMs","Scattered groups","No offers","Content expires"]
+};
+const pick={niche:null,size:null,leak:null};
+function build(id,key){
+  const el=document.getElementById(id);
+  Q[key].forEach(v=>{
+    const b=document.createElement("button"); b.className="opt"; b.textContent=v;
+    b.onclick=()=>{ pick[key]=v; el.querySelectorAll(".opt").forEach(x=>x.classList.remove("on")); b.classList.add("on"); };
+    el.appendChild(b);
+  });
+}
+build("qNiche","niche"); build("qSize","size"); build("qLeak","leak");
+function enterEngine(){
+  const p=new URLSearchParams();
+  if(pick.niche) p.set("niche",pick.niche);
+  if(pick.size) p.set("size",pick.size.replace(/[^0-9+]/g,""));
+  if(pick.leak) p.set("leak",pick.leak);
+  location.href="/test?"+p.toString();
+}
+</script>
+</body>
+</html>
