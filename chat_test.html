@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map and AI coach in one command center.">
 <title>Income Engine — CCC Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,18 +24,19 @@
  --t-fast:120ms; --t-base:160ms; --t-slow:200ms; --t-meter:500ms;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{antialiased:-webkit-font-smoothing:antialiased;background:var(--bg-primary);color:var(--text-secondary);font-family:var(--font-sans);font-size:14px;}
+html,body{background:var(--bg-primary);color:var(--text-secondary);font-family:var(--font-sans);font-size:14px;-webkit-font-smoothing:antialiased;}
 button{font-family:var(--font-sans);}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:none;box-shadow:0 0 0 3px var(--gold-faint);border-color:var(--border-active);}
 .mono{font-family:var(--font-mono);}
-/* ---------- TOPBAR ---------- */
-#topbar{height:52px;display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-primary);position:relative;z-index:5;}
+.vsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+#topbar{height:52px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-primary);position:relative;z-index:5;}
 .crumb{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;}
 .crumb b{color:var(--text-primary);font-weight:600;}
 .logotile{width:28px;height:28px;border-radius:6px;background:var(--gold);color:var(--bg-primary);font:700 11px var(--font-mono);display:flex;align-items:center;justify-content:center;}
 .tspace{flex:1;}
 .chipbtn{background:transparent;border:1px solid var(--border-hover);color:var(--text-secondary);border-radius:var(--r-ctl);padding:6px 10px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
 .chipbtn:hover{border-color:var(--gold-dim);background:var(--bg-elevated);color:var(--text-primary);}
-.chipbtn.on{border-color:var(--border-active);color:var(--gold);background:var(--gold-faint);}
+.kbd .k{border:1px solid var(--border-hover);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--font-mono);}
 .livechip{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9999px;padding:6px 12px;font:500 11px var(--font-mono);color:var(--text-secondary);}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:dot-pulse 2s ease-in-out infinite;}
 .btn-gold{background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg-primary);border:none;border-radius:var(--r-ctl);padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 6px 20px -8px var(--gold-glow);transition:filter var(--t-fast) ease,box-shadow var(--t-base) ease;}
@@ -42,18 +44,20 @@ button{font-family:var(--font-sans);}
 .btn-gold:active{transform:translateY(1px);}
 .btn-ghost{background:transparent;border:1px solid var(--border-hover);color:var(--text-primary);border-radius:var(--r-ctl);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-base) ease;}
 .btn-ghost:hover{background:var(--bg-elevated);border-color:var(--gold-dim);}
-/* ---------- LAYOUT ---------- */
+.btn-goldline{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--r-ctl);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--t-base) ease;}
+.btn-goldline:hover{background:var(--gold-faint);border-color:var(--gold);}
 #shell{display:flex;height:calc(100vh - 52px);}
-#rail{width:64px;background:var(--bg-surface);border-right:1px solid var(--border);overflow:hidden;transition:width var(--t-slow) ease-out;flex-shrink:0;}
+#rail{width:64px;background:var(--bg-surface);border-right:1px solid var(--border);overflow:hidden;transition:width var(--t-slow) ease-out;flex-shrink:0;display:flex;flex-direction:column;}
 #rail:hover,#shell.railwide #rail{width:220px;}
-.ritem{display:flex;align-items:center;gap:14px;padding:14px 22px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:all var(--t-base) ease;border-radius:0;}
+.ritem{display:flex;align-items:center;gap:14px;padding:14px 22px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:all var(--t-base) ease;}
 .ritem .ric{font:600 12px var(--font-mono);width:20px;text-align:center;}
 .ritem .lbl{opacity:0;transition:opacity var(--t-base) ease;font-size:13px;font-weight:500;}
-#rail:hover .lbl,#shell.railwide .lbl{opacity:1;}
+#rail:hover .lbl,#shell.railwide .lbl,.railfoot span:last-child{opacity:0;transition:opacity var(--t-base) ease;}
+#rail:hover .railfoot span:last-child,#shell.railwide .railfoot span:last-child{opacity:1;}
 .ritem:hover{color:var(--text-primary);}
 .ritem.on{color:var(--gold);background:var(--gold-faint);}
+.railfoot{margin-top:auto;padding:16px 22px;display:flex;gap:10px;align-items:center;font:500 10px var(--font-mono);color:var(--text-muted);white-space:nowrap;}
 #main{flex:1;overflow-y:auto;position:relative;}
-/* ---------- HERO ---------- */
 .hero{position:relative;margin:24px 32px 0;border:1px solid var(--border);border-radius:var(--r-hero);background:linear-gradient(180deg,var(--bg-surface),var(--bg-primary));overflow:hidden;padding:28px 32px;}
 .hgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.25;mask-image:radial-gradient(ellipse at 50% 0%,black,transparent 75%);pointer-events:none;}
 .aur{position:absolute;width:340px;height:200px;border-radius:50%;filter:blur(30px);z-index:0;animation:aurora 14s ease-in-out infinite;pointer-events:none;}
@@ -68,46 +72,39 @@ h1 span{color:var(--gold);}
 .kpis{display:flex;gap:16px;flex-wrap:wrap;}
 .kpi{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 20px;min-width:130px;transition:border-color var(--t-base) ease;}
 .kpi:hover{border-color:var(--border-hover);}
-.kpi small{display:block;font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.kpi small{display:block;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
 .kpi .num{font:600 26px var(--font-mono);color:var(--gold);}
 .kpi .num.cy{color:var(--cyan);} .kpi .num.gr{color:var(--success);}
 .ticker{position:relative;z-index:1;margin:22px -32px -28px;border-top:1px solid var(--border);overflow:hidden;background:var(--bg-primary);}
 .tk{display:inline-flex;gap:40px;white-space:nowrap;padding:10px 0;font:500 11px var(--font-mono);color:var(--text-muted);animation:ticker 40s linear infinite;}
 .tk b{color:var(--gold);font-weight:600;}
-/* ---------- SECTIONS ---------- */
 .section{margin:28px 32px;}
 .shead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
 .shead h3{font-size:14px;font-weight:600;color:var(--text-primary);}
 .shead small{color:var(--text-muted);font-size:12px;}
-.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 24px;transition:border-color var(--t-base) ease,transform var(--t-base) ease,box-shadow var(--t-base) ease;}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 24px;transition:border-color var(--t-base) ease,transform var(--t-base) ease;}
 .card:hover{border-color:var(--border-hover);}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-/* stepper */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
 .steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .step{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:var(--r-ctl);padding:8px 14px;background:var(--bg-surface);}
 .step .n{width:24px;height:24px;border-radius:50%;border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;font:600 10px var(--font-mono);color:var(--text-muted);}
 .step .t{font-size:12px;font-weight:600;color:var(--text-secondary);}
 .step.done .n{border-color:var(--success);color:var(--success);background:var(--success-faint);}
-.step.done .t{color:var(--text-secondary);}
 .step.active{border-color:var(--border-active);box-shadow:0 0 18px var(--gold-faint);position:relative;overflow:hidden;}
 .step.active::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--gold-faint) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;}
 .step.active .n{border-color:var(--gold);color:var(--gold);}
 .step.active .t{color:var(--gold);}
 .swire{width:18px;height:1px;background:var(--border);}
-/* spotlight */
 .spot{position:relative;border:1px solid var(--border-active);border-radius:var(--r-card);background:linear-gradient(135deg,var(--gold-faint),var(--bg-surface) 55%);padding:20px 24px;overflow:hidden;}
 .spot::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,var(--gold-faint) 50%,transparent 65%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;pointer-events:none;}
 .spot .ey{font:600 11px var(--font-mono);letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
 .spot h2{font-size:18px;color:var(--text-primary);margin-bottom:6px;}
 .spot p{font-size:12px;color:var(--text-secondary);}
-/* meters */
 .mrow{margin-bottom:12px;}
-.mrow .mt{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px;}
+.mrow .mt{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:5px;}
 .mrow .mt .mono{color:var(--text-secondary);}
 .mtrack{height:6px;background:var(--bg-elevated);border-radius:9999px;overflow:hidden;}
 .mfill{height:100%;width:0;border-radius:9999px;background:var(--gold);transition:width var(--t-meter) ease;}
-/* tasks */
 .task{display:flex;align-items:center;gap:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 18px;margin-bottom:8px;transition:all var(--t-base) ease;animation:fadeUp .4s ease both;}
 .task:hover{border-color:var(--border-hover);transform:translateY(-1px);}
 .task.done{opacity:.5;}
@@ -117,17 +114,15 @@ h1 span{color:var(--gold);}
 .task.done .check{background:var(--success);border-color:var(--success);}
 .tb{flex:1;}
 .tb b{font-size:13px;color:var(--text-primary);display:block;}
-.tb small{font-size:11px;color:var(--text-muted);}
+.tb small{font-size:12px;color:var(--text-muted);}
 .pill{border-radius:9999px;padding:2px 10px;font:600 10px var(--font-mono);letter-spacing:.06em;}
 .pill.warn{background:var(--warning-faint);color:var(--warning);}
 .pill.ok{background:var(--success-faint);color:var(--success);}
 .startbtn{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--r-ctl);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--t-base) ease;}
 .startbtn:hover{background:var(--gold-faint);border-color:var(--gold);}
-/* inputs */
 input,textarea{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-ctl);color:var(--text-primary);font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color var(--t-base) ease,box-shadow var(--t-base) ease;}
 input:focus,textarea:focus{border-color:var(--border-active);box-shadow:0 0 0 3px var(--gold-faint);}
 input::placeholder,textarea::placeholder{color:var(--text-muted);}
-/* chat */
 #modes{display:flex;gap:8px;flex-wrap:wrap;margin:20px 32px 0;}
 .mchip{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9999px;padding:7px 14px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all var(--t-base) ease;}
 .mchip .mi{font:600 10px var(--font-mono);color:var(--text-muted);}
@@ -151,7 +146,6 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 #chatfoot{display:flex;gap:12px;padding:16px 32px;border-top:1px solid var(--border);background:var(--bg-surface);}
 #chatfoot textarea{flex:1;padding:12px 14px;height:52px;resize:none;}
 #doneBar{display:none;align-items:center;gap:10px;padding:10px 32px;background:var(--gold-faint);border-top:1px solid var(--gold-dim);font-size:13px;color:var(--text-secondary);}
-/* map */
 .mapwrap{margin:24px 32px;}
 .opt{background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);border-radius:9999px;padding:8px 16px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
 .opt.on{background:var(--gold-faint);border-color:var(--border-active);color:var(--gold);font-weight:600;}
@@ -159,11 +153,10 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 .ringfg{fill:none;stroke:var(--gold);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
 .leak{background:var(--error-faint);border:1px solid var(--error);border-radius:var(--r-card);padding:14px 18px;font-size:13px;color:var(--text-secondary);margin:16px 0;}
 .leak b{color:var(--error);}
-/* toast / tour / misc */
 #toast{position:fixed;bottom:20px;right:20px;background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--success);color:var(--text-primary);padding:12px 20px;border-radius:var(--r-card);font-weight:600;font-size:13px;opacity:0;transform:translateY(8px);transition:all .22s ease-out;z-index:99;}
 #toast.show{opacity:1;transform:none;}
 .confetti{position:fixed;top:-12px;width:3px;height:12px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
-#tourCard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:440px;width:92%;background:var(--bg-surface);border:1px solid var(--border-active);border-radius:var(--r-card);padding:18px;z-index:97;animation:fadeUp .3s ease-out;}
+#tourCard{position:fixed;bottom:20px;right:20px;max-width:360px;width:92%;background:var(--bg-surface);border:1px solid var(--border-active);border-radius:var(--r-card);padding:18px;z-index:97;animation:fadeUp .3s ease-out;}
 #tourCard p{font-size:13px;line-height:1.55;margin-bottom:12px;color:var(--text-secondary);}
 .tour-hl{outline:2px solid var(--gold);box-shadow:0 0 24px var(--gold-glow);border-radius:var(--r-card);position:relative;z-index:96;}
 @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -174,17 +167,19 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 @keyframes bnc{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
-@media (max-width:1100px){.grid4{grid-template-columns:1fr 1fr;}.grid2{grid-template-columns:1fr;}}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr;}}
+@media (max-width:900px){.kbd,.livechip{display:none;}}
 @media (max-width:768px){
  #shell{flex-direction:column;}
- #rail{width:100%;height:52px;display:flex;overflow-x:auto;}
+ #rail{width:100%;height:52px;flex-direction:row;overflow-x:auto;}
  #rail:hover{width:100%;}
  .ritem{padding:14px 16px;}
  .ritem .lbl{opacity:1;}
+ .railfoot{display:none;}
  .hero,.section,#modes,.mapwrap{margin-left:16px;margin-right:16px;}
  #chat,#chatfoot,#doneBar{padding-left:16px;padding-right:16px;}
  .ticker{margin:22px -16px -28px;}
- .livechip{display:none;}
+ .opt,.mchip,.chipbtn,.startbtn{min-height:44px;}
 }
 </style>
 </head>
@@ -192,6 +187,7 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 <div id="topbar">
   <div class="crumb"><div class="logotile">IE</div><span>Income Engine</span><span>/</span><b id="crumbSec">Dashboard</b></div>
   <div class="tspace"></div>
+  <button class="chipbtn kbd" onclick="askCoach()"><span>Ask the coach</span> <span class="k">⌘K</span></button>
   <button class="chipbtn" onclick="toggleSb()" title="Pin sidebar">☰</button>
   <button class="chipbtn" id="langBtn" onclick="setLang(lang==='en'?'ar':'en')">ع</button>
   <div class="livechip"><span class="dot"></span><span class="mono">api · online</span></div>
@@ -202,14 +198,16 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
     <div class="ritem on" id="tabHome" onclick="showView('home')"><span class="ric">01</span><span class="lbl" id="lbHome">Journey</span></div>
     <div class="ritem" id="tabMap" onclick="showView('map')"><span class="ric">02</span><span class="lbl" id="lbMap">Business Map</span></div>
     <div class="ritem" id="tabChat" onclick="showView('chat')"><span class="ric">03</span><span class="lbl" id="lbChat">Coach</span></div>
+    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v9</span></div>
   </div>
   <div id="main">
     <div id="homeView"></div>
     <div id="mapView" style="display:none"></div>
     <div id="chatView" style="display:none">
+      <h1 class="vsr">Coach</h1>
       <div id="modes"></div>
       <div id="chat"></div>
-      <div id="doneBar"><span id="doneTxt"></span><button class="btn-gold" style="padding:6px 12px;font-size:12px" id="markBtn" onclick="markDone()">Mark done</button><button class="btn-ghost" style="padding:6px 12px;font-size:12px" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
+      <div id="doneBar"><span id="doneTxt"></span><button class="btn-goldline" style="padding:6px 12px;font-size:12px" id="markBtn" onclick="markDone()">Mark done</button><button class="btn-ghost" style="padding:6px 12px;font-size:12px" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
       <div id="chatfoot">
         <textarea id="input" placeholder="Describe your challenge or ask for guidance..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
         <button class="btn-gold" id="send" onclick="send()">Send</button>
@@ -225,8 +223,8 @@ input::placeholder,textarea::placeholder{color:var(--text-muted);}
 const API_URL = "";
 let lang = localStorage.getItem("lang") || "en";
 const CH = {
- en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map"},
- ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة"}
+ en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v9"},
+ ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v9"}
 };
 const MODES = [
  {id:"coach", tier:"free", t:"Daily Operator", d:"90-min rhythm", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة"},
@@ -281,6 +279,7 @@ function C(){ return CH[lang]; }
 function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
 function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
 function toggleSb(){ document.getElementById("shell").classList.toggle("railwide"); }
+function askCoach(){ showView("chat"); document.getElementById("input").focus(); }
 function setLang(l){ lang=l; localStorage.setItem("lang",l); document.documentElement.lang=l; document.documentElement.dir=(l==="ar")?"rtl":"ltr"; applyLang(); }
 function applyLang(){
   const c=C();
@@ -294,6 +293,7 @@ function applyLang(){
   document.getElementById("laterBtn").textContent=c.later;
   document.getElementById("input").placeholder=c.ph;
   document.getElementById("send").textContent=c.send;
+  document.getElementById("sysTxt").textContent=c.sys;
   renderModes(); renderHome(); renderH(); renderStreak(); renderMap();
 }
 function doneCount(){ return JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0); }
@@ -307,12 +307,12 @@ function showView(v){
   document.getElementById("tabMap").classList.toggle("on",v==="map");
   document.getElementById("tabChat").classList.toggle("on",v==="chat");
   document.getElementById("doneBar").style.display="none";
+  document.getElementById("ctaBtn").className=(v==="home")?"btn-gold":"btn-ghost";
   if(v==="home") renderHome();
   if(v==="map") renderMap();
-  if(v==="chat") updateDoneBar();
+  if(v==="chat"){ updateDoneBar(); renderChatEmpty(); }
 }
 function startNext(){ const n=nextTask(); if(n) startTaskById(n.id); else showView("chat"); }
-/* journey */
 function findTask(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return t; return null; }
 function phaseOf(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return p; return null; }
 function nextTask(){ for(const p of JOURNEY) for(const t of p.tasks) if(!done[t.id]) return t; return null; }
@@ -320,6 +320,7 @@ function startTaskById(id){
   const t=findTask(id); if(!t) return;
   if(RANK[tier]<RANK[modeTier(t.mode)]){ showView("chat"); addMsg("Locked: "+T(t,"t")+" is a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); unlockPrompt(); return; }
   mode=t.mode; renderModes(); showView("chat"); activeTask=id;
+  const q=document.getElementById("qwrap"); if(q) q.remove();
   document.getElementById("input").value=t.prompt; send();
 }
 function updateDoneBar(){
@@ -337,17 +338,16 @@ function completeTask(id){
   renderHome(); renderH(); renderStreak(); updateDoneBar();
 }
 function toggleDone(id){ if(done[id]){ done[id]=false; localStorage.setItem("journey_"+memberId,JSON.stringify(done)); renderHome(); } else completeTask(id); }
-function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+function toast(m,ok){ const t=document.getElementById("toast"); t.textContent=m; t.style.borderLeftColor=(ok===false)?"var(--error)":"var(--success)"; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),4000); }
 function confetti(n){ const cols=["#F5A623","#D48C1A","#FFE0B0","#00E599"]; for(let i=0;i<n;i++){ const c=document.createElement("div"); c.className="confetti"; c.style.left=Math.random()*100+"vw"; c.style.background=cols[Math.floor(Math.random()*cols.length)]; c.style.animationDelay=(Math.random()*0.4)+"s"; document.body.appendChild(c); setTimeout(()=>c.remove(),2000);} }
-/* HOME */
 function renderHome(){
   const c=C(); const total=JOURNEY.reduce((a,p)=>a+p.tasks.length,0); const dc=doneCount(); const sm=savedMap(); const next=nextTask();
-  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V8</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-gold" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num gr" id="streak">0</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker"><div class="tk">'+tickerHTML()+'</div></div></div>';
+  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V9</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num gr" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
   h+='<div class="section"><div class="shead"><h3>'+(lang==="ar"?"صحة المسار":"Pipeline Health")+'</h3><small>'+c.prog+' · <span class="mono">'+dc+'/'+total+'</span></small></div><div class="steps">';
   JOURNEY.forEach((p,i)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const st=pd===p.tasks.length?"done":(next&&p.tasks.some(t=>t.id===next.id)?"active":""); h+='<div class="step '+st+'"><span class="n">'+(pd===p.tasks.length?"✓":"0"+(i+1))+'</span><span class="t">'+T(p,"name")+'</span></div>'; if(i<JOURNEY.length-1) h+='<div class="swire"></div>'; });
   h+='</div></div>';
   if(next){ h+='<div class="section"><div class="spot"><div class="ey">'+c.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · <span class="mono">~'+next.min+' min</span></p></div></div>'; }
-  h+='<div class="section"><div class="grid2"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div class="grid2" style="grid-template-columns:1fr"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div></div></div></div>';
+  h+='<div class="section"><div class="grid2"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div style="display:grid;gap:16px"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div></div></div></div>';
   JOURNEY.forEach((p,pi)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const complete=pd===p.tasks.length;
     h+='<div class="section" style="margin-top:8px"><div class="shead"><h3><span class="mono" style="color:var(--text-muted)">0'+(pi+1)+'</span> · '+T(p,"name")+(complete?' <span class="pill ok">'+c.complete+'</span>':'')+'</h3><small class="mono">'+pd+'/'+p.tasks.length+'</small></div>';
     p.tasks.forEach((t,ti)=>{ const isD=!!done[t.id]; const locked=RANK[tier]<RANK[modeTier(t.mode)];
@@ -365,7 +365,7 @@ function tickerHTML(){
 }
 function funnelHTML(sm){
   const c=C(); let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.funnel+'</h3><span class="pill ok">LIVE</span></div>';
-  if(!sm){ h+='<p style="font-size:12px;margin-bottom:12px">'+c.noMap+'</p><button class="btn-ghost" onclick="showView(\'map\')">'+c.buildCta+'</button>'; return h; }
+  if(!sm){ h+='<div style="text-align:center;padding:20px 0"><div class="mono" style="color:var(--text-muted);font-size:20px;margin-bottom:8px">◇</div><p style="font-size:12px;margin-bottom:12px">'+c.noMap+'</p><button class="btn-goldline" onclick="showView(\'map\')">'+c.buildCta+'</button></div>'; return h; }
   const W=[22,55,95]; const col=s=>["var(--error)","var(--warning)","var(--success)"][s];
   [[c.lTraffic,sm.t],[c.lHub,sm.h],[c.lNurture,sm.n],[c.lConversion,sm.c]].forEach(x=>{
     h+='<div class="mrow"><div class="mt"><span>'+x[0]+'</span><span class="mono">'+x[1]+'/2</span></div><div class="mtrack"><div class="mfill" data-w="'+W[x[1]]+'" style="background:'+col(x[1])+'"></div></div></div>'; });
@@ -373,16 +373,15 @@ function funnelHTML(sm){
 }
 function pulseHTML(){
   const c=C();
-  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.pulse+'</h3><span class="dot"></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="opt" id="hC" onclick="toggleH(\'c\')">Content</button><button class="opt" id="hCom" onclick="toggleH(\'com\')">Community</button><button class="opt" id="hConv" onclick="toggleH(\'conv\')">Convos</button></div><button class="btn-gold" style="width:100%" id="logBtn" onclick="logDay()">'+c.log+'</button>';
+  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.pulse+'</h3><span class="dot"></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="opt" id="hC" onclick="toggleH(\'c\')">Content</button><button class="opt" id="hCom" onclick="toggleH(\'com\')">Community</button><button class="opt" id="hConv" onclick="toggleH(\'conv\')">Convos</button></div><button class="btn-ghost" style="width:100%" id="logBtn" onclick="logDay()">'+c.log+'</button>';
 }
 function planHTML(){
   const c=C();
   return '<div class="shead" style="margin-bottom:12px"><h3>'+c.plan+'</h3><span class="pill ok" id="memBadge">MEM</span></div><input id="lic" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.lic+'"><button class="btn-ghost" style="width:100%" onclick="unlock()">'+c.unlock+'</button>';
 }
-/* MAP */
 function ans(qi,oi){ answers[qi]=oi; renderMap(); }
 function buildMap(){
-  if(answers.some(a=>a===null)){ toast(C().answerAll); return; }
+  if(answers.some(a=>a===null)){ toast(C().answerAll,false); return; }
   const t=answers[0],h=answers[1],n=answers[2],cc=Math.round((answers[3]+answers[4])/2),r=answers[5];
   const mom=Math.round(((t+h+n+cc)/8)*80+(r/2)*20);
   const layers={t:t,h:h,n:n,c:cc};
@@ -394,6 +393,7 @@ function retakeMap(){ localStorage.removeItem("map_"+memberId); answers=[null,nu
 function sendMapToCoach(){
   const sm=savedMap(); if(!sm) return;
   mode="xray"; renderModes(); showView("chat");
+  const q=document.getElementById("qwrap"); if(q) q.remove();
   document.getElementById("input").value="BUSINESS MAP RESULT - Momentum "+sm.mom+"/100 | Traffic "+sm.t+"/2 | Hub "+sm.h+"/2 | Nurture "+sm.n+"/2 | Conversion "+sm.c+"/2 | Biggest leak: "+leakName(sm.leak)+". Use this as my full picture and start coaching from the leak. Update my memory with these scores.";
   send();
 }
@@ -410,9 +410,8 @@ function renderMap(){
   }
   h+='</div>';
   document.getElementById("mapView").innerHTML=h;
-  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
+  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".bfill, .mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
 }
-/* MODES + CHAT */
 function renderModes(){
   const box=document.getElementById("modes"); box.innerHTML="";
   MODES.forEach((m,i)=>{ const locked=RANK[tier]<RANK[m.tier];
@@ -422,6 +421,17 @@ function renderModes(){
     box.appendChild(b); });
   const tb=document.getElementById("tierBadge"); if(tb) tb.textContent=tier.toUpperCase();
   const mb=document.getElementById("memBadge"); if(mb) mb.textContent="MEM "+memberId.slice(2,6).toUpperCase();
+}
+function renderChatEmpty(){
+  const c=document.getElementById("chat");
+  const old=document.getElementById("qwrap"); if(old) old.remove();
+  if(history.length>0) return;
+  const chips=[["xray","Audit My Business","Run my Business X-Ray. Interview me one question at a time, then give me my audit and the single first fix."],["community","Build My Community","Help me set up the MVC 6 non-negotiables for my group. Ask me what I have first."],["dm","Write Converting DMs","Teach me the Hand-Raiser flow and write my first DM script for my niche."],["offer","Build My Offer","Interview me and build my 14-block Offer Doc, one section at a time."]];
+  const w=document.createElement("div"); w.id="qwrap"; w.style.cssText="display:flex;gap:8px;flex-wrap:wrap;";
+  chips.forEach(ch=>{ const b=document.createElement("button"); b.className="opt"; b.textContent=ch[1];
+    b.onclick=()=>{ w.remove(); if(RANK[tier]<RANK[modeTier(ch[0])]){ addMsg("Locked: "+ch[1]+" is a "+modeTier(ch[0]).toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); unlockPrompt(); return; } mode=ch[0]; renderModes(); document.getElementById("input").value=ch[2]; send(); };
+    w.appendChild(b); });
+  c.appendChild(w);
 }
 function fmt(text){
   let s=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -451,6 +461,7 @@ function exportChat(){
 }
 async function send(){
   const inp=document.getElementById("input"); const text=inp.value.trim(); if(!text) return;
+  const q=document.getElementById("qwrap"); if(q) q.remove();
   addMsg(text,"user"); history.push({role:"user",content:text}); inp.value=""; showTyping();
   const wire=(lang==="ar")?("[Respond fully in Arabic] "+text):text;
   try{
@@ -467,10 +478,11 @@ async function unlock(){
     const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:key})});
     const d=await r.json(); if(!r.ok) throw new Error(d.detail||"invalid license");
     tier=d.tier; localStorage.setItem("tier",tier); renderModes(); renderHome();
+    toast("Unlocked: "+tier.toUpperCase()+" plan",true);
     addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
-  }catch(e){ addMsg("Unlock failed: "+e.message,"ai"); }
+  }catch(e){ toast("Unlock failed: "+e.message,false); addMsg("Unlock failed: "+e.message,"ai"); }
 }
-function unlockPrompt(){ const k=prompt("Paste your Whop license key:"); if(k){ showView("home"); setTimeout(()=>{ const i=document.getElementById("lic"); if(i){ i.value=k; unlock(); } },100); } }
+function unlockPrompt(){ const k=prompt("Paste your Whop license key:"); if(k){ const i=document.getElementById("lic"); if(i){ i.value=k; unlock(); } else { showView("home"); setTimeout(()=>{ const j=document.getElementById("lic"); if(j){ j.value=k; unlock(); } },100); } } }
 async function loadTier(){ try{ const r=await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId)); const d=await r.json(); if(d.tier){ tier=d.tier; localStorage.setItem("tier",tier);} }catch(e){} renderModes(); }
 function toggleH(k){ habit[k]=!habit[k]; renderH(); }
 function renderH(){ const a=document.getElementById("hC"),b=document.getElementById("hCom"),c=document.getElementById("hConv"); if(a){a.classList.toggle("on",habit.c);} if(b){b.classList.toggle("on",habit.com);} if(c){c.classList.toggle("on",habit.conv);} }
@@ -481,34 +493,40 @@ function logDay(){
   const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); log[dayKey(new Date())]={c:habit.c,com:habit.com,conv:habit.conv}; localStorage.setItem("habit_log",JSON.stringify(log));
   const s=calcStreak();
   const msg="DAILY CHECK-IN - Content: "+(habit.c?"YES":"NO")+" | Community: "+(habit.com?"YES":"NO")+" | Conversations: "+(habit.conv?"YES":"NO")+" | Streak: "+s+" days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy, and give me ONE focus for tomorrow. Update my memory with this check-in and streak.";
-  habit={c:false,com:false,conv:false}; renderH(); showView("chat"); document.getElementById("input").value=msg; send();
+  habit={c:false,com:false,conv:false}; renderH(); showView("chat");
+  const q=document.getElementById("qwrap"); if(q) q.remove();
+  document.getElementById("input").value=msg; send();
 }
-function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); }
-/* TOUR */
+function clearChat(){
+  const n=document.querySelectorAll("#chat .msg").length;
+  if(!confirm("Clear this session? "+n+" messages will be removed.")) return;
+  history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); renderChatEmpty();
+}
 const TOUR=[
- {sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
- {sel:"#tabMap", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
- {sel:"#tabChat", en:"The Coach: a $10K strategist that remembers you across sessions.", ar:"المدرب: استراتيجي يتذكرك عبر الجلسات."},
- {sel:"#modes", en:"Operating modes. LOCK pills open with your Whop plan.", ar:"الأوضاع. شارات LOCK تُفتح بخطتك."},
- {sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm, grow the streak.", ar:"النبض اليومي: سجّل الروتين ونمِّ السلسلة."},
- {sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
+ {view:"home", sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
+ {view:"home", sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
+ {view:"home", sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
+ {view:"map", sel:"#mapView", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
+ {view:"chat", sel:"#modes", en:"Operating modes. LOCK pills open with your Whop plan.", ar:"الأوضاع. شارات LOCK تُفتح بخطتك."},
+ {view:"chat", sel:"#chatfoot", en:"The Coach answers in under a second of feel: typing dots, rich text, voice playback.", ar:"المدرب يجيب مع نقاط كتابة ونص منسق وتشغيل صوتي."},
 ];
 let tourI=0;
 function showTour(){
   document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
   if(tourI>=TOUR.length){ endTour(); return; }
-  const s=TOUR[tourI]; const el=document.querySelector(s.sel);
-  if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); }
+  const s=TOUR[tourI];
+  showView(s.view);
+  setTimeout(()=>{ const el=document.querySelector(s.sel); if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); } },80);
   document.getElementById("tourCard").style.display="block";
   document.getElementById("tourTxt").textContent=(lang==="ar")?s.ar:s.en;
   document.getElementById("tourStep").textContent=(tourI+1)+"/"+TOUR.length;
 }
 function nextTour(){ tourI++; showTour(); }
 function endTour(){ localStorage.setItem("tour_"+memberId,"1"); document.getElementById("tourCard").style.display="none"; document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl")); }
-/* INIT */
+document.addEventListener("keydown",e=>{ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){ e.preventDefault(); askCoach(); } });
 loadTier(); applyLang(); showView("home");
 if(!localStorage.getItem("tour_"+memberId)) setTimeout(()=>{tourI=0;showTour();},800);
-addMsg(C().welcome,"ai");
+addMsg(C().welcome,"ai"); renderChatEmpty();
 </script>
 </body>
 </html>
