@@ -21,20 +21,31 @@ aside{width:270px;background:var(--panel);border-right:1px solid var(--border);d
 .mode small{color:var(--muted);font-size:11px;line-height:1.3;display:block;}
 .mode .lock{margin-left:auto;color:var(--muted);font-size:12px;}
 .tierbox{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:12px;}
-.tierbox .badge{display:inline-block;background:#262626;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;margin-bottom:8px;}
+.badge{display:inline-block;background:#262626;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;margin:0 4px 8px 0;}
 .tierbox input{width:100%;background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px;}
 .tierbox button{width:100%;background:var(--accent);border:none;border-radius:6px;padding:8px;font-weight:700;cursor:pointer;}
 main{flex:1;display:flex;flex-direction:column;}
 header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--panel);}
 header h1{font-size:20px;}
 header p{color:var(--muted);font-size:12px;margin-top:3px;}
+.hbtns button{background:var(--ai);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;margin-left:6px;}
 #chat{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
 .msg{max-width:75%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;}
 .msg.user{align-self:flex-end;background:var(--user);color:#111;border-top-right-radius:2px;}
 .msg.ai{align-self:flex-start;background:var(--ai);border:1px solid var(--border);border-top-left-radius:2px;}
+.speak{background:transparent;border:none;color:var(--muted);cursor:pointer;margin-left:10px;font-size:14px;}
+.speak:hover{color:var(--accent);}
 footer{padding:18px 24px;border-top:1px solid var(--border);background:var(--panel);display:flex;gap:12px;}
 textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:10px;font-size:14px;resize:none;height:54px;outline:none;}
 #send{background:var(--accent);border:none;border-radius:10px;width:90px;font-weight:700;cursor:pointer;}
+@media (max-width:900px){
+ body{flex-direction:column;}
+ aside{width:100%;flex-direction:column;padding:10px;}
+ .logo,.sec{display:none;}
+ #modes{display:flex;flex-direction:row;overflow-x:auto;gap:8px;padding-bottom:6px;}
+ .mode{min-width:160px;margin-bottom:0;}
+ .tierbox{display:none;}
+}
 </style>
 </head>
 <body>
@@ -44,6 +55,7 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
   <div id="modes"></div>
   <div class="tierbox">
     <span class="badge" id="tierBadge">FREE PLAN</span>
+    <span class="badge" id="memBadge">💾 MEMORY ON</span>
     <input id="lic" placeholder="Whop license key (buyers only)">
     <button onclick="unlock()">Unlock Tier</button>
   </div>
@@ -51,7 +63,11 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
 <main>
   <header>
     <div><h1>CCC Diagnostic Brain</h1><p>Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p></div>
-    <button class="mode" onclick="clearChat()" style="width:auto">🗑️</button>
+    <div class="hbtns">
+      <button onclick="unlockPrompt()" title="Unlock tier">🔓</button>
+      <button onclick="exportChat()" title="Export session">⬇️</button>
+      <button onclick="clearChat()" title="Clear chat">🗑️</button>
+    </div>
   </header>
   <div id="chat"></div>
   <footer>
@@ -79,6 +95,7 @@ if(!memberId){ memberId = "m-" + Math.random().toString(36).slice(2,10); localSt
 let tier = localStorage.getItem("tier") || "free";
 let mode = "coach";
 let history = [];
+document.getElementById("memBadge").textContent = "💾 " + memberId.slice(0,8);
 
 function renderModes(){
   const box = document.getElementById("modes");
@@ -88,7 +105,7 @@ function renderModes(){
     const b = document.createElement("button");
     b.className = "mode" + (m.id===mode ? " active" : "");
     b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+m.t+'</b><small>'+m.d+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
-    b.onclick = ()=>{ if(locked){ addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key below to unlock it.", "ai"); return; } mode = m.id; renderModes(); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
+    b.onclick = ()=>{ if(locked){ addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); return; } mode = m.id; renderModes(); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
     box.appendChild(b);
   });
   document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
@@ -97,8 +114,34 @@ function addMsg(text, who){
   const c = document.getElementById("chat");
   const d = document.createElement("div");
   d.className = "msg "+who;
-  d.textContent = text;
+  const s = document.createElement("span");
+  s.textContent = text;
+  d.appendChild(s);
+  if(who==="ai"){
+    const b = document.createElement("button");
+    b.className = "speak"; b.textContent = "🔊"; b.title = "Play voice";
+    b.onclick = ()=> speak(text);
+    d.appendChild(b);
+  }
   c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function speak(text){
+  const clean = text.slice(0, 600);
+  fetch(API_URL+"/api/tts", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text: clean})})
+    .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
+    .then(blob=>{ const a = new Audio(URL.createObjectURL(blob)); a.play(); })
+    .catch(e=> addMsg("⚠️ Voice failed: "+e.message, "ai"));
+}
+function exportChat(){
+  const lines = [];
+  document.querySelectorAll("#chat .msg").forEach(m=>{
+    lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n") + m.querySelector("span").textContent);
+  });
+  const blob = new Blob([lines.join("\n\n")], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "income-engine-session.txt";
+  a.click();
 }
 async function send(){
   const inp = document.getElementById("input");
@@ -107,7 +150,7 @@ async function send(){
   try{
     const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({message:text, history:history.slice(-16), mode:mode, member_id:memberId})});
-    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key below.", "ai"); return; }
+    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key.", "ai"); return; }
     const data = await r.json();
     const reply = data.reply || data.response || data.message || "Error.";
     addMsg(reply, "ai"); history.push({role:"assistant", content:reply});
@@ -123,6 +166,10 @@ async function unlock(){
     tier = data.tier; localStorage.setItem("tier", tier); renderModes();
     addMsg("✅ Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are now open.", "ai");
   }catch(e){ addMsg("⚠️ Unlock failed: "+e.message, "ai"); }
+}
+function unlockPrompt(){
+  const key = prompt("Paste your Whop license key:");
+  if(key){ document.getElementById("lic").value = key; unlock(); }
 }
 async function loadTier(){
   try{
