@@ -1,13 +1,4 @@
 fastapi
 uvicorn
-langchain>=0.2
-langchain-groq
-langchain-community
-supabase
 python-dotenv
 pydantic
-fastembed
-httpx
-edge-tts
-python-multipart
-openai
