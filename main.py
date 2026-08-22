@@ -1,5 +1,5 @@
 """
-E5 AI COACH - main.py (v11 - VAULT + W1 + DOCS + HACKER)
+E5 AI COACH - main.py (v12 - VAULT + W1 + DOCS + HACKER + TOLERANT MEMORY + ROBUST TTS)
 Complete backend. No manual edits required.
 """
 import json
@@ -31,7 +31,6 @@ UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-# Fish Audio fallback to prevent voice breaking
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "") or os.environ.get("FISH_AUDIO_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
@@ -82,7 +81,7 @@ PROVIDERS = [
         "chat_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         "list_url": "https://generativelanguage.googleapis.com/v1beta/models",
         "key": GEMINI_API_KEY,
-        "models": [os.environ.get("GEMINI_MODEL", ""), "gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"],
+        "models": [os.environ.get("GEMINI_MODEL", ""), "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"],
     },
     {
         "name": "groq",
@@ -93,7 +92,7 @@ PROVIDERS = [
     },
 ]
 
-app = FastAPI(title="E5 AI Coach", version="11.0-full")
+app = FastAPI(title="E5 AI Coach", version="12.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -179,7 +178,9 @@ class DocsRequest(BaseModel):
     body: str = ""
 
 # ------------------------- MEMORY + TIER (SUPABASE) -------------------------
-MEMORY_RE = re.compile(r"\[\[MEMORY\]\](.*?)\[\[/MEMORY\]\]", re.S)
+# Tolerant: matches [[MEMORY]]...[[/MEMORY]], [[MEMORY]]...[/MEMORY], [MEMORY]...[/MEMORY],
+# and strips to end-of-message if the closing tag is missing. Raw tags can never leak.
+MEMORY_RE = re.compile(r"\[{1,2}\s*MEMORY\s*\]{1,2}(.*?)(?:\[{1,2}\s*/\s*MEMORY\s*\]{1,2}|$)", re.S)
 
 def load_memory(member_id):
     if not SUPABASE_URL or not SUPABASE_KEY: return "", "free"
@@ -217,7 +218,8 @@ def set_tier(member_id, tier):
 
 def extract_memory(reply):
     m = MEMORY_RE.search(reply)
-    if m: return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
+    if m:
+        return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
     return reply, ""
 
 # ------------------------- WHOP LICENSE CHECK -------------------------
@@ -377,6 +379,9 @@ def try_model(p, model, messages, temperature, max_tokens):
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         return data["choices"][0]["message"]["content"] or ""
+    except urllib.error.HTTPError as e:
+        log.error("LLM FAIL %s/%s HTTP %s", p["name"], model, e.code)
+        return None
     except Exception as e:
         log.error("LLM FAIL %s/%s: %s", p["name"], model, e)
         return None
@@ -426,7 +431,7 @@ def post_process(text): return text.replace("—", "-").replace("–", "-")
 @app.get("/")
 def root():
     if os.path.exists("landing.html"): return FileResponse("landing.html")
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v11", "modes": list(MODE_PROMPTS.keys())}
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v12", "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
 def health():
@@ -451,8 +456,9 @@ def unlock(req: UnlockRequest):
     key = (req.license_key or "").strip()
     if not key: raise HTTPException(400, "empty license key")
     try: tier = whop_tier_for_license(key)
+    except urllib.error.HTTPError as e: raise HTTPException(400, "Whop says: invalid license (HTTP %s)" % e.code)
     except Exception as e: raise HTTPException(502, "Whop check failed: %s" % e)
-    if not tier: raise HTTPException(403, "Invalid license.")
+    if not tier: raise HTTPException(403, "This license is invalid or not linked to a tier.")
     set_tier(member_id, tier)
     return {"tier": tier}
 
@@ -487,15 +493,30 @@ def tts(req: TTSRequest):
     if not TTS_LIMIT.allow(limit_key): raise HTTPException(429, "Voice limit reached.")
     if not FISH_API_KEY: raise HTTPException(503, "FISH_API_KEY missing")
     voice = req.voice_id or FISH_VOICE_ID
+    def call(payload):
+        req_obj = urllib.request.Request("https://api.fish.audio/v1/tts",
+            data=json.dumps(payload).encode("utf-8"), method="POST",
+            headers={"Content-Type": "application/json", "Authorization": "Bearer " + FISH_API_KEY, "User-Agent": UA})
+        with urllib.request.urlopen(req_obj, timeout=60) as resp:
+            return resp.read()
     payload = {"text": req.text, "format": "mp3"}
     if voice: payload["reference_id"] = voice
-    req_obj = urllib.request.Request("https://api.fish.audio/v1/tts",
-        data=json.dumps(payload).encode("utf-8"), method="POST",
-        headers={"Content-Type": "application/json", "Authorization": "Bearer " + FISH_API_KEY, "User-Agent": UA})
     try:
-        with urllib.request.urlopen(req_obj, timeout=60) as resp: audio = resp.read()
-        return Response(content=audio, media_type="audio/mpeg")
-    except Exception as e: raise HTTPException(502, "TTS error: " + str(e))
+        return Response(content=call(payload), media_type="audio/mpeg")
+    except urllib.error.HTTPError as e:
+        body = ""
+        try: body = e.read().decode()[:200]
+        except Exception: pass
+        log.error("FISH HTTP %s: %s", e.code, body)
+        if voice:
+            try:
+                return Response(content=call({"text": req.text, "format": "mp3"}), media_type="audio/mpeg")
+            except Exception as e2:
+                log.error("FISH RETRY FAIL: %s", e2)
+        raise HTTPException(502, "TTS error: Fish HTTP %s%s" % (e.code, " (credits or voice issue)" if e.code in (401, 402, 403) else ""))
+    except Exception as e:
+        log.error("TTS FAIL: %s", e)
+        raise HTTPException(502, "TTS error: " + str(e))
 
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest): return tts(req)
@@ -509,7 +530,8 @@ def connect_whop(req: ConnectWhopRequest):
     key = (req.key or "").strip()
     if not key: raise HTTPException(400, "empty key")
     try: stats = compute_whop_stats(key)
-    except Exception as e: raise HTTPException(400, "Invalid Whop key: %s" % e)
+    except urllib.error.HTTPError as e: raise HTTPException(400, "Whop says: invalid key (HTTP %s)" % e.code)
+    except Exception as e: raise HTTPException(502, "Whop check failed: %s" % e)
     db_upsert_connection(member_id, key)
     WHOP_STATS_CACHE[member_id] = (time.time(), stats)
     return {"connected": True, "stats": stats}
