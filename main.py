@@ -1,6 +1,7 @@
 """
-E5 AI COACH - main.py (v9 - VAULT DOOR EDITION)
-No backdoors. Rate-limited. CORS-locked. Cost-capped. Memory + gating + vault intact.
+E5 AI COACH - main.py (v10 - VAULT DOOR + W1 WHOP CONNECT)
+No backdoors. Rate-limited. CORS-locked. Cost-capped.
+Memory + gating + vault + live Whop community data + /pitch.
 """
 import json
 import os
@@ -12,6 +13,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from typing import List, Optional
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,6 +69,8 @@ class RateLimiter:
 CHAT_LIMIT = RateLimiter(int(os.environ.get("RATE_CHAT_PER_HOUR", "30")), 3600)
 TTS_LIMIT = RateLimiter(int(os.environ.get("RATE_TTS_PER_HOUR", "10")), 3600)
 UNLOCK_LIMIT = RateLimiter(int(os.environ.get("RATE_UNLOCK_PER_HOUR", "10")), 3600)
+CONNECT_LIMIT = RateLimiter(int(os.environ.get("RATE_CONNECT_PER_HOUR", "10")), 3600)
+STATS_LIMIT = RateLimiter(int(os.environ.get("RATE_STATS_PER_HOUR", "60")), 3600)
 
 MODE_TIERS = {
     "coach": "free", "xray": "free", "funnel": "free",
@@ -88,11 +92,11 @@ PROVIDERS = [
         "chat_url": "https://api.groq.com/openai/v1/chat/completions",
         "list_url": "https://api.groq.com/openai/v1/models",
         "key": GROQ_API_KEY,
-        "models": [os.environ.get("GROQ_MODEL", ""), "meta-llama/llama-4-scout-17b-16e-instruct", "openai/gpt-oss-120b"],
+        "models": [os.environ.get("GROQ_MODEL", ""), "meta-llama/llama-4-scout-17b-16e-instant", "openai/gpt-oss-120b"],
     },
 ]
 
-app = FastAPI(title="E5 AI Coach", version="9.0-vaultdoor")
+app = FastAPI(title="E5 AI Coach", version="10.0-vaultdoor-w1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -163,6 +167,13 @@ class TTSRequest(BaseModel):
 class UnlockRequest(BaseModel):
     member_id: str = "default"
     license_key: str = ""
+
+class ConnectWhopRequest(BaseModel):
+    member_id: str = "default"
+    key: str = ""
+
+class DisconnectWhopRequest(BaseModel):
+    member_id: str = "default"
 
 # ------------------------- MEMORY + TIER (SUPABASE) -------------------------
 MEMORY_RE = re.compile(r"\[\[MEMORY\]\](.*?)\[\[/MEMORY\]\]", re.S)
@@ -250,6 +261,86 @@ def whop_tier_for_license(key):
     except Exception as e:
         log.error("WHOP CHECK FAIL: %s", e)
     return None
+
+# ------------------------- W1: WHOP CONNECT (member's own community) -------------------------
+CONNECT_TABLE = "member_connections"
+WHOP_STATS_CACHE = {}
+
+def parse_ts(v):
+    if not v:
+        return None
+    try:
+        if isinstance(v, (int, float)):
+            return float(v)
+        return datetime.fromisoformat(str(v).replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return None
+
+def db_upsert_connection(member_id, whop_key):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return
+    url = SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE
+    body = json.dumps([{"member_id": member_id, "whop_key": whop_key}]).encode("utf-8")
+    req = urllib.request.Request(url, data=body, method="POST", headers={
+        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
+    urllib.request.urlopen(req, timeout=10).read()
+
+def db_get_connection(member_id):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return None
+    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE +
+           "?member_id=eq." + urllib.parse.quote(member_id) + "&select=whop_key")
+    req = urllib.request.Request(url, headers={
+        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        rows = json.loads(resp.read().decode("utf-8"))
+    return rows[0]["whop_key"] if rows else None
+
+def db_delete_connection(member_id):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return
+    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE +
+           "?member_id=eq." + urllib.parse.quote(member_id))
+    req = urllib.request.Request(url, method="DELETE", headers={
+        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
+    urllib.request.urlopen(req, timeout=10).read()
+
+def whop_fetch(key, path):
+    req = urllib.request.Request("https://api.whop.com/api/v2/" + path,
+        headers={"Authorization": "Bearer " + key, "User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+def compute_whop_stats(key):
+    whop_fetch(key, "products?limit=1")  # canary: proves the key is valid
+    now = time.time()
+    members = 0
+    joins7 = 0
+    rev30 = 0.0
+    orders30 = 0
+    try:
+        mem = whop_fetch(key, "memberships?limit=100")
+        items = mem.get("data") or mem.get("memberships") or []
+        members = len(items)
+        for m in items:
+            ts = parse_ts(m.get("created_at") or (m.get("membership") or {}).get("created_at"))
+            if ts and now - ts <= 7 * 86400:
+                joins7 += 1
+    except Exception as e:
+        log.error("WHOP MEMBERSHIPS: %s", e)
+    try:
+        ords = whop_fetch(key, "orders?limit=100")
+        oitems = ords.get("data") or ords.get("orders") or []
+        for o in oitems:
+            ts = parse_ts(o.get("created_at"))
+            if ts and now - ts <= 30 * 86400:
+                amt = o.get("amount") or o.get("total_amount") or 0
+                rev30 += (amt / 100.0) if amt >= 100 else amt
+                orders30 += 1
+    except Exception as e:
+        log.error("WHOP ORDERS: %s", e)
+    return {"members": members, "joins7": joins7, "rev30": round(rev30, 2), "orders30": orders30}
 
 # ------------------------- LLM ENGINE (COST-CAPPED) -------------------------
 def try_model(p, model, messages, temperature, max_tokens):
@@ -341,7 +432,7 @@ def post_process(text):
 # ------------------------- ROUTES -------------------------
 @app.get("/")
 def root():
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v9",
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v10",
             "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
@@ -443,6 +534,57 @@ def tts(req: TTSRequest):
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest):
     return tts(req)
+
+@app.post("/api/connect/whop")
+def connect_whop(req: ConnectWhopRequest):
+    member_id = (req.member_id or "default").strip()
+    if not CONNECT_LIMIT.allow(member_id):
+        raise HTTPException(429, "Too many connect attempts. Retry later.")
+    _, tier = load_memory(member_id)
+    if TIER_RANK.get(tier or "free", 0) < TIER_RANK["insider"]:
+        raise HTTPException(403, "locked:insider")
+    key = (req.key or "").strip()
+    if not key:
+        raise HTTPException(400, "empty key")
+    try:
+        stats = compute_whop_stats(key)
+    except urllib.error.HTTPError as e:
+        raise HTTPException(400, "Whop says: invalid key (HTTP %s)" % e.code)
+    except Exception as e:
+        raise HTTPException(502, "Whop check failed: %s" % e)
+    db_upsert_connection(member_id, key)
+    WHOP_STATS_CACHE[member_id] = (time.time(), stats)
+    return {"connected": True, "stats": stats}
+
+@app.get("/api/whop/stats")
+def whop_stats(member_id: str = "default"):
+    if not STATS_LIMIT.allow(member_id):
+        raise HTTPException(429, "Stats rate limit. Retry later.")
+    cached = WHOP_STATS_CACHE.get(member_id)
+    if cached and time.time() - cached[0] < 300:
+        return {"connected": True, "stats": cached[1]}
+    key = db_get_connection(member_id)
+    if not key:
+        return {"connected": False}
+    try:
+        stats = compute_whop_stats(key)
+    except Exception:
+        return {"connected": True, "stats": None, "stale": True}
+    WHOP_STATS_CACHE[member_id] = (time.time(), stats)
+    return {"connected": True, "stats": stats}
+
+@app.post("/api/connect/whop/disconnect")
+def disconnect_whop(req: DisconnectWhopRequest):
+    member_id = (req.member_id or "default").strip()
+    db_delete_connection(member_id)
+    WHOP_STATS_CACHE.pop(member_id, None)
+    return {"connected": False}
+
+@app.get("/pitch")
+def pitch_page():
+    if os.path.exists("pitch.html"):
+        return FileResponse("pitch.html")
+    return HTMLResponse("<h3>pitch.html not found in repo root.</h3>")
 
 @app.get("/test")
 def test_page():
