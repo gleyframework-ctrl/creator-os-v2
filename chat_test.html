@@ -36,7 +36,6 @@ header h1{font-size:20px;}
 header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .hbtns button{background:var(--ai);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;margin-left:6px;font-size:12px;}
 .hbtns button.on{border-color:var(--accent);color:var(--accent);}
-/* HOME / MISSION CONTROL */
 #homeView{flex:1;overflow-y:auto;padding:28px;max-width:920px;margin:0 auto;width:100%;}
 .line{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:22px;flex-wrap:wrap;}
 .node{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--chat);border:1px solid var(--border);border-radius:12px;padding:10px 16px;opacity:.45;transition:.4s;}
@@ -58,6 +57,7 @@ header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .phead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .phead b{font-size:14px;}
 .phead small{color:var(--muted);font-size:11px;margin-left:auto;}
+.pdone{color:var(--green);font-size:11px;font-weight:800;}
 .picon{font-size:16px;}
 .task{display:flex;align-items:center;gap:12px;background:var(--chat);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;animation:fadeUp .5s ease both;transition:.2s;}
 .task:hover{transform:translateY(-1px);border-color:var(--muted);}
@@ -70,18 +70,35 @@ header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .tbody b{font-size:13px;display:block;}
 .tbody small{color:var(--muted);font-size:11px;}
 .startbtn{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes glow{0%,100%{box-shadow:0 0 4px rgba(255,214,10,.25)}50%{box-shadow:0 0 18px rgba(255,214,10,.5)}}
-/* CHAT */
 #chat{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
-.msg{max-width:75%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;}
+.msg{max-width:78%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word;}
 .msg.user{align-self:flex-end;background:var(--user);color:#111;border-top-right-radius:2px;}
 .msg.ai{align-self:flex-start;background:var(--ai);border:1px solid var(--border);border-top-left-radius:2px;}
+.msg.ai strong{color:var(--accent);}
+.msg.ai .h{color:var(--accent);font-weight:800;}
+.msg.ai .li{padding-left:12px;}
+.msg.ai pre{background:#000;border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0;white-space:pre;overflow-x:auto;}
 .speak{background:transparent;border:none;color:var(--muted);cursor:pointer;margin-left:10px;font-size:14px;}
 .speak:hover{color:var(--accent);}
+.typing{display:flex;gap:5px;padding:14px 18px;align-self:flex-start;}
+.typing span{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bnc 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes bnc{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+#doneBar{display:none;align-items:center;gap:10px;padding:10px 24px;background:#1c1a05;border-top:1px solid var(--accent);font-size:13px;}
+#doneBar button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px;}
+#doneBar .later{background:transparent;color:var(--muted);border:1px solid var(--border);}
 footer{padding:18px 24px;border-top:1px solid var(--border);background:var(--panel);display:flex;gap:12px;}
 textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:10px;font-size:14px;resize:none;height:54px;outline:none;}
 #send{background:var(--accent);border:none;border-radius:10px;width:90px;font-weight:700;cursor:pointer;color:#111;}
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-90px);background:#1c1a05;border:1px solid var(--accent);color:var(--text);padding:12px 22px;border-radius:12px;font-weight:700;transition:.4s;z-index:99;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+.confetti{position:fixed;top:-12px;width:8px;height:14px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
+#tip{position:fixed;bottom:18px;right:18px;max-width:310px;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:16px;z-index:97;animation:fadeUp .5s ease;font-size:13px;line-height:1.5;}
+#tip button{margin-top:10px;background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes glow{0%,100%{box-shadow:0 0 4px rgba(255,214,10,.25)}50%{box-shadow:0 0 18px rgba(255,214,10,.5)}}
 @media (max-width:900px){
  body{flex-direction:column;}
  aside{width:100%;padding:10px;}
@@ -127,11 +144,14 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
   </header>
   <div id="homeView"></div>
   <div id="chat"></div>
+  <div id="doneBar"><span id="doneTxt"></span><button onclick="markDone()">✓ Mark done</button><button class="later" onclick="hideDoneBar()">Later</button></div>
   <footer id="chatFooter">
     <textarea id="input" placeholder="Describe your challenge or ask for guidance... (Shift+Enter for new line)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
     <button id="send" onclick="send()">Send ➤</button>
   </footer>
 </main>
+<div id="toast"></div>
+<div id="tip" style="display:none">👋 <b>Welcome to Mission Control.</b><br>This path IS your business journey. Hit <b>Start</b> on your next move and the coach walks you through it, step by step. Tick ✓ when done and watch the bar fill.<br><button onclick="closeTip()">Got it →</button></div>
 <script>
 const API_URL = "";
 const MODES = [
@@ -157,7 +177,7 @@ const JOURNEY = [
    {id:"quickwin", t:"Install the 15-minute Quick Win", why:"New members must feel progress on day 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."},
  ]},
  {name:"Attention", icon:"🎬", tasks:[
-   {id:"vagel", t:"Build your VAGEL week", why:"Predictable content that builds trust", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story. Ask me what I need."},
+   {id:"vagel", t:"Build your VAGEL week", why:"Predictable content that builds trust", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story. Ask me what you need."},
    {id:"reel", t:"Script your first reel", why:"Hook 0-5s, Body 5-45s, CTA 45-60s", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
    {id:"cta", t:"Post with a Triple-Threat CTA", why:"Turn viewers into group members", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."},
  ]},
@@ -177,30 +197,72 @@ let mode = "coach";
 let history = [];
 let habit = {c:false, com:false, conv:false};
 let done = JSON.parse(localStorage.getItem("journey_" + memberId) || "{}");
+let activeTask = null;
 document.getElementById("memBadge").textContent = "💾 " + memberId.slice(0,8);
 
 function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
 function showView(v){
-  document.getElementById("homeView").style.display = (v==="home") ? "block" : "none";
-  document.getElementById("chat").style.display = (v==="chat") ? "flex" : "none";
+  const hv = document.getElementById("homeView"), cv = document.getElementById("chat");
+  hv.style.display = (v==="home") ? "block" : "none";
+  cv.style.display = (v==="chat") ? "flex" : "none";
   document.getElementById("chatFooter").style.display = (v==="chat") ? "flex" : "none";
+  document.getElementById("doneBar").style.display = "none";
   document.getElementById("tabHome").classList.toggle("on", v==="home");
   document.getElementById("tabChat").classList.toggle("on", v==="chat");
-  if(v==="home") renderHome();
+  if(v==="home"){ renderHome(); hv.style.animation="none"; void hv.offsetWidth; hv.style.animation="fadeUp .35s ease"; }
+  else { updateDoneBar(); cv.style.animation="none"; void cv.offsetWidth; cv.style.animation="fadeUp .35s ease"; }
 }
 function findTask(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return t; } } return null; }
+function phaseOf(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return p; } } return null; }
 function nextTask(){ for(const p of JOURNEY){ for(const t of p.tasks){ if(!done[t.id]) return t; } } return null; }
 function startTaskById(id){
   const t = findTask(id); if(!t) return;
-  if(RANK[tier] < RANK[modeTier(t.mode)]){ addMsg("🔒 \""+t.t+"\" lives in a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); showView("chat"); unlockPrompt(); return; }
+  if(RANK[tier] < RANK[modeTier(t.mode)]){ showView("chat"); addMsg("🔒 \""+t.t+"\" lives in a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); unlockPrompt(); return; }
   mode = t.mode; renderModes(); showView("chat");
+  activeTask = id;
   document.getElementById("input").value = t.prompt;
   send();
 }
-function toggleDone(id){
-  done[id] = !done[id];
+function updateDoneBar(){
+  const bar = document.getElementById("doneBar");
+  if(activeTask && !done[activeTask]){
+    const t = findTask(activeTask);
+    document.getElementById("doneTxt").textContent = "Finished \"" + (t ? t.t : "step") + "\"?";
+    bar.style.display = "flex";
+  } else bar.style.display = "none";
+}
+function hideDoneBar(){ document.getElementById("doneBar").style.display = "none"; }
+function markDone(){ if(activeTask) completeTask(activeTask); hideDoneBar(); }
+function completeTask(id){
+  if(done[id]) return;
+  done[id] = true;
   localStorage.setItem("journey_" + memberId, JSON.stringify(done));
-  renderHome();
+  const p = phaseOf(id);
+  const phaseDone = p && p.tasks.every(t=>done[t.id]);
+  if(phaseDone){ toast("🏆 PHASE COMPLETE: " + p.name + "!"); confetti(40); }
+  else { toast("✅ Step complete. Momentum building."); confetti(18); }
+  renderHome(); updateDoneBar();
+}
+function toggleDone(id){
+  if(done[id]){ done[id]=false; localStorage.setItem("journey_" + memberId, JSON.stringify(done)); renderHome(); }
+  else completeTask(id);
+}
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2600);
+}
+function confetti(n){
+  const colors = ["#ffd60a","#22c55e","#3b82f6","#ef4444","#e5e7eb"];
+  for(let i=0;i<n;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100 + "vw";
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay = (Math.random()*0.4) + "s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 2000);
+  }
 }
 function renderHome(){
   const total = JOURNEY.reduce((a,p)=>a+p.tasks.length,0);
@@ -212,14 +274,15 @@ function renderHome(){
   nodes.forEach((n,i)=>{ html += '<div class="node'+(i<=activeNode?' on':'')+'"><span>'+n[0]+'</span><small>'+n[1]+'</small></div>'; if(i<3) html += '<div class="wire'+(i<activeNode?' on':'')+'"></div>'; });
   html += '</div>';
   if(next){
-    html += '<div class="hero"><div><div class="herolabel">YOUR NEXT MOVE</div><h2>'+next.t+'</h2><p>'+next.why+' · ~'+next.min+' min</p></div><button class="herobtn" onclick="startTaskById(\''+next.id+'\')">Start →</button></div>';
+    html += '<div class="hero"><div><div class="herolabel">YOUR NEXT MOVE</div><h2>'+next.t+'</h2><p>'+next.why+' · ~'+next.min+' min · 🔥 '+calcStreak()+'-day streak</p></div><button class="herobtn" onclick="startTaskById(\''+next.id+'\')">Start →</button></div>';
   } else {
-    html += '<div class="hero"><div><div class="herolabel">JOURNEY COMPLETE</div><h2>You built the machine. Now run it daily.</h2><p>Keep your Daily Pulse streak alive.</p></div><button class="herobtn" onclick="showView(\'chat\')">Open Coach</button></div>';
+    html += '<div class="hero"><div><div class="herolabel">JOURNEY COMPLETE</div><h2>You built the machine. Now run it daily.</h2><p>Keep your Daily Pulse streak alive. 🔥 '+calcStreak()+' days.</p></div><button class="herobtn" onclick="showView(\'chat\')">Open Coach</button></div>';
   }
   html += '<div class="prog"><div class="progtop"><span>Journey progress</span><span>'+doneCount+'/'+total+' steps</span></div><div class="bar"><div class="fill" style="width:'+Math.round((doneCount/total)*100)+'%"></div></div></div>';
   JOURNEY.forEach((p,pi)=>{
     const pd = p.tasks.filter(t=>done[t.id]).length;
-    html += '<div class="phase" style="animation-delay:'+(pi*0.08)+'s"><div class="phead"><span class="picon">'+p.icon+'</span><b>Phase '+(pi+1)+' — '+p.name+'</b><small>'+pd+'/'+p.tasks.length+'</small></div>';
+    const complete = pd === p.tasks.length;
+    html += '<div class="phase" style="animation-delay:'+(pi*0.08)+'s"><div class="phead"><span class="picon">'+p.icon+'</span><b>Phase '+(pi+1)+' — '+p.name+'</b>'+(complete?'<span class="pdone">✓ COMPLETE</span>':'')+'<small>'+pd+'/'+p.tasks.length+'</small></div>';
     p.tasks.forEach((t,ti)=>{
       const isDone = !!done[t.id];
       const locked = RANK[tier] < RANK[modeTier(t.mode)];
@@ -232,6 +295,96 @@ function renderHome(){
     html += '</div>';
   });
   document.getElementById("homeView").innerHTML = html;
+}
+function fmt(text){
+  let s = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  s = s.replace(/```([\s\S]*?)```/g, function(m,c){ return "<pre>"+c+"</pre>"; });
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/^###\s?(.+)$/gm, "<span class='h'>$1</span>");
+  s = s.replace(/^##\s?(.+)$/gm, "<span class='h'>$1</span>");
+  s = s.replace(/^#\s?(.+)$/gm, "<span class='h'>$1</span>");
+  s = s.replace(/^[-*]\s+(.+)$/gm, "<span class='li'>• $1</span>");
+  return s;
+}
+function showTyping(){
+  const c = document.getElementById("chat");
+  const d = document.createElement("div");
+  d.className = "typing"; d.id = "typing";
+  d.innerHTML = "<span></span><span></span><span></span>";
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideTyping(){ const t = document.getElementById("typing"); if(t) t.remove(); }
+function addMsg(text, who){
+  const c = document.getElementById("chat");
+  const d = document.createElement("div");
+  d.className = "msg "+who;
+  const s = document.createElement("span");
+  if(who==="ai"){ s.innerHTML = fmt(text); } else { s.textContent = text; }
+  d.appendChild(s);
+  if(who==="ai"){
+    const b = document.createElement("button");
+    b.className = "speak"; b.textContent = "🔊"; b.title = "Play voice";
+    b.onclick = ()=> speak(text);
+    d.appendChild(b);
+  }
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function speak(text){
+  const clean = text.slice(0, 600);
+  fetch(API_URL+"/api/tts", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text: clean})})
+    .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
+    .then(blob=>{ const a = new Audio(URL.createObjectURL(blob)); a.play(); })
+    .catch(e=> addMsg("⚠️ Voice failed: "+e.message, "ai"));
+}
+function exportChat(){
+  const lines = [];
+  document.querySelectorAll("#chat .msg").forEach(m=>{
+    lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n") + m.querySelector("span").textContent);
+  });
+  const blob = new Blob([lines.join("\n\n")], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "income-engine-session.txt";
+  a.click();
+}
+async function send(){
+  const inp = document.getElementById("input");
+  const text = inp.value.trim(); if(!text) return;
+  addMsg(text, "user"); history.push({role:"user", content:text}); inp.value="";
+  showTyping();
+  try{
+    const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({message:text, history:history.slice(-16), mode:mode, member_id:memberId})});
+    hideTyping();
+    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key.", "ai"); return; }
+    const data = await r.json();
+    const reply = data.reply || data.response || data.message || "Error.";
+    addMsg(reply, "ai"); history.push({role:"assistant", content:reply});
+    updateDoneBar();
+  }catch(e){ hideTyping(); addMsg("⚠️ Connection error: "+e.message, "ai"); }
+}
+async function unlock(){
+  const key = document.getElementById("lic").value.trim(); if(!key) return;
+  try{
+    const r = await fetch(API_URL+"/api/unlock", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({member_id:memberId, license_key:key})});
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.detail || "invalid license");
+    tier = data.tier; localStorage.setItem("tier", tier); renderModes(); renderHome();
+    addMsg("✅ Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are now open.", "ai");
+  }catch(e){ addMsg("⚠️ Unlock failed: "+e.message, "ai"); }
+}
+function unlockPrompt(){
+  const key = prompt("Paste your Whop license key:");
+  if(key){ document.getElementById("lic").value = key; unlock(); }
+}
+async function loadTier(){
+  try{
+    const r = await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId));
+    const data = await r.json();
+    if(data.tier){ tier = data.tier; localStorage.setItem("tier", tier); }
+  }catch(e){}
+  renderModes();
 }
 function toggleH(k){ habit[k] = !habit[k]; renderH(); }
 function renderH(){
@@ -268,82 +421,15 @@ function renderModes(){
     const b = document.createElement("button");
     b.className = "mode" + (m.id===mode ? " active" : "");
     b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+m.t+'</b><small>'+m.d+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
-    b.onclick = ()=>{ if(locked){ addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); showView("chat"); return; } mode = m.id; renderModes(); showView("chat"); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
+    b.onclick = ()=>{ if(locked){ showView("chat"); addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); return; } mode = m.id; renderModes(); showView("chat"); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
     box.appendChild(b);
   });
   document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
 }
-function addMsg(text, who){
-  const c = document.getElementById("chat");
-  const d = document.createElement("div");
-  d.className = "msg "+who;
-  const s = document.createElement("span");
-  s.textContent = text;
-  d.appendChild(s);
-  if(who==="ai"){
-    const b = document.createElement("button");
-    b.className = "speak"; b.textContent = "🔊"; b.title = "Play voice";
-    b.onclick = ()=> speak(text);
-    d.appendChild(b);
-  }
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
-}
-function speak(text){
-  const clean = text.slice(0, 600);
-  fetch(API_URL+"/api/tts", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text: clean})})
-    .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
-    .then(blob=>{ const a = new Audio(URL.createObjectURL(blob)); a.play(); })
-    .catch(e=> addMsg("⚠️ Voice failed: "+e.message, "ai"));
-}
-function exportChat(){
-  const lines = [];
-  document.querySelectorAll("#chat .msg").forEach(m=>{
-    lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n") + m.querySelector("span").textContent);
-  });
-  const blob = new Blob([lines.join("\n\n")], {type:"text/plain"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "income-engine-session.txt";
-  a.click();
-}
-async function send(){
-  const inp = document.getElementById("input");
-  const text = inp.value.trim(); if(!text) return;
-  addMsg(text, "user"); history.push({role:"user", content:text}); inp.value="";
-  try{
-    const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({message:text, history:history.slice(-16), mode:mode, member_id:memberId})});
-    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key.", "ai"); return; }
-    const data = await r.json();
-    const reply = data.reply || data.response || data.message || "Error.";
-    addMsg(reply, "ai"); history.push({role:"assistant", content:reply});
-  }catch(e){ addMsg("⚠️ Connection error: "+e.message, "ai"); }
-}
-async function unlock(){
-  const key = document.getElementById("lic").value.trim(); if(!key) return;
-  try{
-    const r = await fetch(API_URL+"/api/unlock", {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({member_id:memberId, license_key:key})});
-    const data = await r.json();
-    if(!r.ok) throw new Error(data.detail || "invalid license");
-    tier = data.tier; localStorage.setItem("tier", tier); renderModes(); renderHome();
-    addMsg("✅ Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are now open.", "ai");
-  }catch(e){ addMsg("⚠️ Unlock failed: "+e.message, "ai"); }
-}
-function unlockPrompt(){
-  const key = prompt("Paste your Whop license key:");
-  if(key){ document.getElementById("lic").value = key; unlock(); }
-}
-async function loadTier(){
-  try{
-    const r = await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId));
-    const data = await r.json();
-    if(data.tier){ tier = data.tier; localStorage.setItem("tier", tier); }
-  }catch(e){}
-  renderModes();
-}
 function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg("Chat cleared. What are we working on?", "ai"); }
+function closeTip(){ localStorage.setItem("onboarded_"+memberId, "1"); document.getElementById("tip").style.display="none"; }
 loadTier(); renderStreak(); showView("home");
+if(!localStorage.getItem("onboarded_"+memberId)) document.getElementById("tip").style.display = "block";
 addMsg("Welcome to Income Engine. I remember you across sessions, so we never start from zero. Your Journey Map is ready - hit Start on your next move whenever you are.", "ai");
 </script>
 </body>
