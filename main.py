@@ -1,6 +1,6 @@
 """
-E5 AI COACH - main.py (FINAL v6 - VAULT + MEMORY EDITION)
-Pure stdlib. Gemini primary. Self-healing models. Verbatim vault + Supabase memory.
+E5 AI COACH - main.py (v7 - PER-USER MEMORY + WHOP GATING)
+No checkout code. Whop handles money; we verify license keys only.
 """
 import json
 import os
@@ -32,6 +32,18 @@ FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
+WHOP_API_KEY = os.environ.get("WHOP_API_KEY", "")
+WHOP_INSIDER_PRODUCT_ID = os.environ.get("WHOP_INSIDER_PRODUCT_ID", "")
+WHOP_PARTNER_PRODUCT_ID = os.environ.get("WHOP_PARTNER_PRODUCT_ID", "")
+MANUAL_INSIDER_CODES = [c.strip() for c in os.environ.get("MANUAL_INSIDER_CODES", "").split(",") if c.strip()]
+MANUAL_PARTNER_CODES = [c.strip() for c in os.environ.get("MANUAL_PARTNER_CODES", "").split(",") if c.strip()]
+
+MODE_TIERS = {
+    "coach": "free", "xray": "free", "funnel": "free",
+    "community": "insider", "dm": "insider", "content": "insider", "alchemy": "insider",
+    "offer": "partner", "workshop": "partner", "launch": "partner",
+}
+TIER_RANK = {"free": 0, "insider": 1, "partner": 2}
 
 PROVIDERS = [
     {
@@ -50,7 +62,7 @@ PROVIDERS = [
     },
 ]
 
-app = FastAPI(title="E5 AI Coach", version="6.0-vault-memory")
+app = FastAPI(title="E5 AI Coach", version="7.0-gating")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -79,7 +91,7 @@ YOUR INTERNAL LOGIC (HIDDEN FROM USER):
 - One Group: Fragmentation kills momentum.
 - Paths > Libraries: Communities are linear paths, not course dumps.
 - Preselling: Content must agitate the pain and pre-handle objections so the Offer Doc replaces the sales call.
-- Belonging > Value: People stay for identity, rituals, and shared enemies (systems, not people).
+- Belonging > Value: People stay for identity, rituals, and shared enemies (systems, never people).
 - Leverage: Assets (docs, workshops, reels) over one-off effort.
 
 YOUR TONE GUARDRAILS:
@@ -149,25 +161,29 @@ class TTSRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
-# ------------------------- MEMORY (SUPABASE, STDlib) -------------------------
+class UnlockRequest(BaseModel):
+    member_id: str = "default"
+    license_key: str = ""
+
+# ------------------------- MEMORY + TIER (SUPABASE, STDlib) -------------------------
 MEMORY_RE = re.compile(r"\[\[MEMORY\]\](.*?)\[\[/MEMORY\]\]", re.S)
 
 def load_memory(member_id):
     if not SUPABASE_URL or not SUPABASE_KEY:
-        return ""
+        return "", "free"
     try:
         url = (SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory?member_id=eq."
-               + urllib.parse.quote(member_id) + "&select=profile")
+               + urllib.parse.quote(member_id) + "&select=profile,tier")
         req = urllib.request.Request(url, headers={
             "apikey": SUPABASE_KEY,
             "Authorization": "Bearer " + SUPABASE_KEY})
         with urllib.request.urlopen(req, timeout=10) as resp:
             rows = json.loads(resp.read().decode("utf-8"))
-        if rows and rows[0].get("profile"):
-            return rows[0]["profile"]
+        if rows:
+            return (rows[0].get("profile") or "", rows[0].get("tier") or "free")
     except Exception as e:
         log.error("MEMORY LOAD FAIL: %s", e)
-    return ""
+    return "", "free"
 
 def save_memory(member_id, profile_text):
     if not SUPABASE_URL or not SUPABASE_KEY or not profile_text:
@@ -185,11 +201,56 @@ def save_memory(member_id, profile_text):
     except Exception as e:
         log.error("MEMORY SAVE FAIL: %s", e)
 
+def set_tier(member_id, tier):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return
+    try:
+        url = SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory"
+        body = json.dumps([{"member_id": member_id, "tier": tier}]).encode("utf-8")
+        req = urllib.request.Request(url, data=body, method="POST", headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"})
+        urllib.request.urlopen(req, timeout=10).read()
+        log.info("TIER %s for %s", tier, member_id)
+    except Exception as e:
+        log.error("TIER SAVE FAIL: %s", e)
+
 def extract_memory(reply):
     m = MEMORY_RE.search(reply)
     if m:
         return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
     return reply, ""
+
+# ------------------------- WHOP LICENSE CHECK (verify only, no checkout) -------------------------
+def whop_tier_for_license(key):
+    if key in MANUAL_PARTNER_CODES:
+        return "partner"
+    if key in MANUAL_INSIDER_CODES:
+        return "insider"
+    if not WHOP_API_KEY:
+        return None
+    url = "https://api.whop.com/api/v2/licenses/" + urllib.parse.quote(key)
+    req = urllib.request.Request(url, headers={
+        "Authorization": "Bearer " + WHOP_API_KEY,
+        "User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    log.info("WHOP LICENSE DATA: %s", json.dumps(data)[:500])
+    status = str(data.get("status") or data.get("state") or "active").lower()
+    if status in ("revoked", "cancelled", "canceled", "expired", "inactive"):
+        return None
+    pid = (data.get("product_id") or data.get("experience_id") or
+           (data.get("product") or {}).get("id") or
+           (data.get("experience") or {}).get("id") or "")
+    if pid and WHOP_PARTNER_PRODUCT_ID and pid == WHOP_PARTNER_PRODUCT_ID:
+        return "partner"
+    if pid and WHOP_INSIDER_PRODUCT_ID and pid == WHOP_INSIDER_PRODUCT_ID:
+        return "insider"
+    if not WHOP_INSIDER_PRODUCT_ID and not WHOP_PARTNER_PRODUCT_ID:
+        return "insider"
+    return None
 
 # ------------------------- LLM ENGINE (SELF-HEALING) -------------------------
 def try_model(p, model, messages, temperature, max_tokens):
@@ -281,7 +342,7 @@ def post_process(text):
 # ------------------------- ROUTES -------------------------
 @app.get("/")
 def root():
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v6",
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v7",
             "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
@@ -290,11 +351,34 @@ def health():
             "gemini_key_loaded": bool(GEMINI_API_KEY),
             "groq_key_loaded": bool(GROQ_API_KEY),
             "supabase_loaded": bool(SUPABASE_URL and SUPABASE_KEY),
-            "vault_loaded": bool(SCRIPT_VAULT)}
+            "vault_loaded": bool(SCRIPT_VAULT),
+            "whop_loaded": bool(WHOP_API_KEY)}
 
 @app.get("/api/modes")
 def modes():
-    return {"modes": list(MODE_PROMPTS.keys())}
+    return {"modes": list(MODE_PROMPTS.keys()), "tiers": MODE_TIERS}
+
+@app.get("/api/tier")
+def tier_endpoint(member_id: str = "default"):
+    _, tier = load_memory(member_id)
+    return {"tier": tier or "free"}
+
+@app.post("/api/unlock")
+def unlock(req: UnlockRequest):
+    member_id = (req.member_id or "default").strip()
+    key = (req.license_key or "").strip()
+    if not key:
+        raise HTTPException(400, "empty license key")
+    try:
+        tier = whop_tier_for_license(key)
+    except urllib.error.HTTPError as e:
+        raise HTTPException(400, "Whop says: invalid license (HTTP %s)" % e.code)
+    except Exception as e:
+        raise HTTPException(502, "Whop check failed: %s" % e)
+    if not tier:
+        raise HTTPException(403, "This license is not linked to a product tier.")
+    set_tier(member_id, tier)
+    return {"tier": tier}
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
@@ -302,7 +386,10 @@ def chat(req: ChatRequest):
     if not text:
         raise HTTPException(400, "empty message")
     member_id = (req.member_id or "default").strip()
-    memory = load_memory(member_id)
+    memory, tier = load_memory(member_id)
+    need = MODE_TIERS.get(req.mode, "free")
+    if TIER_RANK.get(tier or "free", 0) < TIER_RANK.get(need, 0):
+        raise HTTPException(403, "locked:" + need)
     messages = [{"role": "system", "content": build_system(req.mode, req.member_context, memory)}]
     for m in req.history[-16:]:
         messages.append({"role": m.role, "content": m.content})
