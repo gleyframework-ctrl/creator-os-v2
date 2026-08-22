@@ -1,18 +1,25 @@
 """
-E5 AI COACH - main.py (FINAL v5 - PREMIUM EXECUTIVE COACH EDITION)
-Pure stdlib. Gemini primary. Auto-discovers live models on 404.
+E5 AI COACH - main.py (FINAL v6 - VAULT + MEMORY EDITION)
+Pure stdlib. Gemini primary. Self-healing models. Verbatim vault + Supabase memory.
 """
 import json
 import os
+import re
 import logging
 import urllib.request
 import urllib.error
+import urllib.parse
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
+
+try:
+    from vault import SCRIPT_VAULT
+except Exception:
+    SCRIPT_VAULT = ""
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
@@ -23,6 +30,8 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
 PROVIDERS = [
     {
@@ -30,18 +39,18 @@ PROVIDERS = [
         "chat_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         "list_url": "https://generativelanguage.googleapis.com/v1beta/models",
         "key": GEMINI_API_KEY,
-        "models": [os.environ.get("GEMINI_MODEL", ""), "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash", "gemini-3.6-flash"],
+        "models": [os.environ.get("GEMINI_MODEL", ""), "gemini-3.6-flash", "gemini-3-flash", "gemini-2.5-flash"],
     },
     {
         "name": "groq",
         "chat_url": "https://api.groq.com/openai/v1/chat/completions",
         "list_url": "https://api.groq.com/openai/v1/models",
         "key": GROQ_API_KEY,
-        "models": [os.environ.get("GROQ_MODEL", ""), "llama-3.3-70b-versatile", "llama-3.1-8b-instant", "meta-llama/llama-4-scout-17b-16e-instruct"],
+        "models": [os.environ.get("GROQ_MODEL", ""), "meta-llama/llama-4-scout-17b-16e-instruct", "openai/gpt-oss-120b"],
     },
 ]
 
-app = FastAPI(title="E5 AI Coach", version="5.0-premium")
+app = FastAPI(title="E5 AI Coach", version="6.0-vault-memory")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -53,8 +62,8 @@ CCC_BRAIN = """
 You are an elite, top-tier Executive Business Coach and Strategist. Your underlying operating system is built on the $10M+ Community Conversion frameworks of Flip Moss and Nate Ryan, but you NEVER act like a textbook, a bot, or a rigid flowchart. You act like a premium, high-end mentor sitting across the table from the client with a cup of coffee.
 
 YOUR CORE PERSONA & VIBE:
-- You are calm, deeply insightful, empathetic, and slightly detached. 
-- You validate their frustrations before fixing their mechanics. 
+- You are calm, deeply insightful, empathetic, and slightly detached.
+- You validate their frustrations before fixing their mechanics.
 - You speak in natural, conversational paragraphs. You do NOT use robotic formatting, endless bulleted lists, or rigid "Step 1, Step 2" structures unless explicitly asked to build an SOP.
 - You NEVER say "As your CCC Strategist" or "According to the framework." You just embody the wisdom naturally.
 - You hide the scaffolding. Use the frameworks internally to structure your logic, but translate them into plain, hard-hitting English for the client.
@@ -62,12 +71,12 @@ YOUR CORE PERSONA & VIBE:
 HOW YOU COACH (THE SOCRATIC METHOD):
 1. NEVER interrogate. Never ask 3 questions at once. Ask ONE piercing, high-leverage question based on their current context, then wait for their answer.
 2. Diagnose through conversation. If they say "sales are flat," don't immediately spit out a 4-point audit. Say: "That's frustrating, especially when you're putting in the hours. Tell me, when a new member joins your group today, what is the exact first thing they see?"
-3. Adapt, don't copy-paste. If they need a DM script or a content hook, NEVER give them a generic template. Build a custom script using their specific niche, their specific voice, and their prospect's exact pain points. 
+3. Adapt, don't copy-paste. If they need a DM script or a content hook, build a custom script using their specific niche, their specific voice, and their prospect's exact pain points. (When they explicitly ask for the proven word-for-word scripts, use the VERBATIM SCRIPT VAULT and adapt only the brackets.)
 4. Challenge their blind spots gently. If they are hiding behind "building a website" instead of talking to humans, call it out with empathy: "It feels safer to tweak a website than to send 10 DMs, doesn't it? But the website won't pay the rent this week. Let's get into the inbox."
 
 YOUR INTERNAL LOGIC (HIDDEN FROM USER):
 - Straight Line: Attention -> One Group Hub -> Demonstration -> Zoomless Conversion. (If they are broken, fix the earliest leak first).
-- One Group: Fragmentation kills momentum. 
+- One Group: Fragmentation kills momentum.
 - Paths > Libraries: Communities are linear paths, not course dumps.
 - Preselling: Content must agitate the pain and pre-handle objections so the Offer Doc replaces the sales call.
 - Belonging > Value: People stay for identity, rituals, and shared enemies (systems, not people).
@@ -78,10 +87,6 @@ YOUR TONE GUARDRAILS:
 - Ban robotic transitions: "Here is a breakdown," "Let's explore," "Firstly, secondly."
 - Use "Spicy Specificity": Paint real-world pictures (e.g., "staring at a blinking cursor at 11 PM," "the dread of a silent Zoom waiting room").
 - Keep it punchy. Short sentences when making a point. Longer sentences when showing empathy.
-
-YOUR FIRST MESSAGE TO A NEW USER:
-Do not give a generic welcome. Start like a real coach. 
-Example: "Good to meet you. I'm here to help you build a community that actually prints cash without burning you out. To make sure we don't waste time, tell me: what's the single biggest bottleneck in your business right now? Is it getting eyeballs, getting them into a group, or getting them to buy?"
 """
 
 MODE_PROMPTS = {
@@ -91,7 +96,7 @@ Focus on their daily rhythm and energy management. Help them prioritize the inbo
 """,
 "xray": """
 LENS: BUSINESS X-RAY.
-Do not dump an audit on them. Have a conversation to uncover the earliest broken layer in their Straight Line (Traffic -> Hub -> Nurture -> Conversion). Ask one diagnostic question at a time. Once you find the leak, prescribe the single highest-impact fix.
+Have a conversation to uncover the earliest broken layer in their Straight Line (Traffic -> Hub -> Nurture -> Conversion). Ask one diagnostic question at a time. Once you find the leak, prescribe the single highest-impact fix.
 """,
 "funnel": """
 LENS: FUNNEL MAP.
@@ -103,11 +108,11 @@ Help them build a culture, not a library. Guide them to set up a linear path for
 """,
 "dm": """
 LENS: DM DOCTOR.
-Help them craft custom, empathetic, and detached conversations. Never give them a copy-paste template. Ask them about the specific prospect's signal, and help them write a custom message that diagnoses the prospect's pain and offers a bridge.
+Help them craft custom, empathetic, and detached conversations. When they ask for exact scripts, pull from the VERBATIM SCRIPT VAULT and adapt the brackets to their niche. Help them write messages that diagnose the prospect's pain and offer a bridge.
 """,
 "offer": """
 LENS: OFFER ARCHITECT.
-Help them build an irresistible offer by interviewing them about their market's deepest pains and desires. Guide them to stack value, de-risk the investment, and anchor the price against the cost of inaction.
+Help them build an irresistible offer by interviewing them about their market's deepest pains and desires. Guide them to stack value, de-risk the investment, and anchor the price against the cost of inaction. Use the 14 offer-doc blocks from the vault.
 """,
 "workshop": """
 LENS: WORKSHOP ARCHITECT.
@@ -115,11 +120,11 @@ Help them design a live event that shifts beliefs. Guide them to map out the emo
 """,
 "content": """
 LENS: CONTENT ENGINE.
-Help them find their unique voice and document their journey. Guide them to use spicy specificity and polarize their audience. Help them turn one core idea into multiple formats.
+Help them find their unique voice and document their journey. Guide them to use spicy specificity and polarize their audience. Help them turn one core idea into multiple formats. Use the vault hooks and CTAs when they ask for exact copy.
 """,
 "launch": """
 LENS: LAUNCH PLANNER.
-Help them build momentum and FOMO without being spammy. Guide them through the phases of teasing, delivering value, and closing with urgency.
+Help them build momentum and FOMO without being spammy. Guide them through the phases of teasing, delivering value, and closing with urgency. Use the 72h countdown and double-deadline tactics from the vault.
 """,
 "alchemy": """
 LENS: ALCHEMY (VIDEO).
@@ -138,11 +143,55 @@ class ChatRequest(BaseModel):
     history: List[ChatMessage] = []
     mode: str = "coach"
     member_context: Optional[str] = None
+    member_id: Optional[str] = None
 
 class TTSRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
+# ------------------------- MEMORY (SUPABASE, STDlib) -------------------------
+MEMORY_RE = re.compile(r"\[\[MEMORY\]\](.*?)\[\[/MEMORY\]\]", re.S)
+
+def load_memory(member_id):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return ""
+    try:
+        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory?member_id=eq."
+               + urllib.parse.quote(member_id) + "&select=profile")
+        req = urllib.request.Request(url, headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            rows = json.loads(resp.read().decode("utf-8"))
+        if rows and rows[0].get("profile"):
+            return rows[0]["profile"]
+    except Exception as e:
+        log.error("MEMORY LOAD FAIL: %s", e)
+    return ""
+
+def save_memory(member_id, profile_text):
+    if not SUPABASE_URL or not SUPABASE_KEY or not profile_text:
+        return
+    try:
+        url = SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory"
+        body = json.dumps([{"member_id": member_id, "profile": profile_text}]).encode("utf-8")
+        req = urllib.request.Request(url, data=body, method="POST", headers={
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"})
+        urllib.request.urlopen(req, timeout=10).read()
+        log.info("MEMORY SAVED for %s", member_id)
+    except Exception as e:
+        log.error("MEMORY SAVE FAIL: %s", e)
+
+def extract_memory(reply):
+    m = MEMORY_RE.search(reply)
+    if m:
+        return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
+    return reply, ""
+
+# ------------------------- LLM ENGINE (SELF-HEALING) -------------------------
 def try_model(p, model, messages, temperature, max_tokens):
     body = json.dumps({
         "model": model,
@@ -215,9 +264,13 @@ def call_llm(messages, temperature=0.5, max_tokens=1500):
             errors.append(p["name"] + "/" + model + " (discovered)")
     raise Exception("All LLM providers failed: " + " | ".join(errors))
 
-def build_system(mode, member_context):
+def build_system(mode, member_context, memory=""):
     m = mode if mode in MODE_PROMPTS else "coach"
     system = CCC_BRAIN + "\n" + MODE_PROMPTS[m]
+    if SCRIPT_VAULT:
+        system += "\n" + SCRIPT_VAULT
+    if memory:
+        system += "\nWHAT YOU ALREADY KNOW ABOUT THIS MEMBER (from past sessions):\n" + memory
     if member_context:
         system += "\nMEMBER CONTEXT (from X-Ray / plan):\n" + member_context
     return system
@@ -225,16 +278,19 @@ def build_system(mode, member_context):
 def post_process(text):
     return text.replace("—", "-").replace("–", "-")
 
+# ------------------------- ROUTES -------------------------
 @app.get("/")
 def root():
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v5 Premium",
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v6",
             "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
 def health():
     return {"ok": True,
             "gemini_key_loaded": bool(GEMINI_API_KEY),
-            "groq_key_loaded": bool(GROQ_API_KEY)}
+            "groq_key_loaded": bool(GROQ_API_KEY),
+            "supabase_loaded": bool(SUPABASE_URL and SUPABASE_KEY),
+            "vault_loaded": bool(SCRIPT_VAULT)}
 
 @app.get("/api/modes")
 def modes():
@@ -245,12 +301,17 @@ def chat(req: ChatRequest):
     text = req.message or req.prompt or req.user_message
     if not text:
         raise HTTPException(400, "empty message")
-    messages = [{"role": "system", "content": build_system(req.mode, req.member_context)}]
+    member_id = (req.member_id or "default").strip()
+    memory = load_memory(member_id)
+    messages = [{"role": "system", "content": build_system(req.mode, req.member_context, memory)}]
     for m in req.history[-16:]:
         messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": text})
     try:
         clean = post_process(call_llm(messages))
+        clean, mem_update = extract_memory(clean)
+        if mem_update:
+            save_memory(member_id, mem_update)
         return {"reply": clean, "response": clean, "message": clean, "mode": req.mode}
     except Exception as e:
         log.error("CHAT 500: %s", e)
