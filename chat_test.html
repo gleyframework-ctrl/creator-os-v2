@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map, Revenue Autopsy and AI coach in one command center.">
+<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map, Revenue Autopsy, live Whop data and AI coach in one command center.">
 <title>Income Engine — CCC Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -176,6 +176,11 @@ input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);box-shadow:0 0 0 1px var(--gold);}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);}
 .bigdelta{font:700 34px var(--font-mono);color:var(--gold);}
+.wstats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.wstat small{display:block;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.wstat .num{font:600 20px var(--font-mono);color:var(--gold);}
+.wstat .num.gr{color:var(--success);}
+.wstat .num.cy{color:var(--cyan);}
 .pal{position:fixed;top:76px;left:50%;transform:translateX(-50%);width:560px;max-width:92%;z-index:99;background:var(--bg-surface);border:1px solid var(--border-hover);border-radius:12px;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.85);animation:fadeUp .18s ease-out;}
 .pal input{width:100%;background:var(--bg-input);border:none;border-bottom:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:14px;}
 .pal input:focus{box-shadow:none;border-color:var(--border-active);}
@@ -233,7 +238,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     <div class="ritem" id="tabMap" onclick="showView('map')"><span class="ric">02</span><span class="lbl" id="lbMap">Business Map</span></div>
     <div class="ritem" id="tabChat" onclick="showView('chat')"><span class="ric">03</span><span class="lbl" id="lbChat">Coach</span></div>
     <div class="ritem" id="tabAutopsy" onclick="showView('autopsy')"><span class="ric">04</span><span class="lbl" id="lbAutopsy">Autopsy</span></div>
-    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v13</span></div>
+    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v14</span></div>
   </div>
   <div id="main">
     <div id="homeView"></div>
@@ -260,8 +265,8 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 const API_URL = "";
 let lang = localStorage.getItem("lang") || "en";
 const CH = {
- en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",lbAutopsy:"Autopsy",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v13",pipe:"Pipeline Health",answered:" answered",autoEyebrow:"04 · REVENUE AUTOPSY",autoTitle:"See the money on your broken Straight Line.",autoSub:"Drag your real numbers. The doctrine shows what fixing the earliest leak pays.",sReach:"Targeted strangers / week",sJoin:"Join rate %",sMembers:"Current members",sOffer:"Members offered / month %",sPrice:"Offer price $",sClose:"Close rate %",rCurrent:"CURRENT · 90 DAYS",rFixed:"FIXED · 90 DAYS",rDelta:"LEFT ON THE TABLE",sendAutopsy:"Send my autopsy to the coach"},
- ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",lbAutopsy:"التشريح",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v13",pipe:"صحة المسار",answered:" مُجاب",autoEyebrow:"04 · تشريح الأرباح",autoTitle:"شاهد الأموال على خطك المستقيم المكسور.",autoSub:"اسحب أرقامك الحقيقية. يُظهر النظام ما يدفعه إصلاح أضعف حلقة.",sReach:"غرباء مستهدفون / أسبوع",sJoin:"نسبة الانضمام %",sMembers:"الأعضاء حالياً",sOffer:"يُقدَّم لهم العرض شهرياً %",sPrice:"سعر العرض $",sClose:"نسبة الإغلاق %",rCurrent:"الحالي · 90 يوماً",rFixed:"بعد الإصلاح · 90 يوماً",rDelta:"مال متروك على الطاولة",sendAutopsy:"أرسل تشريحي إلى المدرب"}
+ en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",lbAutopsy:"Autopsy",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v14",pipe:"Pipeline Health",answered:" answered",autoEyebrow:"04 · REVENUE AUTOPSY",autoTitle:"See the money on your broken Straight Line.",autoSub:"Drag your real numbers. The doctrine shows what fixing the earliest leak pays.",sReach:"Targeted strangers / week",sJoin:"Join rate %",sMembers:"Current members",sOffer:"Members offered / month %",sPrice:"Offer price $",sClose:"Close rate %",rCurrent:"CURRENT · 90 DAYS",rFixed:"FIXED · 90 DAYS",rDelta:"LEFT ON THE TABLE",sendAutopsy:"Send my autopsy to the coach",whopTitle:"WHOP CONNECT",whopSub:"Plug your community. Live members, joins and revenue.",whopKeyPh:"Paste your Whop API key",connect:"Connect",disconnect:"Disconnect",sendWhop:"Send my live numbers to the coach",members:"MEMBERS",joins7:"JOINS / 7D",rev30:"REVENUE / 30D",orders30:"ORDERS / 30D",whopLocked:"Insider tier required to connect Whop.",connected:"Whop connected",disconnected:"Whop disconnected"},
+ ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",lbAutopsy:"التشريح",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v14",pipe:"صحة المسار",answered:" مُجاب",autoEyebrow:"04 · تشريح الأرباح",autoTitle:"شاهد الأموال على خطك المستقيم المكسور.",autoSub:"اسحب أرقامك الحقيقية. يُظهر النظام ما يدفعه إصلاح أضعف حلقة.",sReach:"غرباء مستهدفون / أسبوع",sJoin:"نسبة الانضمام %",sMembers:"الأعضاء حالياً",sOffer:"يُقدَّم لهم العرض شهرياً %",sPrice:"سعر العرض $",sClose:"نسبة الإغلاق %",rCurrent:"الحالي · 90 يوماً",rFixed:"بعد الإصلاح · 90 يوماً",rDelta:"مال متروك على الطاولة",sendAutopsy:"أرسل تشريحي إلى المدرب",whopTitle:"ربط Whop",whopSub:"اربط مجتمعك. أعضاء وانضمامات وأرباح حية.",whopKeyPh:"الصق مفتاح Whop API",connect:"اربط",disconnect:"افصل",sendWhop:"أرسل أرقامي الحية إلى المدرب",members:"الأعضاء",joins7:"انضمامات / 7ي",rev30:"أرباح / 30ي",orders30:"طلبات / 30ي",whopLocked:"تتطلب خطة Insider لربط Whop.",connected:"تم ربط Whop",disconnected:"تم فصل Whop"}
 };
 const MODES = [
  {id:"coach", tier:"free", t:"Daily Operator", d:"90-min rhythm", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة"},
@@ -325,6 +330,7 @@ let activeTask = null;
 let answers = [null,null,null,null,null,null];
 let palSel = 0, palFiltered = CMDS.slice();
 let auto = JSON.parse(localStorage.getItem("auto_" + memberId) || "null") || {reach:2000, join:2, members:150, offer:5, price:97, close:10};
+let whop = {connected:false, stats:null};
 
 function C(){ return CH[lang]; }
 function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
@@ -407,27 +413,28 @@ function renderPal(q){
   document.getElementById("palList").innerHTML = palFiltered.map((c,i)=>'<div class="palitem'+(i===palSel?' sel':'')+'" onmousedown="event.preventDefault();palRun('+i+')">'+(lang==="ar"?c.ar:c.en)+'</div>').join("") || '<div class="palitem" style="opacity:.5">No matches</div>';
 }
 function palRun(i){ const c=palFiltered[i]; if(c){ closePal(); c.run(); } }
+/* ---------- HOME ---------- */
 function renderHome(){
   const c=C(); const total=JOURNEY.reduce((a,p)=>a+p.tasks.length,0); const dc=doneCount(); const sm=savedMap(); const next=nextTask();
-  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V13</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button><button class="btn-ghost" onclick="showView(\'autopsy\')">'+c.lbAutopsy+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num '+(sm?'':'mut')+'">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num '+(calcStreak()>0?'gr':'mut')+'" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
+  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V14</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button><button class="btn-ghost" onclick="showView(\'autopsy\')">'+c.lbAutopsy+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num '+(sm?'':'mut')+'">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num '+(calcStreak()>0?'gr':'mut')+'" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
   h+='<div class="minibar" id="minibar"><span class="mono" style="color:var(--gold);font-weight:700">IE</span>'+JOURNEY.map((p,i)=>{const pd=p.tasks.filter(t=>done[t.id]).length;const on=pd===p.tasks.length||(next&&p.tasks.some(t=>t.id===next.id));return '<span class="mstep'+(on?' on':'')+'">0'+(i+1)+' '+T(p,"name")+'</span>';}).join('')+'<span class="mstep" style="margin-left:auto">'+dc+'/'+total+'</span></div>';
   h+='<div class="stickybar" id="pipebar"><div class="shead" style="margin-bottom:10px"><h3>'+c.pipe+'</h3><small>'+c.prog+' · <span class="mono">'+dc+'/'+total+'</span></small></div><div class="steps">';
   JOURNEY.forEach((p,i)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const st=pd===p.tasks.length?"done":(next&&p.tasks.some(t=>t.id===next.id)?"active":""); h+='<div class="step '+st+'"><span class="n">'+(pd===p.tasks.length?"✓":"0"+(i+1))+'</span><span class="t">'+T(p,"name")+'</span></div>'; if(i<JOURNEY.length-1) h+='<div class="swire"></div>'; });
   h+='</div></div>';
   if(next){ h+='<div class="section"><div class="spot"><div class="ey">'+c.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · <span class="mono">~'+next.min+' min</span></p></div></div>'; }
-  h+='<div class="section"><div class="grid2"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div style="display:grid;gap:16px"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div></div></div></div>';
+  h+='<div class="section"><div class="grid2"><div style="display:grid;gap:16px"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div class="card" id="whopCard"></div></div><div style="display:grid;gap:16px"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div></div></div></div>';
   JOURNEY.forEach((p,pi)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const complete=pd===p.tasks.length;
     h+='<div class="section" style="margin-top:8px"><div class="shead"><h3><span class="mono" style="color:var(--text-muted)">0'+(pi+1)+'</span> · '+T(p,"name")+(complete?' <span class="pill ok">'+c.complete+'</span>':'')+'</h3><small class="mono">'+pd+'/'+p.tasks.length+'</small></div>';
     p.tasks.forEach((t,ti)=>{ const isD=!!done[t.id]; const locked=RANK[tier]<RANK[modeTier(t.mode)]; const isNext=next&&next.id===t.id;
       h+='<div class="task'+(isD?" done":"")+(isNext?" next":"")+'" style="animation-delay:'+(ti*0.05)+'s"><button class="check" onclick="toggleDone(\''+t.id+'\')">'+(isD?"✓":"")+'</button><div class="tb"><b>'+T(t,"t")+'</b><small>'+T(t,"why")+' · <span class="mono">~'+t.min+'m</span></small></div>'+(locked?'<span class="pill warn">'+modeTier(t.mode).toUpperCase()+'</span>':'')+'<button class="startbtn'+(isNext?' hot':'')+'" onclick="startTaskById(\''+t.id+'\')">'+(locked?"LOCK":(isD?c.redo:c.start))+'</button></div>'; });
     h+='</div>'; });
   document.getElementById("homeView").innerHTML=h;
-  renderStreak();
+  renderWhop(); renderStreak();
   if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); },80); });
 }
 function tickerHTML(){
   const sm=savedMap(); const n=nextTask();
-  const items=["API ONLINE","VAULT LOADED","MEM "+memberId.slice(2,8).toUpperCase(),"STREAK "+calcStreak()+"D","JOURNEY "+doneCount()+"/11",sm?("MOMENTUM "+sm.mom+"/100"):"MAP PENDING","TIER "+tier.toUpperCase(),n?("NEXT: "+T(n,"t").toUpperCase()):"ALL STEPS DONE"];
+  const items=["API ONLINE","VAULT LOADED",whop.connected?"WHOP LIVE":"WHOP PENDING","MEM "+memberId.slice(2,8).toUpperCase(),"STREAK "+calcStreak()+"D","JOURNEY "+doneCount()+"/11",sm?("MOMENTUM "+sm.mom+"/100"):"MAP PENDING","TIER "+tier.toUpperCase(),n?("NEXT: "+T(n,"t").toUpperCase()):"ALL STEPS DONE"];
   const row=items.map(i=>"<span>◆ "+i+"</span>").join("");
   return row+row;
 }
@@ -447,6 +454,52 @@ function planHTML(){
   const c=C();
   return '<div class="shead" style="margin-bottom:12px"><h3>'+c.plan+'</h3><span class="pill ok" id="memBadge">MEM</span></div><input id="lic" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.lic+'"><button class="btn-ghost" style="width:100%" onclick="unlock()">'+c.unlock+'</button>';
 }
+/* ---------- W1: WHOP CONNECT ---------- */
+async function loadWhop(){
+  try{
+    const r=await fetch(API_URL+"/api/whop/stats?member_id="+encodeURIComponent(memberId));
+    const d=await r.json();
+    whop.connected=!!d.connected; whop.stats=d.stats||null;
+  }catch(e){ whop.connected=false; }
+  renderWhop();
+}
+function renderWhop(){
+  const c=C(); const el=document.getElementById("whopCard"); if(!el) return;
+  let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.whopTitle+'</h3>'+(whop.connected?'<span class="pill ok">LIVE</span>':'<span class="pill warn">OFF</span>')+'</div>';
+  if(!whop.connected){
+    h+='<p style="font-size:12px;margin-bottom:10px">'+c.whopSub+'</p><input id="wkey" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.whopKeyPh+'"><button class="btn-goldline" style="width:100%" onclick="connectWhop()">'+c.connect+'</button>';
+  } else {
+    const s=whop.stats||{};
+    h+='<div class="wstats"><div class="wstat"><small>'+c.members+'</small><div class="num">'+num(s.members||0)+'</div></div><div class="wstat"><small>'+c.joins7+'</small><div class="num cy">'+num(s.joins7||0)+'</div></div><div class="wstat"><small>'+c.rev30+'</small><div class="num gr">$'+num(s.rev30||0)+'</div></div><div class="wstat"><small>'+c.orders30+'</small><div class="num">'+num(s.orders30||0)+'</div></div></div>';
+    h+='<div style="display:flex;gap:8px"><button class="btn-gold" style="flex:1" onclick="sendWhopToCoach()">'+c.sendWhop+'</button><button class="btn-ghost" onclick="disconnectWhop()">'+c.disconnect+'</button></div>';
+  }
+  el.innerHTML=h;
+}
+async function connectWhop(){
+  const el=document.getElementById("wkey"); const k=el?el.value.trim():""; if(!k) return;
+  try{
+    const r=await fetch(API_URL+"/api/connect/whop",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,key:k})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||"failed");
+    whop.connected=true; whop.stats=d.stats||null;
+    toast(C().connected,true); renderWhop();
+  }catch(e){
+    toast(String(e.message).indexOf("locked")>-1?C().whopLocked:e.message,false);
+  }
+}
+async function disconnectWhop(){
+  try{ await fetch(API_URL+"/api/connect/whop/disconnect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId})}); }catch(e){}
+  whop.connected=false; whop.stats=null;
+  toast(C().disconnected,true); renderWhop();
+}
+function sendWhopToCoach(){
+  const s=whop.stats||{};
+  mode="xray"; renderModes(); showView("chat");
+  const q=document.getElementById("qwrap"); if(q) q.remove();
+  document.getElementById("input").value="LIVE WHOP NUMBERS - members "+(s.members||0)+" | joins last 7d "+(s.joins7||0)+" | revenue 30d $"+(s.rev30||0)+" | orders 30d "+(s.orders30||0)+". Audit my real funnel and tell me the single biggest lever. Update my memory with these live numbers.";
+  send();
+}
+/* ---------- MAP ---------- */
 function ans(qi,oi){ answers[qi]=oi; renderMap(); }
 function buildMap(){
   if(answers.some(a=>a===null)){ toast(C().answerAll,false); return; }
@@ -483,6 +536,7 @@ function renderMap(){
   document.getElementById("mapView").innerHTML=h;
   if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
 }
+/* ---------- AUTOPSY ---------- */
 function setAuto(k,v){ auto[k]=+v; localStorage.setItem("auto_"+memberId, JSON.stringify(auto)); computeAutopsy(); }
 function renderAutopsy(){
   const c=C();
@@ -525,6 +579,7 @@ function sendAutopsyToCoach(){
   document.getElementById("input").value="REVENUE AUTOPSY - reach "+auto.reach+"/wk | join "+auto.join+"% | members "+auto.members+" | offered "+auto.offer+"%/mo | price $"+auto.price+" | close "+auto.close+"%. Current 90d "+money(computeCur90())+" vs fixed "+money(computeFix90())+". Coach me on the single biggest lever first. Update my memory with these numbers.";
   send();
 }
+/* ---------- CHAT ---------- */
 function renderModes(){
   const box=document.getElementById("modes"); box.innerHTML="";
   MODES.forEach((m,i)=>{ const locked=RANK[tier]<RANK[m.tier];
@@ -618,7 +673,7 @@ function clearChat(){
 }
 const TOUR=[
  {view:"home", sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
- {view:"home", sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
+ {view:"home", sel:"#whopCard", en:"Whop Connect: plug your community and the coach reads your real members, joins and revenue.", ar:"ربط Whop: اربط مجتمعك ويقرأ المدرب أعضاءك وانضماماتك وأرباحك الحقيقية."},
  {view:"home", sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
  {view:"map", sel:"#mapView", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
  {view:"autopsy", sel:"#autopsyView", en:"Revenue Autopsy: drag your numbers, see the money on the table, send it to the coach.", ar:"تشريح الأرباح: اسحب أرقامك، شاهد المال على الطاولة، وأرسله إلى المدرب."},
@@ -647,7 +702,7 @@ document.addEventListener("keydown",e=>{
     else if(e.key==="Enter"){ e.preventDefault(); palRun(palSel); }
   }
 });
-loadTier(); applyLang(); showView("home");
+loadTier(); applyLang(); showView("home"); loadWhop();
 document.getElementById("main").addEventListener("scroll",function(){
   const mb=document.getElementById("minibar"); const sb=document.getElementById("pipebar");
   if(mb&&sb){ mb.classList.toggle("show", this.scrollTop > (sb.offsetTop+sb.offsetHeight-60)); }
