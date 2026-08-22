@@ -1,6 +1,6 @@
 """
-E5 AI COACH - main.py (FINAL PRODUCTION EDITION)
-Pure standard library. No openai package. Bypasses Cloudflare.
+E5 AI COACH - main.py (FINAL v4 - SELF-HEALING MODEL EDITION)
+Pure stdlib. Gemini primary (gemini-3.6-flash). Auto-discovers live models on 404.
 """
 import json
 import os
@@ -14,33 +14,35 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-# ------------------------- LOGGING & CONFIG -------------------------
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
+
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 
-# Stable, non-retired models. Groq primary, Gemini fallback.
+# Gemini FIRST (API told us gemini-3.6-flash is alive). Groq as fallback.
 PROVIDERS = [
     {
-        "name": "groq",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
-        "key": GROQ_API_KEY,
-        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        "name": "gemini",
+        "chat_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "list_url": "https://generativelanguage.googleapis.com/v1beta/models",
+        "key": GEMINI_API_KEY,
+        "models": [os.environ.get("GEMINI_MODEL", ""), "gemini-3.6-flash", "gemini-3-flash", "gemini-2.5-flash"],
     },
     {
-        "name": "gemini",
-        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-        "key": GEMINI_API_KEY,
-        "models": ["gemini-1.5-flash", "gemini-1.5-pro"]
-    }
+        "name": "groq",
+        "chat_url": "https://api.groq.com/openai/v1/chat/completions",
+        "list_url": "https://api.groq.com/openai/v1/models",
+        "key": GROQ_API_KEY,
+        "models": [os.environ.get("GROQ_MODEL", ""), "meta-llama/llama-4-scout-17b-16e-instruct", "openai/gpt-oss-120b"],
+    },
 ]
 
-# ------------------------- FASTAPI APP -------------------------
-app = FastAPI(title="E5 AI Coach", version="3.0-final")
+app = FastAPI(title="E5 AI Coach", version="4.0-selfheal")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,7 +50,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------------- CCC OPERATING BRAIN -------------------------
 CCC_BRAIN = """
 You are the CCC Strategist layer of the E5 AI Coach: a $10K-level community-business
 operator trained on the Flip Moss and Nate Ryan Community Conversion Operating System.
@@ -114,7 +115,6 @@ furthermore, moreover, landscape, meticulous, bespoke, paradigm.
 Do not use the em dash character.
 """
 
-# ------------------------- MODE ADDENDUMS -------------------------
 MODE_PROMPTS = {
 "coach": """
 MODE: DAILY OPERATOR COACH.
@@ -193,7 +193,6 @@ Keep 30-60s. Conversational tone. No dead space. End with a tap/comment CTA.
 """,
 }
 
-# ------------------------- SCHEMAS -------------------------
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -210,49 +209,77 @@ class TTSRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
-# ------------------------- HELPERS -------------------------
+# ------------------------- LLM ENGINE (SELF-HEALING) -------------------------
+def try_model(p, model, messages, temperature, max_tokens):
+    body = json.dumps({
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        p["chat_url"],
+        data=body,
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + p["key"],
+            "User-Agent": UA,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data["choices"][0]["message"]["content"] or ""
+    except urllib.error.HTTPError as e:
+        log.error("LLM FAIL %s/%s HTTP %s", p["name"], model, e.code)
+        return None
+    except Exception as e:
+        log.error("LLM FAIL %s/%s: %s", p["name"], model, e)
+        return None
+
+def discover_models(p):
+    ids = []
+    try:
+        if p["name"] == "groq":
+            req = urllib.request.Request(
+                p["list_url"],
+                headers={"Authorization": "Bearer " + p["key"], "User-Agent": UA})
+        else:
+            req = urllib.request.Request(
+                p["list_url"] + "?key=" + p["key"],
+                headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        if p["name"] == "groq":
+            ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
+        else:
+            ids = [m.get("name", "").replace("models/", "") for m in data.get("models", []) if m.get("name")]
+        log.info("DISCOVERED %s models: %s", p["name"], ids[:6])
+    except Exception as e:
+        log.error("MODEL LIST FAIL %s: %s", p["name"], e)
+    return ids
+
 def call_llm(messages, temperature=0.5, max_tokens=1500):
     errors = []
-    # Browser User-Agent to bypass Cloudflare 1010 blocks on Groq
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-    
     for p in PROVIDERS:
         if not p["key"]:
-            errors.append(f"{p['name']}: no API key")
+            errors.append(p["name"] + ": no key")
             continue
-            
-        for model in p["models"]:
-            body = json.dumps({
-                "model": model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-            }).encode("utf-8")
-            
-            req = urllib.request.Request(
-                p["url"],
-                data=body,
-                method="POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {p['key']}",
-                    "User-Agent": ua
-                },
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=120) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-                out = data["choices"][0]["message"]["content"] or ""
-                log.info(f"LLM OK via {p['name']}/{model}")
+        candidates = [m for m in p["models"] if m]
+        for model in candidates:
+            out = try_model(p, model, messages, temperature, max_tokens)
+            if out:
+                log.info("LLM OK via %s/%s", p["name"], model)
                 return out
-            except urllib.error.HTTPError as e:
-                err_body = e.read().decode("utf-8", "ignore")[:200]
-                log.error(f"LLM FAIL {p['name']}/{model} HTTP {e.code}: {err_body}")
-                errors.append(f"{p['name']}/{model} HTTP {e.code}")
-            except Exception as e:
-                log.error(f"LLM FAIL {p['name']}/{model}: {e}")
-                errors.append(f"{p['name']}/{model}: {e}")
-                
+            errors.append(p["name"] + "/" + model)
+        discovered = [m for m in discover_models(p) if m and m not in candidates]
+        for model in discovered[:4]:
+            out = try_model(p, model, messages, temperature, max_tokens)
+            if out:
+                log.info("LLM OK via %s/%s (auto-discovered)", p["name"], model)
+                return out
+            errors.append(p["name"] + "/" + model + " (discovered)")
     raise Exception("All LLM providers failed: " + " | ".join(errors))
 
 def build_system(mode, member_context):
@@ -268,20 +295,14 @@ def post_process(text):
 # ------------------------- ROUTES -------------------------
 @app.get("/")
 def root():
-    return {
-        "status": "ok",
-        "app": "E5 AI Coach",
-        "brain": "CCC v3 Final",
-        "modes": list(MODE_PROMPTS.keys())
-    }
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v4",
+            "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
 def health():
-    return {
-        "ok": True,
-        "groq_key_loaded": bool(GROQ_API_KEY),
-        "gemini_key_loaded": bool(GEMINI_API_KEY)
-    }
+    return {"ok": True,
+            "gemini_key_loaded": bool(GEMINI_API_KEY),
+            "groq_key_loaded": bool(GROQ_API_KEY)}
 
 @app.get("/api/modes")
 def modes():
@@ -292,23 +313,16 @@ def chat(req: ChatRequest):
     text = req.message or req.prompt or req.user_message
     if not text:
         raise HTTPException(400, "empty message")
-        
     messages = [{"role": "system", "content": build_system(req.mode, req.member_context)}]
     for m in req.history[-16:]:
         messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": text})
-    
     try:
         clean = post_process(call_llm(messages))
-        return {
-            "reply": clean,
-            "response": clean,
-            "message": clean,
-            "mode": req.mode
-        }
+        return {"reply": clean, "response": clean, "message": clean, "mode": req.mode}
     except Exception as e:
-        log.error(f"CHAT 500: {e}")
-        raise HTTPException(500, f"LLM error: {str(e)}")
+        log.error("CHAT 500: %s", e)
+        raise HTTPException(500, "LLM error: " + str(e))
 
 @app.post("/chat")
 def chat_alias(req: ChatRequest):
@@ -322,22 +336,19 @@ def tts(req: TTSRequest):
     payload = {"text": req.text, "format": "mp3"}
     if voice:
         payload["reference_id"] = voice
-        
     req_obj = urllib.request.Request(
         "https://api.fish.audio/v1/tts",
         data=json.dumps(payload).encode("utf-8"),
         method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {FISH_API_KEY}",
-        },
-    )
+        headers={"Content-Type": "application/json",
+                 "Authorization": "Bearer " + FISH_API_KEY,
+                 "User-Agent": UA})
     try:
         with urllib.request.urlopen(req_obj, timeout=120) as resp:
             audio = resp.read()
         return Response(content=audio, media_type="audio/mpeg")
     except Exception as e:
-        raise HTTPException(502, f"TTS error: {str(e)}")
+        raise HTTPException(502, "TTS error: " + str(e))
 
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest):
@@ -349,7 +360,6 @@ def test_page():
         return FileResponse("chat_test.html")
     return HTMLResponse("<h3>chat_test.html not found in repo root.</h3>")
 
-# ------------------------- STARTUP -------------------------
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", "8000"))
