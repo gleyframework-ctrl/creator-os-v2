@@ -1,6 +1,5 @@
 """
-E5 AI COACH - main.py (FINAL MERGED - CCC BRAIN EDITION)
-No openai package. Uses Groq (primary) + Gemini (fallback) via stdlib.
+E5 AI COACH - main.py (FINAL - CCC BRAIN EDITION)
 """
 import json
 import os
@@ -11,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-# ------------------------- CONFIG -------------------------
+# CONFIG
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
@@ -41,7 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------------- CCC OPERATING BRAIN -------------------------
+# CCC OPERATING BRAIN
 CCC_BRAIN = """
 You are the CCC Strategist layer of the E5 AI Coach: a $10K-level community-business
 operator trained on the Flip Moss and Nate Ryan Community Conversion Operating System.
@@ -117,7 +116,7 @@ furthermore, moreover, landscape, meticulous, bespoke, paradigm.
 Do not use the em dash character.
 """
 
-# ------------------------- MODE ADDENDUMS -------------------------
+# MODE ADDENDUMS
 MODE_PROMPTS = {
     "coach": """
 MODE: DAILY OPERATOR COACH.
@@ -196,7 +195,7 @@ Keep 30-60s. Conversational tone. No dead space. End with a tap/comment CTA.
 """,
 }
 
-# ------------------------- SCHEMAS -------------------------
+# SCHEMAS
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -213,7 +212,7 @@ class TTSRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
-# ------------------------- HELPERS -------------------------
+# HELPERS
 def call_llm(messages, temperature=0.5, max_tokens=1500):
     last_err = "no providers configured"
     for ep in LLM_ENDPOINTS:
@@ -253,7 +252,7 @@ def build_system(mode, member_context):
 def post_process(text):
     return text.replace("—", "-").replace("–", "-")
 
-# ------------------------- ROUTES -------------------------
+# ROUTES
 @app.get("/")
 def root():
     return {
@@ -333,7 +332,7 @@ def tts(req: TTSRequest):
 def voice_alias(req: TTSRequest):
     return tts(req)
 
-# ------------------------- LEGACY UI + STARTUP -------------------------
+# LEGACY UI + STARTUP
 @app.get("/test")
 def test_page():
     if os.path.exists("chat_test.html"):
