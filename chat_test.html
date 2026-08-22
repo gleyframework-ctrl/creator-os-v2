@@ -3,239 +3,269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E5 AI Coach - Income Engine</title>
+<title>Income Engine — CCC Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f1115;--panel:#13151a;--chat:#181b21;--ai:#22252a;--user:#ffd60a;--text:#e5e7eb;--muted:#9ca3af;--border:#2d3139;--accent:#ffd60a;--green:#22c55e;--red:#ef4444;}
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
-body{background:var(--bg);color:var(--text);height:100vh;display:flex;}
-aside{width:270px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px;overflow-y:auto;}
-.nosb aside{display:none;}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;margin-bottom:22px;}
-.logo .bolt{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ffd60a,#22c55e);display:flex;align-items:center;justify-content:center;font-size:20px;}
-.logo span{background:linear-gradient(90deg,#ffd60a,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.sec{font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
-.mode{display:flex;gap:10px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:10px;padding:10px;cursor:pointer;color:var(--text);margin-bottom:6px;}
-.mode:hover{border-color:var(--border);}
-.mode.active{border-color:var(--accent);background:#1c1a05;}
-.mode .ic{font-size:16px;margin-top:2px;}
-.mode b{display:block;font-size:13px;}
-.mode small{color:var(--muted);font-size:11px;line-height:1.3;display:block;}
-.mode .lock{margin-left:auto;color:var(--muted);font-size:12px;}
-.pulse{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:12px;}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
-.chip{background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:6px 10px;font-size:11px;cursor:pointer;}
-.chip.on{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700;}
-.streak{font-size:12px;color:var(--accent);margin-bottom:8px;}
-.logbtn{width:100%;background:var(--accent);border:none;border-radius:6px;padding:8px;font-weight:700;cursor:pointer;color:#111;}
-.tierbox{margin-top:12px;border:1px solid var(--border);border-radius:10px;padding:12px;}
-.badge{display:inline-block;background:#262626;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;margin:0 4px 8px 0;}
-.tierbox input{width:100%;background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px;}
-.tierbox button{width:100%;background:var(--accent);border:none;border-radius:6px;padding:8px;font-weight:700;cursor:pointer;color:#111;}
-main{flex:1;display:flex;flex-direction:column;}
-header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--panel);}
-header h1{font-size:20px;}
-header p{color:var(--muted);font-size:12px;margin-top:3px;}
-.hbtns button{background:var(--ai);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;margin-left:6px;font-size:12px;}
-.hbtns button.on{border-color:var(--accent);color:var(--accent);}
-#homeView,#mapView{flex:1;overflow-y:auto;padding:28px;max-width:920px;margin:0 auto;width:100%;}
-.line{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:22px;flex-wrap:wrap;}
-.node{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--chat);border:1px solid var(--border);border-radius:12px;padding:10px 16px;opacity:.45;transition:.4s;}
-.node span{font-size:18px;}
-.node small{font-size:10px;color:var(--muted);letter-spacing:1px;}
-.node.on{opacity:1;border-color:var(--accent);box-shadow:0 0 18px rgba(255,214,10,.15);}
-.wire{width:26px;height:2px;background:var(--border);}
-.wire.on{background:var(--accent);}
-.hero{display:flex;justify-content:space-between;align-items:center;gap:16px;border:1px solid var(--accent);background:linear-gradient(135deg,#1c1a05,#13151a);border-radius:16px;padding:20px;margin-bottom:18px;animation:fadeUp .5s ease;}
-.herolabel{font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;}
-.hero h2{font-size:18px;margin-bottom:6px;}
-.hero p{color:var(--muted);font-size:12px;}
-.herobtn{background:var(--accent);color:#111;border:none;border-radius:10px;padding:12px 20px;font-weight:800;font-size:14px;cursor:pointer;animation:glow 2s infinite;}
-.mapchip{border:1px solid var(--border);background:var(--chat);border-radius:12px;padding:10px 14px;font-size:12px;margin-bottom:18px;animation:fadeUp .5s ease .05s both;}
-.mapchip a{color:var(--accent);cursor:pointer;font-weight:700;}
-.prog{margin-bottom:22px;animation:fadeUp .5s ease .1s both;}
-.progtop{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
-.bar{height:8px;background:var(--chat);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.fill{height:100%;background:linear-gradient(90deg,#ffd60a,#22c55e);transition:width .8s ease;}
-.phase{margin-bottom:20px;animation:fadeUp .5s ease both;}
-.phead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.phead b{font-size:14px;}
-.phead small{color:var(--muted);font-size:11px;margin-left:auto;}
-.pdone{color:var(--green);font-size:11px;font-weight:800;}
-.picon{font-size:16px;}
-.task{display:flex;align-items:center;gap:12px;background:var(--chat);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;animation:fadeUp .5s ease both;transition:.2s;}
-.task:hover{transform:translateY(-1px);border-color:var(--muted);}
+:root{
+ --bg-primary:#080C1A; --bg-surface:#0F1529; --bg-elevated:#192045; --bg-input:#0A1020;
+ --border:#192045; --border-hover:#2A3A6A; --border-active:#F5A623;
+ --gold:#F5A623; --gold-dim:#D48C1A;
+ --gold-faint:rgba(245,166,35,.08); --gold-glow:rgba(245,166,35,.15); --gold-pulse:rgba(245,166,35,.3);
+ --cyan:#00D4FF; --cyan-faint:rgba(0,212,255,.08);
+ --success:#00E599; --success-faint:rgba(0,229,153,.08);
+ --warning:#FFB800; --warning-faint:rgba(255,184,0,.08);
+ --error:#FF4757; --error-faint:rgba(255,71,87,.08);
+ --text-primary:#FFFFFF; --text-secondary:#8892B0; --text-muted:#4A5578;
+ --font-sans:"Inter",ui-sans-serif,system-ui,sans-serif;
+ --font-mono:"JetBrains Mono",ui-monospace,monospace;
+ --r-card:12px; --r-hero:16px; --r-ctl:6px;
+ --t-fast:120ms; --t-base:160ms; --t-slow:200ms; --t-meter:500ms;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{antialiased:-webkit-font-smoothing:antialiased;background:var(--bg-primary);color:var(--text-secondary);font-family:var(--font-sans);font-size:14px;}
+button{font-family:var(--font-sans);}
+.mono{font-family:var(--font-mono);}
+/* ---------- TOPBAR ---------- */
+#topbar{height:52px;display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-primary);position:relative;z-index:5;}
+.crumb{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;}
+.crumb b{color:var(--text-primary);font-weight:600;}
+.logotile{width:28px;height:28px;border-radius:6px;background:var(--gold);color:var(--bg-primary);font:700 11px var(--font-mono);display:flex;align-items:center;justify-content:center;}
+.tspace{flex:1;}
+.chipbtn{background:transparent;border:1px solid var(--border-hover);color:var(--text-secondary);border-radius:var(--r-ctl);padding:6px 10px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
+.chipbtn:hover{border-color:var(--gold-dim);background:var(--bg-elevated);color:var(--text-primary);}
+.chipbtn.on{border-color:var(--border-active);color:var(--gold);background:var(--gold-faint);}
+.livechip{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9999px;padding:6px 12px;font:500 11px var(--font-mono);color:var(--text-secondary);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:dot-pulse 2s ease-in-out infinite;}
+.btn-gold{background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg-primary);border:none;border-radius:var(--r-ctl);padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 6px 20px -8px var(--gold-glow);transition:filter var(--t-fast) ease,box-shadow var(--t-base) ease;}
+.btn-gold:hover{filter:brightness(1.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 6px 24px -8px var(--gold-pulse);}
+.btn-gold:active{transform:translateY(1px);}
+.btn-ghost{background:transparent;border:1px solid var(--border-hover);color:var(--text-primary);border-radius:var(--r-ctl);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-base) ease;}
+.btn-ghost:hover{background:var(--bg-elevated);border-color:var(--gold-dim);}
+/* ---------- LAYOUT ---------- */
+#shell{display:flex;height:calc(100vh - 52px);}
+#rail{width:64px;background:var(--bg-surface);border-right:1px solid var(--border);overflow:hidden;transition:width var(--t-slow) ease-out;flex-shrink:0;}
+#rail:hover,#shell.railwide #rail{width:220px;}
+.ritem{display:flex;align-items:center;gap:14px;padding:14px 22px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:all var(--t-base) ease;border-radius:0;}
+.ritem .ric{font:600 12px var(--font-mono);width:20px;text-align:center;}
+.ritem .lbl{opacity:0;transition:opacity var(--t-base) ease;font-size:13px;font-weight:500;}
+#rail:hover .lbl,#shell.railwide .lbl{opacity:1;}
+.ritem:hover{color:var(--text-primary);}
+.ritem.on{color:var(--gold);background:var(--gold-faint);}
+#main{flex:1;overflow-y:auto;position:relative;}
+/* ---------- HERO ---------- */
+.hero{position:relative;margin:24px 32px 0;border:1px solid var(--border);border-radius:var(--r-hero);background:linear-gradient(180deg,var(--bg-surface),var(--bg-primary));overflow:hidden;padding:28px 32px;}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.25;mask-image:radial-gradient(ellipse at 50% 0%,black,transparent 75%);pointer-events:none;}
+.aur{position:absolute;width:340px;height:200px;border-radius:50%;filter:blur(30px);z-index:0;animation:aurora 14s ease-in-out infinite;pointer-events:none;}
+.aur.a1{left:-60px;top:-80px;background:radial-gradient(circle,var(--gold-glow),transparent 70%);}
+.aur.a2{right:-60px;top:-80px;background:radial-gradient(circle,var(--cyan-faint),transparent 70%);animation-delay:-7s;}
+.hrow{position:relative;z-index:1;display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--border);border-radius:9999px;padding:4px 12px;margin-bottom:14px;}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dot-pulse 2s infinite;}
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--text-primary);margin-bottom:8px;}
+h1 span{color:var(--gold);}
+.hsub{max-width:560px;margin-bottom:20px;}
+.kpis{display:flex;gap:16px;flex-wrap:wrap;}
+.kpi{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 20px;min-width:130px;transition:border-color var(--t-base) ease;}
+.kpi:hover{border-color:var(--border-hover);}
+.kpi small{display:block;font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.kpi .num{font:600 26px var(--font-mono);color:var(--gold);}
+.kpi .num.cy{color:var(--cyan);} .kpi .num.gr{color:var(--success);}
+.ticker{position:relative;z-index:1;margin:22px -32px -28px;border-top:1px solid var(--border);overflow:hidden;background:var(--bg-primary);}
+.tk{display:inline-flex;gap:40px;white-space:nowrap;padding:10px 0;font:500 11px var(--font-mono);color:var(--text-muted);animation:ticker 40s linear infinite;}
+.tk b{color:var(--gold);font-weight:600;}
+/* ---------- SECTIONS ---------- */
+.section{margin:28px 32px;}
+.shead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+.shead h3{font-size:14px;font-weight:600;color:var(--text-primary);}
+.shead small{color:var(--text-muted);font-size:12px;}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 24px;transition:border-color var(--t-base) ease,transform var(--t-base) ease,box-shadow var(--t-base) ease;}
+.card:hover{border-color:var(--border-hover);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+/* stepper */
+.steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.step{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:var(--r-ctl);padding:8px 14px;background:var(--bg-surface);}
+.step .n{width:24px;height:24px;border-radius:50%;border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;font:600 10px var(--font-mono);color:var(--text-muted);}
+.step .t{font-size:12px;font-weight:600;color:var(--text-secondary);}
+.step.done .n{border-color:var(--success);color:var(--success);background:var(--success-faint);}
+.step.done .t{color:var(--text-secondary);}
+.step.active{border-color:var(--border-active);box-shadow:0 0 18px var(--gold-faint);position:relative;overflow:hidden;}
+.step.active::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--gold-faint) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;}
+.step.active .n{border-color:var(--gold);color:var(--gold);}
+.step.active .t{color:var(--gold);}
+.swire{width:18px;height:1px;background:var(--border);}
+/* spotlight */
+.spot{position:relative;border:1px solid var(--border-active);border-radius:var(--r-card);background:linear-gradient(135deg,var(--gold-faint),var(--bg-surface) 55%);padding:20px 24px;overflow:hidden;}
+.spot::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,var(--gold-faint) 50%,transparent 65%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;pointer-events:none;}
+.spot .ey{font:600 11px var(--font-mono);letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
+.spot h2{font-size:18px;color:var(--text-primary);margin-bottom:6px;}
+.spot p{font-size:12px;color:var(--text-secondary);}
+/* meters */
+.mrow{margin-bottom:12px;}
+.mrow .mt{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px;}
+.mrow .mt .mono{color:var(--text-secondary);}
+.mtrack{height:6px;background:var(--bg-elevated);border-radius:9999px;overflow:hidden;}
+.mfill{height:100%;width:0;border-radius:9999px;background:var(--gold);transition:width var(--t-meter) ease;}
+/* tasks */
+.task{display:flex;align-items:center;gap:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 18px;margin-bottom:8px;transition:all var(--t-base) ease;animation:fadeUp .4s ease both;}
+.task:hover{border-color:var(--border-hover);transform:translateY(-1px);}
 .task.done{opacity:.5;}
-.task.done .tbody b{text-decoration:line-through;}
-.task.next{border-color:var(--accent);animation:glow 2.4s infinite;}
-.check{width:26px;height:26px;min-width:26px;border-radius:50%;border:1px solid var(--border);background:transparent;color:#111;font-weight:800;cursor:pointer;}
-.task.done .check{background:var(--green);border-color:var(--green);}
-.tbody{flex:1;}
-.tbody b{font-size:13px;display:block;}
-.tbody small{color:var(--muted);font-size:11px;}
-.startbtn{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
-/* MAP */
-.mapsub{color:var(--muted);font-size:12px;margin-bottom:18px;}
-.q{margin-bottom:16px;animation:fadeUp .4s ease both;}
-.q b{font-size:13px;display:block;margin-bottom:8px;}
-.opts{display:flex;gap:8px;flex-wrap:wrap;}
-.opt{background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:8px 14px;font-size:12px;cursor:pointer;}
-.opt.on{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700;}
-.deck{display:flex;gap:24px;align-items:center;margin:18px 0;flex-wrap:wrap;}
-.ringbox{position:relative;}
-.ringbg{fill:none;stroke:var(--border);stroke-width:10;}
-.ringfg{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
-.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;font-weight:800;}
-.ringtxt small{font-size:10px;color:var(--muted);}
-.bars{flex:1;min-width:260px;}
-.brow{margin-bottom:12px;}
-.brow small{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;}
-.btrack{height:10px;background:var(--chat);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.bfill{height:100%;width:0;transition:width 1s ease;border-radius:8px;}
-.mind{display:flex;align-items:center;gap:6px;justify-content:center;margin:14px 0;flex-wrap:wrap;}
-.mnode{padding:8px 14px;border-radius:10px;border:2px solid;font-size:12px;font-weight:700;}
-.leak{background:#1c0505;border:1px solid var(--red);border-radius:12px;padding:12px 16px;font-size:13px;margin:14px 0;}
-.mapbtns{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
-/* CHAT */
-#chat{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
-.msg{max-width:78%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word;}
-.msg.user{align-self:flex-end;background:var(--user);color:#111;border-top-right-radius:2px;}
-.msg.ai{align-self:flex-start;background:var(--ai);border:1px solid var(--border);border-top-left-radius:2px;}
-.msg.ai strong{color:var(--accent);}
-.msg.ai .h{color:var(--accent);font-weight:800;}
+.task.done .tb b{text-decoration:line-through;}
+.task.next{border-color:var(--border-active);box-shadow:0 0 18px var(--gold-faint);}
+.check{width:26px;height:26px;min-width:26px;border-radius:50%;border:1px solid var(--border-hover);background:transparent;color:var(--bg-primary);font-weight:800;cursor:pointer;transition:all var(--t-base) ease;}
+.task.done .check{background:var(--success);border-color:var(--success);}
+.tb{flex:1;}
+.tb b{font-size:13px;color:var(--text-primary);display:block;}
+.tb small{font-size:11px;color:var(--text-muted);}
+.pill{border-radius:9999px;padding:2px 10px;font:600 10px var(--font-mono);letter-spacing:.06em;}
+.pill.warn{background:var(--warning-faint);color:var(--warning);}
+.pill.ok{background:var(--success-faint);color:var(--success);}
+.startbtn{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--r-ctl);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--t-base) ease;}
+.startbtn:hover{background:var(--gold-faint);border-color:var(--gold);}
+/* inputs */
+input,textarea{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-ctl);color:var(--text-primary);font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color var(--t-base) ease,box-shadow var(--t-base) ease;}
+input:focus,textarea:focus{border-color:var(--border-active);box-shadow:0 0 0 3px var(--gold-faint);}
+input::placeholder,textarea::placeholder{color:var(--text-muted);}
+/* chat */
+#modes{display:flex;gap:8px;flex-wrap:wrap;margin:20px 32px 0;}
+.mchip{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9999px;padding:7px 14px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all var(--t-base) ease;}
+.mchip .mi{font:600 10px var(--font-mono);color:var(--text-muted);}
+.mchip:hover{border-color:var(--border-hover);color:var(--text-primary);}
+.mchip.on{border-color:var(--border-active);color:var(--gold);background:var(--gold-faint);}
+.mchip.on .mi{color:var(--gold);}
+#chat{padding:20px 32px;display:flex;flex-direction:column;gap:14px;min-height:300px;}
+.msg{max-width:78%;padding:14px 18px;border-radius:var(--r-card);line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word;animation:fadeUp .22s ease-out;}
+.msg.user{align-self:flex-end;background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg-primary);font-weight:500;}
+.msg.ai{align-self:flex-start;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);}
+.msg.ai strong{color:var(--gold);}
+.msg.ai .h{color:var(--gold);font-weight:700;}
 .msg.ai .li{padding-left:12px;}
-.msg.ai pre{background:#000;border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0;white-space:pre;overflow-x:auto;}
-.speak{background:transparent;border:none;color:var(--muted);cursor:pointer;margin-left:10px;font-size:14px;}
-.speak:hover{color:var(--accent);}
+.msg.ai pre{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-ctl);padding:10px;margin:8px 0;white-space:pre;overflow-x:auto;font-family:var(--font-mono);font-size:12px;}
+.speak{background:transparent;border:none;color:var(--text-muted);cursor:pointer;margin-left:10px;font:600 10px var(--font-mono);}
+.speak:hover{color:var(--gold);}
 .typing{display:flex;gap:5px;padding:14px 18px;align-self:flex-start;}
-.typing span{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bnc 1.2s infinite;}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:bnc 1.2s infinite;}
 .typing span:nth-child(2){animation-delay:.15s;}
 .typing span:nth-child(3){animation-delay:.3s;}
+#chatfoot{display:flex;gap:12px;padding:16px 32px;border-top:1px solid var(--border);background:var(--bg-surface);}
+#chatfoot textarea{flex:1;padding:12px 14px;height:52px;resize:none;}
+#doneBar{display:none;align-items:center;gap:10px;padding:10px 32px;background:var(--gold-faint);border-top:1px solid var(--gold-dim);font-size:13px;color:var(--text-secondary);}
+/* map */
+.mapwrap{margin:24px 32px;}
+.opt{background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);border-radius:9999px;padding:8px 16px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
+.opt.on{background:var(--gold-faint);border-color:var(--border-active);color:var(--gold);font-weight:600;}
+.ringbg{fill:none;stroke:var(--bg-elevated);stroke-width:10;}
+.ringfg{fill:none;stroke:var(--gold);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
+.leak{background:var(--error-faint);border:1px solid var(--error);border-radius:var(--r-card);padding:14px 18px;font-size:13px;color:var(--text-secondary);margin:16px 0;}
+.leak b{color:var(--error);}
+/* toast / tour / misc */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--success);color:var(--text-primary);padding:12px 20px;border-radius:var(--r-card);font-weight:600;font-size:13px;opacity:0;transform:translateY(8px);transition:all .22s ease-out;z-index:99;}
+#toast.show{opacity:1;transform:none;}
+.confetti{position:fixed;top:-12px;width:3px;height:12px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
+#tourCard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:440px;width:92%;background:var(--bg-surface);border:1px solid var(--border-active);border-radius:var(--r-card);padding:18px;z-index:97;animation:fadeUp .3s ease-out;}
+#tourCard p{font-size:13px;line-height:1.55;margin-bottom:12px;color:var(--text-secondary);}
+.tour-hl{outline:2px solid var(--gold);box-shadow:0 0 24px var(--gold-glow);border-radius:var(--r-card);position:relative;z-index:96;}
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes aurora{0%,100%{transform:translate3d(-4%,-2%,0) scale(1);opacity:.7}50%{transform:translate3d(4%,3%,0) scale(1.08);opacity:1}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes bnc{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
-#doneBar{display:none;align-items:center;gap:10px;padding:10px 24px;background:#1c1a05;border-top:1px solid var(--accent);font-size:13px;}
-#doneBar button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px;}
-#doneBar .later{background:transparent;color:var(--muted);border:1px solid var(--border);}
-footer{padding:18px 24px;border-top:1px solid var(--border);background:var(--panel);display:flex;gap:12px;}
-textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:10px;font-size:14px;resize:none;height:54px;outline:none;}
-#send{background:var(--accent);border:none;border-radius:10px;width:90px;font-weight:700;cursor:pointer;color:#111;}
-#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-90px);background:#1c1a05;border:1px solid var(--accent);color:var(--text);padding:12px 22px;border-radius:12px;font-weight:700;transition:.4s;z-index:99;}
-#toast.show{transform:translateX(-50%) translateY(0);}
-.confetti{position:fixed;top:-12px;width:8px;height:14px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
-#tourCard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:430px;width:92%;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:16px;z-index:97;animation:fadeUp .4s ease;}
-#tourCard p{font-size:13px;line-height:1.5;margin-bottom:12px;}
-#tourCard .tbtns{display:flex;gap:8px;justify-content:flex-end;}
-#tourCard button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
-#tourCard .skip{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.tour-hl{outline:2px solid var(--accent);box-shadow:0 0 24px rgba(255,214,10,.35);border-radius:12px;z-index:96;position:relative;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes glow{0%,100%{box-shadow:0 0 4px rgba(255,214,10,.25)}50%{box-shadow:0 0 18px rgba(255,214,10,.5)}}
-@media (max-width:900px){
- body{flex-direction:column;}
- aside{width:100%;padding:10px;}
- .logo,.sec{display:none;}
- #modes{display:flex;flex-direction:row;overflow-x:auto;gap:8px;padding-bottom:6px;}
- .mode{min-width:160px;margin-bottom:0;}
- .tierbox,.pulse{display:none;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@media (max-width:1100px){.grid4{grid-template-columns:1fr 1fr;}.grid2{grid-template-columns:1fr;}}
+@media (max-width:768px){
+ #shell{flex-direction:column;}
+ #rail{width:100%;height:52px;display:flex;overflow-x:auto;}
+ #rail:hover{width:100%;}
+ .ritem{padding:14px 16px;}
+ .ritem .lbl{opacity:1;}
+ .hero,.section,#modes,.mapwrap{margin-left:16px;margin-right:16px;}
+ #chat,#chatfoot,#doneBar{padding-left:16px;padding-right:16px;}
+ .ticker{margin:22px -16px -28px;}
+ .livechip{display:none;}
 }
 </style>
 </head>
 <body>
-<aside>
-  <div class="logo"><div class="bolt">⚡</div><span>Income Engine</span></div>
-  <div class="sec" id="secModes">OPERATING MODES</div>
-  <div id="modes"></div>
-  <div class="pulse">
-    <div class="sec" style="margin-bottom:8px" id="secPulse">DAILY PULSE</div>
-    <div class="chips">
-      <button id="hC" class="chip" onclick="toggleH('c')">📝 Content</button>
-      <button id="hCom" class="chip" onclick="toggleH('com')">👥 Community</button>
-      <button id="hConv" class="chip" onclick="toggleH('conv')">💬 Convos</button>
-    </div>
-    <div class="streak" id="streak">🔥 0-day streak</div>
-    <button class="logbtn" id="logBtn" onclick="logDay()">Log Today</button>
+<div id="topbar">
+  <div class="crumb"><div class="logotile">IE</div><span>Income Engine</span><span>/</span><b id="crumbSec">Dashboard</b></div>
+  <div class="tspace"></div>
+  <button class="chipbtn" onclick="toggleSb()" title="Pin sidebar">☰</button>
+  <button class="chipbtn" id="langBtn" onclick="setLang(lang==='en'?'ar':'en')">ع</button>
+  <div class="livechip"><span class="dot"></span><span class="mono">api · online</span></div>
+  <button class="btn-gold" id="ctaBtn" onclick="startNext()">Start Next Step ↗</button>
+</div>
+<div id="shell">
+  <div id="rail">
+    <div class="ritem on" id="tabHome" onclick="showView('home')"><span class="ric">01</span><span class="lbl" id="lbHome">Journey</span></div>
+    <div class="ritem" id="tabMap" onclick="showView('map')"><span class="ric">02</span><span class="lbl" id="lbMap">Business Map</span></div>
+    <div class="ritem" id="tabChat" onclick="showView('chat')"><span class="ric">03</span><span class="lbl" id="lbChat">Coach</span></div>
   </div>
-  <div class="tierbox">
-    <span class="badge" id="tierBadge">FREE PLAN</span>
-    <span class="badge" id="memBadge">💾 MEMORY ON</span>
-    <input id="lic" placeholder="Whop license key (buyers only)">
-    <button id="unlockBtn" onclick="unlock()">Unlock Tier</button>
-  </div>
-</aside>
-<main>
-  <header>
-    <div><h1>CCC Diagnostic Brain</h1><p id="subTitle">Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p></div>
-    <div class="hbtns">
-      <button onclick="toggleSb()" title="Focus mode">☰</button>
-      <button onclick="setLang(lang==='en'?'ar':'en')" id="langBtn">ع</button>
-      <button id="tabHome" onclick="showView('home')">🗺️ Journey</button>
-      <button id="tabMap" onclick="showView('map')">📊 Map</button>
-      <button id="tabChat" onclick="showView('chat')">💬 Coach</button>
-      <button onclick="unlockPrompt()" title="Unlock tier">🔓</button>
-      <button onclick="exportChat()" title="Export session">⬇️</button>
-      <button onclick="clearChat()" title="Clear chat">🗑️</button>
+  <div id="main">
+    <div id="homeView"></div>
+    <div id="mapView" style="display:none"></div>
+    <div id="chatView" style="display:none">
+      <div id="modes"></div>
+      <div id="chat"></div>
+      <div id="doneBar"><span id="doneTxt"></span><button class="btn-gold" style="padding:6px 12px;font-size:12px" id="markBtn" onclick="markDone()">Mark done</button><button class="btn-ghost" style="padding:6px 12px;font-size:12px" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
+      <div id="chatfoot">
+        <textarea id="input" placeholder="Describe your challenge or ask for guidance..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+        <button class="btn-gold" id="send" onclick="send()">Send</button>
+        <button class="btn-ghost" onclick="exportChat()" title="Export">↓</button>
+        <button class="btn-ghost" onclick="clearChat()" title="Clear">✕</button>
+      </div>
     </div>
-  </header>
-  <div id="homeView"></div>
-  <div id="mapView" style="display:none"></div>
-  <div id="chat" style="display:none"></div>
-  <div id="doneBar"><span id="doneTxt"></span><button id="markBtn" onclick="markDone()">✓ Mark done</button><button class="later" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
-  <footer id="chatFooter" style="display:none">
-    <textarea id="input" placeholder="Describe your challenge or ask for guidance... (Shift+Enter for new line)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
-    <button id="send" onclick="send()">Send ➤</button>
-  </footer>
-</main>
+  </div>
+</div>
 <div id="toast"></div>
-<div id="tourCard" style="display:none"><p id="tourTxt"></p><div class="tbtns"><span id="tourStep" style="margin-right:auto;color:var(--muted);font-size:11px"></span><button class="skip" id="tourSkip" onclick="endTour()">Skip</button><button id="tourNext" onclick="nextTour()">Next →</button></div></div>
+<div id="tourCard" style="display:none"><p id="tourTxt"></p><div style="display:flex;gap:8px;justify-content:flex-end;align-items:center"><span id="tourStep" class="mono" style="margin-right:auto;color:var(--text-muted);font-size:11px"></span><button class="btn-ghost" id="tourSkip" onclick="endTour()">Skip</button><button class="btn-gold" id="tourNext" onclick="nextTour()">Next</button></div></div>
 <script>
 const API_URL = "";
 let lang = localStorage.getItem("lang") || "en";
 const CH = {
- en:{sub:"Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system",tabHome:"🗺️ Journey",tabMap:"📊 Map",tabChat:"💬 Coach",secModes:"OPERATING MODES",secPulse:"DAILY PULSE",log:"Log Today",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance... (Shift+Enter for new line)",send:"Send ➤",next:"YOUR NEXT MOVE",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"✓ COMPLETE",phase:"Phase",mark:"✓ Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"✅ Step complete. Momentum building.",toastPhase:"🏆 PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, your momentum, and your biggest leak — before you talk to the coach.",buildMap:"Build my Map →",retake:"Retake",sendCoach:"Send my map to the coach →",bigLeak:"Biggest leak",momentum:"Momentum",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",tourNext:"Next →",tourSkip:"Skip",streak:"🔥 "},
- ar:{sub:"استراتيجي تحويل المجتمعات بمستوى 10 آلاف دولار — مدرّب على نظام فليب موس ونايت ريان",tabHome:"🗺️ الرحلة",tabMap:"📊 الخريطة",tabChat:"💬 المدرب",secModes:"أوضاع التشغيل",secPulse:"النبض اليومي",log:"سجّل اليوم",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل ➤",next:"خطوتك التالية",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"✓ اكتمل",phase:"المرحلة",mark:"✓ تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً. ابنِ خريطة عملك أو اضغط ابدأ على خطوتك التالية.",toastStep:"✅ اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"🏆 اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب — قبل التحدث إلى المدرب.",buildMap:"← ابنِ خريطتي",retake:"إعادة",sendCoach:"← أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",tourNext:"← التالي",tourSkip:"تخطي",streak:"🔥 "}
+ en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map"},
+ ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة"}
 };
 const MODES = [
- {id:"coach", tier:"free", ic:"🕐", t:"Daily Operator", d:"90-min workflow: content → community → convos", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة: محتوى → مجتمع → محادثات"},
- {id:"xray", tier:"free", ic:"🩺", t:"Business X-Ray", d:"Find & fix your biggest revenue leaks", t_ar:"الأشعة السينية للعمل", d_ar:"اعثر على أكبر تسريب أرباح وأصلحه"},
- {id:"funnel", tier:"free", ic:"🔗", t:"Funnel Map", d:"Identify leaks in your conversion flow", t_ar:"خريطة القمع", d_ar:"حدد التسريبات في مسار التحويل"},
- {id:"community", tier:"insider", ic:"👥", t:"Community OS", d:"One group, MVC setup, welcome posts", t_ar:"نظام المجتمع", d_ar:"مجموعة واحدة، MVC، منشور ترحيب"},
- {id:"dm", tier:"insider", ic:"💬", t:"DM Doctor", d:"Scripts that convert without being salesy", t_ar:"طبيب الرسائل", d_ar:"سكريبتات تحوّل بدون بيع مزعج"},
- {id:"offer", tier:"partner", ic:"📄", t:"Offer Doc Builder", d:"10 pillars + 14 building blocks", t_ar:"باني عرض البيع", d_ar:"10 أركان + 14 قطعة بناء"},
- {id:"workshop", tier:"partner", ic:"🎪", t:"Workshop Architect", d:"6-day belief installation sequence", t_ar:"مهندس الورش", d_ar:"تسلسل تثبيت المعتقدات 6 أيام"},
- {id:"content", tier:"insider", ic:"✍️", t:"Content Engine", d:"VAGEL calendar + 7 frameworks", t_ar:"محرك المحتوى", d_ar:"تقويم VAGEL + 7 أطر"},
- {id:"launch", tier:"partner", ic:"🚀", t:"Launch Planner", d:"Pre-promo → drop → push → close", t_ar:"مخطط الإطلاق", d_ar:"تمهيد → إسقاط → دفع → إغلاق"},
- {id:"alchemy", tier:"insider", ic:"🎬", t:"Alchemy (Video)", d:"Hook → Body → CTA in 60 seconds", t_ar:"الخيمياء (فيديو)", d_ar:"خطاف → جسم → CTA في 60 ثانية"},
+ {id:"coach", tier:"free", t:"Daily Operator", d:"90-min rhythm", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة"},
+ {id:"xray", tier:"free", t:"Business X-Ray", d:"revenue leaks", t_ar:"الأشعة السينية", d_ar:"تسريبات الأرباح"},
+ {id:"funnel", tier:"free", t:"Funnel Map", d:"conversion leaks", t_ar:"خريطة القمع", d_ar:"تسريبات التحويل"},
+ {id:"community", tier:"insider", t:"Community OS", d:"one group + MVC", t_ar:"نظام المجتمع", d_ar:"مجموعة واحدة"},
+ {id:"dm", tier:"insider", t:"DM Doctor", d:"converting scripts", t_ar:"طبيب الرسائل", d_ar:"سكريبتات تحوّل"},
+ {id:"offer", tier:"partner", t:"Offer Doc Builder", d:"10 pillars + 14 blocks", t_ar:"باني العرض", d_ar:"10 أركان"},
+ {id:"workshop", tier:"partner", t:"Workshop Architect", d:"6-day belief arc", t_ar:"مهندس الورش", d_ar:"6 أيام"},
+ {id:"content", tier:"insider", t:"Content Engine", d:"VAGEL + 7 frameworks", t_ar:"محرك المحتوى", d_ar:"VAGEL"},
+ {id:"launch", tier:"partner", t:"Launch Planner", d:"21-day map", t_ar:"مخطط الإطلاق", d_ar:"21 يوماً"},
+ {id:"alchemy", tier:"insider", t:"Alchemy", d:"60s video scripts", t_ar:"الخيمياء", d_ar:"فيديو 60 ثانية"},
 ];
 const RANK = {free:0, insider:1, partner:2};
 const JOURNEY = [
- {name:"Diagnose", name_ar:"التشخيص", icon:"🩺", tasks:[
-   {id:"xray", t:"Run your Business X-Ray", t_ar:"شغّل الأشعة السينية على عملك", why:"Find the earliest broken layer before fixing anything", why_ar:"اعثر على أضعف طبقة قبل إصلاح أي شيء", min:10, mode:"xray", prompt:"Run my Business X-Ray. Interview me one question at a time, then give me my RED/YELLOW/GREEN audit and the single first fix."},
- ]},
- {name:"Foundation", name_ar:"الأساس", icon:"🏛️", tasks:[
-   {id:"onegroup", t:"Make the One-Group decision", t_ar:"اتخذ قرار المجموعة الواحدة", why:"Fragmentation kills momentum", why_ar:"التشتت يقتل الزخم", min:5, mode:"community", prompt:"Help me make the One-Group decision. Ask me what groups I currently run, then tell me exactly how to consolidate."},
-   {id:"welcome", t:"Write your Welcome Post", t_ar:"اكتب منشور الترحيب", why:"Sets expectations and pre-frames the DM", why_ar:"يضبط التوقعات ويمهّد للرسالة", min:10, mode:"community", prompt:"Write my group Welcome Post with the honesty statement and DM pre-frame. Ask me my niche first."},
-   {id:"quickwin", t:"Install the 15-minute Quick Win", t_ar:"ركّب الفوز السريع خلال 15 دقيقة", why:"New members must feel progress on day 1", why_ar:"العضو الجديد يجب أن يشعر بتقدم في اليوم 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."},
- ]},
- {name:"Attention", name_ar:"الانتباه", icon:"🎬", tasks:[
-   {id:"vagel", t:"Build your VAGEL week", t_ar:"ابنِ أسبوع VAGEL", why:"Predictable content that builds trust", why_ar:"محتوى متوقع يبني الثقة", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story. Ask me what you need."},
-   {id:"reel", t:"Script your first reel", t_ar:"اكتب أول ريل", why:"Hook 0-5s, Body 5-45s, CTA 45-60s", why_ar:"خطاف 0-5، جسم 5-45، CTA 45-60", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
-   {id:"cta", t:"Post with a Triple-Threat CTA", t_ar:"انشر مع CTA ثلاثي التهديد", why:"Turn viewers into group members", why_ar:"حوّل المشاهدين إلى أعضاء مجموعة", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."},
- ]},
- {name:"Conversion", name_ar:"التحويل", icon:"💬", tasks:[
-   {id:"dmflow", t:"Install the Hand-Raiser DM flow", t_ar:"ركّب تدفق رسائل Hand-Raiser", why:"Convert intent without being salesy", why_ar:"حوّل النية بدون بيع مزعج", min:10, mode:"dm", prompt:"Set up my Hand-Raiser DM flow step by step with exact scripts adapted to my niche."},
-   {id:"offerdoc", t:"Build your Offer Doc", t_ar:"ابنِ وثيقة العرض", why:"The Google Doc that replaces the sales call", why_ar:"وثيقة جوجل التي تغني عن مكالمة البيع", min:30, mode:"offer", prompt:"Interview me and build my 14-block Offer Doc, one section at a time."},
- ]},
- {name:"Scale", name_ar:"التوسع", icon:"🚀", tasks:[
-   {id:"launch", t:"Plan your 21-day launch", t_ar:"خطط لإطلاق 21 يوم", why:"Predictable revenue, not random hope", why_ar:"أرباح متوقعة لا أمل عشوائي", min:20, mode:"launch", prompt:"Build my 21-day launch map: pre-promo, the drop, the push, 72h countdown."},
-   {id:"pulse", t:"Run your Daily Pulse", t_ar:"شغّل نبضك اليومي", why:"The 90-minute rhythm compounds", why_ar:"روتين 90 دقيقة يركّب النتائج", min:2, mode:"coach", prompt:"Set up my daily 90-minute rhythm and hold me accountable to it."},
- ]},
+ {name:"Diagnose", name_ar:"التشخيص", tasks:[
+   {id:"xray", t:"Run your Business X-Ray", t_ar:"شغّل الأشعة السينية", why:"Find the earliest broken layer", why_ar:"اعثر على أضعف طبقة", min:10, mode:"xray", prompt:"Run my Business X-Ray. Interview me one question at a time, then give me my RED/YELLOW/GREEN audit and the single first fix."}]},
+ {name:"Foundation", name_ar:"الأساس", tasks:[
+   {id:"onegroup", t:"Make the One-Group decision", t_ar:"قرار المجموعة الواحدة", why:"Fragmentation kills momentum", why_ar:"التشتت يقتل الزخم", min:5, mode:"community", prompt:"Help me make the One-Group decision. Ask me what groups I currently run, then tell me exactly how to consolidate."},
+   {id:"welcome", t:"Write your Welcome Post", t_ar:"اكتب منشور الترحيب", why:"Sets expectations + pre-frames the DM", why_ar:"يضبط التوقعات", min:10, mode:"community", prompt:"Write my group Welcome Post with the honesty statement and DM pre-frame. Ask me my niche first."},
+   {id:"quickwin", t:"Install the 15-minute Quick Win", t_ar:"ركّب الفوز السريع", why:"Day-1 progress for new members", why_ar:"تقدم اليوم 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."}]},
+ {name:"Attention", name_ar:"الانتباه", tasks:[
+   {id:"vagel", t:"Build your VAGEL week", t_ar:"ابنِ أسبوع VAGEL", why:"Predictable trust-building content", why_ar:"محتوى يبني الثقة", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story."},
+   {id:"reel", t:"Script your first reel", t_ar:"اكتب أول ريل", why:"Hook 0-5 / Body 5-45 / CTA 45-60", why_ar:"خطاف/جسم/CTA", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
+   {id:"cta", t:"Post with a Triple-Threat CTA", t_ar:"انشر بـ CTA ثلاثي", why:"Viewers into group members", why_ar:"مشاهدون إلى أعضاء", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."}]},
+ {name:"Conversion", name_ar:"التحويل", tasks:[
+   {id:"dmflow", t:"Install the Hand-Raiser DM flow", t_ar:"ركّب تدفق Hand-Raiser", why:"Convert intent without pressure", why_ar:"حوّل النية بدون ضغط", min:10, mode:"dm", prompt:"Set up my Hand-Raiser DM flow step by step with exact scripts adapted to my niche."},
+   {id:"offerdoc", t:"Build your Offer Doc", t_ar:"ابنِ وثيقة العرض", why:"The doc that replaces the sales call", why_ar:"الوثيقة التي تغني عن المكالمة", min:30, mode:"offer", prompt:"Interview me and build my 14-block Offer Doc, one section at a time."}]},
+ {name:"Scale", name_ar:"التوسع", tasks:[
+   {id:"launch", t:"Plan your 21-day launch", t_ar:"خطط لإطلاق 21 يوم", why:"Predictable revenue", why_ar:"أرباح متوقعة", min:20, mode:"launch", prompt:"Build my 21-day launch map: pre-promo, the drop, the push, 72h countdown."},
+   {id:"pulse", t:"Run your Daily Pulse", t_ar:"شغّل نبضك اليومي", why:"The 90-min rhythm compounds", why_ar:"الروتين يركّب النتائج", min:2, mode:"coach", prompt:"Set up my daily 90-minute rhythm and hold me accountable to it."}]},
 ];
 const QUIZ = [
- {layer:"t", en:"How many targeted strangers see you each week?", ar:"كم غريباً مستهدفاً يراك كل أسبوع؟", opts:[["Barely any","بالكاد"],["Some","بعض"],["A lot","كثير"]]},
- {layer:"h", en:"Where does your audience live?", ar:"أين يعيش جمهورك؟", opts:[["Scattered platforms","منصات متفرقة"],["One quiet group","مجموعة هادئة"],["One active group","مجموعة نشطة"]]},
- {layer:"n", en:"What happens when a new member joins?", ar:"ماذا يحدث عند انضمام عضو جديد؟", opts:[["Nothing","لا شيء"],["A welcome post","منشور ترحيب"],["A quick-win path","مسار فوز سريع"]]},
- {layer:"c1", en:"How often do you make an offer?", ar:"كم مرة تقدم عرضاً؟", opts:[["Rarely","نادراً"],["Sometimes","أحياناً"],["Most days","أغلب الأيام"]]},
- {layer:"c2", en:"Do you have a written offer doc?", ar:"هل لديك وثيقة عرض مكتوبة؟", opts:[["No","لا"],["Rough notes","مسودة"],["Yes, structured","نعم، منظمة"]]},
- {layer:"r", en:"Your daily 90-minute rhythm?", ar:"التزامك بروتين 90 دقيقة؟", opts:[["Rarely","نادراً"],["Some days","بعض الأيام"],["Every day","يومياً"]]},
+ {en:"How many targeted strangers see you each week?", ar:"كم غريباً مستهدفاً يراك أسبوعياً؟", opts:[["Barely any","بالكاد"],["Some","بعض"],["A lot","كثير"]]},
+ {en:"Where does your audience live?", ar:"أين يعيش جمهورك؟", opts:[["Scattered","متفرق"],["One quiet group","مجموعة هادئة"],["One active group","مجموعة نشطة"]]},
+ {en:"What happens when a new member joins?", ar:"ماذا يحدث عند انضمام عضو؟", opts:[["Nothing","لا شيء"],["Welcome post","ترحيب"],["Quick-win path","مسار فوز"]]},
+ {en:"How often do you make an offer?", ar:"كم مرة تقدم عرضاً؟", opts:[["Rarely","نادراً"],["Sometimes","أحياناً"],["Most days","أغلب الأيام"]]},
+ {en:"Do you have a written offer doc?", ar:"هل لديك وثيقة عرض؟", opts:[["No","لا"],["Rough","مسودة"],["Structured","منظمة"]]},
+ {en:"Your daily 90-minute rhythm?", ar:"روتين 90 دقيقة؟", opts:[["Rarely","نادراً"],["Some days","بعض الأيام"],["Daily","يومياً"]]},
 ];
 let memberId = localStorage.getItem("member_id");
 if(!memberId){ memberId = "m-" + Math.random().toString(36).slice(2,10); localStorage.setItem("member_id", memberId); }
@@ -246,363 +276,239 @@ let habit = {c:false, com:false, conv:false};
 let done = JSON.parse(localStorage.getItem("journey_" + memberId) || "{}");
 let activeTask = null;
 let answers = [null,null,null,null,null,null];
-document.getElementById("memBadge").textContent = "💾 " + memberId.slice(0,8);
 
+function C(){ return CH[lang]; }
 function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
 function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
-function toggleSb(){ document.body.classList.toggle("nosb"); }
-function setLang(l){
-  lang = l; localStorage.setItem("lang", l);
-  document.documentElement.lang = l;
-  document.documentElement.dir = (l==="ar") ? "rtl" : "ltr";
-  applyLang();
-}
+function toggleSb(){ document.getElementById("shell").classList.toggle("railwide"); }
+function setLang(l){ lang=l; localStorage.setItem("lang",l); document.documentElement.lang=l; document.documentElement.dir=(l==="ar")?"rtl":"ltr"; applyLang(); }
 function applyLang(){
-  const C = CH[lang];
-  document.getElementById("subTitle").textContent = C.sub;
-  document.getElementById("tabHome").textContent = C.tabHome;
-  document.getElementById("tabMap").textContent = C.tabMap;
-  document.getElementById("tabChat").textContent = C.tabChat;
-  document.getElementById("secModes").textContent = C.secModes;
-  document.getElementById("secPulse").textContent = C.secPulse;
-  document.getElementById("logBtn").textContent = C.log;
-  document.getElementById("unlockBtn").textContent = C.unlock;
-  document.getElementById("lic").placeholder = C.lic;
-  document.getElementById("input").placeholder = C.ph;
-  document.getElementById("send").textContent = C.send;
-  document.getElementById("markBtn").textContent = C.mark;
-  document.getElementById("laterBtn").textContent = C.later;
-  document.getElementById("langBtn").textContent = (lang==="ar") ? "EN" : "ع";
-  document.getElementById("tourNext").textContent = C.tourNext;
-  document.getElementById("tourSkip").textContent = C.tourSkip;
-  renderModes(); renderHome(); renderMap(); renderStreak();
+  const c=C();
+  document.getElementById("ctaBtn").textContent=c.cta;
+  document.getElementById("lbHome").textContent=c.lbHome;
+  document.getElementById("lbMap").textContent=c.lbMap;
+  document.getElementById("lbChat").textContent=c.lbChat;
+  document.getElementById("crumbSec").textContent=c.crumb;
+  document.getElementById("langBtn").textContent=(lang==="ar")?"EN":"ع";
+  document.getElementById("markBtn").textContent=c.mark;
+  document.getElementById("laterBtn").textContent=c.later;
+  document.getElementById("input").placeholder=c.ph;
+  document.getElementById("send").textContent=c.send;
+  renderModes(); renderHome(); renderH(); renderStreak(); renderMap();
 }
+function doneCount(){ return JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0); }
+function savedMap(){ return JSON.parse(localStorage.getItem("map_"+memberId) || "null"); }
+function leakName(k){ const c=C(); return {t:c.lTraffic,h:c.lHub,n:c.lNurture,c:c.lConversion}[k]||k; }
 function showView(v){
-  document.getElementById("homeView").style.display = (v==="home") ? "block" : "none";
-  document.getElementById("mapView").style.display = (v==="map") ? "block" : "none";
-  document.getElementById("chat").style.display = (v==="chat") ? "flex" : "none";
-  document.getElementById("chatFooter").style.display = (v==="chat") ? "flex" : "none";
-  document.getElementById("doneBar").style.display = "none";
-  document.getElementById("tabHome").classList.toggle("on", v==="home");
-  document.getElementById("tabMap").classList.toggle("on", v==="map");
-  document.getElementById("tabChat").classList.toggle("on", v==="chat");
+  document.getElementById("homeView").style.display=(v==="home")?"block":"none";
+  document.getElementById("mapView").style.display=(v==="map")?"block":"none";
+  document.getElementById("chatView").style.display=(v==="chat")?"block":"none";
+  document.getElementById("tabHome").classList.toggle("on",v==="home");
+  document.getElementById("tabMap").classList.toggle("on",v==="map");
+  document.getElementById("tabChat").classList.toggle("on",v==="chat");
+  document.getElementById("doneBar").style.display="none";
   if(v==="home") renderHome();
   if(v==="map") renderMap();
   if(v==="chat") updateDoneBar();
 }
-/* ---------- JOURNEY ---------- */
-function findTask(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return t; } } return null; }
-function phaseOf(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return p; } } return null; }
-function nextTask(){ for(const p of JOURNEY){ for(const t of p.tasks){ if(!done[t.id]) return t; } } return null; }
+function startNext(){ const n=nextTask(); if(n) startTaskById(n.id); else showView("chat"); }
+/* journey */
+function findTask(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return t; return null; }
+function phaseOf(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return p; return null; }
+function nextTask(){ for(const p of JOURNEY) for(const t of p.tasks) if(!done[t.id]) return t; return null; }
 function startTaskById(id){
-  const t = findTask(id); if(!t) return;
-  if(RANK[tier] < RANK[modeTier(t.mode)]){ showView("chat"); addMsg("🔒 \""+T(t,"t")+"\" lives in a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); unlockPrompt(); return; }
-  mode = t.mode; renderModes(); showView("chat");
-  activeTask = id;
-  document.getElementById("input").value = t.prompt;
-  send();
+  const t=findTask(id); if(!t) return;
+  if(RANK[tier]<RANK[modeTier(t.mode)]){ showView("chat"); addMsg("Locked: "+T(t,"t")+" is a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); unlockPrompt(); return; }
+  mode=t.mode; renderModes(); showView("chat"); activeTask=id;
+  document.getElementById("input").value=t.prompt; send();
 }
 function updateDoneBar(){
-  const bar = document.getElementById("doneBar");
-  if(activeTask && !done[activeTask]){
-    const t = findTask(activeTask);
-    document.getElementById("doneTxt").textContent = (lang==="ar"?"انتهيت من ":"Finished ")+(t?T(t,"t"):"")+"?";
-    bar.style.display = "flex";
-  } else bar.style.display = "none";
+  const bar=document.getElementById("doneBar");
+  if(activeTask && !done[activeTask]){ const t=findTask(activeTask); document.getElementById("doneTxt").textContent=(lang==="ar"?"انتهيت من ":"Finished ")+T(t,"t")+"?"; bar.style.display="flex"; }
+  else bar.style.display="none";
 }
-function hideDoneBar(){ document.getElementById("doneBar").style.display = "none"; }
+function hideDoneBar(){ document.getElementById("doneBar").style.display="none"; }
 function markDone(){ if(activeTask) completeTask(activeTask); hideDoneBar(); }
 function completeTask(id){
   if(done[id]) return;
-  done[id] = true;
-  localStorage.setItem("journey_" + memberId, JSON.stringify(done));
-  const p = phaseOf(id);
-  const phaseDone = p && p.tasks.every(t=>done[t.id]);
-  if(phaseDone){ toast(CH[lang].toastPhase + T(p,"name") + "!"); confetti(40); }
-  else { toast(CH[lang].toastStep); confetti(18); }
-  renderHome(); updateDoneBar();
+  done[id]=true; localStorage.setItem("journey_"+memberId, JSON.stringify(done));
+  const p=phaseOf(id); const pd=p&&p.tasks.every(t=>done[t.id]);
+  if(pd){ toast(C().toastPhase+T(p,"name")); confetti(40); } else { toast(C().toastStep); confetti(18); }
+  renderHome(); renderH(); renderStreak(); updateDoneBar();
 }
-function toggleDone(id){
-  if(done[id]){ done[id]=false; localStorage.setItem("journey_" + memberId, JSON.stringify(done)); renderHome(); }
-  else completeTask(id);
-}
-function toast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 2600);
-}
-function confetti(n){
-  const colors = ["#ffd60a","#22c55e","#3b82f6","#ef4444","#e5e7eb"];
-  for(let i=0;i<n;i++){
-    const c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random()*100 + "vw";
-    c.style.background = colors[Math.floor(Math.random()*colors.length)];
-    c.style.animationDelay = (Math.random()*0.4) + "s";
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(), 2000);
-  }
-}
-function savedMap(){ return JSON.parse(localStorage.getItem("map_" + memberId) || "null"); }
-function leakName(k){ const C=CH[lang]; return {t:C.lTraffic,h:C.lHub,n:C.lNurture,c:C.lConversion}[k] || k; }
+function toggleDone(id){ if(done[id]){ done[id]=false; localStorage.setItem("journey_"+memberId,JSON.stringify(done)); renderHome(); } else completeTask(id); }
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+function confetti(n){ const cols=["#F5A623","#D48C1A","#FFE0B0","#00E599"]; for(let i=0;i<n;i++){ const c=document.createElement("div"); c.className="confetti"; c.style.left=Math.random()*100+"vw"; c.style.background=cols[Math.floor(Math.random()*cols.length)]; c.style.animationDelay=(Math.random()*0.4)+"s"; document.body.appendChild(c); setTimeout(()=>c.remove(),2000);} }
+/* HOME */
 function renderHome(){
-  const C = CH[lang];
-  const total = JOURNEY.reduce((a,p)=>a+p.tasks.length,0);
-  const doneCount = JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0);
-  const next = nextTask();
-  const sm = savedMap();
-  let html = '<div class="line">';
-  const nodes = [["👀","ATTENTION"],["🏠","HUB"],["🎓","DEMONSTRATION"],["💰","CONVERSION"]];
-  const activeNode = Math.min(3, Math.floor((doneCount/total)*4));
-  nodes.forEach((n,i)=>{ html += '<div class="node'+(i<=activeNode?' on':'')+'"><span>'+n[0]+'</span><small>'+n[1]+'</small></div>'; if(i<3) html += '<div class="wire'+(i<activeNode?' on':'')+'"></div>'; });
-  html += '</div>';
-  if(sm){
-    html += '<div class="mapchip">📊 '+C.momentum+': <b>'+sm.mom+'/100</b> · 💧 '+C.bigLeak+': <b>'+leakName(sm.leak)+'</b> · <a onclick="showView(\'map\')">'+C.openMap+'</a></div>';
-  }
-  if(next){
-    html += '<div class="hero"><div><div class="herolabel">'+C.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · ~'+next.min+' min · '+C.streak+calcStreak()+'-day</p></div><button class="herobtn" onclick="startTaskById(\''+next.id+'\')">'+C.start+' →</button></div>';
-  } else {
-    html += '<div class="hero"><div><div class="herolabel">JOURNEY COMPLETE</div><h2>'+(lang==="ar"?"بنيت الآلة. الآن شغّلها يومياً.":"You built the machine. Now run it daily.")+'</h2><p>'+C.streak+calcStreak()+'</p></div><button class="herobtn" onclick="showView(\'chat\')">'+C.tabChat+'</button></div>';
-  }
-  html += '<div class="prog"><div class="progtop"><span>'+C.prog+'</span><span>'+doneCount+'/'+total+' '+C.steps+'</span></div><div class="bar"><div class="fill" style="width:'+Math.round((doneCount/total)*100)+'%"></div></div></div>';
-  JOURNEY.forEach((p,pi)=>{
-    const pd = p.tasks.filter(t=>done[t.id]).length;
-    const complete = pd === p.tasks.length;
-    html += '<div class="phase" style="animation-delay:'+(pi*0.08)+'s"><div class="phead"><span class="picon">'+p.icon+'</span><b>'+C.phase+' '+(pi+1)+' — '+T(p,"name")+'</b>'+(complete?'<span class="pdone">'+C.complete+'</span>':'')+'<small>'+pd+'/'+p.tasks.length+'</small></div>';
-    p.tasks.forEach((t,ti)=>{
-      const isDone = !!done[t.id];
-      const locked = RANK[tier] < RANK[modeTier(t.mode)];
-      html += '<div class="task'+(isDone?' done':'')+(next&&next.id===t.id?' next':'')+'" style="animation-delay:'+(pi*0.08+ti*0.05)+'s">';
-      html += '<button class="check" onclick="toggleDone(\''+t.id+'\')">'+(isDone?'✓':'')+'</button>';
-      html += '<div class="tbody"><b>'+T(t,"t")+'</b><small>'+T(t,"why")+' · ~'+t.min+' min'+(locked?' · 🔒 '+modeTier(t.mode):'')+'</small></div>';
-      html += '<button class="startbtn" onclick="startTaskById(\''+t.id+'\')">'+(locked?'🔒':(isDone?C.redo:C.start))+'</button>';
-      html += '</div>';
-    });
-    html += '</div>';
-  });
-  document.getElementById("homeView").innerHTML = html;
+  const c=C(); const total=JOURNEY.reduce((a,p)=>a+p.tasks.length,0); const dc=doneCount(); const sm=savedMap(); const next=nextTask();
+  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V8</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"10 أوضاع. 11 خطوة. مسار واحد من التشخيص إلى الإطلاق.":"10 modes. 11 steps. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-gold" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num gr" id="streak">0</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker"><div class="tk">'+tickerHTML()+'</div></div></div>';
+  h+='<div class="section"><div class="shead"><h3>'+(lang==="ar"?"صحة المسار":"Pipeline Health")+'</h3><small>'+c.prog+' · <span class="mono">'+dc+'/'+total+'</span></small></div><div class="steps">';
+  JOURNEY.forEach((p,i)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const st=pd===p.tasks.length?"done":(next&&p.tasks.some(t=>t.id===next.id)?"active":""); h+='<div class="step '+st+'"><span class="n">'+(pd===p.tasks.length?"✓":"0"+(i+1))+'</span><span class="t">'+T(p,"name")+'</span></div>'; if(i<JOURNEY.length-1) h+='<div class="swire"></div>'; });
+  h+='</div></div>';
+  if(next){ h+='<div class="section"><div class="spot"><div class="ey">'+c.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · <span class="mono">~'+next.min+' min</span></p></div></div>'; }
+  h+='<div class="section"><div class="grid2"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div class="grid2" style="grid-template-columns:1fr"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div></div></div></div>';
+  JOURNEY.forEach((p,pi)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const complete=pd===p.tasks.length;
+    h+='<div class="section" style="margin-top:8px"><div class="shead"><h3><span class="mono" style="color:var(--text-muted)">0'+(pi+1)+'</span> · '+T(p,"name")+(complete?' <span class="pill ok">'+c.complete+'</span>':'')+'</h3><small class="mono">'+pd+'/'+p.tasks.length+'</small></div>';
+    p.tasks.forEach((t,ti)=>{ const isD=!!done[t.id]; const locked=RANK[tier]<RANK[modeTier(t.mode)];
+      h+='<div class="task'+(isD?" done":"")+(next&&next.id===t.id?" next":"")+'" style="animation-delay:'+(ti*0.05)+'s"><button class="check" onclick="toggleDone(\''+t.id+'\')">'+(isD?"✓":"")+'</button><div class="tb"><b>'+T(t,"t")+'</b><small>'+T(t,"why")+' · <span class="mono">~'+t.min+'m</span></small></div>'+(locked?'<span class="pill warn">'+modeTier(t.mode).toUpperCase()+'</span>':'')+'<button class="startbtn" onclick="startTaskById(\''+t.id+'\')">'+(locked?"LOCK":(isD?c.redo:c.start))+'</button></div>'; });
+    h+='</div>'; });
+  document.getElementById("homeView").innerHTML=h;
+  renderStreak();
+  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ b.style.width=b.dataset.w+"%"; }); },80); });
 }
-/* ---------- BUSINESS MAP ---------- */
+function tickerHTML(){
+  const sm=savedMap(); const n=nextTask();
+  const items=["API ONLINE","VAULT LOADED","MEM "+memberId.slice(2,8).toUpperCase(),"STREAK "+calcStreak()+"D","JOURNEY "+doneCount()+"/11",sm?("MOMENTUM "+sm.mom+"/100"):"MAP PENDING","TIER "+tier.toUpperCase(),n?("NEXT: "+T(n,"t").toUpperCase()):"ALL STEPS DONE"];
+  const row=items.map(i=>"<span>◆ "+i+"</span>").join("");
+  return row+row;
+}
+function funnelHTML(sm){
+  const c=C(); let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.funnel+'</h3><span class="pill ok">LIVE</span></div>';
+  if(!sm){ h+='<p style="font-size:12px;margin-bottom:12px">'+c.noMap+'</p><button class="btn-ghost" onclick="showView(\'map\')">'+c.buildCta+'</button>'; return h; }
+  const W=[22,55,95]; const col=s=>["var(--error)","var(--warning)","var(--success)"][s];
+  [[c.lTraffic,sm.t],[c.lHub,sm.h],[c.lNurture,sm.n],[c.lConversion,sm.c]].forEach(x=>{
+    h+='<div class="mrow"><div class="mt"><span>'+x[0]+'</span><span class="mono">'+x[1]+'/2</span></div><div class="mtrack"><div class="mfill" data-w="'+W[x[1]]+'" style="background:'+col(x[1])+'"></div></div></div>'; });
+  return h;
+}
+function pulseHTML(){
+  const c=C();
+  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.pulse+'</h3><span class="dot"></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="opt" id="hC" onclick="toggleH(\'c\')">Content</button><button class="opt" id="hCom" onclick="toggleH(\'com\')">Community</button><button class="opt" id="hConv" onclick="toggleH(\'conv\')">Convos</button></div><button class="btn-gold" style="width:100%" id="logBtn" onclick="logDay()">'+c.log+'</button>';
+}
+function planHTML(){
+  const c=C();
+  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.plan+'</h3><span class="pill ok" id="memBadge">MEM</span></div><input id="lic" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.lic+'"><button class="btn-ghost" style="width:100%" onclick="unlock()">'+c.unlock+'</button>';
+}
+/* MAP */
 function ans(qi,oi){ answers[qi]=oi; renderMap(); }
 function buildMap(){
-  if(answers.some(a=>a===null)){ toast(CH[lang].answerAll); return; }
-  const t=answers[0], h=answers[1], n=answers[2], c=Math.round((answers[3]+answers[4])/2), r=answers[5];
-  const mom = Math.round(((t+h+n+c)/8)*80 + (r/2)*20);
-  const layers = {t:t,h:h,n:n,c:c};
-  const leak = Object.keys(layers).reduce((a,b)=> layers[a]<=layers[b]?a:b);
-  const map = {t:t,h:h,n:n,c:c,mom:mom,leak:leak};
-  localStorage.setItem("map_" + memberId, JSON.stringify(map));
-  confetti(18);
-  renderMap(); renderHome();
+  if(answers.some(a=>a===null)){ toast(C().answerAll); return; }
+  const t=answers[0],h=answers[1],n=answers[2],cc=Math.round((answers[3]+answers[4])/2),r=answers[5];
+  const mom=Math.round(((t+h+n+cc)/8)*80+(r/2)*20);
+  const layers={t:t,h:h,n:n,c:cc};
+  const leak=Object.keys(layers).reduce((a,b)=>layers[a]<=layers[b]?a:b);
+  localStorage.setItem("map_"+memberId, JSON.stringify({t,h,n,c:cc,mom,leak}));
+  confetti(18); renderMap(); renderHome();
 }
-function retakeMap(){ localStorage.removeItem("map_" + memberId); answers=[null,null,null,null,null,null]; renderMap(); }
+function retakeMap(){ localStorage.removeItem("map_"+memberId); answers=[null,null,null,null,null,null]; renderMap(); }
 function sendMapToCoach(){
-  const sm = savedMap(); if(!sm) return;
-  mode = "xray"; renderModes(); showView("chat");
-  document.getElementById("input").value = "BUSINESS MAP RESULT - Momentum "+sm.mom+"/100 | Traffic "+sm.t+"/2 | Hub "+sm.h+"/2 | Nurture "+sm.n+"/2 | Conversion "+sm.c+"/2 | Biggest leak: "+leakName(sm.leak)+". Use this as my full picture and start coaching from the leak. Update my memory with these scores.";
+  const sm=savedMap(); if(!sm) return;
+  mode="xray"; renderModes(); showView("chat");
+  document.getElementById("input").value="BUSINESS MAP RESULT - Momentum "+sm.mom+"/100 | Traffic "+sm.t+"/2 | Hub "+sm.h+"/2 | Nurture "+sm.n+"/2 | Conversion "+sm.c+"/2 | Biggest leak: "+leakName(sm.leak)+". Use this as my full picture and start coaching from the leak. Update my memory with these scores.";
   send();
 }
 function renderMap(){
-  const C = CH[lang];
-  const mv = document.getElementById("mapView");
-  const sm = savedMap();
-  let html = '<h2 style="margin-bottom:4px">'+C.mapTitle+'</h2><p class="mapsub">'+C.mapSub+'</p>';
+  const c=C(); const sm=savedMap(); let h='<div class="mapwrap"><div class="eyebrow"><i></i>02 · BUSINESS MAP</div><h1 style="font-size:24px">'+c.mapTitle+'</h1><p class="hsub">'+c.mapSub+'</p>';
   if(!sm){
-    html += '<div>';
-    QUIZ.forEach((q,qi)=>{
-      html += '<div class="q" style="animation-delay:'+(qi*0.05)+'s"><b>'+(qi+1)+'. '+(lang==="ar"?q.ar:q.en)+'</b><div class="opts">';
-      q.opts.forEach((o,oi)=>{
-        html += '<button class="opt'+(answers[qi]===oi?' on':'')+'" onclick="ans('+qi+','+oi+')">'+(lang==="ar"?o[1]:o[0])+'</button>';
-      });
-      html += '</div></div>';
-    });
-    html += '<button class="herobtn" onclick="buildMap()">'+C.buildMap+'</button></div>';
+    QUIZ.forEach((q,qi)=>{ h+='<div class="card" style="margin-bottom:10px;padding:16px 20px"><b style="font-size:13px;color:var(--text-primary)"><span class="mono" style="color:var(--text-muted)">0'+(qi+1)+'</span> '+(lang==="ar"?q.ar:q.en)+'</b><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'; q.opts.forEach((o,oi)=>{ h+='<button class="opt'+(answers[qi]===oi?" on":"")+'" onclick="ans('+qi+','+oi+')">'+(lang==="ar"?o[1]:o[0])+'</button>'; }); h+='</div></div>'; });
+    h+='<button class="btn-gold" onclick="buildMap()">'+c.buildMap+'</button>';
   } else {
-    const cols = ["#ef4444","#ffd60a","#22c55e"];
-    const widths = [22,55,95];
-    html += '<div class="deck"><div class="ringbox"><svg width="120" height="120"><circle cx="60" cy="60" r="52" class="ringbg"/><circle cx="60" cy="60" r="52" class="ringfg" id="ring" style="stroke-dasharray:326.7;stroke-dashoffset:326.7"/></svg><div class="ringtxt">'+sm.mom+'<small>/100</small></div></div><div class="bars">';
-    [[C.lTraffic,sm.t],[C.lHub,sm.h],[C.lNurture,sm.n],[C.lConversion,sm.c]].forEach(x=>{
-      html += '<div class="brow"><small>'+x[0]+'</small><div class="btrack"><div class="bfill" data-w="'+widths[x[1]]+'" style="background:'+cols[x[1]]+'"></div></div></div>';
-    });
-    html += '</div></div><div class="mind">';
-    [[C.lTraffic,sm.t],[C.lHub,sm.h],[C.lNurture,sm.n],[C.lConversion,sm.c]].forEach((x,i,arr)=>{
-      html += '<div class="mnode" style="border-color:'+cols[x[1]]+';color:'+cols[x[1]]+'">'+x[0]+'</div>';
-      if(i<arr.length-1) html += '<div class="wire on"></div>';
-    });
-    html += '</div><div class="leak">💧 '+C.bigLeak+': <b>'+leakName(sm.leak)+'</b> — '+(lang==="ar"?"ابدأ الإصلاح من هنا.":"start fixing here.")+'</div>';
-    html += '<div class="mapbtns"><button class="startbtn" onclick="retakeMap()">'+C.retake+'</button><button class="herobtn" onclick="sendMapToCoach()">'+C.sendCoach+'</button></div>';
+    const W=[22,55,95]; const col=s=>["var(--error)","var(--warning)","var(--success)"][s];
+    h+='<div class="grid2"><div class="card" style="display:flex;align-items:center;justify-content:center"><div style="position:relative"><svg width="140" height="140"><circle cx="70" cy="70" r="58" class="ringbg"/><circle cx="70" cy="70" r="58" class="ringfg" id="ring" style="stroke-dasharray:364.4;stroke-dashoffset:364.4"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="mono" style="font-size:28px;font-weight:700;color:var(--gold)">'+sm.mom+'</span><span class="mono" style="font-size:10px;color:var(--text-muted)">/100</span></div></div></div><div class="card">';
+    [[c.lTraffic,sm.t],[c.lHub,sm.h],[c.lNurture,sm.n],[c.lConversion,sm.c]].forEach(x=>{ h+='<div class="mrow"><div class="mt"><span>'+x[0]+'</span><span class="mono">'+x[1]+'/2</span></div><div class="mtrack"><div class="mfill" data-w="'+W[x[1]]+'" style="background:'+col(x[1])+'"></div></div></div>'; });
+    h+='</div></div><div class="leak">◆ '+c.bigLeak+': <b>'+leakName(sm.leak)+'</b> — '+(lang==="ar"?"ابدأ الإصلاح من هنا.":"start fixing here.")+'</div><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="retakeMap()">'+c.retake+'</button><button class="btn-gold" onclick="sendMapToCoach()">'+c.sendCoach+'</button></div>';
   }
-  mv.innerHTML = html;
-  if(sm){
-    requestAnimationFrame(()=>{ setTimeout(()=>{
-      document.querySelectorAll(".bfill").forEach(b=>{ b.style.width = b.dataset.w + "%"; });
-      const ring = document.getElementById("ring");
-      if(ring) ring.style.strokeDashoffset = (326.7 * (1 - sm.mom/100)).toFixed(1);
-    }, 60); });
-  }
+  h+='</div>';
+  document.getElementById("mapView").innerHTML=h;
+  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
 }
-/* ---------- TOUR ---------- */
-const TOUR = [
- {sel:"#homeView", en:"This is Mission Control: your journey, your next move, your progress. One path — no guessing.", ar:"هذه غرفة القيادة: رحلتك، خطوتك التالية، تقدمك. مسار واحد — بدون تخمين."},
- {sel:"#tabMap", en:"The Business Map shows your funnel, momentum and biggest leak as a live visual — before you ever type.", ar:"خريطة العمل تُظهر قمعك وزخمك وأكبر تسريب كصورة حية — قبل أن تكتب أي شيء."},
- {sel:"#tabChat", en:"The Coach: a $10K strategist that remembers you and walks you through every step.", ar:"المدرب: استراتيجي بمستوى 10 آلاف دولار يتذكرك ويمشي معك في كل خطوة."},
- {sel:"#modes", en:"Operating modes. Locked ones open with your Whop plan.", ar:"أوضاع التشغيل. المقفلة تُفتح بخطتك على Whop."},
- {sel:".pulse", en:"Daily Pulse: log your 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
- {sel:".tierbox", en:"Your plan & unlock box: Free → Insider → Partner.", ar:"خطتك وصندوق الفتح: مجاني → إنسايدر → بارتنر."},
-];
-let tourI = 0;
-function showTour(){
-  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
-  if(tourI >= TOUR.length){ endTour(); return; }
-  const s = TOUR[tourI];
-  const el = document.querySelector(s.sel);
-  if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center", behavior:"smooth"}); }
-  document.getElementById("tourCard").style.display = "block";
-  document.getElementById("tourTxt").textContent = (lang==="ar") ? s.ar : s.en;
-  document.getElementById("tourStep").textContent = (tourI+1)+"/"+TOUR.length;
+/* MODES + CHAT */
+function renderModes(){
+  const box=document.getElementById("modes"); box.innerHTML="";
+  MODES.forEach((m,i)=>{ const locked=RANK[tier]<RANK[m.tier];
+    const b=document.createElement("button"); b.className="mchip"+(m.id===mode?" on":"");
+    b.innerHTML='<span class="mi">0'+(i+1)+'</span>'+T(m,"t")+(locked?' <span class="pill warn">'+m.tier.toUpperCase()+'</span>':'');
+    b.onclick=()=>{ if(locked){ showView("chat"); addMsg("Locked: "+T(m,"t")+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); return; } mode=m.id; renderModes(); addMsg((lang==="ar"?"تم التبديل إلى ":"Switched to ")+T(m,"t")+".","ai"); };
+    box.appendChild(b); });
+  const tb=document.getElementById("tierBadge"); if(tb) tb.textContent=tier.toUpperCase();
+  const mb=document.getElementById("memBadge"); if(mb) mb.textContent="MEM "+memberId.slice(2,6).toUpperCase();
 }
-function nextTour(){ tourI++; showTour(); }
-function endTour(){
-  localStorage.setItem("tour_" + memberId, "1");
-  document.getElementById("tourCard").style.display = "none";
-  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
-}
-/* ---------- CHAT ---------- */
 function fmt(text){
-  let s = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  s = s.replace(/```([\s\S]*?)```/g, function(m,c){ return "<pre>"+c+"</pre>"; });
-  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  s = s.replace(/^###\s?(.+)$/gm, "<span class='h'>$1</span>");
-  s = s.replace(/^##\s?(.+)$/gm, "<span class='h'>$1</span>");
-  s = s.replace(/^#\s?(.+)$/gm, "<span class='h'>$1</span>");
-  s = s.replace(/^[-*]\s+(.+)$/gm, "<span class='li'>• $1</span>");
+  let s=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  s=s.replace(/```([\s\S]*?)```/g,function(m,c){return "<pre>"+c+"</pre>";});
+  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/^###?\s?(.+)$/gm,"<span class='h'>$1</span>");
+  s=s.replace(/^[-*]\s+(.+)$/gm,"<span class='li'>• $1</span>");
   return s;
 }
-function showTyping(){
-  const c = document.getElementById("chat");
-  const d = document.createElement("div");
-  d.className = "typing"; d.id = "typing";
-  d.innerHTML = "<span></span><span></span><span></span>";
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
-}
-function hideTyping(){ const t = document.getElementById("typing"); if(t) t.remove(); }
-function addMsg(text, who){
-  const c = document.getElementById("chat");
-  const d = document.createElement("div");
-  d.className = "msg "+who;
-  const s = document.createElement("span");
-  if(who==="ai"){ s.innerHTML = fmt(text); } else { s.textContent = text; }
-  d.appendChild(s);
-  if(who==="ai"){
-    const b = document.createElement("button");
-    b.className = "speak"; b.textContent = "🔊"; b.title = "Play voice";
-    b.onclick = ()=> speak(text);
-    d.appendChild(b);
-  }
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
+function showTyping(){ const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="typing"; d.id="typing"; d.innerHTML="<span></span><span></span><span></span>"; c.appendChild(d); c.scrollTop=c.scrollHeight; }
+function hideTyping(){ const t=document.getElementById("typing"); if(t) t.remove(); }
+function addMsg(text,who){
+  const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="msg "+who;
+  const s=document.createElement("span"); if(who==="ai") s.innerHTML=fmt(text); else s.textContent=text; d.appendChild(s);
+  if(who==="ai"){ const b=document.createElement("button"); b.className="speak"; b.textContent="▶ VOX"; b.onclick=()=>speak(text); d.appendChild(b); }
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
 function speak(text){
-  const clean = text.slice(0, 600);
-  fetch(API_URL+"/api/tts", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({text: clean})})
-    .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
-    .then(blob=>{ const a = new Audio(URL.createObjectURL(blob)); a.play(); })
-    .catch(e=> addMsg("⚠️ Voice failed: "+e.message, "ai"));
+  fetch(API_URL+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text.slice(0,600)})})
+  .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
+  .then(b=>{ const a=new Audio(URL.createObjectURL(b)); a.play(); })
+  .catch(e=>addMsg("Voice failed: "+e.message+". Retry.","ai"));
 }
 function exportChat(){
-  const lines = [];
-  document.querySelectorAll("#chat .msg").forEach(m=>{
-    lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n") + m.querySelector("span").textContent);
-  });
-  const blob = new Blob([lines.join("\n\n")], {type:"text/plain"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "income-engine-session.txt";
-  a.click();
+  const lines=[]; document.querySelectorAll("#chat .msg").forEach(m=>{ lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n")+m.querySelector("span").textContent); });
+  const b=new Blob([lines.join("\n\n")],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="income-engine-session.txt"; a.click();
 }
 async function send(){
-  const inp = document.getElementById("input");
-  const text = inp.value.trim(); if(!text) return;
-  addMsg(text, "user"); history.push({role:"user", content:text}); inp.value="";
-  showTyping();
-  const wire = (lang==="ar") ? ("[The user prefers Arabic. Respond fully in Arabic.] " + text) : text;
+  const inp=document.getElementById("input"); const text=inp.value.trim(); if(!text) return;
+  addMsg(text,"user"); history.push({role:"user",content:text}); inp.value=""; showTyping();
+  const wire=(lang==="ar")?("[Respond fully in Arabic] "+text):text;
   try{
-    const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({message:wire, history:history.slice(-16), mode:mode, member_id:memberId})});
+    const r=await fetch(API_URL+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:wire,history:history.slice(-16),mode:mode,member_id:memberId})});
     hideTyping();
-    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key.", "ai"); return; }
-    const data = await r.json();
-    const reply = data.reply || data.response || data.message || "Error.";
-    addMsg(reply, "ai"); history.push({role:"assistant", content:reply});
-    updateDoneBar();
-  }catch(e){ hideTyping(); addMsg("⚠️ Connection error: "+e.message, "ai"); }
+    if(r.status===403){ addMsg("Locked for your tier. Unlock with your Whop license key.","ai"); return; }
+    const d=await r.json(); const reply=d.reply||d.response||d.message||"Error.";
+    addMsg(reply,"ai"); history.push({role:"assistant",content:reply}); updateDoneBar();
+  }catch(e){ hideTyping(); addMsg("Connection error: "+e.message+". Retry.","ai"); }
 }
 async function unlock(){
-  const key = document.getElementById("lic").value.trim(); if(!key) return;
+  const key=document.getElementById("lic").value.trim(); if(!key) return;
   try{
-    const r = await fetch(API_URL+"/api/unlock", {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({member_id:memberId, license_key:key})});
-    const data = await r.json();
-    if(!r.ok) throw new Error(data.detail || "invalid license");
-    tier = data.tier; localStorage.setItem("tier", tier); renderModes(); renderHome();
-    addMsg("✅ Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are now open.", "ai");
-  }catch(e){ addMsg("⚠️ Unlock failed: "+e.message, "ai"); }
+    const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:key})});
+    const d=await r.json(); if(!r.ok) throw new Error(d.detail||"invalid license");
+    tier=d.tier; localStorage.setItem("tier",tier); renderModes(); renderHome();
+    addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
+  }catch(e){ addMsg("Unlock failed: "+e.message,"ai"); }
 }
-function unlockPrompt(){
-  const key = prompt("Paste your Whop license key:");
-  if(key){ document.getElementById("lic").value = key; unlock(); }
-}
-async function loadTier(){
-  try{
-    const r = await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId));
-    const data = await r.json();
-    if(data.tier){ tier = data.tier; localStorage.setItem("tier", tier); }
-  }catch(e){}
-  renderModes();
-}
-function renderModes(){
-  const box = document.getElementById("modes");
-  box.innerHTML = "";
-  MODES.forEach(m=>{
-    const locked = RANK[tier] < RANK[m.tier];
-    const b = document.createElement("button");
-    b.className = "mode" + (m.id===mode ? " active" : "");
-    b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+T(m,"t")+'</b><small>'+T(m,"d")+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
-    b.onclick = ()=>{ if(locked){ showView("chat"); addMsg("🔒 "+T(m,"t")+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); return; } mode = m.id; renderModes(); showView("chat"); addMsg((lang==="ar"?"تم التبديل إلى ":"Switched to ")+T(m,"t")+".", "ai"); };
-    box.appendChild(b);
-  });
-  document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
-}
-function toggleH(k){ habit[k] = !habit[k]; renderH(); }
-function renderH(){
-  document.getElementById("hC").classList.toggle("on", habit.c);
-  document.getElementById("hCom").classList.toggle("on", habit.com);
-  document.getElementById("hConv").classList.toggle("on", habit.conv);
-}
+function unlockPrompt(){ const k=prompt("Paste your Whop license key:"); if(k){ showView("home"); setTimeout(()=>{ const i=document.getElementById("lic"); if(i){ i.value=k; unlock(); } },100); } }
+async function loadTier(){ try{ const r=await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId)); const d=await r.json(); if(d.tier){ tier=d.tier; localStorage.setItem("tier",tier);} }catch(e){} renderModes(); }
+function toggleH(k){ habit[k]=!habit[k]; renderH(); }
+function renderH(){ const a=document.getElementById("hC"),b=document.getElementById("hCom"),c=document.getElementById("hConv"); if(a){a.classList.toggle("on",habit.c);} if(b){b.classList.toggle("on",habit.com);} if(c){c.classList.toggle("on",habit.conv);} }
 function dayKey(d){ return d.toISOString().slice(0,10); }
-function calcStreak(){
-  const log = JSON.parse(localStorage.getItem("habit_log") || "{}");
-  let streak = 0; const d = new Date();
-  if(!log[dayKey(d)]) d.setDate(d.getDate()-1);
-  while(log[dayKey(d)]){ streak++; d.setDate(d.getDate()-1); }
-  return streak;
-}
-function renderStreak(){ document.getElementById("streak").textContent = CH[lang].streak + calcStreak() + "-day streak"; }
+function calcStreak(){ const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); let s=0; const d=new Date(); if(!log[dayKey(d)]) d.setDate(d.getDate()-1); while(log[dayKey(d)]){s++;d.setDate(d.getDate()-1);} return s; }
+function renderStreak(){ const el=document.getElementById("streak"); if(el) el.textContent=calcStreak()+"d"; }
 function logDay(){
-  const log = JSON.parse(localStorage.getItem("habit_log") || "{}");
-  log[dayKey(new Date())] = {c:habit.c, com:habit.com, conv:habit.conv};
-  localStorage.setItem("habit_log", JSON.stringify(log));
-  renderStreak();
-  const streak = calcStreak();
-  const msg = "DAILY CHECK-IN - Content: " + (habit.c?"YES":"NO") + " | Community: " + (habit.com?"YES":"NO") + " | Conversations: " + (habit.conv?"YES":"NO") + " | Streak: " + streak + " days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy (no guilt), and give me ONE focus for tomorrow. Also update my memory with this check-in and my streak.";
-  habit = {c:false, com:false, conv:false}; renderH();
-  showView("chat");
-  document.getElementById("input").value = msg;
-  send();
+  const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); log[dayKey(new Date())]={c:habit.c,com:habit.com,conv:habit.conv}; localStorage.setItem("habit_log",JSON.stringify(log));
+  const s=calcStreak();
+  const msg="DAILY CHECK-IN - Content: "+(habit.c?"YES":"NO")+" | Community: "+(habit.com?"YES":"NO")+" | Conversations: "+(habit.conv?"YES":"NO")+" | Streak: "+s+" days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy, and give me ONE focus for tomorrow. Update my memory with this check-in and streak.";
+  habit={c:false,com:false,conv:false}; renderH(); showView("chat"); document.getElementById("input").value=msg; send();
 }
-function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم مسح المحادثة. على ماذا نعمل؟":"Chat cleared. What are we working on?", "ai"); }
-loadTier(); renderStreak(); applyLang(); showView("home");
-if(!localStorage.getItem("tour_" + memberId)){ setTimeout(()=>{ tourI=0; showTour(); }, 800); }
-addMsg(CH[lang].welcome, "ai");
+function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); }
+/* TOUR */
+const TOUR=[
+ {sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
+ {sel:"#tabMap", en:"The Business Map renders your funnel as live meters before you ever type.", ar:"خريطة العمل ترسم قمعك كمقاييس حية قبل أن تكتب."},
+ {sel:"#tabChat", en:"The Coach: a $10K strategist that remembers you across sessions.", ar:"المدرب: استراتيجي يتذكرك عبر الجلسات."},
+ {sel:"#modes", en:"Operating modes. LOCK pills open with your Whop plan.", ar:"الأوضاع. شارات LOCK تُفتح بخطتك."},
+ {sel:"#pulseCard", en:"Daily Pulse: log the 90-minute rhythm, grow the streak.", ar:"النبض اليومي: سجّل الروتين ونمِّ السلسلة."},
+ {sel:"#planCard", en:"Plan & unlock: Free → Insider → Partner.", ar:"الخطة والفتح: مجاني → إنسايدر → بارتنر."},
+];
+let tourI=0;
+function showTour(){
+  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
+  if(tourI>=TOUR.length){ endTour(); return; }
+  const s=TOUR[tourI]; const el=document.querySelector(s.sel);
+  if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); }
+  document.getElementById("tourCard").style.display="block";
+  document.getElementById("tourTxt").textContent=(lang==="ar")?s.ar:s.en;
+  document.getElementById("tourStep").textContent=(tourI+1)+"/"+TOUR.length;
+}
+function nextTour(){ tourI++; showTour(); }
+function endTour(){ localStorage.setItem("tour_"+memberId,"1"); document.getElementById("tourCard").style.display="none"; document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl")); }
+/* INIT */
+loadTier(); applyLang(); showView("home");
+if(!localStorage.getItem("tour_"+memberId)) setTimeout(()=>{tourI=0;showTour();},800);
+addMsg(C().welcome,"ai");
 </script>
 </body>
 </html>
