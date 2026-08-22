@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>E5 AI Coach - Income Engine</title>
 <style>
-:root{--bg:#0f1115;--panel:#13151a;--chat:#181b21;--ai:#22252a;--user:#ffd60a;--text:#e5e7eb;--muted:#9ca3af;--border:#2d3139;--accent:#ffd60a;--green:#22c55e;}
+:root{--bg:#0f1115;--panel:#13151a;--chat:#181b21;--ai:#22252a;--user:#ffd60a;--text:#e5e7eb;--muted:#9ca3af;--border:#2d3139;--accent:#ffd60a;--green:#22c55e;--red:#ef4444;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 body{background:var(--bg);color:var(--text);height:100vh;display:flex;}
 aside{width:270px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px;overflow-y:auto;}
+.nosb aside{display:none;}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;margin-bottom:22px;}
 .logo .bolt{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ffd60a,#22c55e);display:flex;align-items:center;justify-content:center;font-size:20px;}
 .logo span{background:linear-gradient(90deg,#ffd60a,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
@@ -36,7 +37,7 @@ header h1{font-size:20px;}
 header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .hbtns button{background:var(--ai);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;margin-left:6px;font-size:12px;}
 .hbtns button.on{border-color:var(--accent);color:var(--accent);}
-#homeView{flex:1;overflow-y:auto;padding:28px;max-width:920px;margin:0 auto;width:100%;}
+#homeView,#mapView{flex:1;overflow-y:auto;padding:28px;max-width:920px;margin:0 auto;width:100%;}
 .line{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:22px;flex-wrap:wrap;}
 .node{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--chat);border:1px solid var(--border);border-radius:12px;padding:10px 16px;opacity:.45;transition:.4s;}
 .node span{font-size:18px;}
@@ -49,6 +50,8 @@ header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .hero h2{font-size:18px;margin-bottom:6px;}
 .hero p{color:var(--muted);font-size:12px;}
 .herobtn{background:var(--accent);color:#111;border:none;border-radius:10px;padding:12px 20px;font-weight:800;font-size:14px;cursor:pointer;animation:glow 2s infinite;}
+.mapchip{border:1px solid var(--border);background:var(--chat);border-radius:12px;padding:10px 14px;font-size:12px;margin-bottom:18px;animation:fadeUp .5s ease .05s both;}
+.mapchip a{color:var(--accent);cursor:pointer;font-weight:700;}
 .prog{margin-bottom:22px;animation:fadeUp .5s ease .1s both;}
 .progtop{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;}
 .bar{height:8px;background:var(--chat);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -70,6 +73,29 @@ header p{color:var(--muted);font-size:12px;margin-top:3px;}
 .tbody b{font-size:13px;display:block;}
 .tbody small{color:var(--muted);font-size:11px;}
 .startbtn{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;}
+/* MAP */
+.mapsub{color:var(--muted);font-size:12px;margin-bottom:18px;}
+.q{margin-bottom:16px;animation:fadeUp .4s ease both;}
+.q b{font-size:13px;display:block;margin-bottom:8px;}
+.opts{display:flex;gap:8px;flex-wrap:wrap;}
+.opt{background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:8px 14px;font-size:12px;cursor:pointer;}
+.opt.on{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700;}
+.deck{display:flex;gap:24px;align-items:center;margin:18px 0;flex-wrap:wrap;}
+.ringbox{position:relative;}
+.ringbg{fill:none;stroke:var(--border);stroke-width:10;}
+.ringfg{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
+.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;font-weight:800;}
+.ringtxt small{font-size:10px;color:var(--muted);}
+.bars{flex:1;min-width:260px;}
+.brow{margin-bottom:12px;}
+.brow small{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;}
+.btrack{height:10px;background:var(--chat);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.bfill{height:100%;width:0;transition:width 1s ease;border-radius:8px;}
+.mind{display:flex;align-items:center;gap:6px;justify-content:center;margin:14px 0;flex-wrap:wrap;}
+.mnode{padding:8px 14px;border-radius:10px;border:2px solid;font-size:12px;font-weight:700;}
+.leak{background:#1c0505;border:1px solid var(--red);border-radius:12px;padding:12px 16px;font-size:13px;margin:14px 0;}
+.mapbtns{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+/* CHAT */
 #chat{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
 .msg{max-width:78%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word;}
 .msg.user{align-self:flex-end;background:var(--user);color:#111;border-top-right-radius:2px;}
@@ -95,8 +121,12 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
 #toast.show{transform:translateX(-50%) translateY(0);}
 .confetti{position:fixed;top:-12px;width:8px;height:14px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
-#tip{position:fixed;bottom:18px;right:18px;max-width:310px;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:16px;z-index:97;animation:fadeUp .5s ease;font-size:13px;line-height:1.5;}
-#tip button{margin-top:10px;background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
+#tourCard{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);max-width:430px;width:92%;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:16px;z-index:97;animation:fadeUp .4s ease;}
+#tourCard p{font-size:13px;line-height:1.5;margin-bottom:12px;}
+#tourCard .tbtns{display:flex;gap:8px;justify-content:flex-end;}
+#tourCard button{background:var(--accent);color:#111;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
+#tourCard .skip{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.tour-hl{outline:2px solid var(--accent);box-shadow:0 0 24px rgba(255,214,10,.35);border-radius:12px;z-index:96;position:relative;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes glow{0%,100%{box-shadow:0 0 4px rgba(255,214,10,.25)}50%{box-shadow:0 0 18px rgba(255,214,10,.5)}}
 @media (max-width:900px){
@@ -112,30 +142,33 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
 <body>
 <aside>
   <div class="logo"><div class="bolt">⚡</div><span>Income Engine</span></div>
-  <div class="sec">OPERATING MODES</div>
+  <div class="sec" id="secModes">OPERATING MODES</div>
   <div id="modes"></div>
   <div class="pulse">
-    <div class="sec" style="margin-bottom:8px">DAILY PULSE</div>
+    <div class="sec" style="margin-bottom:8px" id="secPulse">DAILY PULSE</div>
     <div class="chips">
       <button id="hC" class="chip" onclick="toggleH('c')">📝 Content</button>
       <button id="hCom" class="chip" onclick="toggleH('com')">👥 Community</button>
       <button id="hConv" class="chip" onclick="toggleH('conv')">💬 Convos</button>
     </div>
     <div class="streak" id="streak">🔥 0-day streak</div>
-    <button class="logbtn" onclick="logDay()">Log Today</button>
+    <button class="logbtn" id="logBtn" onclick="logDay()">Log Today</button>
   </div>
   <div class="tierbox">
     <span class="badge" id="tierBadge">FREE PLAN</span>
     <span class="badge" id="memBadge">💾 MEMORY ON</span>
     <input id="lic" placeholder="Whop license key (buyers only)">
-    <button onclick="unlock()">Unlock Tier</button>
+    <button id="unlockBtn" onclick="unlock()">Unlock Tier</button>
   </div>
 </aside>
 <main>
   <header>
-    <div><h1>CCC Diagnostic Brain</h1><p>Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p></div>
+    <div><h1>CCC Diagnostic Brain</h1><p id="subTitle">Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p></div>
     <div class="hbtns">
+      <button onclick="toggleSb()" title="Focus mode">☰</button>
+      <button onclick="setLang(lang==='en'?'ar':'en')" id="langBtn">ع</button>
       <button id="tabHome" onclick="showView('home')">🗺️ Journey</button>
+      <button id="tabMap" onclick="showView('map')">📊 Map</button>
       <button id="tabChat" onclick="showView('chat')">💬 Coach</button>
       <button onclick="unlockPrompt()" title="Unlock tier">🔓</button>
       <button onclick="exportChat()" title="Export session">⬇️</button>
@@ -143,52 +176,66 @@ textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(
     </div>
   </header>
   <div id="homeView"></div>
-  <div id="chat"></div>
-  <div id="doneBar"><span id="doneTxt"></span><button onclick="markDone()">✓ Mark done</button><button class="later" onclick="hideDoneBar()">Later</button></div>
-  <footer id="chatFooter">
+  <div id="mapView" style="display:none"></div>
+  <div id="chat" style="display:none"></div>
+  <div id="doneBar"><span id="doneTxt"></span><button id="markBtn" onclick="markDone()">✓ Mark done</button><button class="later" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
+  <footer id="chatFooter" style="display:none">
     <textarea id="input" placeholder="Describe your challenge or ask for guidance... (Shift+Enter for new line)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
     <button id="send" onclick="send()">Send ➤</button>
   </footer>
 </main>
 <div id="toast"></div>
-<div id="tip" style="display:none">👋 <b>Welcome to Mission Control.</b><br>This path IS your business journey. Hit <b>Start</b> on your next move and the coach walks you through it, step by step. Tick ✓ when done and watch the bar fill.<br><button onclick="closeTip()">Got it →</button></div>
+<div id="tourCard" style="display:none"><p id="tourTxt"></p><div class="tbtns"><span id="tourStep" style="margin-right:auto;color:var(--muted);font-size:11px"></span><button class="skip" id="tourSkip" onclick="endTour()">Skip</button><button id="tourNext" onclick="nextTour()">Next →</button></div></div>
 <script>
 const API_URL = "";
+let lang = localStorage.getItem("lang") || "en";
+const CH = {
+ en:{sub:"Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system",tabHome:"🗺️ Journey",tabMap:"📊 Map",tabChat:"💬 Coach",secModes:"OPERATING MODES",secPulse:"DAILY PULSE",log:"Log Today",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance... (Shift+Enter for new line)",send:"Send ➤",next:"YOUR NEXT MOVE",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"✓ COMPLETE",phase:"Phase",mark:"✓ Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"✅ Step complete. Momentum building.",toastPhase:"🏆 PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, your momentum, and your biggest leak — before you talk to the coach.",buildMap:"Build my Map →",retake:"Retake",sendCoach:"Send my map to the coach →",bigLeak:"Biggest leak",momentum:"Momentum",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",tourNext:"Next →",tourSkip:"Skip",streak:"🔥 "},
+ ar:{sub:"استراتيجي تحويل المجتمعات بمستوى 10 آلاف دولار — مدرّب على نظام فليب موس ونايت ريان",tabHome:"🗺️ الرحلة",tabMap:"📊 الخريطة",tabChat:"💬 المدرب",secModes:"أوضاع التشغيل",secPulse:"النبض اليومي",log:"سجّل اليوم",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل ➤",next:"خطوتك التالية",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"✓ اكتمل",phase:"المرحلة",mark:"✓ تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً. ابنِ خريطة عملك أو اضغط ابدأ على خطوتك التالية.",toastStep:"✅ اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"🏆 اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب — قبل التحدث إلى المدرب.",buildMap:"← ابنِ خريطتي",retake:"إعادة",sendCoach:"← أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",tourNext:"← التالي",tourSkip:"تخطي",streak:"🔥 "}
+};
 const MODES = [
- {id:"coach", tier:"free", ic:"🕐", t:"Daily Operator", d:"90-min workflow: content → community → convos"},
- {id:"xray", tier:"free", ic:"🩺", t:"Business X-Ray", d:"Find & fix your biggest revenue leaks"},
- {id:"funnel", tier:"free", ic:"🔗", t:"Funnel Map", d:"Identify leaks in your conversion flow"},
- {id:"community", tier:"insider", ic:"👥", t:"Community OS", d:"One group, MVC setup, welcome posts"},
- {id:"dm", tier:"insider", ic:"💬", t:"DM Doctor", d:"Scripts that convert without being salesy"},
- {id:"offer", tier:"partner", ic:"📄", t:"Offer Doc Builder", d:"10 pillars + 14 building blocks"},
- {id:"workshop", tier:"partner", ic:"🎪", t:"Workshop Architect", d:"6-day belief installation sequence"},
- {id:"content", tier:"insider", ic:"✍️", t:"Content Engine", d:"VAGEL calendar + 7 frameworks"},
- {id:"launch", tier:"partner", ic:"🚀", t:"Launch Planner", d:"Pre-promo → drop → push → close"},
- {id:"alchemy", tier:"insider", ic:"🎬", t:"Alchemy (Video)", d:"Hook → Body → CTA in 60 seconds"},
+ {id:"coach", tier:"free", ic:"🕐", t:"Daily Operator", d:"90-min workflow: content → community → convos", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة: محتوى → مجتمع → محادثات"},
+ {id:"xray", tier:"free", ic:"🩺", t:"Business X-Ray", d:"Find & fix your biggest revenue leaks", t_ar:"الأشعة السينية للعمل", d_ar:"اعثر على أكبر تسريب أرباح وأصلحه"},
+ {id:"funnel", tier:"free", ic:"🔗", t:"Funnel Map", d:"Identify leaks in your conversion flow", t_ar:"خريطة القمع", d_ar:"حدد التسريبات في مسار التحويل"},
+ {id:"community", tier:"insider", ic:"👥", t:"Community OS", d:"One group, MVC setup, welcome posts", t_ar:"نظام المجتمع", d_ar:"مجموعة واحدة، MVC، منشور ترحيب"},
+ {id:"dm", tier:"insider", ic:"💬", t:"DM Doctor", d:"Scripts that convert without being salesy", t_ar:"طبيب الرسائل", d_ar:"سكريبتات تحوّل بدون بيع مزعج"},
+ {id:"offer", tier:"partner", ic:"📄", t:"Offer Doc Builder", d:"10 pillars + 14 building blocks", t_ar:"باني عرض البيع", d_ar:"10 أركان + 14 قطعة بناء"},
+ {id:"workshop", tier:"partner", ic:"🎪", t:"Workshop Architect", d:"6-day belief installation sequence", t_ar:"مهندس الورش", d_ar:"تسلسل تثبيت المعتقدات 6 أيام"},
+ {id:"content", tier:"insider", ic:"✍️", t:"Content Engine", d:"VAGEL calendar + 7 frameworks", t_ar:"محرك المحتوى", d_ar:"تقويم VAGEL + 7 أطر"},
+ {id:"launch", tier:"partner", ic:"🚀", t:"Launch Planner", d:"Pre-promo → drop → push → close", t_ar:"مخطط الإطلاق", d_ar:"تمهيد → إسقاط → دفع → إغلاق"},
+ {id:"alchemy", tier:"insider", ic:"🎬", t:"Alchemy (Video)", d:"Hook → Body → CTA in 60 seconds", t_ar:"الخيمياء (فيديو)", d_ar:"خطاف → جسم → CTA في 60 ثانية"},
 ];
 const RANK = {free:0, insider:1, partner:2};
 const JOURNEY = [
- {name:"Diagnose", icon:"🩺", tasks:[
-   {id:"xray", t:"Run your Business X-Ray", why:"Find the earliest broken layer before fixing anything", min:10, mode:"xray", prompt:"Run my Business X-Ray. Interview me one question at a time, then give me my RED/YELLOW/GREEN audit and the single first fix."},
+ {name:"Diagnose", name_ar:"التشخيص", icon:"🩺", tasks:[
+   {id:"xray", t:"Run your Business X-Ray", t_ar:"شغّل الأشعة السينية على عملك", why:"Find the earliest broken layer before fixing anything", why_ar:"اعثر على أضعف طبقة قبل إصلاح أي شيء", min:10, mode:"xray", prompt:"Run my Business X-Ray. Interview me one question at a time, then give me my RED/YELLOW/GREEN audit and the single first fix."},
  ]},
- {name:"Foundation", icon:"🏛️", tasks:[
-   {id:"onegroup", t:"Make the One-Group decision", why:"Fragmentation kills momentum", min:5, mode:"community", prompt:"Help me make the One-Group decision. Ask me what groups I currently run, then tell me exactly how to consolidate."},
-   {id:"welcome", t:"Write your Welcome Post", why:"Sets expectations and pre-frames the DM", min:10, mode:"community", prompt:"Write my group Welcome Post with the honesty statement and DM pre-frame. Ask me my niche first."},
-   {id:"quickwin", t:"Install the 15-minute Quick Win", why:"New members must feel progress on day 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."},
+ {name:"Foundation", name_ar:"الأساس", icon:"🏛️", tasks:[
+   {id:"onegroup", t:"Make the One-Group decision", t_ar:"اتخذ قرار المجموعة الواحدة", why:"Fragmentation kills momentum", why_ar:"التشتت يقتل الزخم", min:5, mode:"community", prompt:"Help me make the One-Group decision. Ask me what groups I currently run, then tell me exactly how to consolidate."},
+   {id:"welcome", t:"Write your Welcome Post", t_ar:"اكتب منشور الترحيب", why:"Sets expectations and pre-frames the DM", why_ar:"يضبط التوقعات ويمهّد للرسالة", min:10, mode:"community", prompt:"Write my group Welcome Post with the honesty statement and DM pre-frame. Ask me my niche first."},
+   {id:"quickwin", t:"Install the 15-minute Quick Win", t_ar:"ركّب الفوز السريع خلال 15 دقيقة", why:"New members must feel progress on day 1", why_ar:"العضو الجديد يجب أن يشعر بتقدم في اليوم 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."},
  ]},
- {name:"Attention", icon:"🎬", tasks:[
-   {id:"vagel", t:"Build your VAGEL week", why:"Predictable content that builds trust", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story. Ask me what you need."},
-   {id:"reel", t:"Script your first reel", why:"Hook 0-5s, Body 5-45s, CTA 45-60s", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
-   {id:"cta", t:"Post with a Triple-Threat CTA", why:"Turn viewers into group members", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."},
+ {name:"Attention", name_ar:"الانتباه", icon:"🎬", tasks:[
+   {id:"vagel", t:"Build your VAGEL week", t_ar:"ابنِ أسبوع VAGEL", why:"Predictable content that builds trust", why_ar:"محتوى متوقع يبني الثقة", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story. Ask me what you need."},
+   {id:"reel", t:"Script your first reel", t_ar:"اكتب أول ريل", why:"Hook 0-5s, Body 5-45s, CTA 45-60s", why_ar:"خطاف 0-5، جسم 5-45، CTA 45-60", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
+   {id:"cta", t:"Post with a Triple-Threat CTA", t_ar:"انشر مع CTA ثلاثي التهديد", why:"Turn viewers into group members", why_ar:"حوّل المشاهدين إلى أعضاء مجموعة", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."},
  ]},
- {name:"Conversion", icon:"💬", tasks:[
-   {id:"dmflow", t:"Install the Hand-Raiser DM flow", why:"Convert intent without being salesy", min:10, mode:"dm", prompt:"Set up my Hand-Raiser DM flow step by step with exact scripts adapted to my niche."},
-   {id:"offerdoc", t:"Build your Offer Doc", why:"The Google Doc that replaces the sales call", min:30, mode:"offer", prompt:"Interview me and build my 14-block Offer Doc, one section at a time."},
+ {name:"Conversion", name_ar:"التحويل", icon:"💬", tasks:[
+   {id:"dmflow", t:"Install the Hand-Raiser DM flow", t_ar:"ركّب تدفق رسائل Hand-Raiser", why:"Convert intent without being salesy", why_ar:"حوّل النية بدون بيع مزعج", min:10, mode:"dm", prompt:"Set up my Hand-Raiser DM flow step by step with exact scripts adapted to my niche."},
+   {id:"offerdoc", t:"Build your Offer Doc", t_ar:"ابنِ وثيقة العرض", why:"The Google Doc that replaces the sales call", why_ar:"وثيقة جوجل التي تغني عن مكالمة البيع", min:30, mode:"offer", prompt:"Interview me and build my 14-block Offer Doc, one section at a time."},
  ]},
- {name:"Scale", icon:"🚀", tasks:[
-   {id:"launch", t:"Plan your 21-day launch", why:"Predictable revenue, not random hope", min:20, mode:"launch", prompt:"Build my 21-day launch map: pre-promo, the drop, the push, 72h countdown."},
-   {id:"pulse", t:"Run your Daily Pulse", why:"The 90-minute rhythm compounds", min:2, mode:"coach", prompt:"Set up my daily 90-minute rhythm and hold me accountable to it."},
+ {name:"Scale", name_ar:"التوسع", icon:"🚀", tasks:[
+   {id:"launch", t:"Plan your 21-day launch", t_ar:"خطط لإطلاق 21 يوم", why:"Predictable revenue, not random hope", why_ar:"أرباح متوقعة لا أمل عشوائي", min:20, mode:"launch", prompt:"Build my 21-day launch map: pre-promo, the drop, the push, 72h countdown."},
+   {id:"pulse", t:"Run your Daily Pulse", t_ar:"شغّل نبضك اليومي", why:"The 90-minute rhythm compounds", why_ar:"روتين 90 دقيقة يركّب النتائج", min:2, mode:"coach", prompt:"Set up my daily 90-minute rhythm and hold me accountable to it."},
  ]},
+];
+const QUIZ = [
+ {layer:"t", en:"How many targeted strangers see you each week?", ar:"كم غريباً مستهدفاً يراك كل أسبوع؟", opts:[["Barely any","بالكاد"],["Some","بعض"],["A lot","كثير"]]},
+ {layer:"h", en:"Where does your audience live?", ar:"أين يعيش جمهورك؟", opts:[["Scattered platforms","منصات متفرقة"],["One quiet group","مجموعة هادئة"],["One active group","مجموعة نشطة"]]},
+ {layer:"n", en:"What happens when a new member joins?", ar:"ماذا يحدث عند انضمام عضو جديد؟", opts:[["Nothing","لا شيء"],["A welcome post","منشور ترحيب"],["A quick-win path","مسار فوز سريع"]]},
+ {layer:"c1", en:"How often do you make an offer?", ar:"كم مرة تقدم عرضاً؟", opts:[["Rarely","نادراً"],["Sometimes","أحياناً"],["Most days","أغلب الأيام"]]},
+ {layer:"c2", en:"Do you have a written offer doc?", ar:"هل لديك وثيقة عرض مكتوبة؟", opts:[["No","لا"],["Rough notes","مسودة"],["Yes, structured","نعم، منظمة"]]},
+ {layer:"r", en:"Your daily 90-minute rhythm?", ar:"التزامك بروتين 90 دقيقة؟", opts:[["Rarely","نادراً"],["Some days","بعض الأيام"],["Every day","يومياً"]]},
 ];
 let memberId = localStorage.getItem("member_id");
 if(!memberId){ memberId = "m-" + Math.random().toString(36).slice(2,10); localStorage.setItem("member_id", memberId); }
@@ -198,26 +245,58 @@ let history = [];
 let habit = {c:false, com:false, conv:false};
 let done = JSON.parse(localStorage.getItem("journey_" + memberId) || "{}");
 let activeTask = null;
+let answers = [null,null,null,null,null,null];
 document.getElementById("memBadge").textContent = "💾 " + memberId.slice(0,8);
 
+function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
 function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
+function toggleSb(){ document.body.classList.toggle("nosb"); }
+function setLang(l){
+  lang = l; localStorage.setItem("lang", l);
+  document.documentElement.lang = l;
+  document.documentElement.dir = (l==="ar") ? "rtl" : "ltr";
+  applyLang();
+}
+function applyLang(){
+  const C = CH[lang];
+  document.getElementById("subTitle").textContent = C.sub;
+  document.getElementById("tabHome").textContent = C.tabHome;
+  document.getElementById("tabMap").textContent = C.tabMap;
+  document.getElementById("tabChat").textContent = C.tabChat;
+  document.getElementById("secModes").textContent = C.secModes;
+  document.getElementById("secPulse").textContent = C.secPulse;
+  document.getElementById("logBtn").textContent = C.log;
+  document.getElementById("unlockBtn").textContent = C.unlock;
+  document.getElementById("lic").placeholder = C.lic;
+  document.getElementById("input").placeholder = C.ph;
+  document.getElementById("send").textContent = C.send;
+  document.getElementById("markBtn").textContent = C.mark;
+  document.getElementById("laterBtn").textContent = C.later;
+  document.getElementById("langBtn").textContent = (lang==="ar") ? "EN" : "ع";
+  document.getElementById("tourNext").textContent = C.tourNext;
+  document.getElementById("tourSkip").textContent = C.tourSkip;
+  renderModes(); renderHome(); renderMap(); renderStreak();
+}
 function showView(v){
-  const hv = document.getElementById("homeView"), cv = document.getElementById("chat");
-  hv.style.display = (v==="home") ? "block" : "none";
-  cv.style.display = (v==="chat") ? "flex" : "none";
+  document.getElementById("homeView").style.display = (v==="home") ? "block" : "none";
+  document.getElementById("mapView").style.display = (v==="map") ? "block" : "none";
+  document.getElementById("chat").style.display = (v==="chat") ? "flex" : "none";
   document.getElementById("chatFooter").style.display = (v==="chat") ? "flex" : "none";
   document.getElementById("doneBar").style.display = "none";
   document.getElementById("tabHome").classList.toggle("on", v==="home");
+  document.getElementById("tabMap").classList.toggle("on", v==="map");
   document.getElementById("tabChat").classList.toggle("on", v==="chat");
-  if(v==="home"){ renderHome(); hv.style.animation="none"; void hv.offsetWidth; hv.style.animation="fadeUp .35s ease"; }
-  else { updateDoneBar(); cv.style.animation="none"; void cv.offsetWidth; cv.style.animation="fadeUp .35s ease"; }
+  if(v==="home") renderHome();
+  if(v==="map") renderMap();
+  if(v==="chat") updateDoneBar();
 }
+/* ---------- JOURNEY ---------- */
 function findTask(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return t; } } return null; }
 function phaseOf(id){ for(const p of JOURNEY){ for(const t of p.tasks){ if(t.id===id) return p; } } return null; }
 function nextTask(){ for(const p of JOURNEY){ for(const t of p.tasks){ if(!done[t.id]) return t; } } return null; }
 function startTaskById(id){
   const t = findTask(id); if(!t) return;
-  if(RANK[tier] < RANK[modeTier(t.mode)]){ showView("chat"); addMsg("🔒 \""+t.t+"\" lives in a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); unlockPrompt(); return; }
+  if(RANK[tier] < RANK[modeTier(t.mode)]){ showView("chat"); addMsg("🔒 \""+T(t,"t")+"\" lives in a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); unlockPrompt(); return; }
   mode = t.mode; renderModes(); showView("chat");
   activeTask = id;
   document.getElementById("input").value = t.prompt;
@@ -227,7 +306,7 @@ function updateDoneBar(){
   const bar = document.getElementById("doneBar");
   if(activeTask && !done[activeTask]){
     const t = findTask(activeTask);
-    document.getElementById("doneTxt").textContent = "Finished \"" + (t ? t.t : "step") + "\"?";
+    document.getElementById("doneTxt").textContent = (lang==="ar"?"انتهيت من ":"Finished ")+(t?T(t,"t"):"")+"?";
     bar.style.display = "flex";
   } else bar.style.display = "none";
 }
@@ -239,8 +318,8 @@ function completeTask(id){
   localStorage.setItem("journey_" + memberId, JSON.stringify(done));
   const p = phaseOf(id);
   const phaseDone = p && p.tasks.every(t=>done[t.id]);
-  if(phaseDone){ toast("🏆 PHASE COMPLETE: " + p.name + "!"); confetti(40); }
-  else { toast("✅ Step complete. Momentum building."); confetti(18); }
+  if(phaseDone){ toast(CH[lang].toastPhase + T(p,"name") + "!"); confetti(40); }
+  else { toast(CH[lang].toastStep); confetti(18); }
   renderHome(); updateDoneBar();
 }
 function toggleDone(id){
@@ -264,38 +343,131 @@ function confetti(n){
     setTimeout(()=>c.remove(), 2000);
   }
 }
+function savedMap(){ return JSON.parse(localStorage.getItem("map_" + memberId) || "null"); }
+function leakName(k){ const C=CH[lang]; return {t:C.lTraffic,h:C.lHub,n:C.lNurture,c:C.lConversion}[k] || k; }
 function renderHome(){
+  const C = CH[lang];
   const total = JOURNEY.reduce((a,p)=>a+p.tasks.length,0);
   const doneCount = JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0);
   const next = nextTask();
+  const sm = savedMap();
   let html = '<div class="line">';
   const nodes = [["👀","ATTENTION"],["🏠","HUB"],["🎓","DEMONSTRATION"],["💰","CONVERSION"]];
   const activeNode = Math.min(3, Math.floor((doneCount/total)*4));
   nodes.forEach((n,i)=>{ html += '<div class="node'+(i<=activeNode?' on':'')+'"><span>'+n[0]+'</span><small>'+n[1]+'</small></div>'; if(i<3) html += '<div class="wire'+(i<activeNode?' on':'')+'"></div>'; });
   html += '</div>';
-  if(next){
-    html += '<div class="hero"><div><div class="herolabel">YOUR NEXT MOVE</div><h2>'+next.t+'</h2><p>'+next.why+' · ~'+next.min+' min · 🔥 '+calcStreak()+'-day streak</p></div><button class="herobtn" onclick="startTaskById(\''+next.id+'\')">Start →</button></div>';
-  } else {
-    html += '<div class="hero"><div><div class="herolabel">JOURNEY COMPLETE</div><h2>You built the machine. Now run it daily.</h2><p>Keep your Daily Pulse streak alive. 🔥 '+calcStreak()+' days.</p></div><button class="herobtn" onclick="showView(\'chat\')">Open Coach</button></div>';
+  if(sm){
+    html += '<div class="mapchip">📊 '+C.momentum+': <b>'+sm.mom+'/100</b> · 💧 '+C.bigLeak+': <b>'+leakName(sm.leak)+'</b> · <a onclick="showView(\'map\')">'+C.openMap+'</a></div>';
   }
-  html += '<div class="prog"><div class="progtop"><span>Journey progress</span><span>'+doneCount+'/'+total+' steps</span></div><div class="bar"><div class="fill" style="width:'+Math.round((doneCount/total)*100)+'%"></div></div></div>';
+  if(next){
+    html += '<div class="hero"><div><div class="herolabel">'+C.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · ~'+next.min+' min · '+C.streak+calcStreak()+'-day</p></div><button class="herobtn" onclick="startTaskById(\''+next.id+'\')">'+C.start+' →</button></div>';
+  } else {
+    html += '<div class="hero"><div><div class="herolabel">JOURNEY COMPLETE</div><h2>'+(lang==="ar"?"بنيت الآلة. الآن شغّلها يومياً.":"You built the machine. Now run it daily.")+'</h2><p>'+C.streak+calcStreak()+'</p></div><button class="herobtn" onclick="showView(\'chat\')">'+C.tabChat+'</button></div>';
+  }
+  html += '<div class="prog"><div class="progtop"><span>'+C.prog+'</span><span>'+doneCount+'/'+total+' '+C.steps+'</span></div><div class="bar"><div class="fill" style="width:'+Math.round((doneCount/total)*100)+'%"></div></div></div>';
   JOURNEY.forEach((p,pi)=>{
     const pd = p.tasks.filter(t=>done[t.id]).length;
     const complete = pd === p.tasks.length;
-    html += '<div class="phase" style="animation-delay:'+(pi*0.08)+'s"><div class="phead"><span class="picon">'+p.icon+'</span><b>Phase '+(pi+1)+' — '+p.name+'</b>'+(complete?'<span class="pdone">✓ COMPLETE</span>':'')+'<small>'+pd+'/'+p.tasks.length+'</small></div>';
+    html += '<div class="phase" style="animation-delay:'+(pi*0.08)+'s"><div class="phead"><span class="picon">'+p.icon+'</span><b>'+C.phase+' '+(pi+1)+' — '+T(p,"name")+'</b>'+(complete?'<span class="pdone">'+C.complete+'</span>':'')+'<small>'+pd+'/'+p.tasks.length+'</small></div>';
     p.tasks.forEach((t,ti)=>{
       const isDone = !!done[t.id];
       const locked = RANK[tier] < RANK[modeTier(t.mode)];
       html += '<div class="task'+(isDone?' done':'')+(next&&next.id===t.id?' next':'')+'" style="animation-delay:'+(pi*0.08+ti*0.05)+'s">';
       html += '<button class="check" onclick="toggleDone(\''+t.id+'\')">'+(isDone?'✓':'')+'</button>';
-      html += '<div class="tbody"><b>'+t.t+'</b><small>'+t.why+' · ~'+t.min+' min'+(locked?' · 🔒 '+modeTier(t.mode):'')+'</small></div>';
-      html += '<button class="startbtn" onclick="startTaskById(\''+t.id+'\')">'+(locked?'🔒':(isDone?'Redo':'Start'))+'</button>';
+      html += '<div class="tbody"><b>'+T(t,"t")+'</b><small>'+T(t,"why")+' · ~'+t.min+' min'+(locked?' · 🔒 '+modeTier(t.mode):'')+'</small></div>';
+      html += '<button class="startbtn" onclick="startTaskById(\''+t.id+'\')">'+(locked?'🔒':(isDone?C.redo:C.start))+'</button>';
       html += '</div>';
     });
     html += '</div>';
   });
   document.getElementById("homeView").innerHTML = html;
 }
+/* ---------- BUSINESS MAP ---------- */
+function ans(qi,oi){ answers[qi]=oi; renderMap(); }
+function buildMap(){
+  if(answers.some(a=>a===null)){ toast(CH[lang].answerAll); return; }
+  const t=answers[0], h=answers[1], n=answers[2], c=Math.round((answers[3]+answers[4])/2), r=answers[5];
+  const mom = Math.round(((t+h+n+c)/8)*80 + (r/2)*20);
+  const layers = {t:t,h:h,n:n,c:c};
+  const leak = Object.keys(layers).reduce((a,b)=> layers[a]<=layers[b]?a:b);
+  const map = {t:t,h:h,n:n,c:c,mom:mom,leak:leak};
+  localStorage.setItem("map_" + memberId, JSON.stringify(map));
+  confetti(18);
+  renderMap(); renderHome();
+}
+function retakeMap(){ localStorage.removeItem("map_" + memberId); answers=[null,null,null,null,null,null]; renderMap(); }
+function sendMapToCoach(){
+  const sm = savedMap(); if(!sm) return;
+  mode = "xray"; renderModes(); showView("chat");
+  document.getElementById("input").value = "BUSINESS MAP RESULT - Momentum "+sm.mom+"/100 | Traffic "+sm.t+"/2 | Hub "+sm.h+"/2 | Nurture "+sm.n+"/2 | Conversion "+sm.c+"/2 | Biggest leak: "+leakName(sm.leak)+". Use this as my full picture and start coaching from the leak. Update my memory with these scores.";
+  send();
+}
+function renderMap(){
+  const C = CH[lang];
+  const mv = document.getElementById("mapView");
+  const sm = savedMap();
+  let html = '<h2 style="margin-bottom:4px">'+C.mapTitle+'</h2><p class="mapsub">'+C.mapSub+'</p>';
+  if(!sm){
+    html += '<div>';
+    QUIZ.forEach((q,qi)=>{
+      html += '<div class="q" style="animation-delay:'+(qi*0.05)+'s"><b>'+(qi+1)+'. '+(lang==="ar"?q.ar:q.en)+'</b><div class="opts">';
+      q.opts.forEach((o,oi)=>{
+        html += '<button class="opt'+(answers[qi]===oi?' on':'')+'" onclick="ans('+qi+','+oi+')">'+(lang==="ar"?o[1]:o[0])+'</button>';
+      });
+      html += '</div></div>';
+    });
+    html += '<button class="herobtn" onclick="buildMap()">'+C.buildMap+'</button></div>';
+  } else {
+    const cols = ["#ef4444","#ffd60a","#22c55e"];
+    const widths = [22,55,95];
+    html += '<div class="deck"><div class="ringbox"><svg width="120" height="120"><circle cx="60" cy="60" r="52" class="ringbg"/><circle cx="60" cy="60" r="52" class="ringfg" id="ring" style="stroke-dasharray:326.7;stroke-dashoffset:326.7"/></svg><div class="ringtxt">'+sm.mom+'<small>/100</small></div></div><div class="bars">';
+    [[C.lTraffic,sm.t],[C.lHub,sm.h],[C.lNurture,sm.n],[C.lConversion,sm.c]].forEach(x=>{
+      html += '<div class="brow"><small>'+x[0]+'</small><div class="btrack"><div class="bfill" data-w="'+widths[x[1]]+'" style="background:'+cols[x[1]]+'"></div></div></div>';
+    });
+    html += '</div></div><div class="mind">';
+    [[C.lTraffic,sm.t],[C.lHub,sm.h],[C.lNurture,sm.n],[C.lConversion,sm.c]].forEach((x,i,arr)=>{
+      html += '<div class="mnode" style="border-color:'+cols[x[1]]+';color:'+cols[x[1]]+'">'+x[0]+'</div>';
+      if(i<arr.length-1) html += '<div class="wire on"></div>';
+    });
+    html += '</div><div class="leak">💧 '+C.bigLeak+': <b>'+leakName(sm.leak)+'</b> — '+(lang==="ar"?"ابدأ الإصلاح من هنا.":"start fixing here.")+'</div>';
+    html += '<div class="mapbtns"><button class="startbtn" onclick="retakeMap()">'+C.retake+'</button><button class="herobtn" onclick="sendMapToCoach()">'+C.sendCoach+'</button></div>';
+  }
+  mv.innerHTML = html;
+  if(sm){
+    requestAnimationFrame(()=>{ setTimeout(()=>{
+      document.querySelectorAll(".bfill").forEach(b=>{ b.style.width = b.dataset.w + "%"; });
+      const ring = document.getElementById("ring");
+      if(ring) ring.style.strokeDashoffset = (326.7 * (1 - sm.mom/100)).toFixed(1);
+    }, 60); });
+  }
+}
+/* ---------- TOUR ---------- */
+const TOUR = [
+ {sel:"#homeView", en:"This is Mission Control: your journey, your next move, your progress. One path — no guessing.", ar:"هذه غرفة القيادة: رحلتك، خطوتك التالية، تقدمك. مسار واحد — بدون تخمين."},
+ {sel:"#tabMap", en:"The Business Map shows your funnel, momentum and biggest leak as a live visual — before you ever type.", ar:"خريطة العمل تُظهر قمعك وزخمك وأكبر تسريب كصورة حية — قبل أن تكتب أي شيء."},
+ {sel:"#tabChat", en:"The Coach: a $10K strategist that remembers you and walks you through every step.", ar:"المدرب: استراتيجي بمستوى 10 آلاف دولار يتذكرك ويمشي معك في كل خطوة."},
+ {sel:"#modes", en:"Operating modes. Locked ones open with your Whop plan.", ar:"أوضاع التشغيل. المقفلة تُفتح بخطتك على Whop."},
+ {sel:".pulse", en:"Daily Pulse: log your 90-minute rhythm and grow your streak.", ar:"النبض اليومي: سجّل روتين 90 دقيقة ونمِّ سلسلتك."},
+ {sel:".tierbox", en:"Your plan & unlock box: Free → Insider → Partner.", ar:"خطتك وصندوق الفتح: مجاني → إنسايدر → بارتنر."},
+];
+let tourI = 0;
+function showTour(){
+  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
+  if(tourI >= TOUR.length){ endTour(); return; }
+  const s = TOUR[tourI];
+  const el = document.querySelector(s.sel);
+  if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center", behavior:"smooth"}); }
+  document.getElementById("tourCard").style.display = "block";
+  document.getElementById("tourTxt").textContent = (lang==="ar") ? s.ar : s.en;
+  document.getElementById("tourStep").textContent = (tourI+1)+"/"+TOUR.length;
+}
+function nextTour(){ tourI++; showTour(); }
+function endTour(){
+  localStorage.setItem("tour_" + memberId, "1");
+  document.getElementById("tourCard").style.display = "none";
+  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
+}
+/* ---------- CHAT ---------- */
 function fmt(text){
   let s = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   s = s.replace(/```([\s\S]*?)```/g, function(m,c){ return "<pre>"+c+"</pre>"; });
@@ -352,9 +524,10 @@ async function send(){
   const text = inp.value.trim(); if(!text) return;
   addMsg(text, "user"); history.push({role:"user", content:text}); inp.value="";
   showTyping();
+  const wire = (lang==="ar") ? ("[The user prefers Arabic. Respond fully in Arabic.] " + text) : text;
   try{
     const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({message:text, history:history.slice(-16), mode:mode, member_id:memberId})});
+      body: JSON.stringify({message:wire, history:history.slice(-16), mode:mode, member_id:memberId})});
     hideTyping();
     if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key.", "ai"); return; }
     const data = await r.json();
@@ -386,6 +559,19 @@ async function loadTier(){
   }catch(e){}
   renderModes();
 }
+function renderModes(){
+  const box = document.getElementById("modes");
+  box.innerHTML = "";
+  MODES.forEach(m=>{
+    const locked = RANK[tier] < RANK[m.tier];
+    const b = document.createElement("button");
+    b.className = "mode" + (m.id===mode ? " active" : "");
+    b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+T(m,"t")+'</b><small>'+T(m,"d")+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
+    b.onclick = ()=>{ if(locked){ showView("chat"); addMsg("🔒 "+T(m,"t")+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); return; } mode = m.id; renderModes(); showView("chat"); addMsg((lang==="ar"?"تم التبديل إلى ":"Switched to ")+T(m,"t")+".", "ai"); };
+    box.appendChild(b);
+  });
+  document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
+}
 function toggleH(k){ habit[k] = !habit[k]; renderH(); }
 function renderH(){
   document.getElementById("hC").classList.toggle("on", habit.c);
@@ -400,7 +586,7 @@ function calcStreak(){
   while(log[dayKey(d)]){ streak++; d.setDate(d.getDate()-1); }
   return streak;
 }
-function renderStreak(){ document.getElementById("streak").textContent = "🔥 " + calcStreak() + "-day streak"; }
+function renderStreak(){ document.getElementById("streak").textContent = CH[lang].streak + calcStreak() + "-day streak"; }
 function logDay(){
   const log = JSON.parse(localStorage.getItem("habit_log") || "{}");
   log[dayKey(new Date())] = {c:habit.c, com:habit.com, conv:habit.conv};
@@ -413,24 +599,10 @@ function logDay(){
   document.getElementById("input").value = msg;
   send();
 }
-function renderModes(){
-  const box = document.getElementById("modes");
-  box.innerHTML = "";
-  MODES.forEach(m=>{
-    const locked = RANK[tier] < RANK[m.tier];
-    const b = document.createElement("button");
-    b.className = "mode" + (m.id===mode ? " active" : "");
-    b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+m.t+'</b><small>'+m.d+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
-    b.onclick = ()=>{ if(locked){ showView("chat"); addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock it.", "ai"); return; } mode = m.id; renderModes(); showView("chat"); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
-    box.appendChild(b);
-  });
-  document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
-}
-function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg("Chat cleared. What are we working on?", "ai"); }
-function closeTip(){ localStorage.setItem("onboarded_"+memberId, "1"); document.getElementById("tip").style.display="none"; }
-loadTier(); renderStreak(); showView("home");
-if(!localStorage.getItem("onboarded_"+memberId)) document.getElementById("tip").style.display = "block";
-addMsg("Welcome to Income Engine. I remember you across sessions, so we never start from zero. Your Journey Map is ready - hit Start on your next move whenever you are.", "ai");
+function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم مسح المحادثة. على ماذا نعمل؟":"Chat cleared. What are we working on?", "ai"); }
+loadTier(); renderStreak(); applyLang(); showView("home");
+if(!localStorage.getItem("tour_" + memberId)){ setTimeout(()=>{ tourI=0; showTour(); }, 800); }
+addMsg(CH[lang].welcome, "ai");
 </script>
 </body>
 </html>
