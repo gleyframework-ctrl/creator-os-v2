@@ -1,1082 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E5 AI Coach - Income Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            /* Income Engine Brand Colors - EXACT from your guide */
-            --bg-dark: #0A0A0F;
-            --bg-surface: #14141F;
-            --bg-elevated: #1C1C2E;
-            --gold: #FFD700;
-            --gold-hover: #E6C200;
-            --cyan: #00F0FF;
-            --cyan-hover: #00C8D7;
-            --purple: #8A2BE2;
-            --success: #00FF88;
-            --warning: #FFAA00;
-            --error: #FF3366;
-            --text-primary: #FFFFFF;
-            --text-secondary: #A0A0B0;
-            --text-disabled: #4A4A5A;
-            --border-cyan: rgba(0,240,255,0.15);
-            --border-gold: rgba(255,215,0,0.2);
-            --max-width: 768px;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-            line-height: 1.5;
-        }
-        
-        /* Sidebar - Income Engine Style */
-        .sidebar {
-            width: 280px;
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border-cyan);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            overflow-y: auto;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.5);
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-cyan);
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(255,215,0,0.3);
-        }
-        
-        .logo-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--gold), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .section-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .mode-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .mode-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.875rem;
-            padding: 0.875rem 1rem;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9375rem;
-            transition: all 0.2s;
-            text-align: left;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .mode-btn::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: var(--gold);
-            transform: scaleY(0);
-            transition: transform 0.2s;
-        }
-        
-        .mode-btn:hover {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            border-color: var(--border-cyan);
-        }
-        
-        .mode-btn:hover::before {
-            transform: scaleY(1);
-        }
-        
-        .mode-btn.active {
-            background: rgba(255,215,0,0.08);
-            border-color: var(--gold);
-            color: var(--gold);
-            box-shadow: 0 0 20px rgba(255,215,0,0.1);
-        }
-        
-        .mode-btn.active::before {
-            transform: scaleY(1);
-        }
-        
-        .mode-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-        
-        .mode-info {
-            flex: 1;
-        }
-        
-        .mode-name {
-            font-weight: 600;
-            font-size: 0.9375rem;
-        }
-        
-        .mode-desc {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.125rem;
-            line-height: 1.3;
-        }
-        
-        .mode-btn.active .mode-desc {
-            color: rgba(255,215,0,0.7);
-        }
-        
-        .beginner-help {
-            margin-top: auto;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(255,215,0,0.05));
-            border: 1px solid var(--border-cyan);
-            border-radius: 12px;
-        }
-        
-        .help-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--cyan);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .help-text {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-        
-        /* Main Chat Area */
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: calc(100vw - 280px);
-        }
-        
-        .chat-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-cyan);
-            background: var(--bg-surface);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        
-        .header-content h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: var(--text-primary);
-        }
-        
-        .header-content p {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-cyan);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .icon-btn:hover {
-            background: var(--bg-surface);
-            border-color: var(--cyan);
-            color: var(--cyan);
-            box-shadow: 0 0 12px rgba(0,240,255,0.2);
-        }
-        
-        /* Messages Area */
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        /* Welcome Screen - Beginner Friendly */
-        .welcome-container {
-            text-align: center;
-            padding: 3rem 2rem;
-            max-width: 640px;
-            margin: 2rem auto;
-        }
-        
-        .welcome-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255,215,0,0.1);
-            border: 1px solid var(--gold);
-            border-radius: 20px;
-            color: var(--gold);
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-        
-        .welcome-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(90deg, var(--gold), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .welcome-text {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-        
-        .starter-prompts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .starter-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-cyan);
-            border-radius: 12px;
-            padding: 1.25rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-        }
-        
-        .starter-card:hover {
-            border-color: var(--gold);
-            box-shadow: 0 0 20px rgba(255,215,0,0.1);
-            transform: translateY(-2px);
-        }
-        
-        .starter-icon {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 0.75rem;
-            color: var(--cyan);
-        }
-        
-        .starter-title {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.375rem;
-        }
-        
-        .starter-desc {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-        }
-        
-        /* Mode Switch Notice */
-        .mode-notice {
-            background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(0,240,255,0.05));
-            border: 1px solid var(--border-gold);
-            border-left: 3px solid var(--gold);
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.875rem;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .mode-notice-icon {
-            width: 24px;
-            height: 24px;
-            color: var(--gold);
-            flex-shrink: 0;
-            margin-top: 0.125rem;
-        }
-        
-        .mode-notice-content {
-            flex: 1;
-        }
-        
-        .mode-notice-title {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--gold);
-            margin-bottom: 0.25rem;
-        }
-        
-        .mode-notice-text {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-        
-        /* Message Bubbles - Income Engine Style */
-        .message {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            animation: fadeIn 0.3s ease-out;
-            max-width: var(--max-width);
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message.user {
-            align-items: flex-end;
-        }
-        
-        .message-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0 0.25rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .message.user .message-header {
-            flex-direction: row-reverse;
-        }
-        
-        .message-content {
-            max-width: 85%;
-            padding: 1rem 1.25rem;
-            border-radius: 12px;
-            line-height: 1.6;
-            font-size: 0.9375rem;
-        }
-        
-        .message.user .message-content {
-            background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-            color: var(--bg-dark);
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 12px rgba(255,215,0,0.2);
-        }
-        
-        .message.assistant .message-content {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-cyan);
-            border-bottom-left-radius: 4px;
-        }
-        
-        /* Typing Indicator */
-        .typing-indicator {
-            display: flex;
-            gap: 0.5rem;
-            padding: 1rem 1.25rem;
-            background: var(--bg-surface);
-            border-radius: 12px;
-            border: 1px solid var(--border-cyan);
-            width: fit-content;
-        }
-        
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--cyan);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-10px); opacity: 1; }
-        }
-        
-        /* Input Composer */
-        .chat-input-container {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--border-cyan);
-            background: var(--bg-surface);
-        }
-        
-        .input-wrapper {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            display: flex;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-        
-        .input-group {
-            flex: 1;
-            position: relative;
-        }
-        
-        .chat-input {
-            width: 100%;
-            padding: 1rem 1.25rem;
-            background: var(--bg-dark);
-            border: 1px solid var(--border-cyan);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 0.9375rem;
-            resize: none;
-            outline: none;
-            transition: all 0.2s;
-            font-family: inherit;
-            line-height: 1.5;
-        }
-        
-        .chat-input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(255,215,0,0.1);
-        }
-        
-        .chat-input::placeholder {
-            color: var(--text-secondary);
-        }
-        
-        .send-btn {
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, var(--gold), var(--gold-hover));
-            border: none;
-            border-radius: 12px;
-            color: var(--bg-dark);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9375rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 12px rgba(255,215,0,0.2);
-        }
-        
-        .send-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255,215,0,0.3);
-        }
-        
-        .send-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-        
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .send-btn.loading {
-            position: relative;
-            color: transparent;
-        }
-        
-        .send-btn.loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(10,10,15,0.3);
-            border-top-color: var(--bg-dark);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--bg-elevated);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-disabled);
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                top: 0;
-                bottom: 0;
-                z-index: 1000;
-                transition: left 0.3s;
-            }
-            
-            .sidebar.open {
-                left: 0;
-            }
-            
-            .chat-container {
-                max-width: 100vw;
-            }
-            
-            .menu-toggle {
-                display: block;
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1001;
-                padding: 0.75rem;
-                background: var(--bg-surface);
-                border: 1px solid var(--border-cyan);
-                border-radius: 8px;
-                cursor: pointer;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .chat-messages {
-                padding: 1rem;
-            }
-            
-            .message-content {
-                max-width: 95%;
-            }
-            
-            .chat-input-container {
-                padding: 1rem;
-            }
-            
-            .send-btn {
-                padding: 1rem 1.5rem;
-            }
-            
-            .starter-prompts {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E5 AI Coach - Income Engine</title>
+<style>
+:root{--bg:#0f1115;--panel:#13151a;--chat:#181b21;--ai:#22252a;--user:#ffd60a;--text:#e5e7eb;--muted:#9ca3af;--border:#2d3139;--accent:#ffd60a;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);height:100vh;display:flex;}
+aside{width:270px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px;}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;margin-bottom:22px;}
+.logo .bolt{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ffd60a,#22c55e);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.logo span{background:linear-gradient(90deg,#ffd60a,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sec{font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;}
+.mode{display:flex;gap:10px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:10px;padding:10px;cursor:pointer;color:var(--text);margin-bottom:6px;}
+.mode:hover{border-color:var(--border);}
+.mode.active{border-color:var(--accent);background:#1c1a05;}
+.mode .ic{font-size:16px;margin-top:2px;}
+.mode b{display:block;font-size:13px;}
+.mode small{color:var(--muted);font-size:11px;line-height:1.3;display:block;}
+.mode .lock{margin-left:auto;color:var(--muted);font-size:12px;}
+.tierbox{margin-top:auto;border:1px solid var(--border);border-radius:10px;padding:12px;}
+.tierbox .badge{display:inline-block;background:#262626;border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;margin-bottom:8px;}
+.tierbox input{width:100%;background:var(--chat);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px;}
+.tierbox button{width:100%;background:var(--accent);border:none;border-radius:6px;padding:8px;font-weight:700;cursor:pointer;}
+main{flex:1;display:flex;flex-direction:column;}
+header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--panel);}
+header h1{font-size:20px;}
+header p{color:var(--muted);font-size:12px;margin-top:3px;}
+#chat{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
+.msg{max-width:75%;padding:14px 18px;border-radius:12px;line-height:1.6;font-size:14px;white-space:pre-wrap;}
+.msg.user{align-self:flex-end;background:var(--user);color:#111;border-top-right-radius:2px;}
+.msg.ai{align-self:flex-start;background:var(--ai);border:1px solid var(--border);border-top-left-radius:2px;}
+footer{padding:18px 24px;border-top:1px solid var(--border);background:var(--panel);display:flex;gap:12px;}
+textarea{flex:1;background:var(--chat);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:10px;font-size:14px;resize:none;height:54px;outline:none;}
+#send{background:var(--accent);border:none;border-radius:10px;width:90px;font-weight:700;cursor:pointer;}
+</style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" id="sidebar">
-        <div class="logo">
-            <div class="logo-icon">
-                <i data-lucide="zap" style="width: 24px; height: 24px; color: #0A0A0F;"></i>
-            </div>
-            <span class="logo-text">Income Engine</span>
-        </div>
-        
-        <div class="section-label">
-            <i data-lucide="cpu" style="width: 14px; height: 14px;"></i>
-            <span>Operating Modes</span>
-        </div>
-        
-        <div class="mode-list">
-            <button class="mode-btn active" data-mode="coach" data-desc="Your daily 90-minute workflow coach">
-                <i data-lucide="clock" class="mode-icon" style="color: var(--gold);"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Daily Operator</div>
-                    <div class="mode-desc">90-min workflow: content → community → convos</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="xray" data-desc="Audit your business bottlenecks">
-                <i data-lucide="stethoscope" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Business X-Ray</div>
-                    <div class="mode-desc">Find & fix your biggest revenue leaks</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="funnel" data-desc="Map your conversion flow">
-                <i data-lucide="workflow" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Funnel Map</div>
-                    <div class="mode-desc">Identify leaks in your conversion flow</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="community" data-desc="Build your community OS">
-                <i data-lucide="users" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Community OS</div>
-                    <div class="mode-desc">One group, MVC setup, welcome posts</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="dm" data-desc="Write high-converting DMs">
-                <i data-lucide="message-square" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">DM Doctor</div>
-                    <div class="mode-desc">Scripts that convert without being salesy</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="offer" data-desc="Build your offer document">
-                <i data-lucide="file-text" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Offer Doc Builder</div>
-                    <div class="mode-desc">10 pillars + 14 building blocks</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="workshop" data-desc="Design your workshop arc">
-                <i data-lucide="presentation" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Workshop Architect</div>
-                    <div class="mode-desc">6-day belief installation sequence</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="content" data-desc="Generate content systems">
-                <i data-lucide="pen-tool" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Content Engine</div>
-                    <div class="mode-desc">VAGEL calendar + 7 frameworks</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="launch" data-desc="Plan your 21-day launch">
-                <i data-lucide="rocket" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Launch Planner</div>
-                    <div class="mode-desc">Pre-promo → drop → push → close</div>
-                </div>
-            </button>
-            
-            <button class="mode-btn" data-mode="alchemy" data-desc="Create short-form video scripts">
-                <i data-lucide="video" class="mode-icon"></i>
-                <div class="mode-info">
-                    <div class="mode-name">Alchemy (Video)</div>
-                    <div class="mode-desc">Hook → Body → CTA in 60 seconds</div>
-                </div>
-            </button>
-        </div>
-        
-        <div class="beginner-help">
-            <div class="help-title">
-                <i data-lucide="lightbulb" style="width: 16px; height: 16px;"></i>
-                <span>New Here?</span>
-            </div>
-            <div class="help-text">
-                Start with <strong>Business X-Ray</strong> to audit your ecosystem, or pick any mode above. Each one guides you step-by-step.
-            </div>
-        </div>
-    </aside>
-    
-    <!-- Main Chat Area -->
-    <main class="chat-container">
-        <div class="chat-header">
-            <div class="header-content">
-                <h1>CCC Diagnostic Brain</h1>
-                <p>Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p>
-            </div>
-            <div class="header-actions">
-                <button class="icon-btn" onclick="clearChat()" title="Clear conversation">
-                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
-                </button>
-                <button class="icon-btn" onclick="toggleHelp()" title="Show guidance">
-                    <i data-lucide="help-circle" style="width: 18px; height: 18px;"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="welcome-container">
-                <div class="welcome-badge">
-                    <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
-                    <span>Welcome to Income Engine</span>
-                </div>
-                <h2 class="welcome-title">Build Systems That Scale</h2>
-                <p class="welcome-text">
-                    I'm your CCC (Community Conversion) Brain — a $10K-level strategist trained on proven frameworks. 
-                    I'll diagnose before prescribing and give you actionable steps, not generic advice.
-                </p>
-                
-                <div class="starter-prompts">
-                    <button class="starter-card" onclick="useStarterPrompt('I need to audit my business. What are my biggest bottlenecks right now?')">
-                        <i data-lucide="search" class="starter-icon"></i>
-                        <div class="starter-title">Audit My Business</div>
-                        <div class="starter-desc">Find the earliest broken layer in my ecosystem</div>
-                    </button>
-                    
-                    <button class="starter-card" onclick="useStarterPrompt('Help me build my community from scratch using the One Group method')">
-                        <i data-lucide="users" class="starter-icon"></i>
-                        <div class="starter-title">Build My Community</div>
-                        <div class="starter-desc">Set up the MVC 6 non-negotiables</div>
-                    </button>
-                    
-                    <button class="starter-card" onclick="useStarterPrompt('I need to write DMs that convert. Show me the framework')">
-                        <i data-lucide="message-circle" class="starter-icon"></i>
-                        <div class="starter-title">Write Converting DMs</div>
-                        <div class="starter-desc">Learn the 3-touch follow-up system</div>
-                    </button>
-                    
-                    <button class="starter-card" onclick="useStarterPrompt('Create my offer document using the 10 pillars framework')">
-                        <i data-lucide="file-plus" class="starter-icon"></i>
-                        <div class="starter-title">Build My Offer</div>
-                        <div class="starter-desc">10 pillars + 14 building blocks</div>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="chat-input-container">
-            <div class="input-wrapper">
-                <div class="input-group">
-                    <textarea 
-                        class="chat-input" 
-                        id="chatInput" 
-                        placeholder="Describe your challenge or ask for guidance... (Shift+Enter for new line)"
-                        rows="1"
-                        onkeypress="handleKeyPress(event)"
-                        oninput="autoResize(this)"
-                    ></textarea>
-                </div>
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                    <span>Send</span>
-                    <i data-lucide="send" style="width: 16px; height: 16px;"></i>
-                </button>
-            </div>
-        </div>
-    </main>
+<aside>
+  <div class="logo"><div class="bolt">⚡</div><span>Income Engine</span></div>
+  <div class="sec">OPERATING MODES</div>
+  <div id="modes"></div>
+  <div class="tierbox">
+    <span class="badge" id="tierBadge">FREE PLAN</span>
+    <input id="lic" placeholder="Whop license key (buyers only)">
+    <button onclick="unlock()">Unlock Tier</button>
+  </div>
+</aside>
+<main>
+  <header>
+    <div><h1>CCC Diagnostic Brain</h1><p>Your $10K-level Community Conversion Strategist — trained on Flip Moss & Nate Ryan's operating system</p></div>
+    <button class="mode" onclick="clearChat()" style="width:auto">🗑️</button>
+  </header>
+  <div id="chat"></div>
+  <footer>
+    <textarea id="input" placeholder="Describe your challenge or ask for guidance... (Shift+Enter for new line)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+    <button id="send" onclick="send()">Send ➤</button>
+  </footer>
+</main>
+<script>
+const API_URL = "";
+const MODES = [
+ {id:"coach", tier:"free", ic:"🕐", t:"Daily Operator", d:"90-min workflow: content → community → convos"},
+ {id:"xray", tier:"free", ic:"🩺", t:"Business X-Ray", d:"Find & fix your biggest revenue leaks"},
+ {id:"funnel", tier:"free", ic:"🔗", t:"Funnel Map", d:"Identify leaks in your conversion flow"},
+ {id:"community", tier:"insider", ic:"👥", t:"Community OS", d:"One group, MVC setup, welcome posts"},
+ {id:"dm", tier:"insider", ic:"💬", t:"DM Doctor", d:"Scripts that convert without being salesy"},
+ {id:"offer", tier:"partner", ic:"📄", t:"Offer Doc Builder", d:"10 pillars + 14 building blocks"},
+ {id:"workshop", tier:"partner", ic:"🎪", t:"Workshop Architect", d:"6-day belief installation sequence"},
+ {id:"content", tier:"insider", ic:"✍️", t:"Content Engine", d:"VAGEL calendar + 7 frameworks"},
+ {id:"launch", tier:"partner", ic:"🚀", t:"Launch Planner", d:"Pre-promo → drop → push → close"},
+ {id:"alchemy", tier:"insider", ic:"🎬", t:"Alchemy (Video)", d:"Hook → Body → CTA in 60 seconds"},
+];
+const RANK = {free:0, insider:1, partner:2};
+let memberId = localStorage.getItem("member_id");
+if(!memberId){ memberId = "m-" + Math.random().toString(36).slice(2,10); localStorage.setItem("member_id", memberId); }
+let tier = localStorage.getItem("tier") || "free";
+let mode = "coach";
+let history = [];
 
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-        
-        // Railway API URL
-        const API_URL = 'https://e5-ai-coach-production.up.railway.app';
-        
-        let currentMode = 'coach';
-        let chatHistory = [];
-        let hasInteracted = false;
-        
-        // Mode button handlers with contextual guidance
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentMode = this.dataset.mode;
-                
-                const modeName = this.querySelector('.mode-name').textContent;
-                const modeDesc = this.dataset.desc;
-                
-                // Remove welcome on first interaction
-                const welcomeMsg = document.querySelector('.welcome-container');
-                if (welcomeMsg) {
-                    welcomeMsg.remove();
-                    hasInteracted = true;
-                }
-                
-                // Show mode switch notice with guidance
-                addModeNotice(modeName, modeDesc);
-            });
-        });
-        
-        function handleKeyPress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-        
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-        }
-        
-        function useStarterPrompt(text) {
-            document.getElementById('chatInput').value = text;
-            sendMessage();
-        }
-        
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const sendBtn = document.getElementById('sendBtn');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            // Remove welcome message
-            const welcomeMsg = document.querySelector('.welcome-container');
-            if (welcomeMsg) {
-                welcomeMsg.remove();
-                hasInteracted = true;
-            }
-            
-            // Add user message
-            addMessage(message, 'user');
-            input.value = '';
-            input.style.height = 'auto';
-            
-            // Show loading state
-            sendBtn.disabled = true;
-            sendBtn.classList.add('loading');
-            
-            // Show typing indicator
-            showTypingIndicator();
-            
-            try {
-                const response = await fetch(`${API_URL}/api/chat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        mode: currentMode,
-                        history: chatHistory.slice(-16)
-                    })
-                });
-                
-                removeTypingIndicator();
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const reply = data.reply || data.response || data.message;
-                
-                addMessage(reply, 'assistant');
-                
-                // Update history
-                chatHistory.push({ role: 'user', content: message });
-                chatHistory.push({ role: 'assistant', content: reply });
-                
-            } catch (error) {
-                console.error('Error:', error);
-                removeTypingIndicator();
-                addMessage('I encountered an error. Please try again.', 'assistant');
-            } finally {
-                sendBtn.disabled = false;
-                sendBtn.classList.remove('loading');
-                input.focus();
-            }
-        }
-        
-        function addMessage(content, role) {
-            const chatMessages = document.getElementById('chatMessages');
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-            
-            const label = role === 'user' ? 'You' : 'CCC Brain';
-            const icon = role === 'user' ? 'user' : 'cpu';
-            
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <i data-lucide="${icon}" style="width: 14px; height: 14px;"></i>
-                    <span>${label}</span>
-                </div>
-                <div class="message-content">${formatMessage(content)}</div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            lucide.createIcons();
-            scrollToBottom();
-        }
-        
-        function addModeNotice(modeName, modeDesc) {
-            const chatMessages = document.getElementById('chatMessages');
-            
-            const notice = document.createElement('div');
-            notice.className = 'mode-notice';
-            notice.innerHTML = `
-                <i data-lucide="info" class="mode-notice-icon"></i>
-                <div class="mode-notice-content">
-                    <div class="mode-notice-title">Switched to ${modeName}</div>
-                    <div class="mode-notice-text">${modeDesc}. Ask me anything about this topic.</div>
-                </div>
-            `;
-            
-            chatMessages.appendChild(notice);
-            lucide.createIcons();
-            scrollToBottom();
-        }
-        
-        function formatMessage(text) {
-            return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
-        }
-        
-        function showTypingIndicator() {
-            const chatMessages = document.getElementById('chatMessages');
-            const indicator = document.createElement('div');
-            indicator.className = 'message assistant typing';
-            indicator.id = 'typing-indicator';
-            indicator.innerHTML = `
-                <div class="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
-            chatMessages.appendChild(indicator);
-            scrollToBottom();
-        }
-        
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typing-indicator');
-            if (indicator) {
-                indicator.remove();
-            }
-        }
-        
-        function scrollToBottom() {
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        function clearChat() {
-            chatHistory = [];
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = `
-                <div class="welcome-container">
-                    <div class="welcome-badge">
-                        <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
-                        <span>Welcome to Income Engine</span>
-                    </div>
-                    <h2 class="welcome-title">Build Systems That Scale</h2>
-                    <p class="welcome-text">
-                        I'm your CCC (Community Conversion) Brain — a $10K-level strategist trained on proven frameworks. 
-                        I'll diagnose before prescribing and give you actionable steps, not generic advice.
-                    </p>
-                    
-                    <div class="starter-prompts">
-                        <button class="starter-card" onclick="useStarterPrompt('I need to audit my business. What are my biggest bottlenecks right now?')">
-                            <i data-lucide="search" class="starter-icon"></i>
-                            <div class="starter-title">Audit My Business</div>
-                            <div class="starter-desc">Find the earliest broken layer in my ecosystem</div>
-                        </button>
-                        
-                        <button class="starter-card" onclick="useStarterPrompt('Help me build my community from scratch using the One Group method')">
-                            <i data-lucide="users" class="starter-icon"></i>
-                            <div class="starter-title">Build My Community</div>
-                            <div class="starter-desc">Set up the MVC 6 non-negotiables</div>
-                        </button>
-                        
-                        <button class="starter-card" onclick="useStarterPrompt('I need to write DMs that convert. Show me the framework')">
-                            <i data-lucide="message-circle" class="starter-icon"></i>
-                            <div class="starter-title">Write Converting DMs</div>
-                            <div class="starter-desc">Learn the 3-touch follow-up system</div>
-                        </button>
-                        
-                        <button class="starter-card" onclick="useStarterPrompt('Create my offer document using the 10 pillars framework')">
-                            <i data-lucide="file-plus" class="starter-icon"></i>
-                            <div class="starter-title">Build My Offer</div>
-                            <div class="starter-desc">10 pillars + 14 building blocks</div>
-                        </button>
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-        
-        function toggleHelp() {
-            alert('💡 Pro Tips:\n\n1. Start with Business X-Ray to audit your ecosystem\n2. Each mode has specific capabilities - check the sidebar\n3. Be specific about your situation for better advice\n4. The AI remembers your conversation context\n5. Use Shift+Enter for new lines');
-        }
-        
-        // Mobile menu toggle
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-        }
-    </script>
+function renderModes(){
+  const box = document.getElementById("modes");
+  box.innerHTML = "";
+  MODES.forEach(m=>{
+    const locked = RANK[tier] < RANK[m.tier];
+    const b = document.createElement("button");
+    b.className = "mode" + (m.id===mode ? " active" : "");
+    b.innerHTML = '<span class="ic">'+m.ic+'</span><span><b>'+m.t+'</b><small>'+m.d+'</small></span>'+(locked?'<span class="lock">🔒</span>':'');
+    b.onclick = ()=>{ if(locked){ addMsg("🔒 "+m.t+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key below to unlock it.", "ai"); return; } mode = m.id; renderModes(); addMsg("Switched to "+m.t+". Ask me anything about this topic.", "ai"); };
+    box.appendChild(b);
+  });
+  document.getElementById("tierBadge").textContent = tier.toUpperCase()+" PLAN";
+}
+function addMsg(text, who){
+  const c = document.getElementById("chat");
+  const d = document.createElement("div");
+  d.className = "msg "+who;
+  d.textContent = text;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+async function send(){
+  const inp = document.getElementById("input");
+  const text = inp.value.trim(); if(!text) return;
+  addMsg(text, "user"); history.push({role:"user", content:text}); inp.value="";
+  try{
+    const r = await fetch(API_URL+"/api/chat", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({message:text, history:history.slice(-16), mode:mode, member_id:memberId})});
+    if(r.status===403){ addMsg("🔒 That mode is locked for your current tier. Unlock with your Whop license key below.", "ai"); return; }
+    const data = await r.json();
+    const reply = data.reply || data.response || data.message || "Error.";
+    addMsg(reply, "ai"); history.push({role:"assistant", content:reply});
+  }catch(e){ addMsg("⚠️ Connection error: "+e.message, "ai"); }
+}
+async function unlock(){
+  const key = document.getElementById("lic").value.trim(); if(!key) return;
+  try{
+    const r = await fetch(API_URL+"/api/unlock", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({member_id:memberId, license_key:key})});
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.detail || "invalid license");
+    tier = data.tier; localStorage.setItem("tier", tier); renderModes();
+    addMsg("✅ Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are now open.", "ai");
+  }catch(e){ addMsg("⚠️ Unlock failed: "+e.message, "ai"); }
+}
+async function loadTier(){
+  try{
+    const r = await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId));
+    const data = await r.json();
+    if(data.tier){ tier = data.tier; localStorage.setItem("tier", tier); }
+  }catch(e){}
+  renderModes();
+}
+function clearChat(){ history=[]; document.getElementById("chat").innerHTML=""; addMsg("Chat cleared. What are we working on?", "ai"); }
+loadTier();
+addMsg("Welcome to Income Engine. I remember you across sessions, so we never start from zero. What's the biggest bottleneck in your business right now?", "ai");
+</script>
 </body>
 </html>
