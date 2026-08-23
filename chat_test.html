@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E5 AI Coach – Octovigintillion Executive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <title>E5 AI Coach – Quattuortrigintillion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         /* ================================================================
-           OCTOVIGINTILLION BASE – Ultra-Premium Dark Glassmorphism
+           QUATTUORTRIGINTILLION – Ultimate Calm Luxury
            ================================================================ */
         *,
         *::before,
@@ -19,26 +19,22 @@
         }
 
         :root {
-            --bg-primary: #05080f;
-            --bg-secondary: #0a1420;
+            --bg: #070b14;
+            --bg-surface: #0d1628;
             --bg-card: rgba(255, 255, 255, 0.03);
             --bg-card-hover: rgba(255, 255, 255, 0.06);
-            --border-color: rgba(255, 255, 255, 0.06);
-            --border-glow: rgba(245, 158, 11, 0.15);
-            --text-primary: #f0f4ff;
+            --border: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --text: #edf2f7;
             --text-secondary: #8899bb;
-            --text-muted: #556688;
+            --text-muted: #445566;
             --gold: #f59e0b;
             --gold-light: #fbbf24;
-            --gold-glow: rgba(245, 158, 11, 0.25);
+            --gold-glow: rgba(245, 158, 11, 0.2);
             --purple: #8b5cf6;
-            --purple-glow: rgba(139, 92, 246, 0.2);
             --green: #4ade80;
-            --green-glow: rgba(74, 222, 128, 0.2);
-            --red: #f87171;
-            --pink: #f472b6;
-            --shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
-            --radius: 28px;
+            --radius: 24px;
+            --shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
             --transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -51,24 +47,24 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 16px;
-            background-image: radial-gradient(ellipse at 20% 30%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+            background-image: radial-gradient(ellipse at 25% 30%, rgba(245, 158, 11, 0.035), transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(139, 92, 246, 0.025), transparent 50%);
         }
 
         .app {
             width: 100%;
-            max-width: 1460px;
-            height: 96vh;
-            max-height: 1024px;
-            background: var(--bg-secondary);
+            max-width: 1440px;
+            height: 95vh;
+            max-height: 1000px;
+            background: var(--bg-surface);
             border-radius: var(--radius);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
@@ -80,182 +76,137 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.03), transparent 60%);
+            background: radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.02), transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
 
         /* ================================================================
-           HEADER – with dynamic personalization
+           HEADER – Minimal, Clean
            ================================================================ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 28px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border);
             flex-shrink: 0;
             position: relative;
             z-index: 2;
             flex-wrap: wrap;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(12px);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
-            color: var(--bg-primary);
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
-            animation: logoPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes logoPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(245, 158, 11, 0.4);
-            }
+            color: var(--bg);
+            box-shadow: 0 0 30px var(--gold-glow);
         }
 
         .logo-text {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
         }
 
-        .logo-sub {
-            font-size: 10px;
-            color: var(--text-muted);
-            font-weight: 500;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            -webkit-text-fill-color: var(--text-muted);
-            margin-left: 4px;
+        .logo-text span {
+            color: var(--gold-light);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .greeting {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
-            font-weight: 500;
-            padding: 6px 12px;
+            padding: 4px 14px;
             background: var(--bg-card);
             border-radius: 40px;
-            border: 1px solid var(--border-color);
-            opacity: 0.8;
-            transition: var(--transition);
-        }
-
-        .greeting:hover {
-            opacity: 1;
-            border-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--border);
         }
 
         .tier-badge {
-            padding: 5px 16px;
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            background: rgba(245, 158, 11, 0.12);
-            border: 1px solid rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.15);
             color: var(--gold-light);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: default;
-            transition: var(--transition);
         }
 
-        .tier-badge:hover {
-            background: rgba(245, 158, 11, 0.18);
-            border-color: rgba(245, 158, 11, 0.35);
-            transform: scale(1.02);
-        }
-
-        .btn-outline {
+        .btn-icon {
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             color: var(--text-secondary);
-            padding: 6px 16px;
+            padding: 6px 12px;
             border-radius: 40px;
-            font-weight: 500;
             font-size: 12px;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
-        .btn-outline:hover {
+        .btn-icon:hover {
             background: var(--bg-card);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
-            transform: translateY(-1px);
+            border-color: var(--border-hover);
+            color: var(--text);
         }
 
-        .btn-primary {
+        .btn-gold {
             background: linear-gradient(135deg, var(--gold), var(--gold-light));
             border: none;
-            color: var(--bg-primary);
-            padding: 6px 20px;
+            color: var(--bg);
+            padding: 6px 18px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 12px;
             cursor: pointer;
             transition: var(--transition);
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            box-shadow: 0 4px 20px var(--gold-glow);
         }
 
-        .btn-primary:hover {
+        .btn-gold:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
         /* ================================================================
-           TAB NAV
+           TAB NAV – Simple
            ================================================================ */
         .tab-nav {
             display: flex;
-            gap: 4px;
+            gap: 0;
             padding: 0 28px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
             flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.1);
             position: relative;
             z-index: 2;
         }
@@ -263,49 +214,34 @@
         .tab-btn {
             background: transparent;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 18px;
             color: var(--text-muted);
             font-weight: 500;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             transition: var(--transition);
             border-bottom: 2px solid transparent;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             position: relative;
         }
 
-        .tab-btn::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--gold);
-            transition: var(--transition);
-            transform: translateX(-50%);
-        }
-
         .tab-btn:hover {
-            color: var(--text-primary);
+            color: var(--text-secondary);
         }
 
         .tab-btn.active {
             color: var(--gold-light);
-        }
-
-        .tab-btn.active::after {
-            width: 80%;
+            border-bottom-color: var(--gold);
         }
 
         .tab-btn i {
-            font-size: 15px;
+            font-size: 14px;
         }
 
         /* ================================================================
-           SIDEBAR
+           MAIN LAYOUT – Sidebar hidden by default, clean focus
            ================================================================ */
         .main-area {
             display: flex;
@@ -315,11 +251,33 @@
             z-index: 1;
         }
 
+        /* Sidebar – hidden until user hovers or clicks a toggle */
+        .sidebar-toggle {
+            display: none;
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            z-index: 10;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 6px 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-card-hover);
+            color: var(--text);
+        }
+
         .sidebar {
-            width: 250px;
+            width: 220px;
             background: rgba(255, 255, 255, 0.015);
-            border-right: 1px solid var(--border-color);
-            padding: 16px 12px;
+            border-right: 1px solid var(--border);
+            padding: 16px 10px;
             overflow-y: auto;
             flex-shrink: 0;
             display: none;
@@ -333,13 +291,13 @@
         }
 
         .sidebar-title {
-            font-size: 9px;
+            font-size: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.15em;
             color: var(--text-muted);
             margin-bottom: 12px;
             font-weight: 600;
-            padding-left: 8px;
+            padding-left: 6px;
         }
 
         .mode-list {
@@ -351,12 +309,12 @@
         .mode-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 10px;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: var(--transition);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             color: var(--text-secondary);
             border: 1px solid transparent;
@@ -365,137 +323,103 @@
 
         .mode-item:hover {
             background: var(--bg-card);
-            color: var(--text-primary);
-            transform: translateX(2px);
+            color: var(--text);
         }
 
         .mode-item.active {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: rgba(245, 158, 11, 0.15);
+            background: rgba(245, 158, 11, 0.06);
+            border-color: rgba(245, 158, 11, 0.1);
             color: var(--gold-light);
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.05);
         }
 
         .mode-item .icon {
-            width: 24px;
+            width: 20px;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .mode-item .tier-tag {
             font-size: 7px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 1px 6px;
             border-radius: 20px;
             color: var(--text-muted);
             margin-left: auto;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             font-weight: 600;
         }
 
         .mode-item .tier-tag.free {
-            background: rgba(34, 197, 94, 0.12);
+            background: rgba(34, 197, 94, 0.08);
             color: var(--green);
         }
-
         .mode-item .tier-tag.insider {
-            background: rgba(245, 158, 11, 0.12);
+            background: rgba(245, 158, 11, 0.08);
             color: var(--gold-light);
         }
-
         .mode-item .tier-tag.partner {
-            background: rgba(168, 85, 247, 0.12);
+            background: rgba(168, 85, 247, 0.08);
             color: #c084fc;
         }
 
         .mode-item.locked {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
         }
-
         .mode-item.locked:hover {
-            transform: none;
             background: transparent;
+            transform: none;
         }
 
-        .mode-item .progress-dot {
-            width: 5px;
-            height: 5px;
+        .mode-item .dot {
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
             margin-left: 4px;
-            transition: var(--transition);
         }
-
-        .mode-item .progress-dot.complete {
+        .mode-item .dot.complete {
             background: var(--green);
-            box-shadow: 0 0 12px var(--green-glow);
         }
-
-        .mode-item .progress-dot.partial {
+        .mode-item .dot.partial {
             background: var(--gold);
-            box-shadow: 0 0 12px var(--gold-glow);
         }
-
-        .mode-item .progress-dot.pending {
+        .mode-item .dot.pending {
             background: var(--text-muted);
         }
 
-        .mode-item .tooltip {
-            display: none;
-            position: absolute;
-            left: 110%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 10px;
-            font-weight: 400;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        }
-
-        .mode-item:hover .tooltip {
-            display: block;
-        }
-
         /* ================================================================
-           CONTENT AREA
+           CONTENT AREA – Clean, Focused
            ================================================================ */
         .content-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
-            background: var(--bg-primary);
+            background: var(--bg);
             position: relative;
             overflow: hidden;
         }
 
-        /* ----- DASHBOARD ----- */
+        /* ----- DASHBOARD – Minimal, One Primary View ----- */
         .dashboard-view {
             display: none;
             flex-direction: column;
             padding: 20px 28px;
             overflow-y: auto;
             flex: 1;
-            gap: 20px;
-            animation: fadeSlideIn 0.5s ease;
+            gap: 18px;
+            animation: fadeIn 0.5s ease;
         }
 
         .dashboard-view.active {
             display: flex;
         }
 
-        @keyframes fadeSlideIn {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(16px);
+                transform: translateY(12px);
             }
             to {
                 opacity: 1;
@@ -503,283 +427,253 @@
             }
         }
 
-        /* welcome banner */
-        .welcome-banner {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(139, 92, 246, 0.04));
-            border: 1px solid rgba(245, 158, 11, 0.08);
+        /* Primary Metric – Large, Calm */
+        .primary-metric {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding: 20px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+        }
+
+        .primary-metric .ring-wrap {
             position: relative;
-            overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .welcome-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.04), transparent 70%);
-            pointer-events: none;
-        }
-
-        .welcome-banner .left h2 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--text-primary), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .welcome-banner .left p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-            -webkit-text-fill-color: var(--text-secondary);
-        }
-
-        .welcome-banner .right {
-            display: flex;
-            gap: 10px;
-        }
-
-        .welcome-banner .right .stat {
-            text-align: center;
-            padding: 4px 16px;
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .welcome-banner .right .stat .num {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--gold-light);
-        }
-
-        .welcome-banner .right .stat .label {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        /* dashboard grid */
-        .dash-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 14px;
-        }
-
-        @media (max-width: 1100px) {
-            .dash-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 650px) {
-            .dash-grid {
-                grid-template-columns: 1fr;
-            }
-            .welcome-banner .right .stat .num {
-                font-size: 16px;
-            }
-        }
-
-        .dash-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px 18px;
-            transition: var(--transition);
-        }
-
-        .dash-card:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .dash-card h4 {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dash-card .value {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .dash-card .sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        /* Health Ring */
-        .ring-container {
-            position: relative;
-            display: inline-block;
-            margin: 0 auto;
-        }
-
-        .ring-container svg {
+        .primary-metric .ring-wrap svg {
             transform: rotate(-90deg);
         }
 
-        .ring-container .bg {
+        .primary-metric .ring-wrap .bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.04);
-            stroke-width: 6;
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 5;
         }
 
-        .ring-container .fg {
+        .primary-metric .ring-wrap .fg {
             fill: none;
             stroke: var(--gold);
-            stroke-width: 6;
+            stroke-width: 5;
             stroke-linecap: round;
             transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1);
-            filter: drop-shadow(0 0 12px var(--gold-glow));
+            filter: drop-shadow(0 0 16px var(--gold-glow));
         }
 
-        .ring-container .center-text {
+        .primary-metric .ring-wrap .center {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--text);
         }
 
-        /* Framework mini grid */
-        .framework-grid-dash {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-top: 6px;
+        .primary-metric .info h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
         }
 
-        .fw-mini {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 6px;
-            transition: var(--transition);
+        .primary-metric .info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
 
-        .fw-mini:hover {
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .fw-mini .status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-
-        .fw-mini .status.done {
-            background: var(--green);
-            box-shadow: 0 0 12px var(--green-glow);
-        }
-        .fw-mini .status.pending {
-            background: var(--text-muted);
-        }
-        .fw-mini .status.locked {
-            background: var(--gold);
-            opacity: 0.3;
-        }
-
-        /* Rule of 100 */
-        .rule-100-tracker {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        .primary-metric .info .sub {
+            font-size: 12px;
+            color: var(--text-muted);
             margin-top: 4px;
         }
 
-        .rule-100-tracker .top-row {
+        .primary-metric .quick-actions {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 8px;
+            margin-left: auto;
             flex-wrap: wrap;
         }
 
-        .rule-100-tracker .count {
+        .primary-metric .quick-actions button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 6px 16px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .primary-metric .quick-actions button:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
+
+        /* Secondary Grid – Clean Cards */
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .secondary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .secondary-grid {
+                grid-template-columns: 1fr;
+            }
+            .primary-metric {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            .primary-metric .quick-actions {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .card h4 {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .card .sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Framework progress – simple dots */
+        .fw-strip {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .fw-strip .dot {
+            width: 24px;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            transition: var(--transition);
+        }
+
+        .fw-strip .dot.done {
+            background: var(--green);
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
+        }
+        .fw-strip .dot.partial {
+            background: var(--gold);
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
+
+        /* Rule of 100 – Clean */
+        .rule-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .rule-row .count {
             font-size: 26px;
             font-weight: 700;
             color: var(--gold-light);
-            min-width: 50px;
         }
 
-        .rule-100-tracker .streak {
-            font-size: 13px;
+        .rule-row .streak {
+            font-size: 12px;
             color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: 4px;
             padding: 2px 12px;
             background: rgba(245, 158, 11, 0.06);
             border-radius: 40px;
-            border: 1px solid rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.06);
         }
 
-        .rule-calendar {
+        .rule-row button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 4px 14px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .rule-row button:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
+
+        /* Mini calendar */
+        .mini-cal {
             display: flex;
             gap: 4px;
-            margin-top: 4px;
+            margin-top: 8px;
         }
 
-        .rule-calendar .day {
-            width: 26px;
-            height: 26px;
+        .mini-cal .day {
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.03);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            cursor: default;
+            font-size: 9px;
+            color: var(--text-muted);
             border: 1px solid transparent;
+            transition: var(--transition);
         }
 
-        .rule-calendar .day.hit {
+        .mini-cal .day.hit {
             background: var(--green);
-            color: var(--bg-primary);
-            box-shadow: 0 0 16px var(--green-glow);
+            color: var(--bg);
             border-color: var(--green);
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
         }
 
-        .rule-calendar .day.today {
+        .mini-cal .day.today {
             border-color: var(--gold);
         }
 
-        .rule-calendar .day:hover {
-            transform: scale(1.1);
-        }
-
-        /* ----- CHAT VIEW ----- */
+        /* ----- CHAT VIEW – Clean, Contextual ----- */
         .chat-view {
             display: flex;
             flex-direction: column;
@@ -797,24 +691,24 @@
             padding: 16px 24px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .message {
             display: flex;
             gap: 10px;
-            max-width: 80%;
-            animation: messageIn 0.4s ease;
+            max-width: 78%;
+            animation: msgIn 0.35s ease;
         }
 
-        @keyframes messageIn {
+        @keyframes msgIn {
             from {
                 opacity: 0;
-                transform: translateY(12px) scale(0.96);
+                transform: translateY(8px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
@@ -824,76 +718,66 @@
         }
 
         .message .avatar {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+            border: 1px solid var(--border);
         }
 
         .message.ai .avatar {
             background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: var(--bg-primary);
+            color: var(--bg);
             box-shadow: 0 0 20px var(--gold-glow);
         }
 
         .message.user .avatar {
             background: linear-gradient(135deg, var(--purple), #6d28d9);
             color: white;
-            box-shadow: 0 0 20px var(--purple-glow);
         }
 
         .message .bubble {
             background: var(--bg-card);
-            backdrop-filter: blur(10px);
             padding: 10px 16px;
             border-radius: 14px;
             font-size: 13px;
             line-height: 1.6;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .message .bubble:hover {
-            border-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
         }
 
         .message.user .bubble {
-            background: rgba(139, 92, 246, 0.12);
-            border-color: rgba(139, 92, 246, 0.15);
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.12);
         }
 
-        /* typing indicator */
-        .typing-indicator {
+        /* typing */
+        .typing {
             display: flex;
             gap: 4px;
             padding: 10px 16px;
             background: var(--bg-card);
             border-radius: 14px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             width: fit-content;
         }
 
-        .typing-indicator span {
+        .typing span {
             width: 6px;
             height: 6px;
             border-radius: 50%;
             background: var(--gold-light);
-            display: inline-block;
             animation: typingBounce 1.4s infinite;
         }
 
-        .typing-indicator span:nth-child(2) {
+        .typing span:nth-child(2) {
             animation-delay: 0.2s;
         }
-        .typing-indicator span:nth-child(3) {
+        .typing span:nth-child(3) {
             animation-delay: 0.4s;
         }
 
@@ -904,21 +788,19 @@
                 transform: translateY(0);
             }
             30% {
-                transform: translateY(-6px);
+                transform: translateY(-5px);
             }
         }
 
-        /* status bar */
+        /* status */
         .status-bar {
-            padding: 4px 24px;
+            padding: 3px 24px;
             font-size: 10px;
             color: var(--text-muted);
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
         }
 
@@ -942,66 +824,55 @@
             }
         }
 
-        /* input bar */
+        /* input */
         .input-bar {
-            padding: 12px 24px 16px;
-            border-top: 1px solid var(--border-color);
+            padding: 10px 24px 14px;
+            border-top: 1px solid var(--border);
             display: flex;
             gap: 8px;
             align-items: center;
             flex-wrap: wrap;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .input-bar .mode-selector {
             display: flex;
             align-items: center;
-            gap: 6px;
-            flex: 0 0 auto;
-        }
-
-        .input-bar .mode-selector label {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
+            gap: 4px;
         }
 
         .input-bar .mode-selector select {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 40px;
-            padding: 7px 14px;
-            color: var(--text-primary);
-            font-size: 12px;
+            padding: 6px 12px;
+            color: var(--text);
+            font-size: 11px;
             font-weight: 500;
             outline: none;
-            min-width: 140px;
             cursor: pointer;
             transition: var(--transition);
+            min-width: 120px;
         }
 
         .input-bar .mode-selector select:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .input-bar .mode-selector select:focus {
-            border-color: rgba(245, 158, 11, 0.4);
+            border-color: var(--border-hover);
         }
 
         .input-wrapper {
             flex: 2;
             display: flex;
             gap: 6px;
-            min-width: 140px;
+            min-width: 120px;
         }
 
         .input-wrapper input {
             flex: 1;
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 40px;
-            padding: 8px 16px;
-            color: var(--text-primary);
+            padding: 7px 14px;
+            color: var(--text);
             font-size: 13px;
             outline: none;
             transition: var(--transition);
@@ -1013,29 +884,27 @@
         }
 
         .input-wrapper input:focus {
-            border-color: rgba(245, 158, 11, 0.3);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.25);
         }
 
         .input-wrapper button {
             background: linear-gradient(135deg, var(--gold), var(--gold-light));
             border: none;
             border-radius: 40px;
-            padding: 8px 20px;
+            padding: 7px 18px;
             font-weight: 600;
-            color: var(--bg-primary);
+            color: var(--bg);
             font-size: 13px;
             cursor: pointer;
             transition: var(--transition);
-            white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
         .input-wrapper button:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px var(--gold-glow);
         }
 
         .input-wrapper button:disabled {
@@ -1047,28 +916,27 @@
         .input-actions {
             display: flex;
             gap: 4px;
-            align-items: center;
         }
 
         .input-actions button {
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 40px;
-            padding: 6px 10px;
+            padding: 5px 10px;
             color: var(--text-muted);
             cursor: pointer;
             transition: var(--transition);
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .input-actions button:hover {
             background: var(--bg-card);
-            color: var(--text-primary);
-            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text);
+            border-color: var(--border-hover);
         }
 
         /* ================================================================
-           MODALS
+           MODALS – Clean, Spacious
            ================================================================ */
         .modal-overlay {
             position: fixed;
@@ -1080,10 +948,10 @@
             align-items: center;
             z-index: 2000;
             padding: 20px;
-            animation: modalOverlayIn 0.3s ease;
+            animation: modalIn 0.3s ease;
         }
 
-        @keyframes modalOverlayIn {
+        @keyframes modalIn {
             from {
                 opacity: 0;
             }
@@ -1097,149 +965,146 @@
         }
 
         .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            max-width: 720px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            max-width: 680px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 28px 32px;
+            padding: 24px 28px;
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
             position: relative;
-            animation: modalIn 0.3s ease;
+            animation: modalSlide 0.3s ease;
         }
 
-        @keyframes modalIn {
+        @keyframes modalSlide {
             from {
+                transform: scale(0.97) translateY(16px);
                 opacity: 0;
-                transform: scale(0.96) translateY(20px);
             }
             to {
-                opacity: 1;
                 transform: scale(1) translateY(0);
+                opacity: 1;
             }
         }
 
         .modal-close {
             position: absolute;
-            top: 14px;
-            right: 18px;
+            top: 12px;
+            right: 16px;
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             transition: var(--transition);
         }
 
         .modal-close:hover {
-            color: var(--text-primary);
+            color: var(--text);
             transform: rotate(90deg);
         }
 
         .modal h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             margin-bottom: 4px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text);
+        }
+
+        .modal h2 .gold {
+            color: var(--gold-light);
         }
 
         .modal p.sub {
             color: var(--text-secondary);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             font-size: 13px;
         }
 
-        /* Framework Vault */
-        .framework-grid {
+        /* framework grid */
+        .fw-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         @media (max-width: 600px) {
-            .framework-grid {
+            .fw-grid {
                 grid-template-columns: 1fr;
             }
             .modal {
-                padding: 20px 16px;
+                padding: 18px 16px;
             }
         }
 
-        .framework-card {
+        .fw-card {
             background: var(--bg-card);
             border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border: 1px solid var(--border);
             transition: var(--transition);
-            cursor: default;
         }
 
-        .framework-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+        .fw-card:hover {
+            border-color: var(--border-hover);
         }
 
-        .framework-card h4 {
-            font-size: 14px;
+        .fw-card h4 {
+            font-size: 13px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .framework-card p {
-            font-size: 12px;
+        .fw-card p {
+            font-size: 11px;
             color: var(--text-secondary);
             margin: 4px 0;
         }
 
-        .framework-card .meta {
+        .fw-card .meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
-            color: var(--text-secondary);
+            font-size: 10px;
+            color: var(--text-muted);
             margin-top: 6px;
         }
 
-        .framework-card .meta .value {
+        .fw-card .meta .val {
             color: var(--gold-light);
             font-weight: 600;
         }
 
-        .framework-card .meta .tier {
-            padding: 2px 10px;
+        .fw-card .meta .tier {
+            padding: 1px 8px;
             border-radius: 40px;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 600;
         }
-
-        .framework-card .meta .tier.free {
-            background: rgba(34, 197, 94, 0.1);
+        .fw-card .meta .tier.free {
+            background: rgba(34, 197, 94, 0.08);
             color: var(--green);
         }
-        .framework-card .meta .tier.insider {
-            background: rgba(245, 158, 11, 0.1);
+        .fw-card .meta .tier.insider {
+            background: rgba(245, 158, 11, 0.08);
             color: var(--gold-light);
         }
-        .framework-card .meta .tier.partner {
-            background: rgba(168, 85, 247, 0.1);
+        .fw-card .meta .tier.partner {
+            background: rgba(168, 85, 247, 0.08);
             color: #c084fc;
         }
 
-        .framework-card .action-btn {
+        .fw-card .btn {
             margin-top: 8px;
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 40px;
-            padding: 4px 12px;
-            font-size: 11px;
+            padding: 3px 12px;
+            font-size: 10px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition);
@@ -1247,37 +1112,36 @@
             text-align: center;
         }
 
-        .framework-card .action-btn:hover {
-            background: rgba(245, 158, 11, 0.08);
+        .fw-card .btn:hover {
+            background: rgba(245, 158, 11, 0.06);
             border-color: var(--gold);
-            color: var(--text-primary);
+            color: var(--text);
         }
-
-        .framework-card .action-btn.done {
-            background: rgba(34, 197, 94, 0.08);
+        .fw-card .btn.done {
+            background: rgba(34, 197, 94, 0.06);
             border-color: var(--green);
             color: var(--green);
         }
 
-        /* Upgrade Modal */
+        /* Upgrade tier */
         .billing-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            margin-bottom: 16px;
+            gap: 12px;
+            margin-bottom: 14px;
         }
 
         .billing-toggle span {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
         }
 
         .billing-toggle .switch {
             position: relative;
             display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 40px;
+            height: 22px;
         }
 
         .billing-toggle .switch input {
@@ -1288,18 +1152,18 @@
 
         .billing-toggle .slider {
             position: absolute;
-            cursor: pointer;
             inset: 0;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
             transition: var(--transition);
             border-radius: 34px;
+            cursor: pointer;
         }
 
         .billing-toggle .slider:before {
             content: "";
             position: absolute;
-            height: 18px;
-            width: 18px;
+            height: 16px;
+            width: 16px;
             left: 3px;
             bottom: 3px;
             background: white;
@@ -1310,148 +1174,140 @@
         .billing-toggle input:checked+.slider {
             background: var(--gold);
         }
-
         .billing-toggle input:checked+.slider:before {
-            transform: translateX(20px);
+            transform: translateX(18px);
         }
 
         .tier-table {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin: 12px 0;
+            gap: 6px;
+            margin: 10px 0;
         }
 
         .tier-row {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
-            padding: 10px 14px;
+            padding: 8px 14px;
             background: var(--bg-card);
             border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             align-items: center;
-            transition: var(--transition);
+            font-size: 13px;
         }
 
-        .tier-row:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .tier-row .tier-name {
+        .tier-row .name {
             font-weight: 600;
-            font-size: 14px;
         }
-
         .tier-row .features {
-            font-size: 12px;
             color: var(--text-secondary);
+            font-size: 12px;
         }
-
         .tier-row .price {
             font-weight: 600;
             color: var(--gold-light);
             text-align: right;
-            font-size: 14px;
         }
-
         .tier-row.current {
             border-color: var(--gold);
-            background: rgba(245, 158, 11, 0.04);
+            background: rgba(245, 158, 11, 0.03);
         }
-
-        .tier-row .popular {
-            font-size: 9px;
+        .tier-row .pop {
+            font-size: 8px;
             background: var(--gold);
-            color: var(--bg-primary);
-            padding: 2px 8px;
+            color: var(--bg);
+            padding: 1px 8px;
             border-radius: 40px;
             font-weight: 700;
-            margin-left: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            margin-left: 4px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
         }
 
         /* Onboarding */
-        .onboarding-progress {
+        .onboard-progress {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-bottom: 14px;
         }
 
-        .onboarding-progress .dot {
+        .onboard-progress .dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.04);
             transition: var(--transition);
         }
 
-        .onboarding-progress .dot.active {
+        .onboard-progress .dot.active {
             background: var(--gold);
             box-shadow: 0 0 16px var(--gold-glow);
         }
-
-        .onboarding-progress .dot.done {
+        .onboard-progress .dot.done {
             background: var(--green);
         }
 
-        .onboarding-step {
+        .onboard-step {
             display: none;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
-
-        .onboarding-step.active {
+        .onboard-step.active {
             display: flex;
         }
 
-        .onboarding-step label {
-            font-weight: 500;
+        .onboard-step label {
             font-size: 13px;
+            font-weight: 500;
             color: var(--text-secondary);
         }
 
-        .onboarding-step select,
-        .onboarding-step input {
+        .onboard-step select,
+        .onboard-step input {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 10px;
             padding: 8px 12px;
-            color: var(--text-primary);
+            color: var(--text);
             font-size: 13px;
             outline: none;
             width: 100%;
             transition: var(--transition);
         }
 
-        .onboarding-step select:focus,
-        .onboarding-step input:focus {
-            border-color: rgba(245, 158, 11, 0.3);
+        .onboard-step select:focus,
+        .onboard-step input:focus {
+            border-color: rgba(245, 158, 11, 0.25);
         }
 
-        .onboarding-step .btn-group {
+        .onboard-step .btn-group {
             display: flex;
             gap: 10px;
             justify-content: flex-end;
-            margin-top: 12px;
+            margin-top: 10px;
         }
 
         /* Value Equation */
-        .slider-group {
-            margin: 10px 0;
+        .eq-slider {
+            margin: 8px 0;
         }
 
-        .slider-group label {
+        .eq-slider label {
             display: flex;
             justify-content: space-between;
             font-size: 13px;
             font-weight: 500;
         }
 
-        .slider-group input[type="range"] {
+        .eq-slider input[type="range"] {
             width: 100%;
-            margin: 4px 0 6px;
+            margin: 4px 0;
             accent-color: var(--gold);
             background: var(--bg-card);
             height: 4px;
@@ -1460,29 +1316,53 @@
             cursor: pointer;
         }
 
-        .slider-group .value-display {
+        .eq-slider .val {
             font-weight: 600;
             color: var(--gold-light);
+        }
+
+        .eq-score-box {
+            background: var(--bg-card);
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .eq-score-box .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .eq-score-box .score {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+
+        .eq-score-box .formula {
+            font-size: 11px;
+            color: var(--text-muted);
         }
 
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 12px 20px;
+            padding: 10px 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            color: var(--text-primary);
+            color: var(--text);
             font-size: 13px;
             z-index: 3000;
             transform: translateY(80px);
             opacity: 0;
             transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
             pointer-events: none;
-            max-width: 400px;
+            max-width: 380px;
         }
 
         .toast.show {
@@ -1492,13 +1372,13 @@
         }
 
         .toast.success {
-            border-left: 4px solid var(--green);
+            border-left: 3px solid var(--green);
         }
         .toast.error {
-            border-left: 4px solid #ef4444;
+            border-left: 3px solid #ef4444;
         }
         .toast.info {
-            border-left: 4px solid var(--gold);
+            border-left: 3px solid var(--gold);
         }
 
         /* Confetti */
@@ -1512,24 +1392,24 @@
 
         .confetti {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 2px;
             animation: confettiFall linear forwards;
         }
 
         @keyframes confettiFall {
             0% {
-                transform: translateY(-10px) rotate(0deg) scale(1);
+                transform: translateY(-10px) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translateY(100vh) rotate(720deg) scale(0.5);
+                transform: translateY(100vh) rotate(720deg);
                 opacity: 0;
             }
         }
 
-        /* scrollbar */
+        /* scroll */
         ::-webkit-scrollbar {
             width: 3px;
         }
@@ -1537,11 +1417,11 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.15);
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.3);
         }
 
         /* ================================================================
@@ -1552,7 +1432,6 @@
                 height: 100vh;
                 max-height: none;
                 border-radius: 0;
-                padding: 0;
             }
             .header {
                 padding: 10px 16px;
@@ -1562,26 +1441,32 @@
                 overflow-x: auto;
             }
             .tab-btn {
-                padding: 10px 14px;
-                font-size: 12px;
+                padding: 8px 14px;
+                font-size: 11px;
                 white-space: nowrap;
             }
             .tab-btn span {
                 display: none;
             }
             .tab-btn i {
-                font-size: 16px;
+                font-size: 14px;
             }
-            .dash-grid {
+            .secondary-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            .welcome-banner .right .stat .num {
-                font-size: 18px;
+            .primary-metric {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+            .primary-metric .quick-actions {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-start;
             }
         }
 
         @media (max-width: 768px) {
-            .header-actions .btn-outline span {
+            .header-actions .btn-icon span {
                 display: none;
             }
             .greeting {
@@ -1592,54 +1477,26 @@
                 align-items: stretch;
             }
             .input-bar .mode-selector {
-                flex: unset;
                 width: 100%;
             }
             .input-bar .mode-selector select {
-                max-width: 100%;
+                width: 100%;
             }
             .input-wrapper {
-                flex: unset;
                 width: 100%;
             }
             .input-actions {
                 justify-content: flex-end;
             }
-            .dash-grid {
+            .secondary-grid {
                 grid-template-columns: 1fr;
             }
-            .modal {
-                padding: 20px 16px;
-            }
-            .tier-row {
-                grid-template-columns: 1fr;
-                gap: 4px;
-                text-align: center;
-            }
-            .tier-row .price {
-                text-align: center;
-            }
-            .welcome-banner {
+            .primary-metric {
                 flex-direction: column;
-                align-items: flex-start;
+                text-align: center;
             }
-            .welcome-banner .right {
-                width: 100%;
-                justify-content: space-around;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header .logo-text {
-                font-size: 16px;
-            }
-            .header .logo-sub {
-                display: none;
-            }
-            .logo-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
+            .primary-metric .quick-actions {
+                justify-content: center;
             }
             .chat-messages {
                 padding: 12px 14px;
@@ -1647,9 +1504,52 @@
             .message {
                 max-width: 92%;
             }
+            .modal {
+                padding: 16px;
+            }
+            .tier-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 4px;
+            }
+            .tier-row .price {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 15px;
+            }
+            .logo-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
+            }
             .tier-badge {
-                font-size: 10px;
-                padding: 4px 12px;
+                font-size: 9px;
+                padding: 3px 10px;
+            }
+            .btn-gold {
+                font-size: 11px;
+                padding: 4px 14px;
+            }
+            .btn-icon {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .dashboard-view {
+                padding: 14px 14px;
+            }
+            .chat-messages {
+                padding: 10px 12px;
+            }
+            .status-bar {
+                font-size: 9px;
+                padding: 2px 14px;
+            }
+            .input-bar {
+                padding: 8px 14px 12px;
             }
         }
     </style>
@@ -1662,15 +1562,15 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">E5</div>
-                <div class="logo-text">AI Coach <span class="logo-sub">Octovigintillion</span></div>
+                <div class="logo-text">AI <span>Coach</span></div>
             </div>
             <div class="header-actions">
-                <span class="greeting" id="greetingText">👋 Welcome back</span>
+                <span class="greeting" id="greeting">👋 Welcome</span>
                 <div class="tier-badge" id="tierBadge">
                     <i class="fas fa-crown"></i> <span id="tierLabel">FREE</span>
                 </div>
-                <button class="btn-outline" id="vaultBtn"><i class="fas fa-book"></i> <span>Vault</span></button>
-                <button class="btn-primary" id="upgradeBtn"><i class="fas fa-rocket"></i> Upgrade</button>
+                <button class="btn-icon" id="vaultBtn"><i class="fas fa-book"></i> <span>Vault</span></button>
+                <button class="btn-gold" id="upgradeBtn"><i class="fas fa-rocket"></i> Upgrade</button>
             </div>
         </header>
 
@@ -1680,7 +1580,7 @@
             <button class="tab-btn" data-tab="chat"><i class="fas fa-comment-dots"></i> <span>Chat</span></button>
         </div>
 
-        <!-- MAIN AREA -->
+        <!-- MAIN -->
         <div class="main-area">
 
             <!-- SIDEBAR -->
@@ -1695,108 +1595,88 @@
                 <!-- DASHBOARD -->
                 <div class="dashboard-view active" id="dashboardView">
 
-                    <!-- Welcome Banner -->
-                    <div class="welcome-banner">
-                        <div class="left">
-                            <h2 id="welcomeTitle">Welcome to Your Octovigintillion Coach</h2>
-                            <p id="welcomeSub">Your $20,000+ framework library is ready. Start with one action today.</p>
+                    <!-- Primary Metric -->
+                    <div class="primary-metric">
+                        <div class="ring-wrap">
+                            <svg width="80" height="80" viewBox="0 0 100 100">
+                                <circle class="bg" cx="50" cy="50" r="40" />
+                                <circle class="fg" id="healthRing" cx="50" cy="50" r="40"
+                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                            </svg>
+                            <div class="center" id="healthScore">0</div>
                         </div>
-                        <div class="right">
-                            <div class="stat">
-                                <div class="num" id="statFrameworks">0</div>
-                                <div class="label">Frameworks</div>
-                            </div>
-                            <div class="stat">
-                                <div class="num" id="statHealth">0</div>
-                                <div class="label">Health Score</div>
-                            </div>
-                            <div class="stat">
-                                <div class="num" id="statStreak">0d</div>
-                                <div class="label">Streak</div>
-                            </div>
+                        <div class="info">
+                            <h2 id="welcomeTitle">Your Business Health</h2>
+                            <p id="welcomeSub">Complete frameworks to grow your score</p>
+                            <div class="sub" id="healthSub">0 / 8 frameworks completed</div>
+                        </div>
+                        <div class="quick-actions">
+                            <button id="quickXRay"><i class="fas fa-search"></i> X-Ray</button>
+                            <button id="quickOffer"><i class="fas fa-coins"></i> Offer</button>
+                            <button id="quickDM"><i class="fas fa-comment"></i> DM</button>
                         </div>
                     </div>
 
-                    <!-- Dashboard Grid -->
-                    <div class="dash-grid">
+                    <!-- Secondary Grid -->
+                    <div class="secondary-grid">
 
-                        <!-- Health Ring -->
-                        <div class="dash-card" style="text-align:center;">
-                            <h4>Business Health</h4>
-                            <div class="ring-container">
-                                <svg width="90" height="90" viewBox="0 0 100 100">
-                                    <circle class="bg" cx="50" cy="50" r="40" />
-                                    <circle class="fg" id="healthRing" cx="50" cy="50" r="40"
-                                            stroke-dasharray="251.2" stroke-dashoffset="251.2" />
-                                </svg>
-                                <div class="center-text" id="healthScore">0</div>
-                            </div>
-                            <div class="sub" id="healthSub">Based on completed frameworks</div>
-                        </div>
-
-                        <!-- Frameworks Progress -->
-                        <div class="dash-card">
-                            <h4>Frameworks <span id="fwProgressLabel">0/8</span></h4>
-                            <div class="framework-grid-dash" id="fwMiniGrid"></div>
+                        <!-- Frameworks -->
+                        <div class="card">
+                            <h4>Frameworks</h4>
+                            <div class="value" id="fwCount">0/8</div>
+                            <div class="sub" id="fwSub">Completed</div>
+                            <div class="fw-strip" id="fwStrip"></div>
                         </div>
 
                         <!-- Rule of 100 -->
-                        <div class="dash-card">
+                        <div class="card">
                             <h4>Rule of 100</h4>
-                            <div class="rule-100-tracker">
-                                <div class="top-row">
-                                    <span class="count" id="ruleCount">0</span>
-                                    <span style="color:var(--text-secondary);font-size:12px;">actions today</span>
-                                    <span class="streak" id="ruleStreak"><i class="fas fa-fire"></i> 0d</span>
-                                </div>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                    <button id="ruleAddBtn" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:40px;padding:4px 14px;color:var(--text-primary);cursor:pointer;transition:var(--transition);font-size:12px;"><i class="fas fa-plus"></i> Log +1</button>
-                                    <button id="ruleResetBtn" style="background:transparent;border:1px solid transparent;color:var(--text-muted);cursor:pointer;font-size:12px;">Reset</button>
-                                </div>
-                                <div class="rule-calendar" id="ruleCalendar"></div>
+                            <div class="rule-row">
+                                <span class="count" id="ruleCount">0</span>
+                                <span style="font-size:12px;color:var(--text-secondary);">actions today</span>
+                                <span class="streak" id="ruleStreak"><i class="fas fa-fire"></i> 0d</span>
                             </div>
+                            <div class="rule-row" style="gap:6px;margin-top:4px;">
+                                <button id="ruleAddBtn"><i class="fas fa-plus"></i> Log +1</button>
+                                <button id="ruleResetBtn">Reset</button>
+                            </div>
+                            <div class="mini-cal" id="ruleCalendar"></div>
                         </div>
 
-                        <!-- Revenue Projection -->
-                        <div class="dash-card">
+                        <!-- Revenue -->
+                        <div class="card">
                             <h4>Revenue Projection</h4>
                             <div class="value" id="revenueProjection">$0</div>
-                            <div class="sub">Monthly revenue: <input type="number" id="revenueInput" placeholder="e.g. 5000" style="width:80px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:6px;padding:4px 6px;color:var(--text-primary);font-size:12px;" /> /mo</div>
+                            <div class="sub">Monthly: <input type="number" id="revenueInput" placeholder="5000" style="width:70px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:3px 6px;color:var(--text);font-size:12px;" /> /mo</div>
                         </div>
 
-                        <!-- Next Best Action -->
-                        <div class="dash-card" style="grid-column: 1 / -1;">
+                        <!-- Next Best Action (spans full width) -->
+                        <div class="card" style="grid-column:1/-1;">
                             <h4>🎯 Next Best Action</h4>
-                            <div id="nextAction" style="font-size:15px;margin-top:4px;font-weight:500;">Complete your first framework to get started.</div>
-                            <div class="sub" style="margin-top:4px;">AI‑recommended based on your progress</div>
+                            <div id="nextAction" style="font-size:15px;font-weight:500;margin-top:2px;">Complete your first framework to get started.</div>
+                            <div class="sub" style="margin-top:2px;">AI‑recommended based on your progress</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CHAT VIEW -->
+                <!-- CHAT -->
                 <div class="chat-view" id="chatView">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
                             <div class="avatar"><i class="fas fa-brain"></i></div>
                             <div class="bubble">
-                                <p><strong>Hello, I'm your Octovigintillion Executive Coach.</strong></p>
-                                <p>I have access to <strong>$20,000+</strong> worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.</p>
-                                <p>Select a mode or ask me anything about your business.</p>
+                                <p><strong>Hello, I'm your Quattuortrigintillion Coach.</strong></p>
+                                <p>I have access to <strong>$20,000+</strong> of proven frameworks.</p>
+                                <p>Select a mode or ask me anything.</p>
                             </div>
                         </div>
                     </div>
                     <div class="status-bar">
-                        <div class="left">
-                            <span class="status-dot"></span> <span id="statusText">Ready</span>
-                        </div>
-                        <div class="right">
-                            <span id="rateDisplay">30 msg/h</span>
-                            <span id="modeDisplay">Mode: Coach</span>
-                        </div>
+                        <div><span class="status-dot"></span> <span id="statusText">Ready</span></div>
+                        <div><span id="rateDisplay">30 msg/h</span> · <span id="modeDisplay">Coach</span></div>
                     </div>
                     <div class="input-bar">
                         <div class="mode-selector">
-                            <label for="modeSelect"><i class="fas fa-sliders-h"></i></label>
                             <select id="modeSelect"></select>
                         </div>
                         <div class="input-wrapper">
@@ -1804,9 +1684,9 @@
                             <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
                         </div>
                         <div class="input-actions">
-                            <button id="docBtn" title="Upload documents"><i class="fas fa-file-upload"></i></button>
-                            <button id="voiceBtn" title="Text-to-Speech"><i class="fas fa-volume-up"></i></button>
-                            <button id="valueEqBtn" title="Value Equation Builder"><i class="fas fa-calculator"></i></button>
+                            <button id="docBtn" title="Upload docs"><i class="fas fa-file-upload"></i></button>
+                            <button id="voiceBtn" title="TTS"><i class="fas fa-volume-up"></i></button>
+                            <button id="valueEqBtn" title="Value Equation"><i class="fas fa-calculator"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1816,13 +1696,13 @@
 
     <!-- ============ MODALS ============ -->
 
-    <!-- FRAMEWORK VAULT -->
+    <!-- VAULT -->
     <div class="modal-overlay" id="vaultModal">
         <div class="modal">
             <button class="modal-close" id="closeVault">&times;</button>
-            <h2><i class="fas fa-gem"></i> Framework Vault</h2>
-            <p class="sub">Every framework, worksheet, and playbook from our $20,000+ library.</p>
-            <div class="framework-grid" id="frameworkGrid"></div>
+            <h2>📚 Framework <span class="gold">Vault</span></h2>
+            <p class="sub">Every framework from our $20,000+ library.</p>
+            <div class="fw-grid" id="frameworkGrid"></div>
         </div>
     </div>
 
@@ -1830,8 +1710,8 @@
     <div class="modal-overlay" id="upgradeModal">
         <div class="modal">
             <button class="modal-close" id="closeUpgrade">&times;</button>
-            <h2><i class="fas fa-crown"></i> Unlock More Power</h2>
-            <p class="sub">Choose the tier that fits your business stage.</p>
+            <h2>👑 Unlock <span class="gold">More Power</span></h2>
+            <p class="sub">Choose the tier that fits your business.</p>
             <div class="billing-toggle">
                 <span>Monthly</span>
                 <label class="switch">
@@ -1841,56 +1721,54 @@
                 <span>Yearly <span style="color:var(--green);font-size:11px;">(save 20%)</span></span>
             </div>
             <div class="tier-table" id="tierTable"></div>
-            <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;">
-                <button class="btn-outline" id="upgradeCancel">Cancel</button>
-                <button class="btn-primary" id="upgradeAction">Upgrade Now</button>
+            <div class="modal-actions">
+                <button class="btn-icon" id="upgradeCancel">Cancel</button>
+                <button class="btn-gold" id="upgradeAction">Upgrade Now</button>
             </div>
         </div>
     </div>
 
     <!-- ONBOARDING -->
     <div class="modal-overlay" id="onboardingModal">
-        <div class="modal" style="max-width:480px;">
-            <h2>👋 Welcome to Your AI Coach</h2>
-            <p class="sub">Let's personalise your experience so I can give you the best advice.</p>
-            <div class="onboarding-progress" id="onboardProgress">
+        <div class="modal" style="max-width:460px;">
+            <h2>👋 Welcome to <span class="gold">AI Coach</span></h2>
+            <p class="sub">Let's personalise your experience.</p>
+            <div class="onboard-progress" id="onboardProgress">
                 <span class="dot active" data-step="1"></span>
                 <span class="dot" data-step="2"></span>
                 <span class="dot" data-step="3"></span>
             </div>
-            <div class="onboarding-step active" data-step="1">
-                <label>What's your main business goal right now?</label>
+            <div class="onboard-step active" data-step="1">
+                <label>What's your main business goal?</label>
                 <select id="onboardGoal">
                     <option value="leads">Get more leads</option>
                     <option value="offer">Build a better offer</option>
                     <option value="scale">Scale revenue</option>
                     <option value="retention">Reduce churn</option>
-                    <option value="content">Create content that converts</option>
                 </select>
                 <div class="btn-group">
-                    <button class="btn-primary" id="onboardNext1">Next</button>
+                    <button class="btn-gold" id="onboardNext1">Next</button>
                 </div>
             </div>
-            <div class="onboarding-step" data-step="2">
-                <label>What's your current monthly revenue (approx)?</label>
+            <div class="onboard-step" data-step="2">
+                <label>Monthly revenue (approx)?</label>
                 <input type="number" id="onboardRevenue" placeholder="e.g. 5000" />
                 <div class="btn-group">
-                    <button class="btn-outline" id="onboardBack2">Back</button>
-                    <button class="btn-primary" id="onboardNext2">Next</button>
+                    <button class="btn-icon" id="onboardBack2">Back</button>
+                    <button class="btn-gold" id="onboardNext2">Next</button>
                 </div>
             </div>
-            <div class="onboarding-step" data-step="3">
-                <label>What's your biggest bottleneck right now?</label>
+            <div class="onboard-step" data-step="3">
+                <label>Biggest bottleneck right now?</label>
                 <select id="onboardBottleneck">
-                    <option value="traffic">Not enough traffic/leads</option>
-                    <option value="conversion">Low conversion rate</option>
-                    <option value="offer">Weak offer / pricing</option>
-                    <option value="retention">High churn / low LTV</option>
-                    <option value="time">Not enough time to execute</option>
+                    <option value="traffic">Not enough leads</option>
+                    <option value="conversion">Low conversion</option>
+                    <option value="offer">Weak offer</option>
+                    <option value="retention">High churn</option>
                 </select>
                 <div class="btn-group">
-                    <button class="btn-outline" id="onboardBack3">Back</button>
-                    <button class="btn-primary" id="onboardFinish">Finish & Start</button>
+                    <button class="btn-icon" id="onboardBack3">Back</button>
+                    <button class="btn-gold" id="onboardFinish">Finish & Start</button>
                 </div>
             </div>
         </div>
@@ -1900,32 +1778,32 @@
     <div class="modal-overlay" id="valueEqModal">
         <div class="modal">
             <button class="modal-close" id="closeValueEq">&times;</button>
-            <h2><i class="fas fa-balance-scale"></i> Value Equation Builder</h2>
-            <p class="sub">Adjust the sliders to see how your offer's value changes.</p>
-            <div class="slider-group">
-                <label>Dream Outcome <span class="value-display" id="eqDream">8</span></label>
+            <h2>⚖️ Value <span class="gold">Equation</span></h2>
+            <p class="sub">Adjust sliders to see your offer's value change.</p>
+            <div class="eq-slider">
+                <label>Dream Outcome <span class="val" id="eqDream">8</span></label>
                 <input type="range" min="1" max="10" value="8" id="eqDreamSlider" />
             </div>
-            <div class="slider-group">
-                <label>Perceived Likelihood <span class="value-display" id="eqLikelihood">7</span></label>
+            <div class="eq-slider">
+                <label>Perceived Likelihood <span class="val" id="eqLikelihood">7</span></label>
                 <input type="range" min="1" max="10" value="7" id="eqLikelihoodSlider" />
             </div>
-            <div class="slider-group">
-                <label>Time Delay (lower = better) <span class="value-display" id="eqTime">5</span></label>
+            <div class="eq-slider">
+                <label>Time Delay (lower = better) <span class="val" id="eqTime">5</span></label>
                 <input type="range" min="1" max="10" value="5" id="eqTimeSlider" />
             </div>
-            <div class="slider-group">
-                <label>Effort & Sacrifice (lower = better) <span class="value-display" id="eqEffort">5</span></label>
+            <div class="eq-slider">
+                <label>Effort (lower = better) <span class="val" id="eqEffort">5</span></label>
                 <input type="range" min="1" max="10" value="5" id="eqEffortSlider" />
             </div>
-            <div style="background:var(--bg-card);padding:14px;border-radius:10px;margin-top:10px;text-align:center;">
-                <span style="font-size:13px;color:var(--text-secondary);">Value Equation Score</span>
-                <div style="font-size:32px;font-weight:700;color:var(--gold-light);" id="eqScore">56</div>
-                <div style="font-size:12px;color:var(--text-muted);">(Dream Outcome × Likelihood) ÷ (Time Delay × Effort)</div>
+            <div class="eq-score-box">
+                <div class="label">Value Equation Score</div>
+                <div class="score" id="eqScore">56</div>
+                <div class="formula">(Dream × Likelihood) ÷ (Time × Effort)</div>
             </div>
-            <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
-                <button class="btn-outline" id="closeValueEqBtn">Close</button>
-                <button class="btn-primary" id="saveValueEq">Save & Apply</button>
+            <div class="modal-actions">
+                <button class="btn-icon" id="closeValueEqBtn">Close</button>
+                <button class="btn-gold" id="saveValueEq">Save & Apply</button>
             </div>
         </div>
     </div>
@@ -1935,47 +1813,37 @@
 
     <script>
         // ================================================================
-        //  OCTOVIGINTILLION APP – FULL LOGIC
+        //  QUATTUORTRIGINTILLION – Core Logic
         // ================================================================
 
-        // -------------------- CONFIG --------------------
         const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
-        // For local: 'http://localhost:8000'
 
         const MODES = [
-            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free', desc: 'Daily operations, inbox, Rule of 100' },
-            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free', desc: 'Find the earliest broken layer' },
-            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free', desc: 'Visualise the customer journey' },
-            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider', desc: 'Build culture, rituals, belonging' },
-            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider', desc: 'Craft ECAFI & SOULFUL scripts' },
-            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider', desc: '7 content types, polarise, document' },
-            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider', desc: 'Hook, Body, CTA for short‑form' },
-            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider', desc: 'Reverse‑engineer competitor funnels' },
-            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner', desc: 'Grand Slam Offers, Value Equation' },
-            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner', desc: 'Live event design & close' },
-            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner', desc: '72h urgency, pipeline cleaning' },
+            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
+            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
+            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free' },
+            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
+            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider' },
+            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider' },
+            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider' },
+            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
+            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
+            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
+            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
         ];
 
         const FRAMEWORKS = [
-            { id: 'avocado', name: 'AVOCADO Opening Offers', value: '$2,000+', tier: 'insider',
-            desc: '3‑tier offers, R.I.P.E., ECAFI scripts' },
-            { id: 'money_models', name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner',
-                desc: 'Value Equation, Grand Slam, upsell/downsell' },
-            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider',
-            desc: 'Core 4 Advertising, Rule of 100, Hook Generator' },
-            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner',
-                desc: 'Green to Ripe, 5 Horsemen, Churn Checklist' },
-            { id: 'ttb', name: 'Time to Build (TTB)', value: '$2,500+', tier: 'insider',
-                desc: 'Brand Clarity, TRUST, Sustainable Content' },
-            { id: 'soulful', name: 'SOULFUL Sales Scripts', value: '$1,500+', tier: 'insider',
-                desc: 'Conversational selling, validation, closing' },
-            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free',
-                desc: 'Onboarding, activation, milestones' },
-            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner',
-                desc: 'Interactive tool to optimise offer value' },
+            { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider' },
+            { id: 'money_models', name: '$100M + Money Models', value: '$5,000+', tier: 'partner' },
+            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider' },
+            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner' },
+            { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider' },
+            { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider' },
+            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free' },
+            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner' },
         ];
 
-        // -------------------- STATE --------------------
+        // State
         let currentTier = 'free';
         let currentMode = 'coach';
         let isSending = false;
@@ -1988,90 +1856,49 @@
         let onboarded = false;
         let dailyHistory = {};
 
-        // DOM refs
+        // DOM helpers
         const $ = id => document.getElementById(id);
-        const tierLabel = $('tierLabel');
-        const modeSelect = $('modeSelect');
-        const modeList = $('modeList');
-        const chatMessages = $('chatMessages');
-        const userInput = $('userInput');
-        const sendBtn = $('sendBtn');
-        const statusText = $('statusText');
-        const modeDisplay = $('modeDisplay');
-        const vaultBtn = $('vaultBtn');
-        const vaultModal = $('vaultModal');
-        const closeVault = $('closeVault');
-        const frameworkGrid = $('frameworkGrid');
-        const upgradeBtn = $('upgradeBtn');
-        const upgradeModal = $('upgradeModal');
-        const closeUpgrade = $('closeUpgrade');
-        const upgradeCancel = $('upgradeCancel');
-        const upgradeAction = $('upgradeAction');
-        const tierTable = $('tierTable');
-        const billingToggle = $('billingToggle');
-        const onboardingModal = $('onboardingModal');
-        const valueEqModal = $('valueEqModal');
-        const closeValueEq = $('closeValueEq');
-        const closeValueEqBtn = $('closeValueEqBtn');
-        const saveValueEq = $('saveValueEq');
-        const docBtn = $('docBtn');
-        const voiceBtn = $('voiceBtn');
-        const valueEqBtn = $('valueEqBtn');
-        const tabNav = $('tabNav');
-        const dashboardView = $('dashboardView');
-        const chatView = $('chatView');
-        const healthScore = $('healthScore');
-        const healthRing = $('healthRing');
-        const healthSub = $('healthSub');
-        const fwProgressLabel = $('fwProgressLabel');
-        const fwMiniGrid = $('fwMiniGrid');
-        const ruleCount = $('ruleCount');
-        const ruleStreak = $('ruleStreak');
-        const ruleAddBtn = $('ruleAddBtn');
-        const ruleResetBtn = $('ruleResetBtn');
-        const ruleCalendar = $('ruleCalendar');
-        const revenueInput = $('revenueInput');
-        const revenueProjection = $('revenueProjection');
-        const nextAction = $('nextAction');
-        const greetingText = $('greetingText');
-        const welcomeTitle = $('welcomeTitle');
-        const welcomeSub = $('welcomeSub');
-        const statFrameworks = $('statFrameworks');
-        const statHealth = $('statHealth');
-        const statStreak = $('statStreak');
         const toast = $('toast');
+        let toastTimeout;
 
-        // -------------------- LOCAL STORAGE --------------------
-        function loadLocalState() {
+        function showToast(msg, type = 'info') {
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // Local storage
+        function loadState() {
             try {
-                const data = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
-                frameworkProgress = data.frameworkProgress || {};
-                rule100Count = data.rule100Count || 0;
-                ruleStreakDays = data.ruleStreakDays || 0;
-                lastRuleDate = data.lastRuleDate || '';
-                userRevenue = data.userRevenue || 0;
-                businessName = data.businessName || '';
-                onboarded = data.onboarded || false;
-                dailyHistory = data.dailyHistory || {};
-                if (userRevenue) revenueInput.value = userRevenue;
+                const d = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
+                frameworkProgress = d.frameworkProgress || {};
+                rule100Count = d.rule100Count || 0;
+                ruleStreakDays = d.ruleStreakDays || 0;
+                lastRuleDate = d.lastRuleDate || '';
+                userRevenue = d.userRevenue || 0;
+                businessName = d.businessName || '';
+                onboarded = d.onboarded || false;
+                dailyHistory = d.dailyHistory || {};
+                if (userRevenue) $('revenueInput').value = userRevenue;
                 if (businessName) {
-                    greetingText.textContent = `👋 Welcome, ${businessName}`;
-                    welcomeTitle.textContent = `Welcome back, ${businessName}`;
+                    $('greeting').textContent = '👋 ' + businessName;
+                    $('welcomeTitle').textContent = 'Welcome back, ' + businessName;
                 }
                 const today = new Date().toDateString();
                 if (lastRuleDate !== today) {
                     if (lastRuleDate) {
-                        const dateKey = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[dateKey] = rule100Count;
+                        const key = new Date(lastRuleDate).toISOString().slice(0, 10);
+                        dailyHistory[key] = rule100Count;
                     }
                     rule100Count = 0;
                     lastRuleDate = today;
-                    saveLocalState();
+                    saveState();
                 }
-            } catch (e) { console.warn('Local storage load error', e); }
+            } catch (e) { console.warn('Load error', e); }
         }
 
-        function saveLocalState() {
+        function saveState() {
             try {
                 localStorage.setItem('e5_coach_state', JSON.stringify({
                     frameworkProgress,
@@ -2083,257 +1910,132 @@
                     onboarded,
                     dailyHistory
                 }));
-            } catch (e) { console.warn('Local storage save error', e); }
+            } catch (e) { console.warn('Save error', e); }
         }
 
-        // -------------------- TOAST --------------------
-        let toastTimeout;
-
-        function showToast(message, type = 'info') {
-            toast.textContent = message;
-            toast.className = 'toast ' + type + ' show';
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        // -------------------- INIT --------------------
-        async function init() {
-            loadLocalState();
-            populateModes();
-            await fetchTier();
-            populateFrameworks();
-            updateDashboard();
-
-            if (!onboarded) {
-                onboardingModal.classList.add('open');
-            }
-
-            // Event listeners
-            modeSelect.addEventListener('change', onModeChange);
-            sendBtn.addEventListener('click', sendMessage);
-            userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
-            vaultBtn.addEventListener('click', () => vaultModal.classList.add('open'));
-            closeVault.addEventListener('click', () => vaultModal.classList.remove('open'));
-            vaultModal.addEventListener('click', (e) => { if (e.target === vaultModal) vaultModal.classList.remove('open'); });
-            upgradeBtn.addEventListener('click', openUpgradeModal);
-            closeUpgrade.addEventListener('click', () => upgradeModal.classList.remove('open'));
-            upgradeCancel.addEventListener('click', () => upgradeModal.classList.remove('open'));
-            upgradeAction.addEventListener('click', () => {
-                showToast('Upgrade flow: connect your Whop license key.', 'info');
-                upgradeModal.classList.remove('open');
-            });
-            billingToggle.addEventListener('change', updatePrices);
-
-            docBtn.addEventListener('click', () => showToast('Upload business documents (PDF/TXT) to personalise coaching.',
-                'info'));
-            voiceBtn.addEventListener('click', () => showToast('Text‑to‑Speech coming soon!', 'info'));
-            valueEqBtn.addEventListener('click', openValueEq);
-            closeValueEq.addEventListener('click', () => valueEqModal.classList.remove('open'));
-            closeValueEqBtn.addEventListener('click', () => valueEqModal.classList.remove('open'));
-            saveValueEq.addEventListener('click', () => {
-                showToast('Value Equation saved! (Would update backend.)', 'success');
-                valueEqModal.classList.remove('open');
-            });
-
-            // Tab switching
-            tabNav.addEventListener('click', (e) => {
-                const btn = e.target.closest('.tab-btn');
-                if (!btn) return;
-                const tab = btn.dataset.tab;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                if (tab === 'dashboard') {
-                    dashboardView.classList.add('active');
-                    chatView.classList.remove('active');
-                    updateDashboard();
-                } else {
-                    dashboardView.classList.remove('active');
-                    chatView.classList.add('active');
-                }
-            });
-
-            // Rule of 100
-            ruleAddBtn.addEventListener('click', () => {
-                rule100Count++;
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    if (lastRuleDate) {
-                        const dateKey = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[dateKey] = rule100Count;
-                    }
-                    rule100Count = 1;
-                    lastRuleDate = today;
-                }
-                saveLocalState();
-                updateDashboard();
-                if (rule100Count >= 100) {
-                    fireConfetti();
-                    showToast('🎉 You hit 100 actions today! Amazing!', 'success');
-                }
-            });
-            ruleResetBtn.addEventListener('click', () => {
-                rule100Count = 0;
-                saveLocalState();
-                updateDashboard();
-                showToast('Rule of 100 reset for today.', 'info');
-            });
-
-            // Revenue
-            revenueInput.addEventListener('input', () => {
-                userRevenue = parseFloat(revenueInput.value) || 0;
-                saveLocalState();
-                updateDashboard();
-            });
-
-            // Onboarding
-            $('onboardNext1').addEventListener('click', () => goToStep(2));
-            $('onboardBack2').addEventListener('click', () => goToStep(1));
-            $('onboardNext2').addEventListener('click', () => goToStep(3));
-            $('onboardBack3').addEventListener('click', () => goToStep(2));
-            $('onboardFinish').addEventListener('click', finishOnboarding);
-
-            currentMode = modeSelect.value;
-            updateModeDisplay();
-            userInput.focus();
-        }
-
-        // -------------------- TIER --------------------
+        // Tier
         async function fetchTier() {
             try {
                 const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
                 const data = await res.json();
                 currentTier = data.tier || 'free';
-                tierLabel.textContent = currentTier.toUpperCase();
-                updateSidebarLocks();
+                $('tierLabel').textContent = currentTier.toUpperCase();
+                updateSidebar();
             } catch (e) { console.warn('Tier fetch failed', e); }
         }
 
-        function isTierAtLeast(userTier, required) {
+        function isTierOk(userTier, required) {
             const order = { free: 0, insider: 1, partner: 2 };
             return order[userTier] >= order[required];
         }
 
-        // -------------------- MODES --------------------
+        // Populate modes
         function populateModes() {
-            modeSelect.innerHTML = '';
+            const sel = $('modeSelect');
+            sel.innerHTML = '';
             MODES.forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m.id;
-                opt.textContent = `${m.icon} ${m.label} (${m.tier.toUpperCase()})`;
-                opt.dataset.tier = m.tier;
-                modeSelect.appendChild(opt);
+                opt.textContent = m.label + ' (' + m.tier + ')';
+                sel.appendChild(opt);
             });
-            modeSelect.value = currentMode;
+            sel.value = currentMode;
 
-            modeList.innerHTML = '';
+            const list = $('modeList');
+            list.innerHTML = '';
             MODES.forEach(m => {
                 const div = document.createElement('div');
-                div.className = `mode-item ${m.id === currentMode ? 'active' : ''}`;
-                const tierOk = isTierAtLeast(currentTier, m.tier);
-                if (!tierOk) div.classList.add('locked');
+                div.className = 'mode-item';
+                const ok = isTierOk(currentTier, m.tier);
+                if (!ok) div.classList.add('locked');
+                if (m.id === currentMode) div.classList.add('active');
                 const prog = frameworkProgress[m.id] || 'pending';
                 const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending');
                 div.innerHTML = `
                     <span class="icon"><i class="fas ${m.icon}"></i></span>
                     <span>${m.label}</span>
                     <span class="tier-tag ${m.tier}">${m.tier}</span>
-                    <span class="progress-dot ${dotClass}"></span>
-                    <span class="tooltip">${m.desc}</span>
+                    <span class="dot ${dotClass}"></span>
                 `;
                 div.addEventListener('click', () => {
-                    if (!tierOk) {
-                        showToast(`Upgrade to ${m.tier} tier to unlock ${m.label}.`, 'error');
-                        return;
-                    }
-                    modeSelect.value = m.id;
+                    if (!ok) { showToast('Upgrade to ' + m.tier + ' to unlock ' + m.label, 'error'); return; }
+                    sel.value = m.id;
                     onModeChange();
                     document.querySelector('.tab-btn[data-tab="chat"]').click();
                 });
-                modeList.appendChild(div);
+                list.appendChild(div);
             });
-            updateSidebarLocks();
         }
 
-        function updateSidebarLocks() {
+        function updateSidebar() {
             document.querySelectorAll('.mode-item').forEach((item, idx) => {
                 const m = MODES[idx];
-                const tierOk = isTierAtLeast(currentTier, m.tier);
-                item.classList.toggle('locked', !tierOk);
-                const dot = item.querySelector('.progress-dot');
+                const ok = isTierOk(currentTier, m.tier);
+                item.classList.toggle('locked', !ok);
                 const prog = frameworkProgress[m.id] || 'pending';
-                dot.className = 'progress-dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' :
-                    'pending'));
+                const dot = item.querySelector('.dot');
+                dot.className = 'dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' :
+                'pending'));
             });
         }
 
         function onModeChange() {
-            currentMode = modeSelect.value;
-            updateModeDisplay();
+            currentMode = $('modeSelect').value;
+            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
             document.querySelectorAll('.mode-item').forEach((el, idx) => {
                 el.classList.toggle('active', MODES[idx].id === currentMode);
             });
             if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
                 frameworkProgress[currentMode] = 'started';
-                saveLocalState();
+                saveState();
                 updateDashboard();
-                updateSidebarLocks();
-                showToast(`Started ${MODES.find(m=>m.id===currentMode)?.label} mode.`, 'info');
+                updateSidebar();
+                showToast('Started ' + MODES.find(m => m.id === currentMode)?.label + ' mode', 'info');
             }
-            const modeName = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            addMessage(`Switched to <strong>${modeName}</strong> mode. I'm ready to help.`, 'ai', true);
+            addMessage('Switched to <strong>' + (MODES.find(m => m.id === currentMode)?.label || currentMode) +
+                '</strong> mode.', 'ai', true);
             document.querySelector('.tab-btn[data-tab="chat"]').click();
         }
 
-        function updateModeDisplay() {
-            const modeName = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            modeDisplay.textContent = `Mode: ${modeName}`;
-        }
-
-        // -------------------- CHAT --------------------
+        // Chat
         async function sendMessage() {
-            const text = userInput.value.trim();
+            const text = $('userInput').value.trim();
             if (!text || isSending) return;
             isSending = true;
-            sendBtn.disabled = true;
-            userInput.value = '';
+            $('sendBtn').disabled = true;
+            $('userInput').value = '';
             addMessage(text, 'user');
-            statusText.textContent = 'Thinking...';
+            $('statusText').textContent = 'Thinking...';
             showTyping();
-
             try {
-                const res = await fetch(`${API_BASE}/api/chat`, {
+                const res = await fetch(API_BASE + '/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: text,
-                        mode: currentMode,
-                        member_id: 'default'
-                    })
+                    body: JSON.stringify({ message: text, mode: currentMode, member_id: 'default' })
                 });
                 const data = await res.json();
                 hideTyping();
                 if (data.error) {
-                    addMessage(`⚠️ Error: ${data.error}`, 'ai', true);
-                    statusText.textContent = 'Error';
+                    addMessage('⚠️ ' + data.error, 'ai', true);
+                    $('statusText').textContent = 'Error';
                 } else {
-                    const reply = data.reply || data.response || data.message || 'No response.';
-                    addMessage(reply, 'ai');
-                    statusText.textContent = 'Ready';
+                    addMessage(data.reply || data.response || 'No response.', 'ai');
+                    $('statusText').textContent = 'Ready';
                 }
             } catch (err) {
                 hideTyping();
-                addMessage(`⚠️ Connection error: ${err.message}`, 'ai', true);
-                statusText.textContent = 'Offline';
+                addMessage('⚠️ Connection error', 'ai', true);
+                $('statusText').textContent = 'Offline';
             } finally {
                 isSending = false;
-                sendBtn.disabled = false;
-                userInput.focus();
+                $('sendBtn').disabled = false;
+                $('userInput').focus();
             }
         }
 
         function addMessage(text, sender, isHTML = false) {
             const div = document.createElement('div');
-            div.className = `message ${sender}`;
+            div.className = 'message ' + sender;
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
             avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
@@ -2343,14 +2045,14 @@
             else bubble.textContent = text;
             div.appendChild(avatar);
             div.appendChild(bubble);
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            $('chatMessages').appendChild(div);
+            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
         }
 
-        let typingIndicator = null;
+        let typingEl = null;
 
         function showTyping() {
-            if (typingIndicator) return;
+            if (typingEl) return;
             const div = document.createElement('div');
             div.className = 'message ai';
             div.id = 'typingIndicator';
@@ -2358,180 +2060,153 @@
             avatar.className = 'avatar';
             avatar.innerHTML = '<i class="fas fa-brain"></i>';
             const bubble = document.createElement('div');
-            bubble.className = 'typing-indicator';
+            bubble.className = 'typing';
             bubble.innerHTML = '<span></span><span></span><span></span>';
             div.appendChild(avatar);
             div.appendChild(bubble);
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            typingIndicator = div;
+            $('chatMessages').appendChild(div);
+            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+            typingEl = div;
         }
 
         function hideTyping() {
-            if (typingIndicator) {
-                typingIndicator.remove();
-                typingIndicator = null;
-            }
+            if (typingEl) { typingEl.remove();
+                typingEl = null; }
         }
 
-        // -------------------- FRAMEWORKS --------------------
-        function populateFrameworks() {
-            frameworkGrid.innerHTML = '';
+        // Framework Vault
+        function populateVault() {
+            const grid = $('frameworkGrid');
+            grid.innerHTML = '';
             FRAMEWORKS.forEach(fw => {
                 const card = document.createElement('div');
-                card.className = 'framework-card';
-                const unlocked = isTierAtLeast(currentTier, fw.tier);
+                card.className = 'fw-card';
+                const ok = isTierOk(currentTier, fw.tier);
                 const status = frameworkProgress[fw.id] || 'pending';
-                const isDone = status === 'completed';
-                const isStarted = status === 'started';
-                card.style.opacity = unlocked ? '1' : '0.4';
+                const done = status === 'completed';
+                const started = status === 'started';
+                card.style.opacity = ok ? '1' : '0.4';
                 card.innerHTML = `
-                    <h4>${fw.name} ${isDone ? '✅' : (unlocked ? (isStarted ? '⏳' : '') : '🔒')}</h4>
-                    <p>${fw.desc}</p>
+                    <h4>${fw.name} ${done ? '✅' : (ok ? (started ? '⏳' : '') : '🔒')}</h4>
+                    <p style="font-size:11px;color:var(--text-secondary);">${fw.value}</p>
                     <div class="meta">
-                        <span class="value">${fw.value}</span>
-                        <span class="tier ${fw.tier}">${fw.tier.toUpperCase()}</span>
+                        <span class="val">${fw.value}</span>
+                        <span class="tier ${fw.tier}">${fw.tier}</span>
                     </div>
-                    <button class="action-btn ${isDone ? 'done' : ''}" data-fwid="${fw.id}">
-                        ${isDone ? 'Completed' : (unlocked ? (isStarted ? 'Resume' : 'Start') : 'Locked')}
-                    </button>
+                    <button class="btn ${done ? 'done' : ''}">${done ? 'Completed' : (ok ? (started ? 'Resume' : 'Start') : 'Locked')}</button>
                 `;
-                const btn = card.querySelector('.action-btn');
+                const btn = card.querySelector('.btn');
                 btn.addEventListener('click', () => {
-                    if (!unlocked) {
-                        showToast(`Upgrade to ${fw.tier} tier to access ${fw.name}.`, 'error');
-                        return;
-                    }
-                    if (isDone) {
-                        showToast(`You already completed ${fw.name}. Great job!`, 'info');
-                        return;
-                    }
+                    if (!ok) { showToast('Upgrade to ' + fw.tier + ' for ' + fw.name, 'error'); return; }
+                    if (done) { showToast('Already completed ' + fw.name, 'info'); return; }
                     if (frameworkProgress[fw.id] === 'started') {
                         frameworkProgress[fw.id] = 'completed';
                         fireConfetti();
-                        showToast(`🎉 You completed ${fw.name}! Amazing!`, 'success');
+                        showToast('🎉 Completed ' + fw.name + '!', 'success');
                     } else {
                         frameworkProgress[fw.id] = 'started';
-                        showToast(`Started ${fw.name}. You can continue in the chat.`, 'info');
+                        showToast('Started ' + fw.name, 'info');
                     }
-                    saveLocalState();
-                    populateFrameworks();
+                    saveState();
+                    populateVault();
                     updateDashboard();
-                    updateSidebarLocks();
+                    updateSidebar();
                 });
-                frameworkGrid.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        // -------------------- DASHBOARD --------------------
+        // Dashboard
         function updateDashboard() {
             const total = FRAMEWORKS.length;
-            const completed = FRAMEWORKS.filter(fw => frameworkProgress[fw.id] === 'completed').length;
+            const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
             const health = Math.round((completed / total) * 100);
 
-            // Health ring
-            healthScore.textContent = health;
-            healthSub.textContent = `Based on ${completed} frameworks completed`;
-            const circumference = 251.2;
-            const offset = circumference - (health / 100) * circumference;
-            healthRing.style.strokeDashoffset = offset;
+            // Ring
+            $('healthScore').textContent = health;
+            $('healthSub').textContent = completed + ' / ' + total + ' frameworks completed';
+            const circ = 251.2;
+            $('healthRing').style.strokeDashoffset = circ - (health / 100) * circ;
 
-            fwProgressLabel.textContent = `${completed}/${total}`;
+            // Framework count
+            $('fwCount').textContent = completed + '/' + total;
+            $('fwSub').textContent = completed === 0 ? 'Start your first framework' : completed + ' completed';
 
-            // Mini grid
-            fwMiniGrid.innerHTML = '';
-            FRAMEWORKS.forEach(fw => {
-                const div = document.createElement('div');
-                div.className = 'fw-mini';
-                const status = frameworkProgress[fw.id] || 'pending';
-                const cls = status === 'completed' ? 'done' : (status === 'started' ? 'pending' : 'locked');
-                div.innerHTML = `
-                    <span class="status ${cls}"></span>
-                    <span style="font-size:11px;">${fw.name}</span>
-                `;
-                fwMiniGrid.appendChild(div);
+            // Strip
+            const strip = $('fwStrip');
+            strip.innerHTML = '';
+            FRAMEWORKS.forEach(f => {
+                const d = document.createElement('span');
+                d.className = 'dot';
+                const s = frameworkProgress[f.id] || 'pending';
+                d.classList.add(s === 'completed' ? 'done' : (s === 'started' ? 'partial' : ''));
+                strip.appendChild(d);
             });
 
-            // Rule of 100
-            ruleCount.textContent = rule100Count;
+            // Rule
+            $('ruleCount').textContent = rule100Count;
             const streak = rule100Count >= 100 ? 1 : 0;
-            ruleStreak.innerHTML = `<i class="fas fa-fire"></i> ${streak}d`;
+            $('ruleStreak').innerHTML = '<i class="fas fa-fire"></i> ' + streak + 'd';
 
             // Calendar
-            ruleCalendar.innerHTML = '';
+            const cal = $('ruleCalendar');
+            cal.innerHTML = '';
             for (let i = 6; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(d.getDate() - i);
                 const key = d.toISOString().slice(0, 10);
                 const count = dailyHistory[key] || 0;
-                const isToday = i === 0;
-                const div = document.createElement('div');
-                div.className = `day ${count >= 100 ? 'hit' : ''} ${isToday ? 'today' : ''}`;
+                const div = document.createElement('span');
+                div.className = 'day';
+                if (count >= 100) div.classList.add('hit');
+                if (i === 0) div.classList.add('today');
                 div.textContent = d.getDate();
-                div.title = `${key}: ${count} actions`;
-                ruleCalendar.appendChild(div);
+                cal.appendChild(div);
             }
 
             // Revenue
             const rev = userRevenue || 0;
-            if (rev > 0) {
-                const projected = Math.round(rev * (1 + (completed / total) * 2));
-                revenueProjection.textContent = `$${projected.toLocaleString()}/mo`;
-            } else {
-                revenueProjection.textContent = '$0/mo';
-            }
+            $('revenueProjection').textContent = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2)).toLocaleString() +
+                '/mo' : '$0/mo';
 
             // Next action
-            if (completed === 0) {
-                nextAction.textContent = '🚀 Start with the Delivery Checklist (free tier) to get quick wins.';
-            } else if (completed < 3) {
-                nextAction.textContent = '📈 Complete the AVOCADO Opening Offers framework to build your offer.';
-            } else if (completed < 5) {
-                nextAction.textContent = '💰 Unlock Partner tier to access $100M Offers + Money Models.';
-            } else {
-                nextAction.textContent = '🏆 You\'re on fire! Scale with Community OS and Launch Planner.';
-            }
-
-            // Stats
-            statFrameworks.textContent = completed;
-            statHealth.textContent = health;
-            statStreak.textContent = streak + 'd';
+            if (completed === 0) $('nextAction').textContent = '🚀 Start with the Delivery Checklist (free)';
+            else if (completed < 3) $('nextAction').textContent = '📈 Complete AVOCADO Offers next';
+            else if (completed < 5) $('nextAction').textContent = '💰 Unlock Partner tier for Money Models';
+            else $('nextAction').textContent = '🏆 Scale with Community OS and Launch Planner';
         }
 
-        // -------------------- UPGRADE --------------------
-        function openUpgradeModal() {
-            updatePrices();
-            upgradeModal.classList.add('open');
-        }
-
-        function updatePrices() {
-            const yearly = billingToggle.checked;
+        // Upgrade modal
+        function openUpgrade() {
+            const yearly = $('billingToggle').checked;
             const tiers = [
-                { name: 'Free', features: '3 modes, 30 msg/h, basic frameworks', price: yearly ? '$0' : '$0',
-                current: currentTier === 'free' },
-                { name: 'Insider', features: '+5 modes, frameworks, unlimited chat', price: yearly ? '$40/mo' : '$47/mo',
+                { name: 'Free', features: '3 modes, 30 msg/h', price: yearly ? '$0' : '$0', current: currentTier ===
+                    'free' },
+                { name: 'Insider', features: '+5 modes, frameworks', price: yearly ? '$40/mo' : '$47/mo',
                     current: currentTier === 'insider' },
-                { name: 'Partner', features: '+3 modes, money models, priority support', price: yearly ? '$167/mo' :
-                        '$197/mo', current: currentTier === 'partner' },
+                { name: 'Partner', features: '+3 modes, money models', price: yearly ? '$167/mo' : '$197/mo',
+                    current: currentTier === 'partner' },
             ];
-            tierTable.innerHTML = '';
+            const table = $('tierTable');
+            table.innerHTML = '';
             tiers.forEach(t => {
                 const row = document.createElement('div');
-                row.className = `tier-row${t.current ? ' current' : ''}`;
+                row.className = 'tier-row' + (t.current ? ' current' : '');
                 row.innerHTML = `
-                    <span class="tier-name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="popular">Most Popular</span>' : ''}</span>
+                    <span class="name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="pop">Popular</span>' : ''}</span>
                     <span class="features">${t.features}</span>
                     <span class="price">${t.price}</span>
                 `;
-                tierTable.appendChild(row);
+                table.appendChild(row);
             });
+            $('upgradeModal').classList.add('open');
         }
 
-        // -------------------- ONBOARDING --------------------
+        // Onboarding
         function goToStep(step) {
-            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.onboarding-step[data-step="${step}"]`).classList.add('active');
-            document.querySelectorAll('.onboarding-progress .dot').forEach(d => {
+            document.querySelectorAll('.onboard-step').forEach(el => el.classList.remove('active'));
+            document.querySelector('.onboard-step[data-step="' + step + '"]').classList.add('active');
+            document.querySelectorAll('.onboard-progress .dot').forEach(d => {
                 const s = parseInt(d.dataset.step);
                 d.classList.toggle('active', s === step);
                 d.classList.toggle('done', s < step);
@@ -2539,36 +2214,30 @@
         }
 
         function finishOnboarding() {
-            const goal = $('onboardGoal').value;
             const revenue = parseFloat($('onboardRevenue').value) || 0;
-            const bottleneck = $('onboardBottleneck').value;
-            const name = prompt('What\'s your business name? (optional)') || '';
+            const name = prompt('Business name? (optional)') || '';
             userRevenue = revenue;
             businessName = name;
-            if (revenue) revenueInput.value = revenue;
+            if (revenue) $('revenueInput').value = revenue;
             if (name) {
-                greetingText.textContent = `👋 Welcome, ${name}`;
-                welcomeTitle.textContent = `Welcome back, ${name}`;
+                $('greeting').textContent = '👋 ' + name;
+                $('welcomeTitle').textContent = 'Welcome back, ' + name;
             }
             onboarded = true;
-            saveLocalState();
-            onboardingModal.classList.remove('open');
-            const context =
-                `My goal is ${goal}, my monthly revenue is $${revenue}, my biggest bottleneck is ${bottleneck}.`;
-            addMessage(`Onboarding complete: ${context}`, 'ai', true);
+            saveState();
+            $('onboardingModal').classList.remove('open');
+            showToast('🎉 Welcome! You\'re all set.', 'success');
             updateDashboard();
-            showToast('🎉 Welcome! You\'re all set up.', 'success');
         }
 
-        // -------------------- VALUE EQUATION --------------------
+        // Value Equation
         function openValueEq() {
             ['eqDream', 'eqLikelihood', 'eqTime', 'eqEffort'].forEach(id => {
                 const slider = $(id + 'Slider');
-                const display = $(id);
-                display.textContent = slider.value;
+                $(id).textContent = slider.value;
             });
             updateEqScore();
-            valueEqModal.classList.add('open');
+            $('valueEqModal').classList.add('open');
         }
 
         function updateEqScore() {
@@ -2582,34 +2251,140 @@
 
         ['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
             $(id).addEventListener('input', () => {
-                const display = $(id.replace('Slider', ''));
-                display.textContent = $(id).value;
+                $(id.replace('Slider', '')).textContent = $(id).value;
                 updateEqScore();
             });
         });
 
-        // -------------------- CONFETTI --------------------
+        // Confetti
         function fireConfetti() {
             const container = document.createElement('div');
             container.className = 'confetti-container';
             document.body.appendChild(container);
-            const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa', '#f87171', '#34d399'];
-            for (let i = 0; i < 80; i++) {
-                const piece = document.createElement('div');
-                piece.className = 'confetti';
-                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-                piece.style.left = Math.random() * 100 + '%';
-                piece.style.width = (Math.random() * 8 + 4) + 'px';
-                piece.style.height = (Math.random() * 8 + 4) + 'px';
-                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                piece.style.animationDuration = (Math.random() * 2.5 + 1.5) + 's';
-                piece.style.animationDelay = (Math.random() * 1.2) + 's';
-                container.appendChild(piece);
+            const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
+            for (let i = 0; i < 60; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti';
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = Math.random() * 100 + '%';
+                p.style.width = (Math.random() * 6 + 4) + 'px';
+                p.style.height = (Math.random() * 6 + 4) + 'px';
+                p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                p.style.animationDelay = (Math.random() * 0.8) + 's';
+                container.appendChild(p);
             }
-            setTimeout(() => container.remove(), 4000);
+            setTimeout(() => container.remove(), 3000);
         }
 
-        // -------------------- BOOT --------------------
+        // Init
+        async function init() {
+            loadState();
+            populateModes();
+            await fetchTier();
+            populateVault();
+            updateDashboard();
+
+            if (!onboarded) $('onboardingModal').classList.add('open');
+
+            // Events
+            $('modeSelect').addEventListener('change', onModeChange);
+            $('sendBtn').addEventListener('click', sendMessage);
+            $('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+            $('vaultBtn').addEventListener('click', () => $('vaultModal').classList.add('open'));
+            $('closeVault').addEventListener('click', () => $('vaultModal').classList.remove('open'));
+            $('vaultModal').addEventListener('click', e => { if (e.target === e.currentTarget) $('vaultModal').classList
+                    .remove('open'); });
+
+            $('upgradeBtn').addEventListener('click', openUpgrade);
+            $('closeUpgrade').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
+            $('upgradeCancel').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
+            $('upgradeAction').addEventListener('click', () => {
+                showToast('Upgrade: connect your Whop license key.', 'info');
+                $('upgradeModal').classList.remove('open');
+            });
+            $('billingToggle').addEventListener('change', openUpgrade);
+
+            $('docBtn').addEventListener('click', () => showToast('Upload docs to personalise coaching.', 'info'));
+            $('voiceBtn').addEventListener('click', () => showToast('Text-to-Speech coming soon.', 'info'));
+            $('valueEqBtn').addEventListener('click', openValueEq);
+            $('closeValueEq').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
+            $('closeValueEqBtn').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
+            $('saveValueEq').addEventListener('click', () => {
+                showToast('Value Equation saved!', 'success');
+                $('valueEqModal').classList.remove('open');
+            });
+
+            // Quick actions
+            $('quickXRay').addEventListener('click', () => { $('modeSelect').value = 'xray';
+                onModeChange(); });
+            $('quickOffer').addEventListener('click', () => {
+                if (!isTierOk(currentTier, 'partner')) { showToast('Upgrade to Partner for Offer Architect',
+                        'error'); return; }
+                $('modeSelect').value = 'offer';
+                onModeChange();
+            });
+            $('quickDM').addEventListener('click', () => {
+                if (!isTierOk(currentTier, 'insider')) { showToast('Upgrade to Insider for DM Doctor', 'error'); return; }
+                $('modeSelect').value = 'dm';
+                onModeChange();
+            });
+
+            // Rule
+            $('ruleAddBtn').addEventListener('click', () => {
+                rule100Count++;
+                const today = new Date().toDateString();
+                if (lastRuleDate !== today) {
+                    if (lastRuleDate) { const key = new Date(lastRuleDate).toISOString().slice(0, 10);
+                        dailyHistory[key] = rule100Count; }
+                    rule100Count = 1;
+                    lastRuleDate = today;
+                }
+                saveState();
+                updateDashboard();
+                if (rule100Count >= 100) { fireConfetti();
+                    showToast('🎉 Hit 100 actions!', 'success'); }
+            });
+            $('ruleResetBtn').addEventListener('click', () => { rule100Count = 0;
+                saveState();
+                updateDashboard();
+                showToast('Reset for today.', 'info'); });
+
+            $('revenueInput').addEventListener('input', () => {
+                userRevenue = parseFloat($('revenueInput').value) || 0;
+                saveState();
+                updateDashboard();
+            });
+
+            // Onboarding
+            $('onboardNext1').addEventListener('click', () => goToStep(2));
+            $('onboardBack2').addEventListener('click', () => goToStep(1));
+            $('onboardNext2').addEventListener('click', () => goToStep(3));
+            $('onboardBack3').addEventListener('click', () => goToStep(2));
+            $('onboardFinish').addEventListener('click', finishOnboarding);
+
+            // Tab switching
+            $('tabNav').addEventListener('click', e => {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (tab === 'dashboard') {
+                    $('dashboardView').classList.add('active');
+                    $('chatView').classList.remove('active');
+                    updateDashboard();
+                } else {
+                    $('dashboardView').classList.remove('active');
+                    $('chatView').classList.add('active');
+                }
+            });
+
+            currentMode = $('modeSelect').value;
+            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
+            $('userInput').focus();
+        }
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
