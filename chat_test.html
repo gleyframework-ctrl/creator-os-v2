@@ -190,6 +190,8 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 4px 20px var(--gold-glow);
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-gold:hover {
@@ -251,28 +253,6 @@
             z-index: 1;
         }
 
-        /* Sidebar – hidden until user hovers or clicks a toggle */
-        .sidebar-toggle {
-            display: none;
-            position: absolute;
-            left: 12px;
-            top: 12px;
-            z-index: 10;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 6px 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 12px;
-            transition: var(--transition);
-        }
-
-        .sidebar-toggle:hover {
-            background: var(--bg-card-hover);
-            color: var(--text);
-        }
-
         .sidebar {
             width: 220px;
             background: rgba(255, 255, 255, 0.015);
@@ -313,7 +293,7 @@
             padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
             font-size: 11px;
             font-weight: 500;
             color: var(--text-secondary);
@@ -321,7 +301,8 @@
             position: relative;
         }
 
-        .mode-item:hover {
+        .mode-item:not(.locked):hover {
+            transform: translateX(3px);
             background: var(--bg-card);
             color: var(--text);
         }
@@ -549,6 +530,22 @@
             border-radius: 14px;
             padding: 14px 16px;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(245, 158, 11, 0.04) 50%, transparent 60%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::after {
+            transform: translateX(100%);
         }
 
         .card:hover {
@@ -633,6 +630,8 @@
             font-size: 11px;
             cursor: pointer;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .rule-row button:hover {
@@ -698,17 +697,17 @@
             display: flex;
             gap: 10px;
             max-width: 78%;
-            animation: msgIn 0.35s ease;
+            animation: msgIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         @keyframes msgIn {
             from {
                 opacity: 0;
-                transform: translateY(8px);
+                transform: translateY(10px) scale(0.98);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
@@ -900,6 +899,9 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            position: relative;
+            overflow: hidden;
+            animation: goldPulse 2.5s ease-in-out infinite;
         }
 
         .input-wrapper button:hover {
@@ -908,9 +910,20 @@
         }
 
         .input-wrapper button:disabled {
+            animation: none;
             opacity: 0.4;
             cursor: not-allowed;
             transform: none;
+        }
+
+        @keyframes goldPulse {
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+            }
+            50% {
+                box-shadow: 0 4px 32px rgba(245, 158, 11, 0.55);
+            }
         }
 
         .input-actions {
@@ -1425,6 +1438,150 @@
         }
 
         /* ================================================================
+           RIPPLE, PROGRESS BAR, MOBILE SHEET, EMPTY STATE
+           ================================================================ */
+        .ripple-host {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: rippleAnim 0.5s linear;
+            background: rgba(255, 255, 255, 0.18);
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transition: width 0.4s ease;
+            z-index: 100;
+            box-shadow: 0 0 8px var(--gold-glow);
+        }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 2px;
+            height: 14px;
+            background: var(--gold);
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: blink 0.9s step-start infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+            text-align: center;
+            gap: 12px;
+            opacity: 0.7;
+        }
+        .empty-state .empty-icon {
+            font-size: 32px;
+        }
+        .empty-state p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .empty-state button {
+            margin-top: 4px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--gold-light);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* ================================================================
+           MOBILE BOTTOM SHEET
+           ================================================================ */
+        @media (max-width: 1023px) {
+            .mobile-sidebar-btn {
+                display: flex !important;
+                position: fixed;
+                bottom: 80px;
+                right: 16px;
+                z-index: 200;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--gold);
+                color: var(--bg);
+                align-items: center;
+                justify-content: center;
+                border: none;
+                cursor: pointer;
+                font-size: 16px;
+                box-shadow: 0 4px 20px var(--gold-glow);
+            }
+            .mobile-sheet-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 300;
+                backdrop-filter: blur(4px);
+            }
+            .mobile-sheet-overlay.open {
+                display: block;
+            }
+            .mobile-sheet {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 400;
+                background: var(--bg-surface);
+                border-radius: 20px 20px 0 0;
+                border-top: 1px solid var(--border);
+                padding: 16px 16px 32px;
+                transform: translateY(100%);
+                transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+            .mobile-sheet.open {
+                transform: translateY(0);
+            }
+            .sheet-handle {
+                width: 40px;
+                height: 4px;
+                background: var(--border-hover);
+                border-radius: 2px;
+                margin: 0 auto 16px;
+            }
+        }
+
+        .mobile-sidebar-btn {
+            display: none;
+        }
+        .mobile-sheet-overlay {
+            display: none;
+        }
+
+        /* ================================================================
            RESPONSIVE
            ================================================================ */
         @media (max-width: 1024px) {
@@ -1556,7 +1713,18 @@
 </head>
 <body>
 
+    <!-- mobile fab -->
+    <button class="mobile-sidebar-btn" id="mobileFab"><i class="fas fa-bolt"></i></button>
+    <div class="mobile-sheet-overlay" id="sheetOverlay">
+        <div class="mobile-sheet" id="mobileSheet">
+            <div class="sheet-handle"></div>
+            <div class="sidebar-title">⚡ Modes</div>
+            <div class="mode-list" id="modeListMobile"></div>
+        </div>
+    </div>
+
     <div class="app" id="app">
+        <div class="progress-bar" id="progressBar"></div>
 
         <!-- HEADER -->
         <header class="header">
@@ -1882,7 +2050,9 @@
                 dailyHistory = d.dailyHistory || {};
                 if (userRevenue) $('revenueInput').value = userRevenue;
                 if (businessName) {
-                    $('greeting').textContent = '👋 ' + businessName;
+                    const hr = new Date().getHours();
+                    const salutation = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+                    $('greeting').textContent = salutation + ', ' + businessName + ' 👋';
                     $('welcomeTitle').textContent = 'Welcome back, ' + businessName;
                 }
                 const today = new Date().toDateString();
@@ -2007,6 +2177,13 @@
             addMessage(text, 'user');
             $('statusText').textContent = 'Thinking...';
             showTyping();
+
+            // Progress bar
+            const pb = $('progressBar');
+            pb.style.width = '0%';
+            pb.style.transition = 'width 8s linear';
+            setTimeout(() => pb.style.width = '85%', 10);
+
             try {
                 const res = await fetch(API_BASE + '/api/chat', {
                     method: 'POST',
@@ -2030,6 +2207,11 @@
                 isSending = false;
                 $('sendBtn').disabled = false;
                 $('userInput').focus();
+                // Reset progress bar
+                pb.style.transition = 'width 0.3s ease';
+                pb.style.width = '100%';
+                setTimeout(() => { pb.style.width = '0%';
+                    pb.style.transition = 'none'; }, 400);
             }
         }
 
@@ -2045,6 +2227,37 @@
             else bubble.textContent = text;
             div.appendChild(avatar);
             div.appendChild(bubble);
+
+            // Listen button on AI messages
+            if (sender === 'ai') {
+                const listenBtn = document.createElement('button');
+                listenBtn.className = 'listen-btn';
+                listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+                listenBtn.style.cssText =
+                    'margin-top:6px;padding:3px 10px;border-radius:20px;border:1px solid rgba(245,158,11,0.2);background:rgba(245,158,11,0.06);color:var(--gold-light);font-size:10px;cursor:pointer;display:block;';
+                listenBtn.addEventListener('click', async () => {
+                    const plainText = bubble.innerText.slice(0, 500);
+                    listenBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                    try {
+                        const res = await fetch(API_BASE + '/api/tts', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: plainText, lang: 'en' })
+                        });
+                        if (!res.ok) throw new Error('TTS error');
+                        const blob = await res.blob();
+                        const audio = new Audio(URL.createObjectURL(blob));
+                        audio.play();
+                        listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Playing...';
+                        audio.onended = () => { listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen'; };
+                    } catch (e) {
+                        listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
+                        showToast('Voice unavailable', 'error');
+                    }
+                });
+                bubble.appendChild(listenBtn);
+            }
+
             $('chatMessages').appendChild(div);
             $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
         }
@@ -2116,6 +2329,23 @@
             });
         }
 
+        // Animated counter helper
+        function animateCounter(el, target, prefix = '', suffix = '', duration = 600) {
+            const start = parseFloat(el.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const range = target - start;
+            const startTime = performance.now();
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const val = start + range * ease;
+                el.textContent = prefix + Math.round(val).toLocaleString() + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
         // Dashboard
         function updateDashboard() {
             const total = FRAMEWORKS.length;
@@ -2166,8 +2396,8 @@
 
             // Revenue
             const rev = userRevenue || 0;
-            $('revenueProjection').textContent = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2)).toLocaleString() +
-                '/mo' : '$0/mo';
+            $('revenueProjection').textContent = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2))
+                .toLocaleString() + '/mo' : '$0/mo';
 
             // Next action
             if (completed === 0) $('nextAction').textContent = '🚀 Start with the Delivery Checklist (free)';
@@ -2220,7 +2450,9 @@
             businessName = name;
             if (revenue) $('revenueInput').value = revenue;
             if (name) {
-                $('greeting').textContent = '👋 ' + name;
+                const hr = new Date().getHours();
+                const salutation = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+                $('greeting').textContent = salutation + ', ' + name + ' 👋';
                 $('welcomeTitle').textContent = 'Welcome back, ' + name;
             }
             onboarded = true;
@@ -2255,6 +2487,20 @@
                 updateEqScore();
             });
         });
+
+        // Ripple effect on gold buttons
+        function addRipple(e) {
+            const btn = e.currentTarget;
+            const r = document.createElement('span');
+            r.className = 'ripple-wave';
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            r.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - rect.left - size / 2) +
+                'px;top:' + (e.clientY - rect.top - size / 2) + 'px';
+            btn.classList.add('ripple-host');
+            btn.appendChild(r);
+            setTimeout(() => r.remove(), 600);
+        }
 
         // Confetti
         function fireConfetti() {
@@ -2306,7 +2552,28 @@
             $('billingToggle').addEventListener('change', openUpgrade);
 
             $('docBtn').addEventListener('click', () => showToast('Upload docs to personalise coaching.', 'info'));
-            $('voiceBtn').addEventListener('click', () => showToast('Text-to-Speech coming soon.', 'info'));
+
+            // Real TTS from /api/tts
+            $('voiceBtn').addEventListener('click', async () => {
+                const msgs = document.querySelectorAll('.message.ai .bubble');
+                if (!msgs.length) { showToast('No coach reply to read yet.', 'info'); return; }
+                const lastText = msgs[msgs.length - 1].innerText.slice(0, 500);
+                showToast('🔊 Playing...', 'info');
+                try {
+                    const res = await fetch(API_BASE + '/api/tts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: lastText, lang: 'en' })
+                    });
+                    if (!res.ok) throw new Error('TTS failed');
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.play();
+                    audio.onended = () => URL.revokeObjectURL(url);
+                } catch (e) { showToast('Voice unavailable: ' + e.message, 'error'); }
+            });
+
             $('valueEqBtn').addEventListener('click', openValueEq);
             $('closeValueEq').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
             $('closeValueEqBtn').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
@@ -2331,6 +2598,7 @@
             });
 
             // Rule
+            $('ruleAddBtn').addEventListener('click', addRipple);
             $('ruleAddBtn').addEventListener('click', () => {
                 rule100Count++;
                 const today = new Date().toDateString();
@@ -2377,6 +2645,52 @@
                 } else {
                     $('dashboardView').classList.remove('active');
                     $('chatView').classList.add('active');
+                }
+            });
+
+            // Ripple on send and gold buttons
+            document.querySelectorAll('.btn-gold, #sendBtn, #ruleAddBtn').forEach(b => {
+                b.addEventListener('click', addRipple);
+            });
+
+            // Mobile bottom sheet sidebar
+            const fab = $('mobileFab');
+            const overlay = $('sheetOverlay');
+            const sheet = $('mobileSheet');
+            const mobileList = $('modeListMobile');
+
+            function populateMobileList() {
+                mobileList.innerHTML = '';
+                MODES.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'mode-item' + (m.id === currentMode ? ' active' : '');
+                    if (!isTierOk(currentTier, m.tier)) div.classList.add('locked');
+                    div.innerHTML =
+                        '<span class="icon"><i class="fas ' + m.icon + '"></i></span><span>' + m.label +
+                        '</span><span class="tier-tag ' + m.tier + '">' + m.tier + '</span>';
+                    div.addEventListener('click', () => {
+                        if (!isTierOk(currentTier, m.tier)) { showToast('Upgrade to ' + m.tier + ' for ' +
+                                m.label, 'error'); return; }
+                        $('modeSelect').value = m.id;
+                        onModeChange();
+                        overlay.classList.remove('open');
+                        sheet.classList.remove('open');
+                        document.querySelector('.tab-btn[data-tab="chat"]').click();
+                    });
+                    mobileList.appendChild(div);
+                });
+            }
+            populateMobileList();
+
+            if (fab) fab.addEventListener('click', () => {
+                populateMobileList();
+                overlay.classList.add('open');
+                sheet.classList.add('open');
+            });
+            if (overlay) overlay.addEventListener('click', e => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('open');
+                    sheet.classList.remove('open');
                 }
             });
 
