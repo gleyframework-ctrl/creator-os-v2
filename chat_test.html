@@ -2,1731 +2,413 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>E5 AI Coach – Quattuortrigintillion</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ================================================================
-           QUATTUORTRIGINTILLION – Ultimate Calm Luxury
-           ================================================================ */
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #070b14;
-            --bg-surface: #0d1628;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --bg-card-hover: rgba(255, 255, 255, 0.06);
-            --border: rgba(255, 255, 255, 0.05);
-            --border-hover: rgba(255, 255, 255, 0.12);
-            --text: #edf2f7;
-            --text-secondary: #8899bb;
-            --text-muted: #445566;
-            --gold: #f59e0b;
-            --gold-light: #fbbf24;
-            --gold-glow: rgba(245, 158, 11, 0.2);
-            --purple: #8b5cf6;
-            --green: #4ade80;
-            --radius: 24px;
-            --shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            --bg: #070b14; --bg-surface: #0d1628; --bg-card: rgba(255,255,255,0.03);
+            --bg-card-hover: rgba(255,255,255,0.06); --bg-elevated: rgba(255,255,255,0.05);
+            --border: rgba(255,255,255,0.05); --border-hover: rgba(255,255,255,0.12);
+            --border-gold: rgba(245,158,11,0.15); --text: #edf2f7; --text-secondary: #8899bb;
+            --text-muted: #445566; --gold: #f59e0b; --gold-light: #fbbf24;
+            --gold-glow: rgba(245,158,11,0.2); --purple: #8b5cf6; --green: #4ade80;
+            --green-glow: rgba(74,222,128,0.15); --radius-sm: 8px; --radius-md: 12px;
+            --radius-lg: 16px; --radius-xl: 24px;
+            --shadow: 0 30px 80px rgba(0,0,0,0.8);
+            --shadow-card: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(245,158,11,0.03);
+            --shadow-card-hover: 0 16px 48px rgba(0,0,0,0.4), 0 4px 16px rgba(245,158,11,0.06);
             --transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-
-        html,
+        html, body { height: 100%; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+            display: flex; justify-content: center; align-items: center; padding: 16px; overflow: hidden;
+            background-image:
+                radial-gradient(ellipse at 25% 30%, rgba(245,158,11,0.035), transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(139,92,246,0.025), transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.01), transparent 70%);
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            background-image: radial-gradient(ellipse at 25% 30%, rgba(245, 158, 11, 0.035), transparent 55%),
-                radial-gradient(ellipse at 75% 70%, rgba(139, 92, 246, 0.025), transparent 50%);
+        .ambient-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .ambient-bg::before, .ambient-bg::after {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.04;
+            animation: ambientFloat 20s ease-in-out infinite;
         }
-
+        .ambient-bg::before { width: 600px; height: 600px; background: var(--gold); top: -10%; left: -10%; }
+        .ambient-bg::after { width: 500px; height: 500px; background: var(--purple); bottom: -10%; right: -10%; animation-delay: -10s; }
+        @keyframes ambientFloat {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(30px,-30px) scale(1.1); }
+            66% { transform: translate(-20px,20px) scale(0.95); }
+        }
         .app {
-            width: 100%;
-            max-width: 1440px;
-            height: 95vh;
-            max-height: 1000px;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+            width: 100%; max-width: 1440px; height: 95vh; max-height: 1000px;
+            background: var(--bg-surface); border-radius: var(--radius-xl); border: 1px solid var(--border);
+            box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden;
+            position: relative; z-index: 1;
         }
-
         .app::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.02), transparent 60%);
-            pointer-events: none;
-            z-index: 0;
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(245,158,11,0.02), transparent 60%);
+            pointer-events: none; z-index: 0;
         }
-
-        /* ================================================================
-           HEADER – Minimal, Clean
-           ================================================================ */
+        /* Ripple */
+        .ripple-container { position: relative; overflow: hidden; }
+        .ripple {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,158,11,0.25), transparent 70%);
+            transform: scale(0); animation: rippleAnim 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+            pointer-events: none; z-index: 0;
+        }
+        @keyframes rippleAnim { from { transform: scale(0); opacity: 0.6; } to { transform: scale(4); opacity: 0; } }
+        /* Header */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 28px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            position: relative;
-            z-index: 2;
-            flex-wrap: wrap;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(12px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 28px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+            position: relative; z-index: 2; flex-wrap: wrap; gap: 10px;
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(12px);
+            animation: slideDown 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+        .logo { display: flex; align-items: center; gap: 10px; }
         .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--bg);
-            box-shadow: 0 0 30px var(--gold-glow);
+            width: 36px; height: 36px; background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 800; color: var(--bg); box-shadow: 0 0 30px var(--gold-glow);
+            transition: var(--transition-spring);
         }
-
-        .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            color: var(--text);
-        }
-
-        .logo-text span {
-            color: var(--gold-light);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .logo:hover .logo-icon { transform: rotate(-5deg) scale(1.05); }
+        .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+        .logo-text span { color: var(--gold-light); }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
         .greeting {
-            font-size: 12px;
-            color: var(--text-secondary);
-            padding: 4px 14px;
-            background: var(--bg-card);
-            border-radius: 40px;
-            border: 1px solid var(--border);
+            font-size: 12px; color: var(--text-secondary); padding: 4px 14px; background: var(--bg-card);
+            border-radius: 40px; border: 1px solid var(--border); transition: var(--transition);
+            opacity: 0; animation: fadeIn 0.5s 0.3s ease forwards;
         }
-
+        .greeting:hover { border-color: var(--border-hover); color: var(--text); }
         .tier-badge {
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 10px;
-            font-weight: 600;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.15);
-            color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: default;
+            padding: 4px 14px; border-radius: 40px; font-size: 10px; font-weight: 600;
+            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.15);
+            color: var(--gold-light); display: flex; align-items: center; gap: 4px;
+            cursor: default; transition: var(--transition-spring);
+            opacity: 0; animation: fadeIn 0.5s 0.4s ease forwards;
         }
-
+        .tier-badge:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold-glow); }
         .btn-icon {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+            padding: 6px 12px; border-radius: 40px; font-size: 12px; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 4px;
+            position: relative; overflow: hidden; opacity: 0; animation: fadeIn 0.5s 0.5s ease forwards;
         }
-
-        .btn-icon:hover {
-            background: var(--bg-card);
-            border-color: var(--border-hover);
-            color: var(--text);
-        }
-
+        .btn-icon:hover { background: var(--bg-card); border-color: var(--border-hover); color: var(--text); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn-icon:active { transform: scale(0.97); }
         .btn-gold {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border: none;
-            color: var(--bg);
-            padding: 6px 18px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 20px var(--gold-glow);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: none; color: var(--bg);
+            padding: 6px 18px; border-radius: 40px; font-weight: 600; font-size: 12px; cursor: pointer;
+            transition: var(--transition-spring); box-shadow: 0 4px 20px var(--gold-glow);
+            position: relative; overflow: hidden; opacity: 0; animation: fadeIn 0.5s 0.6s ease forwards;
         }
-
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
-        }
-
-        /* ================================================================
-           TAB NAV – Simple
-           ================================================================ */
-        .tab-nav {
-            display: flex;
-            gap: 0;
-            padding: 0 28px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 2;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 10px 18px;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            border-bottom: 2px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            position: relative;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-secondary);
-        }
-
-        .tab-btn.active {
-            color: var(--gold-light);
-            border-bottom-color: var(--gold);
-        }
-
-        .tab-btn i {
-            font-size: 14px;
-        }
-
-        /* ================================================================
-           MAIN LAYOUT – Sidebar hidden by default, clean focus
-           ================================================================ */
-        .main-area {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-
-        .sidebar {
-            width: 220px;
-            background: rgba(255, 255, 255, 0.015);
-            border-right: 1px solid var(--border);
-            padding: 16px 10px;
-            overflow-y: auto;
-            flex-shrink: 0;
-            display: none;
-            transition: var(--transition);
-        }
-
-        @media (min-width: 1024px) {
-            .sidebar {
-                display: block;
-            }
-        }
-
-        .sidebar-title {
-            font-size: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            font-weight: 600;
-            padding-left: 6px;
-        }
-
-        .mode-list {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .mode-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            position: relative;
-        }
-
-        .mode-item:not(.locked):hover {
-            transform: translateX(3px);
-            background: var(--bg-card);
-            color: var(--text);
-        }
-
-        .mode-item.active {
-            background: rgba(245, 158, 11, 0.06);
-            border-color: rgba(245, 158, 11, 0.1);
-            color: var(--gold-light);
-        }
-
-        .mode-item .icon {
-            width: 20px;
-            text-align: center;
-            font-size: 12px;
-        }
-
-        .mode-item .tier-tag {
-            font-size: 7px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 1px 6px;
-            border-radius: 20px;
-            color: var(--text-muted);
-            margin-left: auto;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            font-weight: 600;
-        }
-
-        .mode-item .tier-tag.free {
-            background: rgba(34, 197, 94, 0.08);
-            color: var(--green);
-        }
-        .mode-item .tier-tag.insider {
-            background: rgba(245, 158, 11, 0.08);
-            color: var(--gold-light);
-        }
-        .mode-item .tier-tag.partner {
-            background: rgba(168, 85, 247, 0.08);
-            color: #c084fc;
-        }
-
-        .mode-item.locked {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        .mode-item.locked:hover {
-            background: transparent;
-            transform: none;
-        }
-
-        .mode-item .dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            margin-left: 4px;
-        }
-        .mode-item .dot.complete {
-            background: var(--green);
-        }
-        .mode-item .dot.partial {
-            background: var(--gold);
-        }
-        .mode-item .dot.pending {
-            background: var(--text-muted);
-        }
-
-        /* ================================================================
-           CONTENT AREA – Clean, Focused
-           ================================================================ */
-        .content-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            background: var(--bg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ----- DASHBOARD – Minimal, One Primary View ----- */
-        .dashboard-view {
-            display: none;
-            flex-direction: column;
-            padding: 20px 28px;
-            overflow-y: auto;
-            flex: 1;
-            gap: 18px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .dashboard-view.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Primary Metric – Large, Calm */
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.35); }
+        .btn-gold:active { transform: scale(0.96); }
+        /* XP Bar */
+        .xp-bar-wrap { display: flex; align-items: center; gap: 8px; padding: 2px 14px; background: var(--bg-card); border-radius: 40px; border: 1px solid var(--border); font-size: 10px; color: var(--text-secondary); opacity: 0; animation: fadeIn 0.5s 0.55s ease forwards; }
+        .xp-bar-track { width: 60px; height: 4px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 4px; width: 0%; transition: width 1s cubic-bezier(0.22,1,0.36,1); box-shadow: 0 0 8px var(--gold-glow); }
+        .xp-level { font-weight: 700; color: var(--gold-light); font-size: 10px; }
+        /* Tab Nav */
+        .tab-nav { display: flex; gap: 4px; padding: 6px 28px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: rgba(0,0,0,0.1); position: relative; z-index: 2; opacity: 0; animation: fadeIn 0.5s 0.35s ease forwards; }
+        .tab-btn { background: transparent; border: none; padding: 8px 18px; color: var(--text-muted); font-weight: 500; font-size: 12px; cursor: pointer; transition: var(--transition); border-radius: 40px; display: flex; align-items: center; gap: 6px; position: relative; }
+        .tab-btn:hover { color: var(--text-secondary); background: var(--bg-card); }
+        .tab-btn.active { color: var(--gold-light); background: rgba(245,158,11,0.08); font-weight: 600; }
+        .tab-btn i { font-size: 14px; }
+        /* Mobile Menu */
+        .mobile-menu-btn { display: none; position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 100; background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 8px 12px; color: var(--text-secondary); cursor: pointer; font-size: 14px; transition: var(--transition); backdrop-filter: blur(12px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .mobile-menu-btn:hover { background: var(--bg-card-hover); color: var(--text); }
+        .mobile-menu-btn.active { color: var(--gold-light); border-color: var(--border-gold); }
+        /* Main */
+        .main-area { display: flex; flex: 1; overflow: hidden; position: relative; z-index: 1; }
+        .sidebar { width: 220px; background: rgba(255,255,255,0.015); border-right: 1px solid var(--border); padding: 16px 10px; overflow-y: auto; flex-shrink: 0; transition: var(--transition); opacity: 0; animation: slideRight 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) forwards; }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .sidebar-title { font-size: 8px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; padding-left: 6px; }
+        .mode-list { display: flex; flex-direction: column; gap: 2px; }
+        .mode-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-size: 11px; font-weight: 500; color: var(--text-secondary); border: 1px solid transparent; position: relative; }
+        .mode-item:hover { background: var(--bg-card); color: var(--text); transform: translateX(2px); }
+        .mode-item.active { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.1); color: var(--gold-light); }
+        .mode-item .icon { width: 20px; text-align: center; font-size: 12px; }
+        .mode-item .tier-tag { font-size: 7px; background: rgba(255,255,255,0.04); padding: 1px 6px; border-radius: 20px; color: var(--text-muted); margin-left: auto; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+        .mode-item .tier-tag.free { background: rgba(34,197,94,0.08); color: var(--green); }
+        .mode-item .tier-tag.insider { background: rgba(245,158,11,0.08); color: var(--gold-light); }
+        .mode-item .tier-tag.partner { background: rgba(168,85,247,0.08); color: #c084fc; }
+        .mode-item.locked { opacity: 0.3; cursor: not-allowed; }
+        .mode-item.locked:hover { background: transparent; transform: none; }
+        .mode-item .dot { width: 4px; height: 4px; border-radius: 50%; margin-left: 4px; }
+        .mode-item .dot.complete { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+        .mode-item .dot.partial { background: var(--gold); }
+        .mode-item .dot.pending { background: var(--text-muted); }
+        /* Mobile Bottom Sheet */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+        .sidebar-bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; height: 70vh; background: var(--bg-surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border); padding: 20px 16px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); z-index: 200; overflow-y: auto; display: none; }
+        .sidebar-bottom-sheet.open { transform: translateY(0); }
+        .sidebar-bottom-sheet .sheet-handle { width: 36px; height: 4px; background: var(--text-muted); border-radius: 4px; margin: 0 auto 16px; opacity: 0.5; }
+        /* Content */
+        .content-area { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg); position: relative; overflow: hidden; }
+        /* Skeleton */
+        .skeleton-screen { display: none; flex-direction: column; gap: 14px; padding: 20px 28px; flex: 1; }
+        .skeleton-screen.active { display: flex; }
+        .skeleton { background: rgba(255,255,255,0.03); border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.03); overflow: hidden; animation: skeletonPulse 1.5s ease-in-out infinite; }
+        @keyframes skeletonPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .skeleton-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.04); margin: 20px; }
+        .skeleton-text { height: 16px; background: rgba(255,255,255,0.04); border-radius: 4px; margin: 8px 20px; }
+        .skeleton-text.short { width: 40%; }
+        .skeleton-card { height: 120px; }
+        /* Dashboard */
+        .dashboard-view { display: none; flex-direction: column; padding: 20px 28px; overflow-y: auto; flex: 1; gap: 18px; }
+        .dashboard-view.active { display: flex; }
+        .dashboard-view > * { opacity: 0; animation: cardIn 0.5s ease forwards; }
+        .dashboard-view > *:nth-child(1) { animation-delay: 0.05s; }
+        .dashboard-view > *:nth-child(2) { animation-delay: 0.12s; }
+        .dashboard-view > *:nth-child(3) { animation-delay: 0.19s; }
+        .dashboard-view > *:nth-child(4) { animation-delay: 0.26s; }
+        .dashboard-view > *:nth-child(5) { animation-delay: 0.33s; }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .primary-metric {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            padding: 20px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            flex-wrap: wrap;
-        }
-
-        .primary-metric .ring-wrap {
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .primary-metric .ring-wrap svg {
-            transform: rotate(-90deg);
-        }
-
-        .primary-metric .ring-wrap .bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.03);
-            stroke-width: 5;
-        }
-
-        .primary-metric .ring-wrap .fg {
-            fill: none;
-            stroke: var(--gold);
-            stroke-width: 5;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1);
-            filter: drop-shadow(0 0 16px var(--gold-glow));
-        }
-
-        .primary-metric .ring-wrap .center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .primary-metric .info h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .primary-metric .info p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .primary-metric .info .sub {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .primary-metric .quick-actions {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
-            flex-wrap: wrap;
-        }
-
-        .primary-metric .quick-actions button {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 6px 16px;
-            color: var(--text-secondary);
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .primary-metric .quick-actions button:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-hover);
-            color: var(--text);
-        }
-
-        /* Secondary Grid – Clean Cards */
-        .secondary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 14px;
-        }
-
-        @media (max-width: 900px) {
-            .secondary-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 600px) {
-            .secondary-grid {
-                grid-template-columns: 1fr;
-            }
-            .primary-metric {
-                flex-direction: column;
-                text-align: center;
-                gap: 16px;
-            }
-            .primary-metric .quick-actions {
-                margin-left: 0;
-                justify-content: center;
-            }
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px 16px;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(245, 158, 11, 0.04) 50%, transparent 60%);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-            pointer-events: none;
-        }
-
-        .card:hover::after {
-            transform: translateX(100%);
-        }
-
-        .card:hover {
-            border-color: var(--border-hover);
-        }
-
-        .card h4 {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .card .value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .card .sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        /* Framework progress – simple dots */
-        .fw-strip {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            margin-top: 6px;
-        }
-
-        .fw-strip .dot {
-            width: 24px;
-            height: 6px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.04);
-            transition: var(--transition);
-        }
-
-        .fw-strip .dot.done {
-            background: var(--green);
-            box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
-        }
-        .fw-strip .dot.partial {
-            background: var(--gold);
-            box-shadow: 0 0 12px var(--gold-glow);
-        }
-
-        /* Rule of 100 – Clean */
-        .rule-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .rule-row .count {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--gold-light);
-        }
-
-        .rule-row .streak {
-            font-size: 12px;
-            color: var(--gold-light);
-            padding: 2px 12px;
-            background: rgba(245, 158, 11, 0.06);
-            border-radius: 40px;
-            border: 1px solid rgba(245, 158, 11, 0.06);
-        }
-
-        .rule-row button {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 4px 14px;
-            color: var(--text-secondary);
-            font-size: 11px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .rule-row button:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-hover);
-            color: var(--text);
-        }
-
-        /* Mini calendar */
-        .mini-cal {
-            display: flex;
-            gap: 4px;
-            margin-top: 8px;
-        }
-
-        .mini-cal .day {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.03);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            color: var(--text-muted);
-            border: 1px solid transparent;
-            transition: var(--transition);
-        }
-
-        .mini-cal .day.hit {
-            background: var(--green);
-            color: var(--bg);
-            border-color: var(--green);
-            box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
-        }
-
-        .mini-cal .day.today {
-            border-color: var(--gold);
-        }
-
-        /* ----- CHAT VIEW – Clean, Contextual ----- */
-        .chat-view {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .chat-view.active {
-            display: flex;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            max-width: 78%;
-            animation: msgIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-
-        @keyframes msgIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-        }
-
-        .message.ai .avatar {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: var(--bg);
-            box-shadow: 0 0 20px var(--gold-glow);
-        }
-
-        .message.user .avatar {
-            background: linear-gradient(135deg, var(--purple), #6d28d9);
-            color: white;
-        }
-
-        .message .bubble {
-            background: var(--bg-card);
-            padding: 10px 16px;
-            border-radius: 14px;
-            font-size: 13px;
-            line-height: 1.6;
-            border: 1px solid var(--border);
-        }
-
-        .message.user .bubble {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.12);
-        }
-
-        /* typing */
-        .typing {
-            display: flex;
-            gap: 4px;
-            padding: 10px 16px;
-            background: var(--bg-card);
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            width: fit-content;
-        }
-
-        .typing span {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--gold-light);
-            animation: typingBounce 1.4s infinite;
-        }
-
-        .typing span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typingBounce {
-            0%,
-            60%,
-            100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-5px);
-            }
-        }
-
-        /* status */
-        .status-bar {
-            padding: 3px 24px;
-            font-size: 10px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.1);
-            flex-shrink: 0;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--green);
-            margin-right: 4px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        /* input */
-        .input-bar {
-            padding: 10px 24px 14px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .input-bar .mode-selector {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .input-bar .mode-selector select {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 6px 12px;
-            color: var(--text);
-            font-size: 11px;
-            font-weight: 500;
-            outline: none;
-            cursor: pointer;
-            transition: var(--transition);
-            min-width: 120px;
-        }
-
-        .input-bar .mode-selector select:hover {
-            border-color: var(--border-hover);
-        }
-
-        .input-wrapper {
-            flex: 2;
-            display: flex;
-            gap: 6px;
-            min-width: 120px;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 7px 14px;
-            color: var(--text);
-            font-size: 13px;
-            outline: none;
-            transition: var(--transition);
-            min-width: 0;
-        }
-
-        .input-wrapper input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .input-wrapper input:focus {
-            border-color: rgba(245, 158, 11, 0.25);
-        }
-
-        .input-wrapper button {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border: none;
-            border-radius: 40px;
-            padding: 7px 18px;
-            font-weight: 600;
-            color: var(--bg);
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            position: relative;
-            overflow: hidden;
-            animation: goldPulse 2.5s ease-in-out infinite;
-        }
-
-        .input-wrapper button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px var(--gold-glow);
-        }
-
-        .input-wrapper button:disabled {
-            animation: none;
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        @keyframes goldPulse {
-            0%,
-            100% {
-                box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
-            }
-            50% {
-                box-shadow: 0 4px 32px rgba(245, 158, 11, 0.55);
-            }
-        }
-
-        .input-actions {
-            display: flex;
-            gap: 4px;
-        }
-
-        .input-actions button {
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 5px 10px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 12px;
-        }
-
-        .input-actions button:hover {
-            background: var(--bg-card);
-            color: var(--text);
-            border-color: var(--border-hover);
-        }
-
-        /* ================================================================
-           MODALS – Clean, Spacious
-           ================================================================ */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(16px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            max-width: 680px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 24px 28px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
-            position: relative;
-            animation: modalSlide 0.3s ease;
-        }
-
-        @keyframes modalSlide {
-            from {
-                transform: scale(0.97) translateY(16px);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 20px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            color: var(--text);
-            transform: rotate(90deg);
-        }
-
-        .modal h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: var(--text);
-        }
-
-        .modal h2 .gold {
-            color: var(--gold-light);
-        }
-
-        .modal p.sub {
-            color: var(--text-secondary);
-            margin-bottom: 18px;
-            font-size: 13px;
-        }
-
-        /* framework grid */
-        .fw-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        @media (max-width: 600px) {
-            .fw-grid {
-                grid-template-columns: 1fr;
-            }
-            .modal {
-                padding: 18px 16px;
-            }
-        }
-
-        .fw-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-
-        .fw-card:hover {
-            border-color: var(--border-hover);
-        }
-
-        .fw-card h4 {
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .fw-card p {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin: 4px 0;
-        }
-
-        .fw-card .meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .fw-card .meta .val {
-            color: var(--gold-light);
-            font-weight: 600;
-        }
-
-        .fw-card .meta .tier {
-            padding: 1px 8px;
-            border-radius: 40px;
-            font-size: 8px;
-            font-weight: 600;
-        }
-        .fw-card .meta .tier.free {
-            background: rgba(34, 197, 94, 0.08);
-            color: var(--green);
-        }
-        .fw-card .meta .tier.insider {
-            background: rgba(245, 158, 11, 0.08);
-            color: var(--gold-light);
-        }
-        .fw-card .meta .tier.partner {
-            background: rgba(168, 85, 247, 0.08);
-            color: #c084fc;
-        }
-
-        .fw-card .btn {
-            margin-top: 8px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 3px 12px;
-            font-size: 10px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            width: 100%;
-            text-align: center;
-        }
-
-        .fw-card .btn:hover {
-            background: rgba(245, 158, 11, 0.06);
-            border-color: var(--gold);
-            color: var(--text);
-        }
-        .fw-card .btn.done {
-            background: rgba(34, 197, 94, 0.06);
-            border-color: var(--green);
-            color: var(--green);
-        }
-
-        /* Upgrade tier */
-        .billing-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .billing-toggle span {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .billing-toggle .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 22px;
-        }
-
-        .billing-toggle .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .billing-toggle .slider {
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.06);
-            transition: var(--transition);
-            border-radius: 34px;
-            cursor: pointer;
-        }
-
-        .billing-toggle .slider:before {
-            content: "";
-            position: absolute;
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
-            transition: var(--transition);
-            border-radius: 50%;
-        }
-
-        .billing-toggle input:checked+.slider {
-            background: var(--gold);
-        }
-        .billing-toggle input:checked+.slider:before {
-            transform: translateX(18px);
-        }
-
-        .tier-table {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin: 10px 0;
-        }
-
-        .tier-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            padding: 8px 14px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            align-items: center;
-            font-size: 13px;
-        }
-
-        .tier-row .name {
-            font-weight: 600;
-        }
-        .tier-row .features {
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-        .tier-row .price {
-            font-weight: 600;
-            color: var(--gold-light);
-            text-align: right;
-        }
-        .tier-row.current {
-            border-color: var(--gold);
-            background: rgba(245, 158, 11, 0.03);
-        }
-        .tier-row .pop {
-            font-size: 8px;
-            background: var(--gold);
-            color: var(--bg);
-            padding: 1px 8px;
-            border-radius: 40px;
-            font-weight: 700;
-            margin-left: 4px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
-
-        /* Onboarding */
-        .onboard-progress {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-
-        .onboard-progress .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
-            transition: var(--transition);
-        }
-
-        .onboard-progress .dot.active {
-            background: var(--gold);
-            box-shadow: 0 0 16px var(--gold-glow);
-        }
-        .onboard-progress .dot.done {
-            background: var(--green);
-        }
-
-        .onboard-step {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .onboard-step.active {
-            display: flex;
-        }
-
-        .onboard-step label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .onboard-step select,
-        .onboard-step input {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 12px;
-            color: var(--text);
-            font-size: 13px;
-            outline: none;
-            width: 100%;
-            transition: var(--transition);
-        }
-
-        .onboard-step select:focus,
-        .onboard-step input:focus {
-            border-color: rgba(245, 158, 11, 0.25);
-        }
-
-        .onboard-step .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-
-        /* Value Equation */
-        .eq-slider {
-            margin: 8px 0;
-        }
-
-        .eq-slider label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .eq-slider input[type="range"] {
-            width: 100%;
-            margin: 4px 0;
-            accent-color: var(--gold);
-            background: var(--bg-card);
-            height: 4px;
-            border-radius: 4px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .eq-slider .val {
-            font-weight: 600;
-            color: var(--gold-light);
-        }
-
-        .eq-score-box {
-            background: var(--bg-card);
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .eq-score-box .label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .eq-score-box .score {
-            font-size: 30px;
-            font-weight: 700;
-            color: var(--gold-light);
-        }
-
-        .eq-score-box .formula {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
+            display: flex; align-items: center; gap: 32px; padding: 24px 28px;
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card); transition: var(--transition); flex-wrap: wrap;
+        }
+        .primary-metric:hover { border-color: var(--border-gold); box-shadow: var(--shadow-card-hover); transform: translateY(-2px); }
+        .primary-metric .ring-wrap { position: relative; flex-shrink: 0; }
+        .primary-metric .ring-wrap svg { transform: rotate(-90deg); }
+        .primary-metric .ring-wrap .bg { fill: none; stroke: rgba(255,255,255,0.03); stroke-width: 5; }
+        .primary-metric .ring-wrap .fg { fill: none; stroke: var(--gold); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1); filter: drop-shadow(0 0 16px var(--gold-glow)); }
+        .primary-metric .ring-wrap .center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 28px; font-weight: 700; color: var(--text); }
+        .primary-metric .info h2 { font-size: 18px; font-weight: 600; color: var(--text); }
+        .primary-metric .info p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .primary-metric .info .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .primary-metric .quick-actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+        .primary-metric .quick-actions button { background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 6px 16px; color: var(--text-secondary); font-size: 11px; font-weight: 500; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
+        .primary-metric .quick-actions button:hover { background: var(--bg-card-hover); border-color: var(--border-hover); color: var(--text); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .secondary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .card-premium {
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-lg); padding: 18px 20px;
+            transition: var(--transition); box-shadow: var(--shadow-card); position: relative; overflow: hidden;
+        }
+        .card-premium::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.4s ease; }
+        .card-premium:hover::before { opacity: 0.3; }
+        .card-premium:hover { border-color: rgba(245,158,11,0.12); box-shadow: var(--shadow-card-hover); transform: translateY(-4px); }
+        .card-premium h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .card-premium .value { font-size: 26px; font-weight: 700; color: var(--text); transition: var(--transition-bounce); }
+        .card-premium:hover .value { transform: scale(1.02); }
+        .card-premium .sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .fw-strip { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+        .fw-strip .dot { width: 24px; height: 6px; border-radius: 4px; background: rgba(255,255,255,0.04); transition: var(--transition); position: relative; overflow: hidden; }
+        .fw-strip .dot.done { background: var(--green); box-shadow: 0 0 12px var(--green-glow); animation: dotPulse 2s ease-in-out infinite; }
+        .fw-strip .dot.partial { background: var(--gold); box-shadow: 0 0 12px var(--gold-glow); }
+        @keyframes dotPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .rule-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .rule-row .count { font-size: 32px; font-weight: 700; color: var(--gold-light); transition: var(--transition-bounce); }
+        .rule-row .streak { font-size: 12px; color: var(--gold-light); padding: 2px 12px; background: rgba(245,158,11,0.06); border-radius: 40px; border: 1px solid rgba(245,158,11,0.06); }
+        .rule-row button { background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 4px 14px; color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
+        .rule-row button:hover { background: var(--bg-card-hover); border-color: var(--border-hover); color: var(--text); }
+        .mini-cal { display: flex; gap: 4px; margin-top: 8px; }
+        .mini-cal .day { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text-muted); border: 1px solid transparent; transition: var(--transition); }
+        .mini-cal .day.hit { background: var(--green); color: var(--bg); border-color: var(--green); box-shadow: 0 0 12px var(--green-glow); animation: hitPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes hitPop { from { transform: scale(0); } to { transform: scale(1); } }
+        .mini-cal .day.today { border-color: var(--gold); }
+        .next-action-card { grid-column: 1 / -1; background: linear-gradient(135deg, rgba(245,158,11,0.04), rgba(139,92,246,0.03)); border: 1px solid rgba(245,158,11,0.08); }
+        .next-action-card:hover { border-color: rgba(245,158,11,0.15); }
+        .next-action-card #nextAction { font-size: 15px; font-weight: 500; margin-top: 2px; color: var(--text); }
+        .next-action-card .sub { margin-top: 2px; }
+        /* Empty State */
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px; text-align: center; gap: 12px; }
+        .empty-state .icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 4px; animation: floatIcon 3s ease-in-out infinite; }
+        @keyframes floatIcon { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        .empty-state h3 { font-size: 14px; font-weight: 600; color: var(--text); }
+        .empty-state p { font-size: 12px; color: var(--text-secondary); max-width: 240px; }
+        .empty-state .btn-gold { margin-top: 4px; font-size: 11px; padding: 6px 16px; }
+        /* Chat */
+        .chat-view { display: none; flex-direction: column; flex: 1; min-height: 0; }
+        .chat-view.active { display: flex; animation: fadeIn 0.4s ease; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+        .message { display: flex; gap: 10px; max-width: 78%; animation: msgIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards; opacity: 0; }
+        @keyframes msgIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message .avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; background: var(--bg-card); border: 1px solid var(--border); transition: var(--transition-spring); }
+        .message.ai .avatar { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--bg); box-shadow: 0 0 20px var(--gold-glow); }
+        .message.user .avatar { background: linear-gradient(135deg, var(--purple), #6d28d9); color: white; }
+        .message .bubble { background: var(--bg-card); padding: 10px 16px; border-radius: 14px; font-size: 13px; line-height: 1.6; border: 1px solid var(--border); transition: var(--transition); position: relative; }
+        .message .bubble:hover { border-color: var(--border-hover); }
+        .message.user .bubble { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.12); }
+        .typing { display: flex; gap: 4px; padding: 10px 16px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); width: fit-content; }
+        .typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold-light); animation: typingWave 1.4s ease-in-out infinite; }
+        .typing span:nth-child(2) { animation-delay: 0.15s; }
+        .typing span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingWave { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+        .status-bar { padding: 4px 24px; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--border); display: flex; justify-content: space-between; background: rgba(0,0,0,0.1); flex-shrink: 0; }
+        .status-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--green); margin-right: 4px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .input-bar { padding: 10px 24px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: rgba(0,0,0,0.1); }
+        .input-bar .mode-selector { display: flex; align-items: center; gap: 4px; }
+        .input-bar .mode-selector select { background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 6px 12px; color: var(--text); font-size: 11px; font-weight: 500; outline: none; cursor: pointer; transition: var(--transition); min-width: 120px; }
+        .input-bar .mode-selector select:hover { border-color: var(--border-hover); }
+        .input-bar .mode-selector select:focus { border-color: rgba(245,158,11,0.25); }
+        .input-wrapper { flex: 2; display: flex; gap: 6px; min-width: 120px; }
+        .input-wrapper input { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 40px; padding: 7px 14px; color: var(--text); font-size: 13px; outline: none; transition: var(--transition); min-width: 0; }
+        .input-wrapper input::placeholder { color: var(--text-muted); }
+        .input-wrapper input:focus { border-color: rgba(245,158,11,0.25); box-shadow: 0 0 0 3px rgba(245,158,11,0.05); }
+        .input-wrapper button { background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: none; border-radius: 40px; padding: 7px 18px; font-weight: 600; color: var(--bg); font-size: 13px; cursor: pointer; transition: var(--transition-spring); display: flex; align-items: center; gap: 4px; position: relative; overflow: hidden; }
+        .input-wrapper button:hover { transform: scale(1.03); box-shadow: 0 4px 20px var(--gold-glow); }
+        .input-wrapper button:active { transform: scale(0.97); }
+        .input-wrapper button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .input-actions { display: flex; gap: 4px; }
+        .input-actions button { background: transparent; border: 1px solid var(--border); border-radius: 40px; padding: 5px 10px; color: var(--text-muted); cursor: pointer; transition: var(--transition); font-size: 12px; position: relative; overflow: hidden; }
+        .input-actions button:hover { background: var(--bg-card); color: var(--text); border-color: var(--border-hover); }
+        .input-actions button:active { transform: scale(0.95); }
+        /* Badges */
+        .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 40px; font-size: 10px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); transition: var(--transition); cursor: default; }
+        .badge.unlocked { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.15); color: var(--gold-light); animation: badgeUnlock 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes badgeUnlock { 0% { transform: scale(0) rotate(-10deg); opacity: 0; } 60% { transform: scale(1.1) rotate(3deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(16px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px 28px; box-shadow: 0 40px 100px rgba(0,0,0,0.8); position: relative; transform: scale(0.95) translateY(20px); opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
+        .modal-overlay.open .modal { transform: scale(1) translateY(0); opacity: 1; }
+        .modal-close { position: absolute; top: 12px; right: 16px; background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; transition: var(--transition-spring); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .modal-close:hover { color: var(--text); background: var(--bg-card); transform: rotate(90deg); }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+        .modal h2 .gold { color: var(--gold-light); }
+        .modal p.sub { color: var(--text-secondary); margin-bottom: 18px; font-size: 13px; }
+        .fw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .fw-card { background: var(--bg-card); border-radius: 12px; padding: 12px 14px; border: 1px solid var(--border); transition: var(--transition); position: relative; overflow: hidden; }
+        .fw-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.3s; }
+        .fw-card:hover::before { opacity: 0.3; }
+        .fw-card:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .fw-card h4 { font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .fw-card p { font-size: 11px; color: var(--text-secondary); margin: 4px 0; }
+        .fw-card .meta { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); margin-top: 6px; }
+        .fw-card .meta .val { color: var(--gold-light); font-weight: 600; }
+        .fw-card .meta .tier { padding: 1px 8px; border-radius: 40px; font-size: 8px; font-weight: 600; }
+        .fw-card .meta .tier.free { background: rgba(34,197,94,0.08); color: var(--green); }
+        .fw-card .meta .tier.insider { background: rgba(245,158,11,0.08); color: var(--gold-light); }
+        .fw-card .meta .tier.partner { background: rgba(168,85,247,0.08); color: #c084fc; }
+        .fw-card .btn { margin-top: 8px; background: transparent; border: 1px solid var(--border); border-radius: 40px; padding: 3px 12px; font-size: 10px; color: var(--text-secondary); cursor: pointer; transition: var(--transition); width: 100%; text-align: center; position: relative; overflow: hidden; }
+        .fw-card .btn:hover { background: rgba(245,158,11,0.06); border-color: var(--gold); color: var(--text); }
+        .fw-card .btn.done { background: rgba(34,197,94,0.06); border-color: var(--green); color: var(--green); }
+        .billing-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px; }
+        .billing-toggle span { font-size: 12px; color: var(--text-secondary); }
+        .billing-toggle .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .billing-toggle .switch input { opacity: 0; width: 0; height: 0; }
+        .billing-toggle .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.06); transition: var(--transition); border-radius: 34px; cursor: pointer; }
+        .billing-toggle .slider:before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: white; transition: var(--transition); border-radius: 50%; }
+        .billing-toggle input:checked + .slider { background: var(--gold); }
+        .billing-toggle input:checked + .slider:before { transform: translateX(18px); }
+        .tier-table { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+        .tier-row { display: grid; grid-template-columns: 1fr 2fr 1fr; padding: 8px 14px; background: var(--bg-card); border-radius: 10px; border: 1px solid var(--border); align-items: center; font-size: 13px; transition: var(--transition); }
+        .tier-row:hover { border-color: var(--border-hover); transform: translateX(2px); }
+        .tier-row .name { font-weight: 600; }
+        .tier-row .features { color: var(--text-secondary); font-size: 12px; }
+        .tier-row .price { font-weight: 600; color: var(--gold-light); text-align: right; }
+        .tier-row.current { border-color: var(--gold); background: rgba(245,158,11,0.03); }
+        .tier-row .pop { font-size: 8px; background: var(--gold); color: var(--bg); padding: 1px 8px; border-radius: 40px; font-weight: 700; margin-left: 4px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+        .onboard-progress { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+        .onboard-progress .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.04); transition: var(--transition); }
+        .onboard-progress .dot.active { background: var(--gold); box-shadow: 0 0 16px var(--gold-glow); }
+        .onboard-progress .dot.done { background: var(--green); }
+        .onboard-step { display: none; flex-direction: column; gap: 10px; }
+        .onboard-step.active { display: flex; animation: fadeIn 0.4s ease; }
+        .onboard-step label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+        .onboard-step select, .onboard-step input { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-size: 13px; outline: none; width: 100%; transition: var(--transition); }
+        .onboard-step select:focus, .onboard-step input:focus { border-color: rgba(245,158,11,0.25); }
+        .onboard-step .btn-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+        .eq-slider { margin: 8px 0; }
+        .eq-slider label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; }
+        .eq-slider input[type="range"] { width: 100%; margin: 4px 0; accent-color: var(--gold); background: var(--bg-card); height: 4px; border-radius: 4px; outline: none; cursor: pointer; }
+        .eq-slider .val { font-weight: 600; color: var(--gold-light); }
+        .eq-score-box { background: var(--bg-card); padding: 14px; border-radius: 10px; text-align: center; margin-top: 10px; border: 1px solid var(--border); transition: var(--transition); }
+        .eq-score-box:hover { border-color: var(--border-hover); }
+        .eq-score-box .label { font-size: 12px; color: var(--text-secondary); }
+        .eq-score-box .score { font-size: 30px; font-weight: 700; color: var(--gold-light); transition: var(--transition-bounce); }
+        .eq-score-box .formula { font-size: 11px; color: var(--text-muted); }
         /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            color: var(--text);
-            font-size: 13px;
-            z-index: 3000;
-            transform: translateY(80px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-            pointer-events: none;
-            max-width: 380px;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .toast.success {
-            border-left: 3px solid var(--green);
-        }
-        .toast.error {
-            border-left: 3px solid #ef4444;
-        }
-        .toast.info {
-            border-left: 3px solid var(--gold);
-        }
-
+        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: var(--text); font-size: 13px; z-index: 3000; transform: translateY(80px) scale(0.95); opacity: 0; transition: all 0.5s cubic-bezier(0.22,1,0.36,1); pointer-events: none; max-width: 380px; display: flex; align-items: center; gap: 10px; }
+        .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+        .toast.success { border-left: 3px solid var(--green); }
+        .toast.error { border-left: 3px solid #ef4444; }
+        .toast.info { border-left: 3px solid var(--gold); }
+        .toast .toast-icon { font-size: 16px; }
         /* Confetti */
-        .confetti-container {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 9999;
-            overflow: hidden;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            border-radius: 2px;
-            animation: confettiFall linear forwards;
-        }
-
-        @keyframes confettiFall {
-            0% {
-                transform: translateY(-10px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* scroll */
-        ::-webkit-scrollbar {
-            width: 3px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(245, 158, 11, 0.15);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(245, 158, 11, 0.3);
-        }
-
-        /* ================================================================
-           RIPPLE, PROGRESS BAR, MOBILE SHEET, EMPTY STATE
-           ================================================================ */
-        .ripple-host {
-            position: relative;
-            overflow: hidden;
-        }
-        .ripple-wave {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            animation: rippleAnim 0.5s linear;
-            background: rgba(255, 255, 255, 0.18);
-            pointer-events: none;
-        }
-        @keyframes rippleAnim {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        .progress-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 2px;
-            width: 0%;
-            background: linear-gradient(90deg, var(--gold), var(--gold-light));
-            transition: width 0.4s ease;
-            z-index: 100;
-            box-shadow: 0 0 8px var(--gold-glow);
-        }
-
-        .cursor-blink {
-            display: inline-block;
-            width: 2px;
-            height: 14px;
-            background: var(--gold);
-            margin-left: 2px;
-            vertical-align: middle;
-            animation: blink 0.9s step-start infinite;
-        }
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 16px;
-            text-align: center;
-            gap: 12px;
-            opacity: 0.7;
-        }
-        .empty-state .empty-icon {
-            font-size: 32px;
-        }
-        .empty-state p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .empty-state button {
-            margin-top: 4px;
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            color: var(--gold-light);
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* ================================================================
-           MOBILE BOTTOM SHEET
-           ================================================================ */
-        @media (max-width: 1023px) {
-            .mobile-sidebar-btn {
-                display: flex !important;
-                position: fixed;
-                bottom: 80px;
-                right: 16px;
-                z-index: 200;
-                width: 44px;
-                height: 44px;
-                border-radius: 50%;
-                background: var(--gold);
-                color: var(--bg);
-                align-items: center;
-                justify-content: center;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-                box-shadow: 0 4px 20px var(--gold-glow);
-            }
-            .mobile-sheet-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.6);
-                z-index: 300;
-                backdrop-filter: blur(4px);
-            }
-            .mobile-sheet-overlay.open {
-                display: block;
-            }
-            .mobile-sheet {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 400;
-                background: var(--bg-surface);
-                border-radius: 20px 20px 0 0;
-                border-top: 1px solid var(--border);
-                padding: 16px 16px 32px;
-                transform: translateY(100%);
-                transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-                max-height: 70vh;
-                overflow-y: auto;
-            }
-            .mobile-sheet.open {
-                transform: translateY(0);
-            }
-            .sheet-handle {
-                width: 40px;
-                height: 4px;
-                background: var(--border-hover);
-                border-radius: 2px;
-                margin: 0 auto 16px;
-            }
-        }
-
-        .mobile-sidebar-btn {
-            display: none;
-        }
-        .mobile-sheet-overlay {
-            display: none;
-        }
-
-        /* ================================================================
-           RESPONSIVE
-           ================================================================ */
+        .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+        .confetti { position: absolute; border-radius: 2px; animation: confettiFall linear forwards; }
+        @keyframes confettiFall { 0% { transform: translateY(-10px) rotate(0deg) rotateX(0deg) rotateY(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg) rotateX(360deg) rotateY(180deg); opacity: 0; } }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(245,158,11,0.3); }
+        /* Responsive */
         @media (max-width: 1024px) {
-            .app {
-                height: 100vh;
-                max-height: none;
-                border-radius: 0;
-            }
-            .header {
-                padding: 10px 16px;
-            }
-            .tab-nav {
-                padding: 0 16px;
-                overflow-x: auto;
-            }
-            .tab-btn {
-                padding: 8px 14px;
-                font-size: 11px;
-                white-space: nowrap;
-            }
-            .tab-btn span {
-                display: none;
-            }
-            .tab-btn i {
-                font-size: 14px;
-            }
-            .secondary-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .primary-metric {
-                flex-wrap: wrap;
-                gap: 16px;
-            }
-            .primary-metric .quick-actions {
-                margin-left: 0;
-                width: 100%;
-                justify-content: flex-start;
-            }
+            .app { height: 100vh; max-height: none; border-radius: 0; }
+            .header { padding: 10px 16px; }
+            .tab-nav { padding: 6px 16px; overflow-x: auto; }
+            .tab-btn { padding: 8px 14px; font-size: 11px; white-space: nowrap; }
+            .tab-btn span { display: none; }
+            .tab-btn i { font-size: 14px; }
+            .secondary-grid { grid-template-columns: 1fr 1fr; }
+            .primary-metric { flex-wrap: wrap; gap: 16px; }
+            .primary-metric .quick-actions { margin-left: 0; width: 100%; justify-content: flex-start; }
+            .sidebar { display: none; }
+            .mobile-menu-btn { display: flex; }
         }
-
         @media (max-width: 768px) {
-            .header-actions .btn-icon span {
-                display: none;
-            }
-            .greeting {
-                display: none;
-            }
-            .input-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .input-bar .mode-selector {
-                width: 100%;
-            }
-            .input-bar .mode-selector select {
-                width: 100%;
-            }
-            .input-wrapper {
-                width: 100%;
-            }
-            .input-actions {
-                justify-content: flex-end;
-            }
-            .secondary-grid {
-                grid-template-columns: 1fr;
-            }
-            .primary-metric {
-                flex-direction: column;
-                text-align: center;
-            }
-            .primary-metric .quick-actions {
-                justify-content: center;
-            }
-            .chat-messages {
-                padding: 12px 14px;
-            }
-            .message {
-                max-width: 92%;
-            }
-            .modal {
-                padding: 16px;
-            }
-            .tier-row {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 4px;
-            }
-            .tier-row .price {
-                text-align: center;
-            }
+            .header-actions .btn-icon span { display: none; }
+            .greeting { display: none; }
+            .xp-bar-wrap { display: none; }
+            .input-bar { flex-direction: column; align-items: stretch; }
+            .input-bar .mode-selector { width: 100%; }
+            .input-bar .mode-selector select { width: 100%; }
+            .input-wrapper { width: 100%; }
+            .input-actions { justify-content: flex-end; }
+            .secondary-grid { grid-template-columns: 1fr; }
+            .primary-metric { flex-direction: column; text-align: center; }
+            .primary-metric .quick-actions { justify-content: center; }
+            .chat-messages { padding: 12px 14px; }
+            .message { max-width: 92%; }
+            .modal { padding: 16px; }
+            .tier-row { grid-template-columns: 1fr; text-align: center; gap: 4px; }
+            .tier-row .price { text-align: center; }
+            .fw-grid { grid-template-columns: 1fr; }
+            .sidebar-bottom-sheet { display: block; }
         }
-
         @media (max-width: 480px) {
-            .logo-text {
-                font-size: 15px;
-            }
-            .logo-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 13px;
-            }
-            .tier-badge {
-                font-size: 9px;
-                padding: 3px 10px;
-            }
-            .btn-gold {
-                font-size: 11px;
-                padding: 4px 14px;
-            }
-            .btn-icon {
-                font-size: 11px;
-                padding: 4px 10px;
-            }
-            .dashboard-view {
-                padding: 14px 14px;
-            }
-            .chat-messages {
-                padding: 10px 12px;
-            }
-            .status-bar {
-                font-size: 9px;
-                padding: 2px 14px;
-            }
-            .input-bar {
-                padding: 8px 14px 12px;
-            }
+            .logo-text { font-size: 15px; }
+            .logo-icon { width: 30px; height: 30px; font-size: 13px; }
+            .tier-badge { font-size: 9px; padding: 3px 10px; }
+            .btn-gold { font-size: 11px; padding: 4px 14px; }
+            .btn-icon { font-size: 11px; padding: 4px 10px; }
+            .dashboard-view { padding: 14px 14px; }
+            .chat-messages { padding: 10px 12px; }
+            .status-bar { font-size: 9px; padding: 2px 14px; }
+            .input-bar { padding: 8px 14px 12px; }
+            .primary-metric { padding: 16px; }
+            .card-premium { padding: 14px 16px; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
-
-    <!-- mobile fab -->
-    <button class="mobile-sidebar-btn" id="mobileFab"><i class="fas fa-bolt"></i></button>
-    <div class="mobile-sheet-overlay" id="sheetOverlay">
-        <div class="mobile-sheet" id="mobileSheet">
-            <div class="sheet-handle"></div>
-            <div class="sidebar-title">⚡ Modes</div>
-            <div class="mode-list" id="modeListMobile"></div>
-        </div>
-    </div>
-
+    <div class="ambient-bg"></div>
     <div class="app" id="app">
-        <div class="progress-bar" id="progressBar"></div>
-
-        <!-- HEADER -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">E5</div>
@@ -1734,42 +416,49 @@
             </div>
             <div class="header-actions">
                 <span class="greeting" id="greeting">👋 Welcome</span>
-                <div class="tier-badge" id="tierBadge">
-                    <i class="fas fa-crown"></i> <span id="tierLabel">FREE</span>
+                <div class="xp-bar-wrap" id="xpBarWrap" style="display:none;">
+                    <span class="xp-level" id="xpLevel">Lv.1</span>
+                    <div class="xp-bar-track"><div class="xp-bar-fill" id="xpBarFill"></div></div>
                 </div>
-                <button class="btn-icon" id="vaultBtn"><i class="fas fa-book"></i> <span>Vault</span></button>
-                <button class="btn-gold" id="upgradeBtn"><i class="fas fa-rocket"></i> Upgrade</button>
+                <div class="tier-badge" id="tierBadge"><i class="fas fa-crown"></i> <span id="tierLabel">FREE</span></div>
+                <button class="btn-icon ripple-container" id="vaultBtn"><i class="fas fa-book"></i> <span>Vault</span></button>
+                <button class="btn-gold ripple-container" id="upgradeBtn"><i class="fas fa-rocket"></i> Upgrade</button>
             </div>
         </header>
-
-        <!-- TAB NAV -->
         <div class="tab-nav" id="tabNav">
-            <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
-            <button class="tab-btn" data-tab="chat"><i class="fas fa-comment-dots"></i> <span>Chat</span></button>
+            <button class="tab-btn active ripple-container" data-tab="dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
+            <button class="tab-btn ripple-container" data-tab="chat"><i class="fas fa-comment-dots"></i> <span>Chat</span></button>
         </div>
-
-        <!-- MAIN -->
         <div class="main-area">
-
-            <!-- SIDEBAR -->
+            <button class="mobile-menu-btn ripple-container" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-title">⚡ Modes</div>
                 <div class="mode-list" id="modeList"></div>
             </aside>
-
-            <!-- CONTENT -->
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+            <div class="sidebar-bottom-sheet" id="mobileSidebar">
+                <div class="sheet-handle"></div>
+                <div class="sidebar-title">⚡ Modes</div>
+                <div class="mode-list" id="mobileModeList"></div>
+            </div>
             <div class="content-area">
-
-                <!-- DASHBOARD -->
+                <div class="skeleton-screen" id="skeletonScreen">
+                    <div class="skeleton" style="display:flex;align-items:center;padding:20px;gap:20px;">
+                        <div class="skeleton-ring"></div>
+                        <div style="flex:1;"><div class="skeleton-text" style="width:60%;"></div><div class="skeleton-text short"></div></div>
+                    </div>
+                    <div class="secondary-grid">
+                        <div class="skeleton skeleton-card"></div>
+                        <div class="skeleton skeleton-card"></div>
+                        <div class="skeleton skeleton-card"></div>
+                    </div>
+                </div>
                 <div class="dashboard-view active" id="dashboardView">
-
-                    <!-- Primary Metric -->
-                    <div class="primary-metric">
+                    <div class="primary-metric" id="primaryMetric">
                         <div class="ring-wrap">
                             <svg width="80" height="80" viewBox="0 0 100 100">
                                 <circle class="bg" cx="50" cy="50" r="40" />
-                                <circle class="fg" id="healthRing" cx="50" cy="50" r="40"
-                                        stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                                <circle class="fg" id="healthRing" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
                             </svg>
                             <div class="center" id="healthScore">0</div>
                         </div>
@@ -1779,55 +468,44 @@
                             <div class="sub" id="healthSub">0 / 8 frameworks completed</div>
                         </div>
                         <div class="quick-actions">
-                            <button id="quickXRay"><i class="fas fa-search"></i> X-Ray</button>
-                            <button id="quickOffer"><i class="fas fa-coins"></i> Offer</button>
-                            <button id="quickDM"><i class="fas fa-comment"></i> DM</button>
+                            <button class="ripple-container" id="quickXRay"><i class="fas fa-search"></i> X-Ray</button>
+                            <button class="ripple-container" id="quickOffer"><i class="fas fa-coins"></i> Offer</button>
+                            <button class="ripple-container" id="quickDM"><i class="fas fa-comment"></i> DM</button>
                         </div>
                     </div>
-
-                    <!-- Secondary Grid -->
                     <div class="secondary-grid">
-
-                        <!-- Frameworks -->
-                        <div class="card">
-                            <h4>Frameworks</h4>
+                        <div class="card-premium" id="fwCard">
+                            <h4><i class="fas fa-layer-group"></i> Frameworks</h4>
                             <div class="value" id="fwCount">0/8</div>
                             <div class="sub" id="fwSub">Completed</div>
                             <div class="fw-strip" id="fwStrip"></div>
+                            <div class="badge-row" id="fwBadges"></div>
                         </div>
-
-                        <!-- Rule of 100 -->
-                        <div class="card">
-                            <h4>Rule of 100</h4>
+                        <div class="card-premium">
+                            <h4><i class="fas fa-fire"></i> Rule of 100</h4>
                             <div class="rule-row">
                                 <span class="count" id="ruleCount">0</span>
                                 <span style="font-size:12px;color:var(--text-secondary);">actions today</span>
                                 <span class="streak" id="ruleStreak"><i class="fas fa-fire"></i> 0d</span>
                             </div>
                             <div class="rule-row" style="gap:6px;margin-top:4px;">
-                                <button id="ruleAddBtn"><i class="fas fa-plus"></i> Log +1</button>
-                                <button id="ruleResetBtn">Reset</button>
+                                <button class="ripple-container" id="ruleAddBtn"><i class="fas fa-plus"></i> Log +1</button>
+                                <button class="ripple-container" id="ruleResetBtn">Reset</button>
                             </div>
                             <div class="mini-cal" id="ruleCalendar"></div>
                         </div>
-
-                        <!-- Revenue -->
-                        <div class="card">
-                            <h4>Revenue Projection</h4>
+                        <div class="card-premium">
+                            <h4><i class="fas fa-chart-line"></i> Revenue Projection</h4>
                             <div class="value" id="revenueProjection">$0</div>
                             <div class="sub">Monthly: <input type="number" id="revenueInput" placeholder="5000" style="width:70px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:3px 6px;color:var(--text);font-size:12px;" /> /mo</div>
                         </div>
-
-                        <!-- Next Best Action (spans full width) -->
-                        <div class="card" style="grid-column:1/-1;">
-                            <h4>🎯 Next Best Action</h4>
+                        <div class="card-premium next-action-card">
+                            <h4><i class="fas fa-bullseye"></i> 🎯 Next Best Action</h4>
                             <div id="nextAction" style="font-size:15px;font-weight:500;margin-top:2px;">Complete your first framework to get started.</div>
                             <div class="sub" style="margin-top:2px;">AI‑recommended based on your progress</div>
                         </div>
                     </div>
                 </div>
-
-                <!-- CHAT -->
                 <div class="chat-view" id="chatView">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
@@ -1844,59 +522,46 @@
                         <div><span id="rateDisplay">30 msg/h</span> · <span id="modeDisplay">Coach</span></div>
                     </div>
                     <div class="input-bar">
-                        <div class="mode-selector">
-                            <select id="modeSelect"></select>
-                        </div>
+                        <div class="mode-selector"><select id="modeSelect"></select></div>
                         <div class="input-wrapper">
                             <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off" />
-                            <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+                            <button class="ripple-container" id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
                         </div>
                         <div class="input-actions">
-                            <button id="docBtn" title="Upload docs"><i class="fas fa-file-upload"></i></button>
-                            <button id="voiceBtn" title="TTS"><i class="fas fa-volume-up"></i></button>
-                            <button id="valueEqBtn" title="Value Equation"><i class="fas fa-calculator"></i></button>
+                            <button class="ripple-container" id="docBtn" title="Upload docs"><i class="fas fa-file-upload"></i></button>
+                            <button class="ripple-container" id="voiceBtn" title="TTS"><i class="fas fa-volume-up"></i></button>
+                            <button class="ripple-container" id="valueEqBtn" title="Value Equation"><i class="fas fa-calculator"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- ============ MODALS ============ -->
-
-    <!-- VAULT -->
     <div class="modal-overlay" id="vaultModal">
         <div class="modal">
-            <button class="modal-close" id="closeVault">&times;</button>
+            <button class="modal-close ripple-container" id="closeVault">&times;</button>
             <h2>📚 Framework <span class="gold">Vault</span></h2>
             <p class="sub">Every framework from our $20,000+ library.</p>
             <div class="fw-grid" id="frameworkGrid"></div>
         </div>
     </div>
-
-    <!-- UPGRADE -->
     <div class="modal-overlay" id="upgradeModal">
         <div class="modal">
-            <button class="modal-close" id="closeUpgrade">&times;</button>
+            <button class="modal-close ripple-container" id="closeUpgrade">&times;</button>
             <h2>👑 Unlock <span class="gold">More Power</span></h2>
             <p class="sub">Choose the tier that fits your business.</p>
             <div class="billing-toggle">
                 <span>Monthly</span>
-                <label class="switch">
-                    <input type="checkbox" id="billingToggle">
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox" id="billingToggle"><span class="slider"></span></label>
                 <span>Yearly <span style="color:var(--green);font-size:11px;">(save 20%)</span></span>
             </div>
             <div class="tier-table" id="tierTable"></div>
             <div class="modal-actions">
-                <button class="btn-icon" id="upgradeCancel">Cancel</button>
-                <button class="btn-gold" id="upgradeAction">Upgrade Now</button>
+                <button class="btn-icon ripple-container" id="upgradeCancel">Cancel</button>
+                <button class="btn-gold ripple-container" id="upgradeAction">Upgrade Now</button>
             </div>
         </div>
     </div>
-
-    <!-- ONBOARDING -->
     <div class="modal-overlay" id="onboardingModal">
         <div class="modal" style="max-width:460px;">
             <h2>👋 Welcome to <span class="gold">AI Coach</span></h2>
@@ -1908,798 +573,848 @@
             </div>
             <div class="onboard-step active" data-step="1">
                 <label>What's your main business goal?</label>
-                <select id="onboardGoal">
-                    <option value="leads">Get more leads</option>
-                    <option value="offer">Build a better offer</option>
-                    <option value="scale">Scale revenue</option>
-                    <option value="retention">Reduce churn</option>
-                </select>
-                <div class="btn-group">
-                    <button class="btn-gold" id="onboardNext1">Next</button>
-                </div>
+                <select id="onboardGoal"><option value="leads">Get more leads</option><option value="offer">Build a better offer</option><option value="scale">Scale revenue</option><option value="retention">Reduce churn</option></select>
+                <div class="btn-group"><button class="btn-gold ripple-container" id="onboardNext1">Next</button></div>
             </div>
             <div class="onboard-step" data-step="2">
                 <label>Monthly revenue (approx)?</label>
                 <input type="number" id="onboardRevenue" placeholder="e.g. 5000" />
-                <div class="btn-group">
-                    <button class="btn-icon" id="onboardBack2">Back</button>
-                    <button class="btn-gold" id="onboardNext2">Next</button>
-                </div>
+                <div class="btn-group"><button class="btn-icon ripple-container" id="onboardBack2">Back</button><button class="btn-gold ripple-container" id="onboardNext2">Next</button></div>
             </div>
             <div class="onboard-step" data-step="3">
                 <label>Biggest bottleneck right now?</label>
-                <select id="onboardBottleneck">
-                    <option value="traffic">Not enough leads</option>
-                    <option value="conversion">Low conversion</option>
-                    <option value="offer">Weak offer</option>
-                    <option value="retention">High churn</option>
-                </select>
-                <div class="btn-group">
-                    <button class="btn-icon" id="onboardBack3">Back</button>
-                    <button class="btn-gold" id="onboardFinish">Finish & Start</button>
-                </div>
+                <select id="onboardBottleneck"><option value="traffic">Not enough leads</option><option value="conversion">Low conversion</option><option value="offer">Weak offer</option><option value="retention">High churn</option></select>
+                <div class="btn-group"><button class="btn-icon ripple-container" id="onboardBack3">Back</button><button class="btn-gold ripple-container" id="onboardFinish">Finish & Start</button></div>
             </div>
         </div>
     </div>
-
-    <!-- VALUE EQUATION -->
     <div class="modal-overlay" id="valueEqModal">
         <div class="modal">
-            <button class="modal-close" id="closeValueEq">&times;</button>
+            <button class="modal-close ripple-container" id="closeValueEq">&times;</button>
             <h2>⚖️ Value <span class="gold">Equation</span></h2>
             <p class="sub">Adjust sliders to see your offer's value change.</p>
-            <div class="eq-slider">
-                <label>Dream Outcome <span class="val" id="eqDream">8</span></label>
-                <input type="range" min="1" max="10" value="8" id="eqDreamSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>Perceived Likelihood <span class="val" id="eqLikelihood">7</span></label>
-                <input type="range" min="1" max="10" value="7" id="eqLikelihoodSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>Time Delay (lower = better) <span class="val" id="eqTime">5</span></label>
-                <input type="range" min="1" max="10" value="5" id="eqTimeSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>Effort (lower = better) <span class="val" id="eqEffort">5</span></label>
-                <input type="range" min="1" max="10" value="5" id="eqEffortSlider" />
-            </div>
-            <div class="eq-score-box">
-                <div class="label">Value Equation Score</div>
-                <div class="score" id="eqScore">56</div>
-                <div class="formula">(Dream × Likelihood) ÷ (Time × Effort)</div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-icon" id="closeValueEqBtn">Close</button>
-                <button class="btn-gold" id="saveValueEq">Save & Apply</button>
-            </div>
+            <div class="eq-slider"><label>Dream Outcome <span class="val" id="eqDream">8</span></label><input type="range" min="1" max="10" value="8" id="eqDreamSlider" /></div>
+            <div class="eq-slider"><label>Perceived Likelihood <span class="val" id="eqLikelihood">7</span></label><input type="range" min="1" max="10" value="7" id="eqLikelihoodSlider" /></div>
+            <div class="eq-slider"><label>Time Delay (lower=better) <span class="val" id="eqTime">5</span></label><input type="range" min="1" max="10" value="5" id="eqTimeSlider" /></div>
+            <div class="eq-slider"><label>Effort (lower=better) <span class="val" id="eqEffort">5</span></label><input type="range" min="1" max="10" value="5" id="eqEffortSlider" /></div>
+            <div class="eq-score-box"><div class="label">Value Equation Score</div><div class="score" id="eqScore">56</div><div class="formula">(Dream × Likelihood) ÷ (Time × Effort)</div></div>
+            <div class="modal-actions"><button class="btn-icon ripple-container" id="closeValueEqBtn">Close</button><button class="btn-gold ripple-container" id="saveValueEq">Save & Apply</button></div>
         </div>
     </div>
+    <div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastText"></span></div>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
+<script>
+// ================================================================
+// QUATTUORTRIGINTILLION – Enhanced Core Logic
+// ================================================================
 
-    <script>
-        // ================================================================
-        //  QUATTUORTRIGINTILLION – Core Logic
-        // ================================================================
+const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
 
-        const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
+const MODES = [
+    { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
+    { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
+    { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free' },
+    { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
+    { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider' },
+    { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider' },
+    { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider' },
+    { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
+    { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
+    { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
+    { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
+];
 
-        const MODES = [
-            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
-            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
-            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free' },
-            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
-            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider' },
-            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider' },
-            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider' },
-            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
-            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
-            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
-            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
-        ];
+const FRAMEWORKS = [
+    { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider' },
+    { id: 'money_models', name: '$100M + Money Models', value: '$5,000+', tier: 'partner' },
+    { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider' },
+    { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner' },
+    { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider' },
+    { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider' },
+    { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free' },
+    { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner' },
+];
 
-        const FRAMEWORKS = [
-            { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider' },
-            { id: 'money_models', name: '$100M + Money Models', value: '$5,000+', tier: 'partner' },
-            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider' },
-            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner' },
-            { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider' },
-            { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider' },
-            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free' },
-            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner' },
-        ];
+const BADGES = {
+    first_framework: { name: '🏆 First Step', desc: 'Complete your first framework', xp: 100 },
+    streak_3: { name: '🔥 3-Day Streak', desc: 'Hit Rule of 100 for 3 days', xp: 150 },
+    streak_7: { name: '🔥 7-Day Streak', desc: 'Hit Rule of 100 for 7 days', xp: 300 },
+    framework_master: { name: '🎓 Framework Master', desc: 'Complete all 8 frameworks', xp: 500 },
+    insider: { name: '⭐ Insider', desc: 'Upgrade to Insider tier', xp: 200 },
+    partner: { name: '👑 Partner', desc: 'Upgrade to Partner tier', xp: 500 },
+    value_eq: { name: '⚖️ Value Architect', desc: 'Use the Value Equation Builder', xp: 50 },
+    first_chat: { name: '💬 First Chat', desc: 'Send your first message', xp: 25 },
+};
 
-        // State
-        let currentTier = 'free';
-        let currentMode = 'coach';
-        let isSending = false;
-        let frameworkProgress = {};
-        let rule100Count = 0;
-        let ruleStreakDays = 0;
-        let lastRuleDate = '';
-        let userRevenue = 0;
-        let businessName = '';
-        let onboarded = false;
-        let dailyHistory = {};
+// State
+let currentTier = 'free';
+let currentMode = 'coach';
+let isSending = false;
+let frameworkProgress = {};
+let rule100Count = 0;
+let ruleStreakDays = 0;
+let lastRuleDate = '';
+let userRevenue = 0;
+let businessName = '';
+let onboarded = false;
+let dailyHistory = {};
+let userXP = 0;
+let userLevel = 1;
+let unlockedBadges = [];
+let totalActions = 0;
 
-        // DOM helpers
-        const $ = id => document.getElementById(id);
-        const toast = $('toast');
-        let toastTimeout;
+// DOM helpers
+const $ = id => document.getElementById(id);
+const toast = $('toast');
+const toastIcon = $('toastIcon');
+const toastText = $('toastText');
+let toastTimeout;
 
-        function showToast(msg, type = 'info') {
-            toast.textContent = msg;
-            toast.className = 'toast ' + type + ' show';
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
-        }
-
-        // Local storage
-        function loadState() {
-            try {
-                const d = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
-                frameworkProgress = d.frameworkProgress || {};
-                rule100Count = d.rule100Count || 0;
-                ruleStreakDays = d.ruleStreakDays || 0;
-                lastRuleDate = d.lastRuleDate || '';
-                userRevenue = d.userRevenue || 0;
-                businessName = d.businessName || '';
-                onboarded = d.onboarded || false;
-                dailyHistory = d.dailyHistory || {};
-                if (userRevenue) $('revenueInput').value = userRevenue;
-                if (businessName) {
-                    const hr = new Date().getHours();
-                    const salutation = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-                    $('greeting').textContent = salutation + ', ' + businessName + ' 👋';
-                    $('welcomeTitle').textContent = 'Welcome back, ' + businessName;
-                }
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    if (lastRuleDate) {
-                        const key = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[key] = rule100Count;
-                    }
-                    rule100Count = 0;
-                    lastRuleDate = today;
-                    saveState();
-                }
-            } catch (e) { console.warn('Load error', e); }
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem('e5_coach_state', JSON.stringify({
-                    frameworkProgress,
-                    rule100Count,
-                    ruleStreakDays,
-                    lastRuleDate,
-                    userRevenue,
-                    businessName,
-                    onboarded,
-                    dailyHistory
-                }));
-            } catch (e) { console.warn('Save error', e); }
-        }
-
-        // Tier
-        async function fetchTier() {
-            try {
-                const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
-                const data = await res.json();
-                currentTier = data.tier || 'free';
-                $('tierLabel').textContent = currentTier.toUpperCase();
-                updateSidebar();
-            } catch (e) { console.warn('Tier fetch failed', e); }
-        }
-
-        function isTierOk(userTier, required) {
-            const order = { free: 0, insider: 1, partner: 2 };
-            return order[userTier] >= order[required];
-        }
-
-        // Populate modes
-        function populateModes() {
-            const sel = $('modeSelect');
-            sel.innerHTML = '';
-            MODES.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.textContent = m.label + ' (' + m.tier + ')';
-                sel.appendChild(opt);
-            });
-            sel.value = currentMode;
-
-            const list = $('modeList');
-            list.innerHTML = '';
-            MODES.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'mode-item';
-                const ok = isTierOk(currentTier, m.tier);
-                if (!ok) div.classList.add('locked');
-                if (m.id === currentMode) div.classList.add('active');
-                const prog = frameworkProgress[m.id] || 'pending';
-                const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending');
-                div.innerHTML = `
-                    <span class="icon"><i class="fas ${m.icon}"></i></span>
-                    <span>${m.label}</span>
-                    <span class="tier-tag ${m.tier}">${m.tier}</span>
-                    <span class="dot ${dotClass}"></span>
-                `;
-                div.addEventListener('click', () => {
-                    if (!ok) { showToast('Upgrade to ' + m.tier + ' to unlock ' + m.label, 'error'); return; }
-                    sel.value = m.id;
-                    onModeChange();
-                    document.querySelector('.tab-btn[data-tab="chat"]').click();
-                });
-                list.appendChild(div);
-            });
-        }
-
-        function updateSidebar() {
-            document.querySelectorAll('.mode-item').forEach((item, idx) => {
-                const m = MODES[idx];
-                const ok = isTierOk(currentTier, m.tier);
-                item.classList.toggle('locked', !ok);
-                const prog = frameworkProgress[m.id] || 'pending';
-                const dot = item.querySelector('.dot');
-                dot.className = 'dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' :
-                'pending'));
-            });
-        }
-
-        function onModeChange() {
-            currentMode = $('modeSelect').value;
-            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            document.querySelectorAll('.mode-item').forEach((el, idx) => {
-                el.classList.toggle('active', MODES[idx].id === currentMode);
-            });
-            if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
-                frameworkProgress[currentMode] = 'started';
-                saveState();
-                updateDashboard();
-                updateSidebar();
-                showToast('Started ' + MODES.find(m => m.id === currentMode)?.label + ' mode', 'info');
-            }
-            addMessage('Switched to <strong>' + (MODES.find(m => m.id === currentMode)?.label || currentMode) +
-                '</strong> mode.', 'ai', true);
-            document.querySelector('.tab-btn[data-tab="chat"]').click();
-        }
-
-        // Chat
-        async function sendMessage() {
-            const text = $('userInput').value.trim();
-            if (!text || isSending) return;
-            isSending = true;
-            $('sendBtn').disabled = true;
-            $('userInput').value = '';
-            addMessage(text, 'user');
-            $('statusText').textContent = 'Thinking...';
-            showTyping();
-
-            // Progress bar
-            const pb = $('progressBar');
-            pb.style.width = '0%';
-            pb.style.transition = 'width 8s linear';
-            setTimeout(() => pb.style.width = '85%', 10);
-
-            try {
-                const res = await fetch(API_BASE + '/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, mode: currentMode, member_id: 'default' })
-                });
-                const data = await res.json();
-                hideTyping();
-                if (data.error) {
-                    addMessage('⚠️ ' + data.error, 'ai', true);
-                    $('statusText').textContent = 'Error';
-                } else {
-                    addMessage(data.reply || data.response || 'No response.', 'ai');
-                    $('statusText').textContent = 'Ready';
-                }
-            } catch (err) {
-                hideTyping();
-                addMessage('⚠️ Connection error', 'ai', true);
-                $('statusText').textContent = 'Offline';
-            } finally {
-                isSending = false;
-                $('sendBtn').disabled = false;
-                $('userInput').focus();
-                // Reset progress bar
-                pb.style.transition = 'width 0.3s ease';
-                pb.style.width = '100%';
-                setTimeout(() => { pb.style.width = '0%';
-                    pb.style.transition = 'none'; }, 400);
-            }
-        }
-
-        function addMessage(text, sender, isHTML = false) {
-            const div = document.createElement('div');
-            div.className = 'message ' + sender;
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            if (isHTML) bubble.innerHTML = text;
-            else bubble.textContent = text;
-            div.appendChild(avatar);
-            div.appendChild(bubble);
-
-            // Listen button on AI messages
-            if (sender === 'ai') {
-                const listenBtn = document.createElement('button');
-                listenBtn.className = 'listen-btn';
-                listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
-                listenBtn.style.cssText =
-                    'margin-top:6px;padding:3px 10px;border-radius:20px;border:1px solid rgba(245,158,11,0.2);background:rgba(245,158,11,0.06);color:var(--gold-light);font-size:10px;cursor:pointer;display:block;';
-                listenBtn.addEventListener('click', async () => {
-                    const plainText = bubble.innerText.slice(0, 500);
-                    listenBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                    try {
-                        const res = await fetch(API_BASE + '/api/tts', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ text: plainText, lang: 'en' })
-                        });
-                        if (!res.ok) throw new Error('TTS error');
-                        const blob = await res.blob();
-                        const audio = new Audio(URL.createObjectURL(blob));
-                        audio.play();
-                        listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Playing...';
-                        audio.onended = () => { listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen'; };
-                    } catch (e) {
-                        listenBtn.innerHTML = '<i class="fas fa-volume-up"></i> Listen';
-                        showToast('Voice unavailable', 'error');
-                    }
-                });
-                bubble.appendChild(listenBtn);
-            }
-
-            $('chatMessages').appendChild(div);
-            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-        }
-
-        let typingEl = null;
-
-        function showTyping() {
-            if (typingEl) return;
-            const div = document.createElement('div');
-            div.className = 'message ai';
-            div.id = 'typingIndicator';
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = '<i class="fas fa-brain"></i>';
-            const bubble = document.createElement('div');
-            bubble.className = 'typing';
-            bubble.innerHTML = '<span></span><span></span><span></span>';
-            div.appendChild(avatar);
-            div.appendChild(bubble);
-            $('chatMessages').appendChild(div);
-            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-            typingEl = div;
-        }
-
-        function hideTyping() {
-            if (typingEl) { typingEl.remove();
-                typingEl = null; }
-        }
-
-        // Framework Vault
-        function populateVault() {
-            const grid = $('frameworkGrid');
-            grid.innerHTML = '';
-            FRAMEWORKS.forEach(fw => {
-                const card = document.createElement('div');
-                card.className = 'fw-card';
-                const ok = isTierOk(currentTier, fw.tier);
-                const status = frameworkProgress[fw.id] || 'pending';
-                const done = status === 'completed';
-                const started = status === 'started';
-                card.style.opacity = ok ? '1' : '0.4';
-                card.innerHTML = `
-                    <h4>${fw.name} ${done ? '✅' : (ok ? (started ? '⏳' : '') : '🔒')}</h4>
-                    <p style="font-size:11px;color:var(--text-secondary);">${fw.value}</p>
-                    <div class="meta">
-                        <span class="val">${fw.value}</span>
-                        <span class="tier ${fw.tier}">${fw.tier}</span>
-                    </div>
-                    <button class="btn ${done ? 'done' : ''}">${done ? 'Completed' : (ok ? (started ? 'Resume' : 'Start') : 'Locked')}</button>
-                `;
-                const btn = card.querySelector('.btn');
-                btn.addEventListener('click', () => {
-                    if (!ok) { showToast('Upgrade to ' + fw.tier + ' for ' + fw.name, 'error'); return; }
-                    if (done) { showToast('Already completed ' + fw.name, 'info'); return; }
-                    if (frameworkProgress[fw.id] === 'started') {
-                        frameworkProgress[fw.id] = 'completed';
-                        fireConfetti();
-                        showToast('🎉 Completed ' + fw.name + '!', 'success');
-                    } else {
-                        frameworkProgress[fw.id] = 'started';
-                        showToast('Started ' + fw.name, 'info');
-                    }
-                    saveState();
-                    populateVault();
-                    updateDashboard();
-                    updateSidebar();
-                });
-                grid.appendChild(card);
-            });
-        }
-
-        // Animated counter helper
-        function animateCounter(el, target, prefix = '', suffix = '', duration = 600) {
-            const start = parseFloat(el.textContent.replace(/[^0-9.]/g, '')) || 0;
-            const range = target - start;
-            const startTime = performance.now();
-
-            function step(now) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const ease = 1 - Math.pow(1 - progress, 3);
-                const val = start + range * ease;
-                el.textContent = prefix + Math.round(val).toLocaleString() + suffix;
-                if (progress < 1) requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
-        }
-
-        // Dashboard
-        function updateDashboard() {
-            const total = FRAMEWORKS.length;
-            const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
-            const health = Math.round((completed / total) * 100);
-
-            // Ring
-            $('healthScore').textContent = health;
-            $('healthSub').textContent = completed + ' / ' + total + ' frameworks completed';
-            const circ = 251.2;
-            $('healthRing').style.strokeDashoffset = circ - (health / 100) * circ;
-
-            // Framework count
-            $('fwCount').textContent = completed + '/' + total;
-            $('fwSub').textContent = completed === 0 ? 'Start your first framework' : completed + ' completed';
-
-            // Strip
-            const strip = $('fwStrip');
-            strip.innerHTML = '';
-            FRAMEWORKS.forEach(f => {
-                const d = document.createElement('span');
-                d.className = 'dot';
-                const s = frameworkProgress[f.id] || 'pending';
-                d.classList.add(s === 'completed' ? 'done' : (s === 'started' ? 'partial' : ''));
-                strip.appendChild(d);
-            });
-
-            // Rule
-            $('ruleCount').textContent = rule100Count;
-            const streak = rule100Count >= 100 ? 1 : 0;
-            $('ruleStreak').innerHTML = '<i class="fas fa-fire"></i> ' + streak + 'd';
-
-            // Calendar
-            const cal = $('ruleCalendar');
-            cal.innerHTML = '';
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const key = d.toISOString().slice(0, 10);
-                const count = dailyHistory[key] || 0;
-                const div = document.createElement('span');
-                div.className = 'day';
-                if (count >= 100) div.classList.add('hit');
-                if (i === 0) div.classList.add('today');
-                div.textContent = d.getDate();
-                cal.appendChild(div);
-            }
-
-            // Revenue
-            const rev = userRevenue || 0;
-            $('revenueProjection').textContent = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2))
-                .toLocaleString() + '/mo' : '$0/mo';
-
-            // Next action
-            if (completed === 0) $('nextAction').textContent = '🚀 Start with the Delivery Checklist (free)';
-            else if (completed < 3) $('nextAction').textContent = '📈 Complete AVOCADO Offers next';
-            else if (completed < 5) $('nextAction').textContent = '💰 Unlock Partner tier for Money Models';
-            else $('nextAction').textContent = '🏆 Scale with Community OS and Launch Planner';
-        }
-
-        // Upgrade modal
-        function openUpgrade() {
-            const yearly = $('billingToggle').checked;
-            const tiers = [
-                { name: 'Free', features: '3 modes, 30 msg/h', price: yearly ? '$0' : '$0', current: currentTier ===
-                    'free' },
-                { name: 'Insider', features: '+5 modes, frameworks', price: yearly ? '$40/mo' : '$47/mo',
-                    current: currentTier === 'insider' },
-                { name: 'Partner', features: '+3 modes, money models', price: yearly ? '$167/mo' : '$197/mo',
-                    current: currentTier === 'partner' },
-            ];
-            const table = $('tierTable');
-            table.innerHTML = '';
-            tiers.forEach(t => {
-                const row = document.createElement('div');
-                row.className = 'tier-row' + (t.current ? ' current' : '');
-                row.innerHTML = `
-                    <span class="name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="pop">Popular</span>' : ''}</span>
-                    <span class="features">${t.features}</span>
-                    <span class="price">${t.price}</span>
-                `;
-                table.appendChild(row);
-            });
-            $('upgradeModal').classList.add('open');
-        }
-
-        // Onboarding
-        function goToStep(step) {
-            document.querySelectorAll('.onboard-step').forEach(el => el.classList.remove('active'));
-            document.querySelector('.onboard-step[data-step="' + step + '"]').classList.add('active');
-            document.querySelectorAll('.onboard-progress .dot').forEach(d => {
-                const s = parseInt(d.dataset.step);
-                d.classList.toggle('active', s === step);
-                d.classList.toggle('done', s < step);
-            });
-        }
-
-        function finishOnboarding() {
-            const revenue = parseFloat($('onboardRevenue').value) || 0;
-            const name = prompt('Business name? (optional)') || '';
-            userRevenue = revenue;
-            businessName = name;
-            if (revenue) $('revenueInput').value = revenue;
-            if (name) {
-                const hr = new Date().getHours();
-                const salutation = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-                $('greeting').textContent = salutation + ', ' + name + ' 👋';
-                $('welcomeTitle').textContent = 'Welcome back, ' + name;
-            }
-            onboarded = true;
-            saveState();
-            $('onboardingModal').classList.remove('open');
-            showToast('🎉 Welcome! You\'re all set.', 'success');
-            updateDashboard();
-        }
-
-        // Value Equation
-        function openValueEq() {
-            ['eqDream', 'eqLikelihood', 'eqTime', 'eqEffort'].forEach(id => {
-                const slider = $(id + 'Slider');
-                $(id).textContent = slider.value;
-            });
-            updateEqScore();
-            $('valueEqModal').classList.add('open');
-        }
-
-        function updateEqScore() {
-            const dream = parseInt($('eqDreamSlider').value);
-            const like = parseInt($('eqLikelihoodSlider').value);
-            const time = parseInt($('eqTimeSlider').value);
-            const effort = parseInt($('eqEffortSlider').value);
-            const score = (dream * like) / (time * effort);
-            $('eqScore').textContent = Math.round(score * 10) / 10;
-        }
-
-        ['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
-            $(id).addEventListener('input', () => {
-                $(id.replace('Slider', '')).textContent = $(id).value;
-                updateEqScore();
-            });
-        });
-
-        // Ripple effect on gold buttons
-        function addRipple(e) {
-            const btn = e.currentTarget;
-            const r = document.createElement('span');
-            r.className = 'ripple-wave';
-            const rect = btn.getBoundingClientRect();
+// ================================================================
+// RIPPLE EFFECT
+// ================================================================
+function setupRipple() {
+    document.querySelectorAll('.ripple-container').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
-            r.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - rect.left - size / 2) +
-                'px;top:' + (e.clientY - rect.top - size / 2) + 'px';
-            btn.classList.add('ripple-host');
-            btn.appendChild(r);
-            setTimeout(() => r.remove(), 600);
-        }
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px;`;
+            if (getComputedStyle(this).position === 'static') this.style.position = 'relative';
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+        });
+    });
+}
 
-        // Confetti
-        function fireConfetti() {
-            const container = document.createElement('div');
-            container.className = 'confetti-container';
-            document.body.appendChild(container);
-            const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
-            for (let i = 0; i < 60; i++) {
-                const p = document.createElement('div');
-                p.className = 'confetti';
-                p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                p.style.left = Math.random() * 100 + '%';
-                p.style.width = (Math.random() * 6 + 4) + 'px';
-                p.style.height = (Math.random() * 6 + 4) + 'px';
-                p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
-                p.style.animationDelay = (Math.random() * 0.8) + 's';
-                container.appendChild(p);
+// ================================================================
+// ANIMATED COUNTER
+// ================================================================
+function animateCounter(element, target, duration = 1200) {
+    const start = parseInt(element.textContent) || 0;
+    if (start === target) return;
+    const startTime = performance.now();
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (target - start) * eased);
+        element.textContent = current;
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+// ================================================================
+// TOAST SYSTEM (Enhanced)
+// ================================================================
+function showToast(msg, type = 'info') {
+    const icons = { success: '✅', error: '⚠️', info: '💡' };
+    toastIcon.textContent = icons[type] || '💡';
+    toastText.textContent = msg;
+    toast.className = 'toast ' + type + ' show';
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+// ================================================================
+// TIME-BASED GREETING
+// ================================================================
+function getTimeBasedGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+}
+
+// ================================================================
+// XP & LEVELING SYSTEM
+// ================================================================
+function addXP(amount) {
+    userXP += amount;
+    totalActions++;
+    const nextLevel = userLevel * 300;
+    if (userXP >= nextLevel) {
+        userLevel++;
+        userXP = userXP - nextLevel;
+        showToast(`🎉 Level Up! You're now Level ${userLevel}`, 'success');
+        fireConfetti();
+    }
+    updateXPBar();
+    saveState();
+}
+
+function updateXPBar() {
+    const wrap = $('xpBarWrap');
+    if (userLevel > 1 || userXP > 0) wrap.style.display = 'flex';
+    const nextLevel = userLevel * 300;
+    const pct = Math.min((userXP / nextLevel) * 100, 100);
+    $('xpLevel').textContent = 'Lv.' + userLevel;
+    $('xpBarFill').style.width = pct + '%';
+}
+
+// ================================================================
+// BADGE SYSTEM
+// ================================================================
+function checkBadge(id) {
+    if (unlockedBadges.includes(id)) return;
+    unlockedBadges.push(id);
+    const badge = BADGES[id];
+    if (badge) {
+        addXP(badge.xp);
+        showToast(`🏅 Unlocked: ${badge.name}!`, 'success');
+        updateBadges();
+        saveState();
+    }
+}
+
+function updateBadges() {
+    const row = $('fwBadges');
+    if (!row) return;
+    row.innerHTML = '';
+    unlockedBadges.forEach(id => {
+        const b = BADGES[id];
+        if (!b) return;
+        const span = document.createElement('span');
+        span.className = 'badge unlocked';
+        span.textContent = b.name;
+        span.title = b.desc;
+        row.appendChild(span);
+    });
+}
+
+// ================================================================
+// LOCAL STORAGE
+// ================================================================
+function loadState() {
+    try {
+        const d = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
+        frameworkProgress = d.frameworkProgress || {};
+        rule100Count = d.rule100Count || 0;
+        ruleStreakDays = d.ruleStreakDays || 0;
+        lastRuleDate = d.lastRuleDate || '';
+        userRevenue = d.userRevenue || 0;
+        businessName = d.businessName || '';
+        onboarded = d.onboarded || false;
+        dailyHistory = d.dailyHistory || {};
+        userXP = d.userXP || 0;
+        userLevel = d.userLevel || 1;
+        unlockedBadges = d.unlockedBadges || [];
+        totalActions = d.totalActions || 0;
+        if (userRevenue) $('revenueInput').value = userRevenue;
+        updatePersonalization();
+        const today = new Date().toDateString();
+        if (lastRuleDate !== today) {
+            if (lastRuleDate) {
+                const key = new Date(lastRuleDate).toISOString().slice(0, 10);
+                dailyHistory[key] = rule100Count;
             }
-            setTimeout(() => container.remove(), 3000);
+            rule100Count = 0;
+            lastRuleDate = today;
+            saveState();
         }
+    } catch (e) { console.warn('Load error', e); }
+}
 
-        // Init
-        async function init() {
-            loadState();
-            populateModes();
-            await fetchTier();
+function saveState() {
+    try {
+        localStorage.setItem('e5_coach_state', JSON.stringify({
+            frameworkProgress, rule100Count, ruleStreakDays, lastRuleDate,
+            userRevenue, businessName, onboarded, dailyHistory,
+            userXP, userLevel, unlockedBadges, totalActions
+        }));
+    } catch (e) { console.warn('Save error', e); }
+}
+
+// ================================================================
+// PERSONALIZATION
+// ================================================================
+function updatePersonalization() {
+    const greeting = $('greeting');
+    const welcomeTitle = $('welcomeTitle');
+    if (businessName) {
+        const timeGreeting = getTimeBasedGreeting();
+        greeting.textContent = '👋 ' + timeGreeting + ', ' + businessName;
+        welcomeTitle.textContent = timeGreeting + ', ' + businessName;
+    }
+}
+
+// ================================================================
+// TIER
+// ================================================================
+async function fetchTier() {
+    try {
+        const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
+        const data = await res.json();
+        currentTier = data.tier || 'free';
+        $('tierLabel').textContent = currentTier.toUpperCase();
+        updateSidebar();
+        updateMobileSidebar();
+    } catch (e) { console.warn('Tier fetch failed', e); }
+}
+
+function isTierOk(userTier, required) {
+    const order = { free: 0, insider: 1, partner: 2 };
+    return order[userTier] >= order[required];
+}
+
+// ================================================================
+// MODE POPULATION (Desktop + Mobile)
+// ================================================================
+function populateModes() {
+    const sel = $('modeSelect');
+    sel.innerHTML = '';
+    MODES.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.label + ' (' + m.tier + ')';
+        sel.appendChild(opt);
+    });
+    sel.value = currentMode;
+    renderModeList($('modeList'));
+    renderModeList($('mobileModeList'));
+}
+
+function renderModeList(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    MODES.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'mode-item ripple-container';
+        const ok = isTierOk(currentTier, m.tier);
+        if (!ok) div.classList.add('locked');
+        if (m.id === currentMode) div.classList.add('active');
+        const prog = frameworkProgress[m.id] || 'pending';
+        const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending');
+        div.innerHTML = `<span class="icon"><i class="fas ${m.icon}"></i></span><span>${m.label}</span><span class="tier-tag ${m.tier}">${m.tier}</span><span class="dot ${dotClass}"></span>`;
+        div.addEventListener('click', () => {
+            if (!ok) { showToast('Upgrade to ' + m.tier + ' to unlock ' + m.label, 'error'); return; }
+            sel.value = m.id;
+            onModeChange();
+            document.querySelector('.tab-btn[data-tab="chat"]').click();
+            closeMobileSidebar();
+        });
+        container.appendChild(div);
+    });
+}
+
+function updateSidebar() {
+    document.querySelectorAll('.mode-item').forEach((item, idx) => {
+        const m = MODES[idx % MODES.length];
+        const ok = isTierOk(currentTier, m.tier);
+        item.classList.toggle('locked', !ok);
+        const prog = frameworkProgress[m.id] || 'pending';
+        const dot = item.querySelector('.dot');
+        if (dot) dot.className = 'dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending'));
+    });
+}
+
+function updateMobileSidebar() {
+    renderModeList($('mobileModeList'));
+}
+
+// ================================================================
+// MOBILE SIDEBAR
+// ================================================================
+function openMobileSidebar() {
+    $('sidebarOverlay').classList.add('open');
+    $('mobileSidebar').classList.add('open');
+    $('mobileMenuBtn').classList.add('active');
+}
+function closeMobileSidebar() {
+    $('sidebarOverlay').classList.remove('open');
+    $('mobileSidebar').classList.remove('open');
+    $('mobileMenuBtn').classList.remove('active');
+}
+
+// ================================================================
+// MODE CHANGE
+// ================================================================
+function onModeChange() {
+    currentMode = $('modeSelect').value;
+    $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
+    document.querySelectorAll('.mode-item').forEach((el, idx) => {
+        const m = MODES[idx % MODES.length];
+        el.classList.toggle('active', m.id === currentMode);
+    });
+    if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
+        frameworkProgress[currentMode] = 'started';
+        saveState();
+        updateDashboard();
+        updateSidebar();
+        showToast('Started ' + MODES.find(m => m.id === currentMode)?.label + ' mode', 'info');
+    }
+    addMessage('Switched to <strong>' + (MODES.find(m => m.id === currentMode)?.label || currentMode) + '</strong> mode.', 'ai', true);
+    document.querySelector('.tab-btn[data-tab="chat"]').click();
+}
+
+// ================================================================
+// CHAT (with typing simulation)
+// ================================================================
+async function sendMessage() {
+    const text = $('userInput').value.trim();
+    if (!text || isSending) return;
+    isSending = true;
+    $('sendBtn').disabled = true;
+    $('userInput').value = '';
+    addMessage(text, 'user');
+    $('statusText').textContent = 'Thinking...';
+    showTyping();
+    if (totalActions === 0) checkBadge('first_chat');
+    try {
+        const res = await fetch(API_BASE + '/api/chat', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, mode: currentMode, member_id: 'default' })
+        });
+        const data = await res.json();
+        hideTyping();
+        if (data.error) {
+            addMessage('⚠️ ' + data.error, 'ai', true);
+            $('statusText').textContent = 'Error';
+        } else {
+            const reply = data.reply || data.response || 'No response.';
+            simulateTyping(reply, 'ai');
+            $('statusText').textContent = 'Ready';
+        }
+    } catch (err) {
+        hideTyping();
+        addMessage('⚠️ Connection error', 'ai', true);
+        $('statusText').textContent = 'Offline';
+    } finally {
+        isSending = false;
+        $('sendBtn').disabled = false;
+        $('userInput').focus();
+    }
+}
+
+// Simulated typing effect
+function simulateTyping(text, sender) {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.style.opacity = '1';
+    div.style.animation = 'none';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = '<i class="fas fa-brain"></i>';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = '<span class="typing-cursor">|</span>';
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    $('chatMessages').appendChild(div);
+    $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+
+    let i = 0;
+    const speed = Math.max(15, Math.min(40, 800 / text.length));
+    function typeChar() {
+        if (i < text.length) {
+            bubble.innerHTML = text.slice(0, i + 1).replace(/\n/g, '<br>') + '<span class="typing-cursor">|</span>';
+            i++;
+            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+            setTimeout(typeChar, speed);
+        } else {
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+        }
+    }
+    typeChar();
+}
+
+function addMessage(text, sender, isHTML = false) {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    if (isHTML) bubble.innerHTML = text;
+    else bubble.textContent = text;
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    $('chatMessages').appendChild(div);
+    $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+}
+
+let typingEl = null;
+function showTyping() {
+    if (typingEl) return;
+    const div = document.createElement('div');
+    div.className = 'message ai';
+    div.id = 'typingIndicator';
+    div.style.opacity = '1';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.innerHTML = '<i class="fas fa-brain"></i>';
+    const bubble = document.createElement('div');
+    bubble.className = 'typing';
+    bubble.innerHTML = '<span></span><span></span><span></span>';
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    $('chatMessages').appendChild(div);
+    $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+    typingEl = div;
+}
+function hideTyping() {
+    if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+// ================================================================
+// FRAMEWORK VAULT
+// ================================================================
+function populateVault() {
+    const grid = $('frameworkGrid');
+    grid.innerHTML = '';
+    FRAMEWORKS.forEach(fw => {
+        const card = document.createElement('div');
+        card.className = 'fw-card';
+        const ok = isTierOk(currentTier, fw.tier);
+        const status = frameworkProgress[fw.id] || 'pending';
+        const done = status === 'completed';
+        const started = status === 'started';
+        card.style.opacity = ok ? '1' : '0.4';
+        card.innerHTML = `<h4>${fw.name} ${done ? '✅' : (ok ? (started ? '⏳' : '') : '🔒')}</h4><p style="font-size:11px;color:var(--text-secondary);">${fw.value}</p><div class="meta"><span class="val">${fw.value}</span><span class="tier ${fw.tier}">${fw.tier}</span></div><button class="btn ripple-container ${done ? 'done' : ''}">${done ? 'Completed' : (ok ? (started ? 'Resume' : 'Start') : 'Locked')}</button>`;
+        const btn = card.querySelector('.btn');
+        btn.addEventListener('click', () => {
+            if (!ok) { showToast('Upgrade to ' + fw.tier + ' for ' + fw.name, 'error'); return; }
+            if (done) { showToast('Already completed ' + fw.name, 'info'); return; }
+            if (frameworkProgress[fw.id] === 'started') {
+                frameworkProgress[fw.id] = 'completed';
+                addXP(100);
+                checkBadge('first_framework');
+                const completedCount = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
+                if (completedCount === FRAMEWORKS.length) checkBadge('framework_master');
+                fireConfetti();
+                showToast('🎉 Completed ' + fw.name + '!', 'success');
+            } else {
+                frameworkProgress[fw.id] = 'started';
+                showToast('Started ' + fw.name, 'info');
+            }
+            saveState();
             populateVault();
             updateDashboard();
+            updateSidebar();
+            updateMobileSidebar();
+        });
+        grid.appendChild(card);
+    });
+}
 
-            if (!onboarded) $('onboardingModal').classList.add('open');
+// ================================================================
+// DASHBOARD (with empty states & animated counters)
+// ================================================================
+function updateDashboard() {
+    const total = FRAMEWORKS.length;
+    const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
+    const health = Math.round((completed / total) * 100);
 
-            // Events
-            $('modeSelect').addEventListener('change', onModeChange);
-            $('sendBtn').addEventListener('click', sendMessage);
-            $('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    // Ring with animation
+    const healthEl = $('healthScore');
+    animateCounter(healthEl, health, 1200);
+    $('healthSub').textContent = completed + ' / ' + total + ' frameworks completed';
+    const circ = 251.2;
+    $('healthRing').style.strokeDashoffset = circ - (health / 100) * circ;
 
-            $('vaultBtn').addEventListener('click', () => $('vaultModal').classList.add('open'));
-            $('closeVault').addEventListener('click', () => $('vaultModal').classList.remove('open'));
-            $('vaultModal').addEventListener('click', e => { if (e.target === e.currentTarget) $('vaultModal').classList
-                    .remove('open'); });
+    // Framework count
+    animateCounter($('fwCount'), completed, 800);
+    $('fwCount').textContent = completed + '/' + total;
+    $('fwSub').textContent = completed === 0 ? 'Start your first framework' : completed + ' completed';
 
-            $('upgradeBtn').addEventListener('click', openUpgrade);
-            $('closeUpgrade').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
-            $('upgradeCancel').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
-            $('upgradeAction').addEventListener('click', () => {
-                showToast('Upgrade: connect your Whop license key.', 'info');
-                $('upgradeModal').classList.remove('open');
-            });
-            $('billingToggle').addEventListener('change', openUpgrade);
+    // Strip
+    const strip = $('fwStrip');
+    strip.innerHTML = '';
+    FRAMEWORKS.forEach(f => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        const s = frameworkProgress[f.id] || 'pending';
+        d.classList.add(s === 'completed' ? 'done' : (s === 'started' ? 'partial' : ''));
+        strip.appendChild(d);
+    });
 
-            $('docBtn').addEventListener('click', () => showToast('Upload docs to personalise coaching.', 'info'));
+    // Rule of 100
+    animateCounter($('ruleCount'), rule100Count, 600);
+    const streak = rule100Count >= 100 ? 1 : 0;
+    $('ruleStreak').innerHTML = '<i class="fas fa-fire"></i> ' + streak + 'd';
 
-            // Real TTS from /api/tts
-            $('voiceBtn').addEventListener('click', async () => {
-                const msgs = document.querySelectorAll('.message.ai .bubble');
-                if (!msgs.length) { showToast('No coach reply to read yet.', 'info'); return; }
-                const lastText = msgs[msgs.length - 1].innerText.slice(0, 500);
-                showToast('🔊 Playing...', 'info');
-                try {
-                    const res = await fetch(API_BASE + '/api/tts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: lastText, lang: 'en' })
-                    });
-                    if (!res.ok) throw new Error('TTS failed');
-                    const blob = await res.blob();
-                    const url = URL.createObjectURL(blob);
-                    const audio = new Audio(url);
-                    audio.play();
-                    audio.onended = () => URL.revokeObjectURL(url);
-                } catch (e) { showToast('Voice unavailable: ' + e.message, 'error'); }
-            });
+    // Calendar
+    const cal = $('ruleCalendar');
+    cal.innerHTML = '';
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const count = dailyHistory[key] || 0;
+        const div = document.createElement('span');
+        div.className = 'day';
+        if (count >= 100) div.classList.add('hit');
+        if (i === 0) div.classList.add('today');
+        div.textContent = d.getDate();
+        cal.appendChild(div);
+    }
 
-            $('valueEqBtn').addEventListener('click', openValueEq);
-            $('closeValueEq').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
-            $('closeValueEqBtn').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
-            $('saveValueEq').addEventListener('click', () => {
-                showToast('Value Equation saved!', 'success');
-                $('valueEqModal').classList.remove('open');
-            });
+    // Revenue
+    const rev = userRevenue || 0;
+    const projected = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2)).toLocaleString() + '/mo' : '$0/mo';
+    $('revenueProjection').textContent = projected;
 
-            // Quick actions
-            $('quickXRay').addEventListener('click', () => { $('modeSelect').value = 'xray';
-                onModeChange(); });
-            $('quickOffer').addEventListener('click', () => {
-                if (!isTierOk(currentTier, 'partner')) { showToast('Upgrade to Partner for Offer Architect',
-                        'error'); return; }
-                $('modeSelect').value = 'offer';
-                onModeChange();
-            });
-            $('quickDM').addEventListener('click', () => {
-                if (!isTierOk(currentTier, 'insider')) { showToast('Upgrade to Insider for DM Doctor', 'error'); return; }
-                $('modeSelect').value = 'dm';
-                onModeChange();
-            });
+    // Next Best Action – contextual
+    const nextActionEl = $('nextAction');
+    if (completed === 0) {
+        nextActionEl.innerHTML = '🚀 <strong>Start with the Delivery Checklist</strong> — it's free and gives quick wins.';
+    } else if (completed < 3) {
+        nextActionEl.innerHTML = '📈 <strong>Complete AVOCADO Offers</strong> next to unlock lead generation power.';
+    } else if (completed < 5 && currentTier === 'free') {
+        nextActionEl.innerHTML = '💎 <strong>Upgrade to Insider</strong> for DM Doctor & Content Engine.';
+    } else if (completed < 8) {
+        nextActionEl.innerHTML = '🏗️ <strong>Scale with Community OS</strong> — build retention that compounds.';
+    } else {
+        nextActionEl.innerHTML = '👑 <strong>You're a Framework Master!</strong> Maintain your Rule of 100 streak.';
+    }
 
-            // Rule
-            $('ruleAddBtn').addEventListener('click', addRipple);
-            $('ruleAddBtn').addEventListener('click', () => {
-                rule100Count++;
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    if (lastRuleDate) { const key = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[key] = rule100Count; }
-                    rule100Count = 1;
-                    lastRuleDate = today;
-                }
-                saveState();
-                updateDashboard();
-                if (rule100Count >= 100) { fireConfetti();
-                    showToast('🎉 Hit 100 actions!', 'success'); }
-            });
-            $('ruleResetBtn').addEventListener('click', () => { rule100Count = 0;
-                saveState();
-                updateDashboard();
-                showToast('Reset for today.', 'info'); });
+    // Badges
+    updateBadges();
+    updateXPBar();
+}
 
-            $('revenueInput').addEventListener('input', () => {
-                userRevenue = parseFloat($('revenueInput').value) || 0;
-                saveState();
-                updateDashboard();
-            });
+// ================================================================
+// UPGRADE MODAL
+// ================================================================
+function openUpgrade() {
+    const yearly = $('billingToggle').checked;
+    const tiers = [
+        { name: 'Free', features: '3 modes, 30 msg/h', price: yearly ? '$0' : '$0', current: currentTier === 'free' },
+        { name: 'Insider', features: '+5 modes, frameworks', price: yearly ? '$40/mo' : '$47/mo', current: currentTier === 'insider' },
+        { name: 'Partner', features: '+3 modes, money models', price: yearly ? '$167/mo' : '$197/mo', current: currentTier === 'partner' },
+    ];
+    const table = $('tierTable');
+    table.innerHTML = '';
+    tiers.forEach(t => {
+        const row = document.createElement('div');
+        row.className = 'tier-row' + (t.current ? ' current' : '');
+        row.innerHTML = `<span class="name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="pop">Popular</span>' : ''}</span><span class="features">${t.features}</span><span class="price">${t.price}</span>`;
+        table.appendChild(row);
+    });
+    $('upgradeModal').classList.add('open');
+}
 
-            // Onboarding
-            $('onboardNext1').addEventListener('click', () => goToStep(2));
-            $('onboardBack2').addEventListener('click', () => goToStep(1));
-            $('onboardNext2').addEventListener('click', () => goToStep(3));
-            $('onboardBack3').addEventListener('click', () => goToStep(2));
-            $('onboardFinish').addEventListener('click', finishOnboarding);
+// ================================================================
+// ONBOARDING
+// ================================================================
+function goToStep(step) {
+    document.querySelectorAll('.onboard-step').forEach(el => el.classList.remove('active'));
+    document.querySelector('.onboard-step[data-step="' + step + '"]').classList.add('active');
+    document.querySelectorAll('.onboard-progress .dot').forEach(d => {
+        const s = parseInt(d.dataset.step);
+        d.classList.toggle('active', s === step);
+        d.classList.toggle('done', s < step);
+    });
+}
+function finishOnboarding() {
+    const revenue = parseFloat($('onboardRevenue').value) || 0;
+    const name = prompt('Business name? (optional)') || '';
+    userRevenue = revenue;
+    businessName = name;
+    if (revenue) $('revenueInput').value = revenue;
+    onboarded = true;
+    saveState();
+    $('onboardingModal').classList.remove('open');
+    showToast('🎉 Welcome! You're all set.', 'success');
+    updatePersonalization();
+    updateDashboard();
+    addXP(50);
+}
 
-            // Tab switching
-            $('tabNav').addEventListener('click', e => {
-                const btn = e.target.closest('.tab-btn');
-                if (!btn) return;
-                const tab = btn.dataset.tab;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                if (tab === 'dashboard') {
-                    $('dashboardView').classList.add('active');
-                    $('chatView').classList.remove('active');
-                    updateDashboard();
-                } else {
-                    $('dashboardView').classList.remove('active');
-                    $('chatView').classList.add('active');
-                }
-            });
+// ================================================================
+// VALUE EQUATION
+// ================================================================
+function openValueEq() {
+    ['eqDream', 'eqLikelihood', 'eqTime', 'eqEffort'].forEach(id => {
+        const slider = $(id + 'Slider');
+        $(id).textContent = slider.value;
+    });
+    updateEqScore();
+    $('valueEqModal').classList.add('open');
+}
+function updateEqScore() {
+    const dream = parseInt($('eqDreamSlider').value);
+    const like = parseInt($('eqLikelihoodSlider').value);
+    const time = parseInt($('eqTimeSlider').value);
+    const effort = parseInt($('eqEffortSlider').value);
+    const score = (dream * like) / (time * effort);
+    $('eqScore').textContent = Math.round(score * 10) / 10;
+}
+['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
+    $(id).addEventListener('input', () => {
+        $(id.replace('Slider', '')).textContent = $(id).value;
+        updateEqScore();
+    });
+});
 
-            // Ripple on send and gold buttons
-            document.querySelectorAll('.btn-gold, #sendBtn, #ruleAddBtn').forEach(b => {
-                b.addEventListener('click', addRipple);
-            });
+// ================================================================
+// CONFETTI – 3D Enhanced
+// ================================================================
+function fireConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
+    for (let i = 0; i < 80; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = Math.random() * 100 + '%';
+        p.style.width = (Math.random() * 6 + 4) + 'px';
+        p.style.height = (Math.random() * 6 + 4) + 'px';
+        p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+        p.style.animationDelay = (Math.random() * 0.8) + 's';
+        p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(p);
+    }
+    setTimeout(() => container.remove(), 3500);
+}
 
-            // Mobile bottom sheet sidebar
-            const fab = $('mobileFab');
-            const overlay = $('sheetOverlay');
-            const sheet = $('mobileSheet');
-            const mobileList = $('modeListMobile');
+// ================================================================
+// SKELETON LOADING
+// ================================================================
+function showSkeleton() {
+    $('skeletonScreen').classList.add('active');
+    $('dashboardView').classList.remove('active');
+}
+function hideSkeleton() {
+    $('skeletonScreen').classList.remove('active');
+    $('dashboardView').classList.add('active');
+}
 
-            function populateMobileList() {
-                mobileList.innerHTML = '';
-                MODES.forEach(m => {
-                    const div = document.createElement('div');
-                    div.className = 'mode-item' + (m.id === currentMode ? ' active' : '');
-                    if (!isTierOk(currentTier, m.tier)) div.classList.add('locked');
-                    div.innerHTML =
-                        '<span class="icon"><i class="fas ' + m.icon + '"></i></span><span>' + m.label +
-                        '</span><span class="tier-tag ' + m.tier + '">' + m.tier + '</span>';
-                    div.addEventListener('click', () => {
-                        if (!isTierOk(currentTier, m.tier)) { showToast('Upgrade to ' + m.tier + ' for ' +
-                                m.label, 'error'); return; }
-                        $('modeSelect').value = m.id;
-                        onModeChange();
-                        overlay.classList.remove('open');
-                        sheet.classList.remove('open');
-                        document.querySelector('.tab-btn[data-tab="chat"]').click();
-                    });
-                    mobileList.appendChild(div);
-                });
-            }
-            populateMobileList();
+// ================================================================
+// INIT
+// ================================================================
+async function init() {
+    showSkeleton();
+    loadState();
+    populateModes();
+    setupRipple();
+    await fetchTier();
+    populateVault();
+    hideSkeleton();
+    updateDashboard();
 
-            if (fab) fab.addEventListener('click', () => {
-                populateMobileList();
-                overlay.classList.add('open');
-                sheet.classList.add('open');
-            });
-            if (overlay) overlay.addEventListener('click', e => {
-                if (e.target === overlay) {
-                    overlay.classList.remove('open');
-                    sheet.classList.remove('open');
-                }
-            });
+    if (!onboarded) {
+        setTimeout(() => $('onboardingModal').classList.add('open'), 600);
+    }
 
-            currentMode = $('modeSelect').value;
-            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            $('userInput').focus();
+    // Events
+    $('modeSelect').addEventListener('change', onModeChange);
+    $('sendBtn').addEventListener('click', sendMessage);
+    $('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+    $('vaultBtn').addEventListener('click', () => $('vaultModal').classList.add('open'));
+    $('closeVault').addEventListener('click', () => $('vaultModal').classList.remove('open'));
+    $('vaultModal').addEventListener('click', e => { if (e.target === e.currentTarget) $('vaultModal').classList.remove('open'); });
+
+    $('upgradeBtn').addEventListener('click', openUpgrade);
+    $('closeUpgrade').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
+    $('upgradeCancel').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
+    $('upgradeAction').addEventListener('click', () => {
+        showToast('Upgrade: connect your Whop license key.', 'info');
+        $('upgradeModal').classList.remove('open');
+    });
+    $('billingToggle').addEventListener('change', openUpgrade);
+
+    $('docBtn').addEventListener('click', () => showToast('Upload docs to personalise coaching.', 'info'));
+    $('voiceBtn').addEventListener('click', () => showToast('Text-to-Speech coming soon.', 'info'));
+    $('valueEqBtn').addEventListener('click', () => { openValueEq(); checkBadge('value_eq'); });
+    $('closeValueEq').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
+    $('closeValueEqBtn').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
+    $('saveValueEq').addEventListener('click', () => {
+        showToast('Value Equation saved!', 'success');
+        $('valueEqModal').classList.remove('open');
+    });
+
+    $('quickXRay').addEventListener('click', () => { $('modeSelect').value = 'xray'; onModeChange(); });
+    $('quickOffer').addEventListener('click', () => {
+        if (!isTierOk(currentTier, 'partner')) { showToast('Upgrade to Partner for Offer Architect', 'error'); return; }
+        $('modeSelect').value = 'offer'; onModeChange();
+    });
+    $('quickDM').addEventListener('click', () => {
+        if (!isTierOk(currentTier, 'insider')) { showToast('Upgrade to Insider for DM Doctor', 'error'); return; }
+        $('modeSelect').value = 'dm'; onModeChange();
+    });
+
+    $('ruleAddBtn').addEventListener('click', () => {
+        rule100Count++;
+        const today = new Date().toDateString();
+        if (lastRuleDate !== today) {
+            if (lastRuleDate) { const key = new Date(lastRuleDate).toISOString().slice(0, 10); dailyHistory[key] = rule100Count; }
+            rule100Count = 1;
+            lastRuleDate = today;
         }
+        addXP(10);
+        saveState();
+        updateDashboard();
+        if (rule100Count >= 100) {
+            fireConfetti();
+            showToast('🎉 Hit 100 actions!', 'success');
+            checkBadge('streak_3');
+            checkBadge('streak_7');
+        }
+    });
+    $('ruleResetBtn').addEventListener('click', () => { rule100Count = 0; saveState(); updateDashboard(); showToast('Reset for today.', 'info'); });
 
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    $('revenueInput').addEventListener('input', () => {
+        userRevenue = parseFloat($('revenueInput').value) || 0;
+        saveState();
+        updateDashboard();
+    });
+
+    $('onboardNext1').addEventListener('click', () => goToStep(2));
+    $('onboardBack2').addEventListener('click', () => goToStep(1));
+    $('onboardNext2').addEventListener('click', () => goToStep(3));
+    $('onboardBack3').addEventListener('click', () => goToStep(2));
+    $('onboardFinish').addEventListener('click', finishOnboarding);
+
+    $('tabNav').addEventListener('click', e => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (tab === 'dashboard') {
+            $('dashboardView').classList.add('active');
+            $('chatView').classList.remove('active');
+            updateDashboard();
+        } else {
+            $('dashboardView').classList.remove('active');
+            $('chatView').classList.add('active');
+        }
+    });
+
+    $('mobileMenuBtn').addEventListener('click', () => {
+        if ($('mobileSidebar').classList.contains('open')) closeMobileSidebar();
+        else openMobileSidebar();
+    });
+    $('sidebarOverlay').addEventListener('click', closeMobileSidebar);
+
+    currentMode = $('modeSelect').value;
+    $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
+    $('userInput').focus();
+
+    // Check existing badges on load
+    const completedCount = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
+    if (completedCount > 0) {
+        if (!unlockedBadges.includes('first_framework')) unlockedBadges.push('first_framework');
+    }
+    if (completedCount === FRAMEWORKS.length) {
+        if (!unlockedBadges.includes('framework_master')) unlockedBadges.push('framework_master');
+    }
+    if (currentTier === 'insider' && !unlockedBadges.includes('insider')) unlockedBadges.push('insider');
+    if (currentTier === 'partner' && !unlockedBadges.includes('partner')) unlockedBadges.push('partner');
+    updateBadges();
+    updateXPBar();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
