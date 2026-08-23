@@ -4,42 +4,61 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E5 AI Coach – Quindecillion Executive</title>
-    <!-- Font & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* ----- RESET & BASE ----- */
-        * {
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #141a3a;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --purple: #8b5cf6;
+            --green: #4ade80;
+            --glass: rgba(255, 255, 255, 0.03);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0e27;
-            color: #e2e8f0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
+            margin: 0;
         }
+        /* main app container */
         .app {
             width: 100%;
             max-width: 1440px;
             height: 96vh;
-            background: rgba(10, 14, 39, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            max-height: 1000px;
+            background: var(--bg-secondary);
             border-radius: 36px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            backdrop-filter: blur(20px);
         }
-        /* ----- GLOW OVERLAY ----- */
+        /* subtle glow */
         .app::before {
             content: '';
             position: absolute;
@@ -47,83 +66,86 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.06), transparent 60%);
+            background: radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.05), transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
-        /* ----- HEADER ----- */
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 32px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px 28px;
+            border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
             position: relative;
             z-index: 1;
             flex-wrap: wrap;
             gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
         }
-        .logo-area {
+        .logo {
             display: flex;
             align-items: center;
             gap: 12px;
         }
         .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            border-radius: 14px;
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            color: #0a0e27;
+            font-size: 20px;
             font-weight: 700;
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+            color: var(--bg-primary);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
         }
         .logo-text {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         .logo-sub {
-            font-size: 12px;
-            color: #94a3b8;
+            font-size: 11px;
+            color: var(--text-secondary);
             font-weight: 400;
+            -webkit-text-fill-color: var(--text-secondary);
             margin-left: 4px;
-            -webkit-text-fill-color: #94a3b8;
         }
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
         }
         .tier-badge {
-            padding: 6px 16px;
+            padding: 5px 16px;
             border-radius: 40px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             background: rgba(245, 158, 11, 0.15);
             border: 1px solid rgba(245, 158, 11, 0.25);
-            color: #fbbf24;
+            color: var(--gold-light);
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-        .tier-badge i {
-            font-size: 14px;
+            cursor: default;
         }
         .btn-outline {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #e2e8f0;
-            padding: 8px 20px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 7px 18px;
             border-radius: 40px;
             font-weight: 500;
             font-size: 13px;
@@ -134,32 +156,74 @@
             gap: 8px;
         }
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: var(--bg-card);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
             border: none;
-            color: #0a0e27;
-            padding: 8px 24px;
+            color: var(--bg-primary);
+            padding: 7px 22px;
             border-radius: 40px;
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
             display: flex;
             align-items: center;
             gap: 8px;
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
         }
         .btn-primary:active {
             transform: translateY(0);
         }
-        /* ----- MAIN LAYOUT (SIDEBAR + CHAT) ----- */
+
+        /* ============================================================
+           TAB NAVIGATION
+           ============================================================ */
+        .tab-nav {
+            display: flex;
+            gap: 2px;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            background: rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .tab-btn.active {
+            color: var(--gold-light);
+            border-bottom-color: var(--gold);
+        }
+        .tab-btn i {
+            font-size: 16px;
+        }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
         .main-area {
             display: flex;
             flex: 1;
@@ -167,15 +231,15 @@
             position: relative;
             z-index: 1;
         }
-        /* SIDEBAR */
+        /* sidebar (desktop) */
         .sidebar {
-            width: 280px;
-            background: rgba(255, 255, 255, 0.03);
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 24px 16px;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 14px;
             overflow-y: auto;
             flex-shrink: 0;
-            display: none; /* hidden on mobile, show on desktop */
+            display: none;
         }
         @media (min-width: 1024px) {
             .sidebar {
@@ -183,62 +247,63 @@
             }
         }
         .sidebar-title {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #64748b;
-            margin-bottom: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
             font-weight: 600;
         }
         .mode-list {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
         .mode-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
+            padding: 9px 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            color: #94a3b8;
+            color: var(--text-secondary);
             border: 1px solid transparent;
+            position: relative;
         }
         .mode-item:hover {
-            background: rgba(255, 255, 255, 0.04);
-            color: #e2e8f0;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
         .mode-item.active {
             background: rgba(245, 158, 11, 0.08);
-            border-color: rgba(245, 158, 11, 0.2);
-            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.15);
+            color: var(--gold-light);
         }
         .mode-item .icon {
-            width: 28px;
+            width: 26px;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
         }
         .mode-item .tier-tag {
-            font-size: 9px;
+            font-size: 8px;
             background: rgba(255, 255, 255, 0.06);
             padding: 2px 8px;
             border-radius: 20px;
-            color: #64748b;
+            color: var(--text-secondary);
             margin-left: auto;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .mode-item .tier-tag.free {
             background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
+            color: var(--green);
         }
         .mode-item .tier-tag.insider {
             background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
+            color: var(--gold-light);
         }
         .mode-item .tier-tag.partner {
             background: rgba(168, 85, 247, 0.15);
@@ -247,44 +312,208 @@
         .mode-item.locked {
             opacity: 0.5;
         }
-        /* CHAT AREA */
-        .chat-area {
+        .mode-item .check {
+            margin-left: auto;
+            color: var(--green);
+            font-size: 12px;
+            display: none;
+        }
+        .mode-item.completed .check {
+            display: block;
+        }
+        /* progress indicator for framework completion in sidebar */
+        .mode-item .progress-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-left: 6px;
+        }
+        .mode-item .progress-dot.complete {
+            background: var(--green);
+        }
+        .mode-item .progress-dot.partial {
+            background: var(--gold);
+        }
+
+        /* chat / dashboard container */
+        .content-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
+            background: var(--bg-primary);
+            position: relative;
+        }
+
+        /* ============================================================
+           DASHBOARD VIEW
+           ============================================================ */
+        .dashboard-view {
+            display: none;
+            flex-direction: column;
+            padding: 24px 28px;
+            overflow-y: auto;
+            flex: 1;
+            gap: 24px;
+        }
+        .dashboard-view.active {
+            display: flex;
+        }
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 900px) {
+            .dash-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .dash-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .dash-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px 20px;
+            transition: all 0.2s;
+        }
+        .dash-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .dash-card h4 {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .dash-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .dash-card .sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .dash-card .progress-ring {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+        .dash-card .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+        .dash-card .progress-ring .bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 6;
+        }
+        .dash-card .progress-ring .fg {
+            fill: none;
+            stroke: var(--gold);
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+        .framework-grid-dash {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .fw-mini {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+        .fw-mini .status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .fw-mini .status.done {
+            background: var(--green);
+        }
+        .fw-mini .status.pending {
+            background: var(--text-secondary);
+        }
+        .fw-mini .status.locked {
+            background: var(--gold);
+            opacity: 0.4;
+        }
+        .rule-100-tracker {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .rule-100-tracker .count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+        .rule-100-tracker button {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 4px 16px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .rule-100-tracker button:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--gold);
+        }
+
+        /* ============================================================
+           CHAT VIEW (unchanged mostly)
+           ============================================================ */
+        .chat-view {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        .chat-view.active {
+            display: flex;
         }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 28px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
+        /* ... rest of chat styles ... */
         .message {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             max-width: 80%;
             animation: fadeUp 0.3s ease;
-        }
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         .message.user {
             align-self: flex-end;
             flex-direction: row-reverse;
         }
         .message .avatar {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             flex-shrink: 0;
             display: flex;
@@ -292,53 +521,44 @@
             justify-content: center;
             font-weight: 600;
             font-size: 14px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
         }
         .message.ai .avatar {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: #0a0e27;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--bg-primary);
         }
         .message.user .avatar {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            background: linear-gradient(135deg, var(--purple), #6d28d9);
             color: white;
         }
         .message .bubble {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             backdrop-filter: blur(10px);
-            padding: 14px 20px;
-            border-radius: 18px;
-            font-size: 15px;
+            padding: 12px 18px;
+            border-radius: 16px;
+            font-size: 14px;
             line-height: 1.6;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            word-break: break-word;
+            border: 1px solid var(--border-color);
         }
         .message.user .bubble {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(109, 40, 217, 0.15));
+            background: rgba(139, 92, 246, 0.15);
             border-color: rgba(139, 92, 246, 0.2);
         }
-        .message .bubble p {
-            margin-bottom: 8px;
-        }
-        .message .bubble p:last-child {
-            margin-bottom: 0;
-        }
-        /* typing indicator */
         .typing-indicator {
             display: flex;
             gap: 6px;
-            padding: 14px 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            align-items: center;
+            padding: 12px 18px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
             width: fit-content;
         }
         .typing-indicator span {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #fbbf24;
+            background: var(--gold-light);
             display: inline-block;
             animation: typingBounce 1.4s infinite;
         }
@@ -355,95 +575,101 @@
                 transform: translateY(0);
             }
             30% {
-                transform: translateY(-8px);
+                transform: translateY(-6px);
             }
         }
-        /* INPUT BAR */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* input bar */
         .input-bar {
-            padding: 16px 28px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 14px 24px 20px;
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
             flex-wrap: wrap;
             background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
         }
         .input-bar .mode-selector {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 1 1 200px;
+            gap: 8px;
+            flex: 1 1 180px;
         }
         .input-bar .mode-selector label {
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--text-secondary);
             font-weight: 500;
             white-space: nowrap;
         }
         .input-bar .mode-selector select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 40px;
-            padding: 10px 18px;
-            color: #e2e8f0;
-            font-size: 14px;
+            padding: 8px 14px;
+            color: var(--text-primary);
+            font-size: 13px;
             font-weight: 500;
             outline: none;
             width: 100%;
-            max-width: 240px;
+            max-width: 200px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .input-bar .mode-selector select:hover {
             border-color: rgba(255, 255, 255, 0.2);
         }
-        .input-bar .mode-selector select option {
-            background: #0a0e27;
-            color: #e2e8f0;
-        }
         .input-wrapper {
             flex: 2;
             display: flex;
-            gap: 10px;
-            min-width: 200px;
+            gap: 8px;
+            min-width: 160px;
         }
         .input-wrapper input {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 40px;
-            padding: 12px 20px;
-            color: #e2e8f0;
-            font-size: 15px;
+            padding: 10px 18px;
+            color: var(--text-primary);
+            font-size: 14px;
             outline: none;
             transition: border 0.2s;
             min-width: 0;
         }
         .input-wrapper input::placeholder {
-            color: #64748b;
+            color: var(--text-secondary);
         }
         .input-wrapper input:focus {
             border-color: rgba(245, 158, 11, 0.4);
         }
         .input-wrapper button {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
             border: none;
             border-radius: 40px;
-            padding: 12px 28px;
+            padding: 10px 24px;
             font-weight: 600;
-            color: #0a0e27;
-            font-size: 15px;
+            color: var(--bg-primary);
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .input-wrapper button:hover {
             transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
         }
         .input-wrapper button:disabled {
             opacity: 0.5;
@@ -452,24 +678,58 @@
         }
         .input-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
         .input-actions button {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
             border-radius: 40px;
-            padding: 10px 14px;
-            color: #94a3b8;
+            padding: 8px 12px;
+            color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s;
             font-size: 14px;
         }
         .input-actions button:hover {
-            background: rgba(255, 255, 255, 0.04);
-            color: #e2e8f0;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
-        /* FRAMEWORK VAULT MODAL */
+        /* status bar */
+        .status-bar {
+            padding: 4px 24px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            margin-right: 4px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ============================================================
+           MODALS
+           ============================================================ */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -481,22 +741,22 @@
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
             padding: 20px;
         }
         .modal-overlay.open {
             display: flex;
         }
         .modal {
-            background: #141a3a;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 32px;
-            max-width: 800px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            max-width: 700px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             padding: 32px 36px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
             position: relative;
         }
         .modal-close {
@@ -505,32 +765,34 @@
             right: 20px;
             background: transparent;
             border: none;
-            color: #94a3b8;
+            color: var(--text-secondary);
             font-size: 24px;
             cursor: pointer;
             transition: color 0.2s;
         }
         .modal-close:hover {
-            color: #e2e8f0;
+            color: var(--text-primary);
         }
         .modal h2 {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         .modal p.sub {
-            color: #94a3b8;
-            margin-bottom: 28px;
-            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
         }
+
+        /* framework grid in vault */
         .framework-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 14px;
         }
         @media (max-width: 600px) {
             .framework-grid {
@@ -538,63 +800,218 @@
             }
         }
         .framework-card {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 18px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
             transition: all 0.2s;
+            cursor: default;
         }
         .framework-card:hover {
             background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.15);
         }
         .framework-card h4 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 4px;
-            color: #f1f5f9;
-        }
-        .framework-card .meta {
-            font-size: 12px;
-            color: #94a3b8;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        .framework-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 6px 0;
+        }
+        .framework-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
             margin-top: 8px;
         }
         .framework-card .meta .value {
-            color: #fbbf24;
+            color: var(--gold-light);
             font-weight: 600;
         }
         .framework-card .meta .tier {
-            background: rgba(245, 158, 11, 0.12);
             padding: 2px 12px;
             border-radius: 40px;
             font-size: 10px;
             font-weight: 600;
-            color: #fbbf24;
-        }
-        .framework-card .meta .tier.partner {
-            background: rgba(168, 85, 247, 0.15);
-            color: #c084fc;
         }
         .framework-card .meta .tier.free {
             background: rgba(34, 197, 94, 0.12);
-            color: #4ade80;
+            color: var(--green);
         }
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .header {
-                padding: 16px 20px;
+        .framework-card .meta .tier.insider {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--gold-light);
+        }
+        .framework-card .meta .tier.partner {
+            background: rgba(168, 85, 247, 0.12);
+            color: #c084fc;
+        }
+        .framework-card .action-btn {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 4px 14px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+        .framework-card .action-btn:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--gold);
+            color: var(--text-primary);
+        }
+        .framework-card .action-btn.done {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* upgrade modal */
+        .tier-table {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .tier-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            align-items: center;
+        }
+        .tier-row .tier-name {
+            font-weight: 600;
+        }
+        .tier-row .features {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .tier-row .price {
+            font-weight: 600;
+            color: var(--gold-light);
+            text-align: right;
+        }
+        .tier-row.current {
+            border-color: var(--gold);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        /* ============================================================
+           ONBOARDING WIZARD
+           ============================================================ */
+        .onboarding-step {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .onboarding-step.active {
+            display: flex;
+        }
+        .onboarding-step label {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .onboarding-step input,
+        .onboarding-step select {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+        .onboarding-step input:focus,
+        .onboarding-step select:focus {
+            border-color: var(--gold);
+        }
+        .onboarding-step .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        /* ============================================================
+           VALUE EQUATION BUILDER (inside modal)
+           ============================================================ */
+        .slider-group {
+            margin: 12px 0;
+        }
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .slider-group input[type="range"] {
+            width: 100%;
+            margin: 4px 0 8px;
+            accent-color: var(--gold);
+            background: var(--bg-card);
+            height: 4px;
+            border-radius: 4px;
+            outline: none;
+        }
+        .slider-group .value-display {
+            font-weight: 600;
+            color: var(--gold-light);
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .app {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+                padding: 0;
             }
-            .logo-text {
+            .header {
+                padding: 12px 16px;
+            }
+            .tab-nav {
+                padding: 0 16px;
+            }
+            .tab-btn {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+            .content-area {
+                padding: 0;
+            }
+            .dash-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .header-actions .btn-outline span {
+                display: none;
+            }
+            .tab-btn span {
+                display: none;
+            }
+            .tab-btn i {
                 font-size: 18px;
             }
-            .chat-messages {
-                padding: 16px 18px;
-            }
             .input-bar {
-                padding: 12px 18px 18px;
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -612,27 +1029,22 @@
             .input-actions {
                 justify-content: flex-end;
             }
-            .btn-primary {
-                padding: 6px 16px;
-                font-size: 12px;
-            }
-            .btn-outline {
-                padding: 6px 14px;
-                font-size: 12px;
-            }
-        }
-        @media (max-width: 480px) {
-            .header-actions .btn-outline span {
-                display: none;
-            }
-            .tier-badge {
-                font-size: 11px;
-                padding: 4px 12px;
+            .dash-grid {
+                grid-template-columns: 1fr;
             }
             .modal {
                 padding: 24px 18px;
             }
+            .tier-row {
+                grid-template-columns: 1fr;
+                gap: 4px;
+                text-align: center;
+            }
+            .tier-row .price {
+                text-align: center;
+            }
         }
+
         /* scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
@@ -647,54 +1059,45 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(245, 158, 11, 0.5);
         }
-        /* status bar */
-        .status-bar {
-            padding: 6px 28px;
-            font-size: 12px;
-            color: #64748b;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.15);
+
+        /* confetti animation (simple) */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
         }
-        .status-bar .left {
-            display: flex;
-            gap: 16px;
-            align-items: center;
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--gold);
+            opacity: 0.8;
+            animation: confettiFall linear forwards;
         }
-        .status-bar .right {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4ade80;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%,
-            100% {
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
                 opacity: 1;
             }
-            50% {
-                opacity: 0.4;
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
             }
         }
     </style>
 </head>
 <body>
+
     <div class="app" id="app">
 
-        <!-- HEADER -->
+        <!-- ============ HEADER ============ -->
         <header class="header">
-            <div class="logo-area">
+            <div class="logo">
                 <div class="logo-icon">E5</div>
                 <div class="logo-text">AI Coach <span class="logo-sub">Quindecillion</span></div>
             </div>
@@ -707,82 +1110,215 @@
             </div>
         </header>
 
-        <!-- MAIN -->
+        <!-- ============ TAB NAV ============ -->
+        <div class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
+            <button class="tab-btn" data-tab="chat"><i class="fas fa-comment-dots"></i> <span>Chat</span></button>
+        </div>
+
+        <!-- ============ MAIN AREA ============ -->
         <div class="main-area">
 
-            <!-- SIDEBAR -->
+            <!-- SIDEBAR (modes) -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-title">⚡ Modes</div>
-                <div class="mode-list" id="modeList">
-                    <!-- filled by JS -->
-                </div>
+                <div class="mode-list" id="modeList"></div>
             </aside>
 
-            <!-- CHAT -->
-            <div class="chat-area">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        <div class="avatar"><i class="fas fa-brain"></i></div>
-                        <div class="bubble">
-                            <p><strong>Hello, I'm your Quindecillion Executive Coach.</strong></p>
-                            <p>I have access to <strong>$20,000+</strong> worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.</p>
-                            <p>Select a mode above or just ask me anything about your business.</p>
+            <!-- CONTENT -->
+            <div class="content-area">
+
+                <!-- DASHBOARD VIEW -->
+                <div class="dashboard-view active" id="dashboardView">
+                    <div class="dash-grid">
+                        <!-- Health Score -->
+                        <div class="dash-card">
+                            <h4>Business Health <span id="healthScoreLabel">72</span></h4>
+                            <div class="value" id="healthScore">72</div>
+                            <div class="sub">Based on 4 frameworks completed</div>
+                        </div>
+                        <!-- Frameworks Progress -->
+                        <div class="dash-card">
+                            <h4>Frameworks <span id="fwProgressLabel">4/8</span></h4>
+                            <div class="framework-grid-dash" id="fwMiniGrid"></div>
+                        </div>
+                        <!-- Rule of 100 -->
+                        <div class="dash-card">
+                            <h4>Rule of 100 <span id="ruleStreak">🔥 0d</span></h4>
+                            <div class="rule-100-tracker">
+                                <span class="count" id="ruleCount">0</span>
+                                <span style="color:var(--text-secondary);font-size:13px;">actions today</span>
+                                <button id="ruleAddBtn"><i class="fas fa-plus"></i> Log +1</button>
+                                <button id="ruleResetBtn" style="background:transparent;border-color:transparent;color:var(--text-secondary);">Reset</button>
+                            </div>
+                            <div class="sub" style="margin-top:6px;">Target: 100 actions/day</div>
+                        </div>
+                        <!-- Revenue Projection -->
+                        <div class="dash-card">
+                            <h4>Revenue Projection</h4>
+                            <div class="value" id="revenueProjection">$0</div>
+                            <div class="sub">Based on monthly revenue: <input type="number" id="revenueInput" placeholder="e.g. 5000" style="width:80px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:4px 8px;color:var(--text-primary);" /> /mo</div>
+                        </div>
+                        <!-- Next Best Action -->
+                        <div class="dash-card" style="grid-column: 1 / -1;">
+                            <h4>🎯 Next Best Action</h4>
+                            <div id="nextAction" style="font-size:16px;margin-top:4px;">Complete your first framework to get started.</div>
+                            <div class="sub" style="margin-top:6px;">AI-recommended based on your progress</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- STATUS -->
-                <div class="status-bar">
-                    <div class="left">
-                        <span class="status-dot"></span> <span id="statusText">Ready</span>
+                <!-- CHAT VIEW -->
+                <div class="chat-view" id="chatView">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            <div class="avatar"><i class="fas fa-brain"></i></div>
+                            <div class="bubble">
+                                <p><strong>Hello, I'm your Quindecillion Executive Coach.</strong></p>
+                                <p>I have access to <strong>$20,000+</strong> worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.</p>
+                                <p>Select a mode or ask me anything about your business.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="right">
-                        <span id="rateDisplay">30 msg/h</span>
-                        <span id="modeDisplay">Mode: Coach</span>
+                    <div class="status-bar">
+                        <div class="left">
+                            <span class="status-dot"></span> <span id="statusText">Ready</span>
+                        </div>
+                        <div class="right">
+                            <span id="rateDisplay">30 msg/h</span>
+                            <span id="modeDisplay">Mode: Coach</span>
+                        </div>
                     </div>
-                </div>
-
-                <!-- INPUT -->
-                <div class="input-bar">
-                    <div class="mode-selector">
-                        <label for="modeSelect"><i class="fas fa-sliders-h"></i></label>
-                        <select id="modeSelect">
-                            <!-- filled by JS -->
-                        </select>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off" />
-                        <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
-                    </div>
-                    <div class="input-actions">
-                        <button id="docBtn" title="Upload business documents"><i class="fas fa-file-upload"></i></button>
-                        <button id="voiceBtn" title="Text-to-Speech"><i class="fas fa-volume-up"></i></button>
+                    <div class="input-bar">
+                        <div class="mode-selector">
+                            <label for="modeSelect"><i class="fas fa-sliders-h"></i></label>
+                            <select id="modeSelect"></select>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off" />
+                            <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+                        </div>
+                        <div class="input-actions">
+                            <button id="docBtn" title="Upload documents"><i class="fas fa-file-upload"></i></button>
+                            <button id="voiceBtn" title="Text-to-Speech"><i class="fas fa-volume-up"></i></button>
+                            <button id="valueEqBtn" title="Value Equation Builder"><i class="fas fa-calculator"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: FRAMEWORK VAULT -->
+    <!-- ============ MODALS ============ -->
+
+    <!-- FRAMEWORK VAULT -->
     <div class="modal-overlay" id="vaultModal">
         <div class="modal">
             <button class="modal-close" id="closeVault">&times;</button>
-            <h2><i class="fas fa-gem" style="margin-right: 8px;"></i> Framework Vault</h2>
-            <p class="sub">Every framework, worksheet, and playbook from our $20,000+ library. Unlock as you upgrade.</p>
-            <div class="framework-grid" id="frameworkGrid">
-                <!-- filled by JS -->
+            <h2><i class="fas fa-gem"></i> Framework Vault</h2>
+            <p class="sub">Every framework, worksheet, and playbook from our $20,000+ library.</p>
+            <div class="framework-grid" id="frameworkGrid"></div>
+        </div>
+    </div>
+
+    <!-- UPGRADE MODAL -->
+    <div class="modal-overlay" id="upgradeModal">
+        <div class="modal">
+            <button class="modal-close" id="closeUpgrade">&times;</button>
+            <h2><i class="fas fa-crown"></i> Unlock More Power</h2>
+            <p class="sub">Choose the tier that fits your business stage.</p>
+            <div class="tier-table" id="tierTable"></div>
+            <div style="margin-top:20px;display:flex;gap:12px;justify-content:flex-end;">
+                <button class="btn-outline" id="upgradeCancel">Cancel</button>
+                <button class="btn-primary" id="upgradeAction">Upgrade Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING WIZARD -->
+    <div class="modal-overlay" id="onboardingModal">
+        <div class="modal" style="max-width:500px;">
+            <h2>👋 Welcome to Your AI Coach</h2>
+            <p class="sub">Let's personalize your experience so I can give you the best advice.</p>
+            <div class="onboarding-step active" data-step="1">
+                <label>What's your main business goal right now?</label>
+                <select id="onboardGoal">
+                    <option value="leads">Get more leads</option>
+                    <option value="offer">Build a better offer</option>
+                    <option value="scale">Scale revenue</option>
+                    <option value="retention">Reduce churn</option>
+                    <option value="content">Create content that converts</option>
+                </select>
+                <div class="btn-group">
+                    <button class="btn-primary" id="onboardNext1">Next</button>
+                </div>
+            </div>
+            <div class="onboarding-step" data-step="2">
+                <label>What's your current monthly revenue (approx)?</label>
+                <input type="number" id="onboardRevenue" placeholder="e.g. 5000" />
+                <div class="btn-group">
+                    <button class="btn-outline" id="onboardBack2">Back</button>
+                    <button class="btn-primary" id="onboardNext2">Next</button>
+                </div>
+            </div>
+            <div class="onboarding-step" data-step="3">
+                <label>What's your biggest bottleneck right now?</label>
+                <select id="onboardBottleneck">
+                    <option value="traffic">Not enough traffic/leads</option>
+                    <option value="conversion">Low conversion rate</option>
+                    <option value="offer">Weak offer / pricing</option>
+                    <option value="retention">High churn / low LTV</option>
+                    <option value="time">Not enough time to execute</option>
+                </select>
+                <div class="btn-group">
+                    <button class="btn-outline" id="onboardBack3">Back</button>
+                    <button class="btn-primary" id="onboardFinish">Finish & Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VALUE EQUATION BUILDER MODAL -->
+    <div class="modal-overlay" id="valueEqModal">
+        <div class="modal">
+            <button class="modal-close" id="closeValueEq">&times;</button>
+            <h2><i class="fas fa-balance-scale"></i> Value Equation Builder</h2>
+            <p class="sub">Adjust the sliders to see how your offer's value changes.</p>
+            <div class="slider-group">
+                <label>Dream Outcome <span class="value-display" id="eqDream">8</span></label>
+                <input type="range" min="1" max="10" value="8" id="eqDreamSlider" />
+            </div>
+            <div class="slider-group">
+                <label>Perceived Likelihood <span class="value-display" id="eqLikelihood">7</span></label>
+                <input type="range" min="1" max="10" value="7" id="eqLikelihoodSlider" />
+            </div>
+            <div class="slider-group">
+                <label>Time Delay (lower = better) <span class="value-display" id="eqTime">5</span></label>
+                <input type="range" min="1" max="10" value="5" id="eqTimeSlider" />
+            </div>
+            <div class="slider-group">
+                <label>Effort & Sacrifice (lower = better) <span class="value-display" id="eqEffort">5</span></label>
+                <input type="range" min="1" max="10" value="5" id="eqEffortSlider" />
+            </div>
+            <div style="background:var(--bg-card);padding:16px;border-radius:12px;margin-top:12px;text-align:center;">
+                <span style="font-size:14px;color:var(--text-secondary);">Value Equation Score</span>
+                <div style="font-size:36px;font-weight:700;color:var(--gold-light);" id="eqScore">56</div>
+                <div style="font-size:13px;color:var(--text-secondary);">(Dream Outcome × Likelihood) / (Time Delay × Effort)</div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;">
+                <button class="btn-outline" id="closeValueEqBtn">Close</button>
+                <button class="btn-primary" id="saveValueEq">Save & Apply</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        //  CONFIG
-        // ============================================================
+        // ================================================================
+        //   CONFIG & STATE
+        // ================================================================
         const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
-        // For local dev, you can use: const API_BASE = 'http://localhost:8000';
+        // For local: 'http://localhost:8000'
 
-        // MODE DEFINITIONS (match backend)
         const MODES = [
             { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
             { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
@@ -797,53 +1333,102 @@
             { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
         ];
 
-        // FRAMEWORK DATA (matches the gold)
         const FRAMEWORKS = [
-            { name: 'AVOCADO Opening Offers', value: '$2,000+', tier: 'insider', desc: '3-tier offer structure, R.I.P.E. Lead Magnets, ECAFI scripts' },
-            { name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner', desc: 'Value Equation, Grand Slam Offer, upsell/downsell sequences' },
-            { name: '$100M Leads', value: '$3,000+', tier: 'insider', desc: 'Core 4 Advertising, Rule of 100, Hook Generator' },
-            { name: 'Community OS', value: '$10,000+', tier: 'partner', desc: 'Green to Ripe, 5 Horsemen of Retention, Churn Checklist' },
-            { name: 'Time to Build (TTB)', value: '$2,500+', tier: 'insider', desc: 'Brand Clarity, TRUST formula, Sustainable Content, Launch' },
-            { name: 'SOULFUL Sales Scripts', value: '$1,500+', tier: 'insider', desc: 'Conversational selling, validation, closing without pressure' },
-            { name: 'Delivery Checklist', value: '$1,000+', tier: 'free', desc: 'Onboarding, activation points, milestone tracking' },
-            { name: 'Value Equation Builder', value: '$1,200+', tier: 'partner', desc: 'Interactive tool to optimize Dream Outcome vs. Effort' },
+            { id: 'avocado', name: 'AVOCADO Opening Offers', value: '$2,000+', tier: 'insider',
+            desc: '3-tier offers, R.I.P.E., ECAFI scripts' },
+            { id: 'money_models', name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner',
+                desc: 'Value Equation, Grand Slam, upsell/downsell' },
+            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider',
+            desc: 'Core 4 Advertising, Rule of 100, Hook Generator' },
+            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner',
+                desc: 'Green to Ripe, 5 Horsemen, Churn Checklist' },
+            { id: 'ttb', name: 'Time to Build (TTB)', value: '$2,500+', tier: 'insider',
+                desc: 'Brand Clarity, TRUST, Sustainable Content' },
+            { id: 'soulful', name: 'SOULFUL Sales Scripts', value: '$1,500+', tier: 'insider',
+                desc: 'Conversational selling, validation, closing' },
+            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free',
+                desc: 'Onboarding, activation, milestones' },
+            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner',
+                desc: 'Interactive tool to optimize offer value' },
         ];
 
-        // ============================================================
-        //  STATE
-        // ============================================================
-        let currentTier = 'free'; // will be fetched
+        // ================================================================
+        //   DOM REFS
+        // ================================================================
+        const $ = id => document.getElementById(id);
+        const tierLabel = $('tierLabel');
+        const modeSelect = $('modeSelect');
+        const modeList = $('modeList');
+        const chatMessages = $('chatMessages');
+        const userInput = $('userInput');
+        const sendBtn = $('sendBtn');
+        const statusText = $('statusText');
+        const modeDisplay = $('modeDisplay');
+        const vaultBtn = $('vaultBtn');
+        const vaultModal = $('vaultModal');
+        const closeVault = $('closeVault');
+        const frameworkGrid = $('frameworkGrid');
+        const upgradeBtn = $('upgradeBtn');
+        const upgradeModal = $('upgradeModal');
+        const closeUpgrade = $('closeUpgrade');
+        const upgradeCancel = $('upgradeCancel');
+        const upgradeAction = $('upgradeAction');
+        const tierTable = $('tierTable');
+        const onboardingModal = $('onboardingModal');
+        const valueEqModal = $('valueEqModal');
+        const closeValueEq = $('closeValueEq');
+        const closeValueEqBtn = $('closeValueEqBtn');
+        const saveValueEq = $('saveValueEq');
+        const docBtn = $('docBtn');
+        const voiceBtn = $('voiceBtn');
+        const valueEqBtn = $('valueEqBtn');
+        const tabNav = $('tabNav');
+        const dashboardView = $('dashboardView');
+        const chatView = $('chatView');
+        const healthScore = $('healthScore');
+        const healthScoreLabel = $('healthScoreLabel');
+        const fwProgressLabel = $('fwProgressLabel');
+        const fwMiniGrid = $('fwMiniGrid');
+        const ruleCount = $('ruleCount');
+        const ruleStreak = $('ruleStreak');
+        const ruleAddBtn = $('ruleAddBtn');
+        const ruleResetBtn = $('ruleResetBtn');
+        const revenueInput = $('revenueInput');
+        const revenueProjection = $('revenueProjection');
+        const nextAction = $('nextAction');
+
+        // ================================================================
+        //   STATE
+        // ================================================================
+        let currentTier = 'free';
         let currentMode = 'coach';
         let isSending = false;
         let messageCount = 0;
+        let frameworkProgress = {}; // { id: 'completed' | 'started' | 'locked' }
+        let rule100Count = 0;
+        let ruleStreakDays = 0;
+        let lastRuleDate = '';
+        let userRevenue = 0;
+        let onboarded = localStorage.getItem('e5_onboarded') === 'true';
 
-        // DOM refs
-        const chatMessages = document.getElementById('chatMessages');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const modeSelect = document.getElementById('modeSelect');
-        const modeList = document.getElementById('modeList');
-        const tierLabel = document.getElementById('tierLabel');
-        const statusText = document.getElementById('statusText');
-        const modeDisplay = document.getElementById('modeDisplay');
-        const vaultBtn = document.getElementById('vaultBtn');
-        const vaultModal = document.getElementById('vaultModal');
-        const closeVault = document.getElementById('closeVault');
-        const frameworkGrid = document.getElementById('frameworkGrid');
-        const upgradeBtn = document.getElementById('upgradeBtn');
-        const docBtn = document.getElementById('docBtn');
-        const voiceBtn = document.getElementById('voiceBtn');
-
-        // ============================================================
-        //  INIT
-        // ============================================================
+        // ================================================================
+        //   INIT
+        // ================================================================
         async function init() {
-            // Populate mode dropdown and sidebar
+            // Load local state
+            loadLocalState();
+            // Populate modes
             populateModes();
-            // Fetch current tier
+            // Fetch tier
             await fetchTier();
             // Populate framework vault
             populateFrameworks();
+            // Update dashboard
+            updateDashboard();
+            // Show onboarding if not done
+            if (!onboarded) {
+                onboardingModal.classList.add('open');
+            }
             // Event listeners
             modeSelect.addEventListener('change', onModeChange);
             sendBtn.addEventListener('click', sendMessage);
@@ -851,19 +1436,128 @@
             vaultBtn.addEventListener('click', () => vaultModal.classList.add('open'));
             closeVault.addEventListener('click', () => vaultModal.classList.remove('open'));
             vaultModal.addEventListener('click', (e) => { if (e.target === vaultModal) vaultModal.classList.remove('open'); });
-            upgradeBtn.addEventListener('click', () => alert('Upgrade flow: connect to Whop or enter license key.'));
-            docBtn.addEventListener('click', () => alert('Upload business documents (PDF/TXT) to personalize coaching.'));
-            voiceBtn.addEventListener('click', () => alert('Text-to-Speech coming soon with Fish Audio.'));
+            upgradeBtn.addEventListener('click', openUpgradeModal);
+            closeUpgrade.addEventListener('click', () => upgradeModal.classList.remove('open'));
+            upgradeCancel.addEventListener('click', () => upgradeModal.classList.remove('open'));
+            upgradeAction.addEventListener('click', () => {
+                alert('Upgrade flow: connect your Whop license key or visit our checkout page.');
+                upgradeModal.classList.remove('open');
+            });
+            docBtn.addEventListener('click', () => alert('Upload business documents (PDF/TXT) to personalize your coaching.'));
+            voiceBtn.addEventListener('click', () => alert('Text-to-Speech coming soon!'));
+            valueEqBtn.addEventListener('click', openValueEq);
+            closeValueEq.addEventListener('click', () => valueEqModal.classList.remove('open'));
+            closeValueEqBtn.addEventListener('click', () => valueEqModal.classList.remove('open'));
+            saveValueEq.addEventListener('click', () => {
+                alert('Value Equation saved! (This would update your offer in the backend.)');
+                valueEqModal.classList.remove('open');
+            });
+            // Tab switching
+            tabNav.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (tab === 'dashboard') {
+                    dashboardView.classList.add('active');
+                    chatView.classList.remove('active');
+                    updateDashboard();
+                } else {
+                    dashboardView.classList.remove('active');
+                    chatView.classList.add('active');
+                }
+            });
+            // Rule of 100
+            ruleAddBtn.addEventListener('click', () => {
+                rule100Count++;
+                saveLocalState();
+                updateDashboard();
+                if (rule100Count >= 100) {
+                    // Celebration
+                    fireConfetti();
+                    alert('🎉 You hit 100 actions today! Amazing!');
+                }
+            });
+            ruleResetBtn.addEventListener('click', () => {
+                rule100Count = 0;
+                saveLocalState();
+                updateDashboard();
+            });
+            // Revenue input
+            revenueInput.addEventListener('input', () => {
+                userRevenue = parseFloat(revenueInput.value) || 0;
+                saveLocalState();
+                updateDashboard();
+            });
+            // Onboarding
+            $('onboardNext1').addEventListener('click', () => goToStep(2));
+            $('onboardBack2').addEventListener('click', () => goToStep(1));
+            $('onboardNext2').addEventListener('click', () => goToStep(3));
+            $('onboardBack3').addEventListener('click', () => goToStep(2));
+            $('onboardFinish').addEventListener('click', finishOnboarding);
+
             // Set initial mode
             currentMode = modeSelect.value;
             updateModeDisplay();
-            // Focus input
             userInput.focus();
         }
 
-        // ============================================================
-        //  POPULATE MODES
-        // ============================================================
+        // ================================================================
+        //   LOCAL STORAGE
+        // ================================================================
+        function loadLocalState() {
+            try {
+                const data = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
+                frameworkProgress = data.frameworkProgress || {};
+                rule100Count = data.rule100Count || 0;
+                ruleStreakDays = data.ruleStreakDays || 0;
+                lastRuleDate = data.lastRuleDate || '';
+                userRevenue = data.userRevenue || 0;
+                if (userRevenue) revenueInput.value = userRevenue;
+                // Check if we need to reset daily count
+                const today = new Date().toDateString();
+                if (lastRuleDate !== today) {
+                    rule100Count = 0;
+                    lastRuleDate = today;
+                    saveLocalState();
+                }
+            } catch (e) { console.warn('Local storage load error', e); }
+        }
+
+        function saveLocalState() {
+            try {
+                localStorage.setItem('e5_coach_state', JSON.stringify({
+                    frameworkProgress,
+                    rule100Count,
+                    ruleStreakDays,
+                    lastRuleDate,
+                    userRevenue
+                }));
+            } catch (e) { console.warn('Local storage save error', e); }
+        }
+
+        // ================================================================
+        //   TIER
+        // ================================================================
+        async function fetchTier() {
+            try {
+                const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
+                const data = await res.json();
+                currentTier = data.tier || 'free';
+                tierLabel.textContent = currentTier.toUpperCase();
+                updateSidebarLocks();
+            } catch (e) { console.warn('Tier fetch failed', e); }
+        }
+
+        function isTierAtLeast(userTier, required) {
+            const order = { free: 0, insider: 1, partner: 2 };
+            return order[userTier] >= order[required];
+        }
+
+        // ================================================================
+        //   MODES
+        // ================================================================
         function populateModes() {
             // Dropdown
             modeSelect.innerHTML = '';
@@ -874,74 +1568,69 @@
                 opt.dataset.tier = m.tier;
                 modeSelect.appendChild(opt);
             });
+            modeSelect.value = currentMode;
+
             // Sidebar
             modeList.innerHTML = '';
             MODES.forEach(m => {
                 const div = document.createElement('div');
                 div.className = `mode-item ${m.id === currentMode ? 'active' : ''}`;
-                if (m.tier !== 'free' && currentTier !== m.tier && !isTierAtLeast(currentTier, m.tier)) {
-                    div.classList.add('locked');
-                }
+                const tierOk = isTierAtLeast(currentTier, m.tier);
+                if (!tierOk) div.classList.add('locked');
+                // progress dot
+                const prog = frameworkProgress[m.id] || 'pending';
+                const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : '');
                 div.innerHTML = `
                     <span class="icon"><i class="fas ${m.icon}"></i></span>
                     <span>${m.label}</span>
                     <span class="tier-tag ${m.tier}">${m.tier}</span>
+                    <span class="progress-dot ${dotClass}"></span>
                 `;
                 div.addEventListener('click', () => {
-                    if (m.tier !== 'free' && !isTierAtLeast(currentTier, m.tier)) {
+                    if (!tierOk) {
                         alert(`Upgrade to ${m.tier} tier to unlock ${m.label}.`);
                         return;
                     }
                     modeSelect.value = m.id;
                     onModeChange();
+                    // Switch to chat tab
+                    document.querySelector('.tab-btn[data-tab="chat"]').click();
                 });
                 modeList.appendChild(div);
             });
-            // Select current
-            modeSelect.value = currentMode;
+            updateSidebarLocks();
         }
 
-        function isTierAtLeast(userTier, required) {
-            const order = { free: 0, insider: 1, partner: 2 };
-            return order[userTier] >= order[required];
+        function updateSidebarLocks() {
+            document.querySelectorAll('.mode-item').forEach((item, idx) => {
+                const m = MODES[idx];
+                const tierOk = isTierAtLeast(currentTier, m.tier);
+                item.classList.toggle('locked', !tierOk);
+                const dot = item.querySelector('.progress-dot');
+                const prog = frameworkProgress[m.id] || 'pending';
+                dot.className = 'progress-dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' :
+                ''));
+            });
         }
 
-        // ============================================================
-        //  FETCH TIER
-        // ============================================================
-        async function fetchTier() {
-            try {
-                const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
-                const data = await res.json();
-                currentTier = data.tier || 'free';
-                tierLabel.textContent = currentTier.toUpperCase();
-                // Update sidebar lock states
-                document.querySelectorAll('.mode-item').forEach((item, idx) => {
-                    const m = MODES[idx];
-                    if (m.tier !== 'free' && !isTierAtLeast(currentTier, m.tier)) {
-                        item.classList.add('locked');
-                    } else {
-                        item.classList.remove('locked');
-                    }
-                });
-            } catch (e) {
-                console.warn('Tier fetch failed:', e);
-            }
-        }
-
-        // ============================================================
-        //  MODE CHANGE
-        // ============================================================
         function onModeChange() {
             currentMode = modeSelect.value;
             updateModeDisplay();
-            // Highlight sidebar
             document.querySelectorAll('.mode-item').forEach((el, idx) => {
                 el.classList.toggle('active', MODES[idx].id === currentMode);
             });
-            // Show a system message that mode changed
+            // Mark mode as started
+            if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
+                frameworkProgress[currentMode] = 'started';
+                saveLocalState();
+                updateDashboard();
+                updateSidebarLocks();
+            }
+            // Show a system message in chat
             const modeName = MODES.find(m => m.id === currentMode)?.label || currentMode;
             addMessage(`Switched to <strong>${modeName}</strong> mode. I'm ready to help.`, 'ai', true);
+            // Switch to chat tab
+            document.querySelector('.tab-btn[data-tab="chat"]').click();
         }
 
         function updateModeDisplay() {
@@ -949,9 +1638,9 @@
             modeDisplay.textContent = `Mode: ${modeName}`;
         }
 
-        // ============================================================
-        //  SEND MESSAGE
-        // ============================================================
+        // ================================================================
+        //   CHAT
+        // ================================================================
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text || isSending) return;
@@ -982,6 +1671,11 @@
                     addMessage(reply, 'ai');
                     statusText.textContent = 'Ready';
                     messageCount++;
+                    // Check if AI mentions framework completion
+                    if (reply.includes('framework') && reply.includes('complete')) {
+                        // Auto-complete detection (simple)
+                        // could be improved with NLP
+                    }
                 }
             } catch (err) {
                 hideTyping();
@@ -994,26 +1688,16 @@
             }
         }
 
-        // ============================================================
-        //  MESSAGE HELPERS
-        // ============================================================
         function addMessage(text, sender, isHTML = false) {
             const div = document.createElement('div');
             div.className = `message ${sender}`;
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            if (sender === 'ai') {
-                avatar.innerHTML = '<i class="fas fa-brain"></i>';
-            } else {
-                avatar.innerHTML = '<i class="fas fa-user"></i>';
-            }
+            avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            if (isHTML) {
-                bubble.innerHTML = text;
-            } else {
-                bubble.textContent = text;
-            }
+            if (isHTML) bubble.innerHTML = text;
+            else bubble.textContent = text;
             div.appendChild(avatar);
             div.appendChild(bubble);
             chatMessages.appendChild(div);
@@ -1021,6 +1705,7 @@
         }
 
         let typingIndicator = null;
+
         function showTyping() {
             if (typingIndicator) return;
             const div = document.createElement('div');
@@ -1046,37 +1731,229 @@
             }
         }
 
-        // ============================================================
-        //  FRAMEWORK VAULT
-        // ============================================================
+        // ================================================================
+        //   FRAMEWORK VAULT
+        // ================================================================
         function populateFrameworks() {
             frameworkGrid.innerHTML = '';
             FRAMEWORKS.forEach(fw => {
                 const card = document.createElement('div');
                 card.className = 'framework-card';
-                const isUnlocked = isTierAtLeast(currentTier, fw.tier);
-                card.style.opacity = isUnlocked ? '1' : '0.5';
+                const unlocked = isTierAtLeast(currentTier, fw.tier);
+                const status = frameworkProgress[fw.id] || 'pending';
+                const isDone = status === 'completed';
+                const isStarted = status === 'started';
+                card.style.opacity = unlocked ? '1' : '0.5';
                 card.innerHTML = `
-                    <h4>${fw.name} ${isUnlocked ? '✅' : '🔒'}</h4>
-                    <p style="font-size:13px;color:#94a3b8;margin:6px 0;">${fw.desc}</p>
+                    <h4>${fw.name} ${isDone ? '✅' : (unlocked ? (isStarted ? '⏳' : '') : '🔒')}</h4>
+                    <p>${fw.desc}</p>
                     <div class="meta">
                         <span class="value">${fw.value}</span>
                         <span class="tier ${fw.tier}">${fw.tier.toUpperCase()}</span>
                     </div>
+                    <button class="action-btn ${isDone ? 'done' : ''}" data-fwid="${fw.id}">
+                        ${isDone ? 'Completed' : (unlocked ? (isStarted ? 'Resume' : 'Start') : 'Locked')}
+                    </button>
                 `;
-                if (!isUnlocked) {
-                    card.style.cursor = 'pointer';
-                    card.addEventListener('click', () => {
+                const btn = card.querySelector('.action-btn');
+                btn.addEventListener('click', () => {
+                    if (!unlocked) {
                         alert(`Upgrade to ${fw.tier} tier to access ${fw.name}.`);
-                    });
-                }
+                        return;
+                    }
+                    if (isDone) {
+                        alert(`You already completed ${fw.name}. Great job!`);
+                        return;
+                    }
+                    // Mark as started/completed (toggle for demo)
+                    if (frameworkProgress[fw.id] === 'completed') {
+                        // do nothing
+                    } else if (frameworkProgress[fw.id] === 'started') {
+                        frameworkProgress[fw.id] = 'completed';
+                        fireConfetti();
+                        alert(`🎉 You completed ${fw.name}! Amazing!`);
+                    } else {
+                        frameworkProgress[fw.id] = 'started';
+                        alert(`Started ${fw.name}. You can continue in the chat.`);
+                    }
+                    saveLocalState();
+                    populateFrameworks();
+                    updateDashboard();
+                    updateSidebarLocks();
+                });
                 frameworkGrid.appendChild(card);
             });
         }
 
-        // ============================================================
-        //  BOOT
-        // ============================================================
+        // ================================================================
+        //   DASHBOARD
+        // ================================================================
+        function updateDashboard() {
+            // Count completed frameworks
+            const total = FRAMEWORKS.length;
+            const completed = FRAMEWORKS.filter(fw => frameworkProgress[fw.id] === 'completed').length;
+            const started = FRAMEWORKS.filter(fw => frameworkProgress[fw.id] === 'started').length;
+            const health = Math.round((completed / total) * 100);
+            healthScore.textContent = health;
+            healthScoreLabel.textContent = health;
+            fwProgressLabel.textContent = `${completed}/${total}`;
+
+            // Mini grid
+            fwMiniGrid.innerHTML = '';
+            FRAMEWORKS.forEach(fw => {
+                const div = document.createElement('div');
+                div.className = 'fw-mini';
+                const status = frameworkProgress[fw.id] || 'pending';
+                const cls = status === 'completed' ? 'done' : (status === 'started' ? 'pending' : 'locked');
+                div.innerHTML = `
+                    <span class="status ${cls}"></span>
+                    <span style="font-size:12px;">${fw.name}</span>
+                `;
+                fwMiniGrid.appendChild(div);
+            });
+
+            // Rule of 100
+            ruleCount.textContent = rule100Count;
+            const today = new Date().toDateString();
+            if (lastRuleDate === today) {
+                // streak update would be more complex; placeholder
+            }
+
+            // Revenue projection (simple multiplier)
+            const rev = userRevenue || 0;
+            if (rev > 0) {
+                // Assume 3x increase with frameworks (optimistic)
+                const projected = Math.round(rev * (1 + (completed / total) * 2));
+                revenueProjection.textContent = `$${projected.toLocaleString()}/mo`;
+            } else {
+                revenueProjection.textContent = '$0/mo';
+            }
+
+            // Next best action
+            if (completed === 0) {
+                nextAction.textContent = '🚀 Start with the Delivery Checklist (free tier) to get quick wins.';
+            } else if (completed < 3) {
+                nextAction.textContent = '📈 Complete the AVOCADO Opening Offers framework to build your offer.';
+            } else if (completed < 5) {
+                nextAction.textContent = '💰 Unlock Partner tier to access $100M Offers + Money Models.';
+            } else {
+                nextAction.textContent = '🏆 You\'re on fire! Scale with Community OS and Launch Planner.';
+            }
+        }
+
+        // ================================================================
+        //   UPGRADE MODAL
+        // ================================================================
+        function openUpgradeModal() {
+            const tiers = [
+                { name: 'Free', features: '3 modes, 30 msg/h, basic frameworks', price: '$0', current: currentTier ===
+                    'free' },
+                { name: 'Insider', features: '+5 modes, frameworks, unlimited chat', price: '$47/mo', current: currentTier ===
+                    'insider' },
+                { name: 'Partner', features: '+3 modes, money models, priority support', price: '$197/mo', current: currentTier ===
+                    'partner' },
+            ];
+            tierTable.innerHTML = '';
+            tiers.forEach(t => {
+                const row = document.createElement('div');
+                row.className = `tier-row${t.current ? ' current' : ''}`;
+                row.innerHTML = `
+                    <span class="tier-name">${t.name} ${t.current ? '👈' : ''}</span>
+                    <span class="features">${t.features}</span>
+                    <span class="price">${t.price}</span>
+                `;
+                tierTable.appendChild(row);
+            });
+            upgradeModal.classList.add('open');
+        }
+
+        // ================================================================
+        //   ONBOARDING
+        // ================================================================
+        function goToStep(step) {
+            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.onboarding-step[data-step="${step}"]`).classList.add('active');
+        }
+
+        function finishOnboarding() {
+            const goal = $('onboardGoal').value;
+            const revenue = parseFloat($('onboardRevenue').value) || 0;
+            const bottleneck = $('onboardBottleneck').value;
+            userRevenue = revenue;
+            if (revenue) revenueInput.value = revenue;
+            // Store in localStorage
+            onboarded = true;
+            localStorage.setItem('e5_onboarded', 'true');
+            saveLocalState();
+            onboardingModal.classList.remove('open');
+            // Send a message to AI with context
+            const context = `My goal is ${goal}, my monthly revenue is $${revenue}, and my biggest bottleneck is ${bottleneck}.`;
+            addMessage(`Onboarding complete: ${context}`, 'ai', true);
+            // Optionally send to chat via API to store memory
+            // We could call /api/chat with a special message, but for now we just display.
+            updateDashboard();
+        }
+
+        // ================================================================
+        //   VALUE EQUATION BUILDER
+        // ================================================================
+        function openValueEq() {
+            // Set initial values from sliders
+            const dream = parseInt($('eqDreamSlider').value);
+            const like = parseInt($('eqLikelihoodSlider').value);
+            const time = parseInt($('eqTimeSlider').value);
+            const effort = parseInt($('eqEffortSlider').value);
+            updateEqScore(dream, like, time, effort);
+            valueEqModal.classList.add('open');
+        }
+
+        function updateEqScore(dream, like, time, effort) {
+            const score = (dream * like) / (time * effort);
+            $('eqScore').textContent = Math.round(score * 10) / 10;
+        }
+
+        // Slider listeners
+        ['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
+            const slider = $(id);
+            slider.addEventListener('input', () => {
+                const dream = parseInt($('eqDreamSlider').value);
+                const like = parseInt($('eqLikelihoodSlider').value);
+                const time = parseInt($('eqTimeSlider').value);
+                const effort = parseInt($('eqEffortSlider').value);
+                // Update displays
+                $('eqDream').textContent = dream;
+                $('eqLikelihood').textContent = like;
+                $('eqTime').textContent = time;
+                $('eqEffort').textContent = effort;
+                updateEqScore(dream, like, time, effort);
+            });
+        });
+
+        // ================================================================
+        //   CONFETTI
+        // ================================================================
+        function fireConfetti() {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+            for (let i = 0; i < 60; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti';
+                const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.width = (Math.random() * 8 + 4) + 'px';
+                piece.style.height = (Math.random() * 8 + 4) + 'px';
+                piece.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                piece.style.animationDelay = (Math.random() * 0.8) + 's';
+                container.appendChild(piece);
+            }
+            setTimeout(() => container.remove(), 3000);
+        }
+
+        // ================================================================
+        //   BOOT
+        // ================================================================
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
