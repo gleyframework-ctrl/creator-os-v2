@@ -3,512 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Engine — CCC Command Center</title>
+    <title>AI Coach - Your Personal AI Assistant</title>
     <style>
-        :root {
-            --bg-main: #09090b;
-            --bg-panel: #111114;
-            --bg-input: #18181b;
-            --border: #27272a;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --accent: #f59e0b; /* Amber for Income Engine vibe */
-            --accent-hover: #d97706;
-            --user-bubble: #f59e0b;
-            --user-text: #000000;
-            --ai-bubble: #27272a;
-            --success: #10b981;
-            --danger: #ef4444;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
-            overflow: hidden;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 260px;
-            background-color: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        .logo {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-section { margin-bottom: 20px; }
-        .nav-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .nav-item {
-            padding: 10px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-item:hover { background-color: var(--bg-input); color: var(--text-primary); }
-        .nav-item.active { background-color: rgba(245, 158, 11, 0.1); color: var(--accent); font-weight: 600; }
-        .tier-badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: var(--border);
-        }
-        .tier-insider { background: #3b82f6; color: white; }
-        .tier-partner { background: var(--accent); color: black; }
-
-        .sidebar-footer {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px; height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        /* MAIN CHAT AREA */
-        .main-content {
-            flex: 1;
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
             display: flex;
             flex-direction: column;
-            position: relative;
+            overflow: hidden;
         }
 
         .header {
-            padding: 15px 25px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-panel);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
         }
 
-        .header-title { font-size: 16px; font-weight: 600; }
-        .header-actions { display: flex; gap: 10px; }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
         }
-        .btn:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-primary { background: var(--accent); color: black; border: none; font-weight: 600; }
-        .btn-primary:hover { background: var(--accent-hover); color: black; }
 
-        /* CHAT WINDOW */
-        .chat-window {
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 25px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
         }
 
-        .message { display: flex; gap: 12px; max-width: 85%; }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
-        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
         .avatar {
-            width: 32px; height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--border);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
         }
-        .message.user .avatar { background: var(--accent); color: black; }
 
-        .bubble {
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-            background: var(--ai-bubble);
+        .message.ai .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-right: 10px;
         }
-        .message.user .bubble { background: var(--user-bubble); color: var(--user-text); }
 
-        .bubble strong { font-weight: 700; }
-        .bubble ul, .bubble ol { margin-left: 20px; margin-top: 8px; }
-        .bubble code { background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+        .message.user .avatar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-left: 10px;
+        }
 
-        /* INPUT AREA */
-        .input-area {
-            padding: 20px 25px;
-            border-top: 1px solid var(--border);
-            background: var(--bg-panel);
+        .message-content {
+            background: white;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
 
         .input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
             display: flex;
             gap: 10px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            align-items: flex-end;
         }
 
-        .input-container:focus-within { border-color: var(--accent); }
-
-        textarea {
+        #userInput {
             flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 14px;
-            resize: none;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
             outline: none;
-            max-height: 120px;
-            padding: 8px;
-            font-family: inherit;
+            transition: border-color 0.3s;
         }
 
-        .icon-btn {
-            background: transparent;
+        #userInput:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            color: var(--text-secondary);
+            border-radius: 25px;
+            font-size: 16px;
             cursor: pointer;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 18px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .icon-btn:hover { color: var(--accent); background: rgba(245, 158, 11, 0.1); }
 
-        /* MODAL */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none; align-items: center; justify-content: center;
-            z-index: 1000;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        .modal-overlay.active { display: flex; }
-        
-        .modal {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 25px;
-            width: 400px;
-            max-width: 90%;
-        }
-        .modal h3 { margin-bottom: 15px; font-size: 18px; }
-        .modal input {
-            width: 100%; padding: 10px; margin-bottom: 15px;
-            background: var(--bg-input); border: 1px solid var(--border);
-            border-radius: 6px; color: var(--text-primary);
-        }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* UTILS */
-        .hidden { display: none !important; }
-        .typing-indicator { font-style: italic; color: var(--text-secondary); font-size: 12px; margin-left: 44px; }
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 18px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .status-bar {
+            background: #f0f0f0;
+            padding: 8px 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            .message-content {
+                max-width: 85%;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="logo">⚡ Income Engine</div>
-        
-        <div class="nav-section">
-            <div class="nav-title">Core Modes</div>
-            <div class="nav-item active" data-mode="coach"> Coach <span class="tier-badge">Free</span></div>
-            <div class="nav-item" data-mode="xray">🔍 Business X-Ray <span class="tier-badge">Free</span></div>
-            <div class="nav-item" data-mode="funnel"> Funnel Map <span class="tier-badge">Free</span></div>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-title">Growth Engines</div>
-            <div class="nav-item" data-mode="community">🏘️ Community OS <span class="tier-badge tier-insider">Insider</span></div>
-            <div class="nav-item" data-mode="dm">💬 DM Doctor <span class="tier-badge tier-insider">Insider</span></div>
-            <div class="nav-item" data-mode="content">📝 Content Engine <span class="tier-badge tier-insider">Insider</span></div>
-            <div class="nav-item" data-mode="alchemy">🎥 Alchemy (Video) <span class="tier-badge tier-insider">Insider</span></div>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-title">Scale & Launch</div>
-            <div class="nav-item" data-mode="offer">💎 Offer Architect <span class="tier-badge tier-partner">Partner</span></div>
-            <div class="nav-item" data-mode="workshop">🎤 Workshop Architect <span class="tier-badge tier-partner">Partner</span></div>
-            <div class="nav-item" data-mode="launch">🚀 Launch Planner <span class="tier-badge tier-partner">Partner</span></div>
-            <div class="nav-item" data-mode="hack">🕵️ Funnel Hacker <span class="tier-badge tier-insider">Insider</span></div>
-        </div>
-
-        <div class="sidebar-footer">
-            <div><span class="status-dot"></span>API Online · v17</div>
-            <div style="margin-top: 8px; cursor: pointer;" onclick="openUnlockModal()"> Unlock Plan</div>
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
+    <div class="container">
         <div class="header">
-            <div class="header-title" id="current-mode-title"> Coach</div>
-            <div class="header-actions">
-                <button class="btn" onclick="clearChat()">Clear Chat</button>
-                <button class="btn btn-primary" onclick="openUnlockModal()">Upgrade Tier</button>
-            </div>
+            <h1>🤖 AI Coach</h1>
+            <p>Your Personal AI Assistant</p>
+        </div>
+        
+        <div class="status-bar" id="statusBar">
+            Ready to chat • Rate limit: 30 messages/hour
         </div>
 
-        <div class="chat-window" id="chat-window">
-            <div class="message">
-                <div class="avatar">🤖</div>
-                <div class="bubble">
-                    Welcome to the <strong>Income Engine</strong>. I am your elite executive coach. <br><br>
-                    Select a mode from the sidebar to switch lenses (e.g., <em>Offer Architect</em>, <em>DM Doctor</em>, <em>Business X-Ray</em>).<br><br>
-                    What's the biggest bottleneck in your business today?
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai">
+                <div class="avatar">AI</div>
+                <div class="message-content">
+                    Hello! I'm your AI Coach. How can I help you today?
                 </div>
             </div>
         </div>
 
-        <div class="typing-indicator hidden" id="typing-indicator">Coach is thinking...</div>
-
-        <div class="input-area">
-            <div class="input-container">
-                <button class="icon-btn" title="Upload Business Doc" onclick="document.getElementById('file-input').click()">📎</button>
-                <input type="file" id="file-input" class="hidden" accept=".txt,.md,.json" onchange="handleFileUpload(event)">
-                
-                <textarea id="user-input" placeholder="Ask the coach..." rows="1" onkeydown="handleEnter(event)"></textarea>
-                
-                <button class="icon-btn" title="Read Aloud" onclick="readLastMessage()">🔊</button>
-                <button class="icon-btn btn-primary" style="color: black;" onclick="sendMessage()">➤</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- UNLOCK MODAL -->
-    <div class="modal-overlay" id="unlock-modal">
-        <div class="modal">
-            <h3>Unlock Your Plan</h3>
-            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;">
-                Free → Insider → Partner. Your license key is shown in your Whop account after purchase.
-            </p>
-            <input type="text" id="license-key-input" placeholder="Enter your Whop license key...">
-            <div class="modal-actions">
-                <button class="btn" onclick="closeUnlockModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitUnlock()">Unlock</button>
-            </div>
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="userInput" 
+                placeholder="Type your message..." 
+                autocomplete="off"
+            >
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        // --- STATE ---
-        let currentMode = 'coach';
-        let memberId = localStorage.getItem('ttb_member_id') || 'default';
-        let chatHistory = [];
+        const API_URL = 'https://e5-ai-coach-production.up.railway.app';
         
-        // --- INIT ---
-        if (!localStorage.getItem('ttb_member_id')) {
-            localStorage.setItem('ttb_member_id', memberId);
-        }
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusBar = document.getElementById('statusBar');
 
-        // --- NAVIGATION ---
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                currentMode = item.dataset.mode;
-                document.getElementById('current-mode-title').innerText = item.innerText.split(' ')[0] + ' ' + item.innerText.split(' ')[1];
-            });
-        });
-
-        // --- CHAT LOGIC ---
-        function handleEnter(e) {
+        // Allow Enter key to send message
+        userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
-        }
+        });
 
         async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+            const message = userInput.value.trim();
+            if (!message) return;
 
-            // Add user message to UI
-            appendMessage('user', text);
-            chatHistory.push({ role: 'user', content: text });
-            input.value = '';
-            input.style.height = 'auto';
-
-            // Show typing
-            document.getElementById('typing-indicator').classList.remove('hidden');
+            // Add user message to chat
+            addMessage(message, 'user');
+            userInput.value = '';
+            sendBtn.disabled = true;
+            showTypingIndicator();
+            updateStatus('Sending message...');
 
             try {
-                const res = await fetch('/api/chat', {
+                const response = await fetch(`${API_URL}/chat`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
-                        message: text,
-                        mode: currentMode,
-                        member_id: memberId,
-                        history: chatHistory.slice(-10) // Send last 10 for context
+                        message: message,
+                        mode: 'gemini' // or 'groq'
                     })
                 });
 
-                const data = await res.json();
-                
-                if (res.ok) {
-                    appendMessage('ai', data.reply);
-                    chatHistory.push({ role: 'assistant', content: data.reply });
+                const data = await response.json();
+                hideTypingIndicator();
+
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'ai');
+                    updateStatus('Error occurred');
                 } else {
-                    appendMessage('ai', `⚠️ Error: ${data.detail || 'Unknown error'}`);
+                    addMessage(data.response || data.message, 'ai');
+                    updateStatus(`Ready • Remaining: ${data.remaining || 'N/A'}`);
                 }
-            } catch (err) {
-                appendMessage('ai', `⚠️ Network error: ${err.message}`);
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage(`Connection error: ${error.message}`, 'ai');
+                updateStatus('Connection failed');
             } finally {
-                document.getElementById('typing-indicator').classList.add('hidden');
+                sendBtn.disabled = false;
+                userInput.focus();
             }
         }
 
-        function appendMessage(role, text) {
-            const chatWindow = document.getElementById('chat-window');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${role}`;
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
             
-            // Basic markdown formatting
-            let formattedText = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/`(.*?)`/g, '<code>$1</code>')
-                .replace(/\n/g, '<br>');
-
-            msgDiv.innerHTML = `
-                <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
-                <div class="bubble">${formattedText}</div>
-            `;
-            chatWindow.appendChild(msgDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function clearChat() {
-            chatHistory = [];
-            document.getElementById('chat-window').innerHTML = `
-                <div class="message">
-                    <div class="avatar"></div>
-                    <div class="bubble">Chat cleared. Ready for the next session.</div>
-                </div>
-            `;
-        }
-
-        // --- TTS (TEXT TO SPEECH) ---
-        async function readLastMessage() {
-            if (chatHistory.length === 0) return;
-            const lastMsg = chatHistory[chatHistory.length - 1].content;
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = sender === 'ai' ? 'AI' : 'You';
             
-            try {
-                const res = await fetch('/api/tts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: lastMsg, member_id: memberId })
-                });
-                
-                if (res.ok) {
-                    const blob = await res.blob();
-                    const audio = new Audio(URL.createObjectURL(blob));
-                    audio.play();
-                }
-            } catch (err) {
-                console.error('TTS Error:', err);
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatContainer.appendChild(messageDiv);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+            
+            const content = document.createElement('div');
+            content.className = 'typing-indicator';
+            content.style.display = 'block';
+            content.innerHTML = '<span></span><span></span><span></span>';
+            
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(content);
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
             }
         }
 
-        // --- FILE UPLOAD ---
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const text = await file.text();
-            try {
-                const res = await fetch('/api/docs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: file.name,
-                        body: text,
-                        member_id: memberId
-                    })
-                });
-                
-                if (res.ok) {
-                    appendMessage('ai', `📎 Successfully uploaded and indexed: <strong>${file.name}</strong>. I will use this context in our next conversation.`);
-                }
-            } catch (err) {
-                appendMessage('ai', `⚠️ Failed to upload file.`);
-            }
-            event.target.value = '';
+        function updateStatus(text) {
+            statusBar.textContent = text;
         }
 
-        // --- UNLOCK MODAL ---
-        function openUnlockModal() { document.getElementById('unlock-modal').classList.add('active'); }
-        function closeUnlockModal() { document.getElementById('unlock-modal').classList.remove('active'); }
-
-        async function submitUnlock() {
-            const key = document.getElementById('license-key-input').value.trim();
-            if (!key) return;
-
-            try {
-                const res = await fetch('/api/unlock', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ license_key: key, member_id: memberId })
-                });
-                const data = await res.json();
-                
-                if (res.ok) {
-                    alert(`Success! You are now a ${data.tier} member.`);
-                    closeUnlockModal();
-                    // In a real app, you'd update UI badges here
-                } else {
-                    alert(`Error: ${data.detail}`);
-                }
-            } catch (err) {
-                alert('Network error.');
-            }
-        }
-
-        // Auto-resize textarea
-        document.getElementById('user-input').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
+        // Focus input on load
+        userInput.focus();
     </script>
 </body>
 </html>
