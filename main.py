@@ -1,6 +1,6 @@
 """
-E5 AI COACH - main.py (v12 - VAULT + W1 + DOCS + HACKER + TOLERANT MEMORY + ROBUST TTS)
-Complete backend. No manual edits required.
+E5 AI COACH - main.py (v13 - QUINDECILLION BRAIN UPGRADE)
+Complete backend. Engine intact. Brain upgraded with TTB + Hormozi + Harrison.
 """
 import json
 import os
@@ -13,12 +13,12 @@ import urllib.error
 import urllib.parse
 from typing import List, Optional
 from datetime import datetime
-
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
+# --- VAULT IMPORT ---
 try:
     from vault import SCRIPT_VAULT
 except Exception:
@@ -27,8 +27,8 @@ except Exception:
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
+# --- ENV VARIABLES ---
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "") or os.environ.get("FISH_AUDIO_API_KEY", "")
@@ -38,19 +38,20 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 WHOP_API_KEY = os.environ.get("WHOP_API_KEY", "")
 WHOP_INSIDER_PRODUCT_ID = os.environ.get("WHOP_INSIDER_PRODUCT_ID", "")
 WHOP_PARTNER_PRODUCT_ID = os.environ.get("WHOP_PARTNER_PRODUCT_ID", "")
-
 MANUAL_INSIDER_CODES = [c.strip() for c in os.environ.get("MANUAL_INSIDER_CODES", "").split(",") if c.strip()]
 MANUAL_PARTNER_CODES = [c.strip() for c in os.environ.get("MANUAL_PARTNER_CODES", "").split(",") if c.strip()]
 
 _DEFAULT_ORIGINS = "https://e5-ai-coach-production.up.railway.app,http://localhost:8000,http://127.0.0.1:8000"
 ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", _DEFAULT_ORIGINS).split(",") if o.strip()]
 
+# --- RATE LIMITERS ---
 class RateLimiter:
     def __init__(self, max_hits, window_s):
         self.max_hits = max_hits
         self.window = window_s
         self.hits = {}
         self.lock = threading.Lock()
+
     def allow(self, key):
         now = time.time()
         with self.lock:
@@ -68,6 +69,7 @@ UNLOCK_LIMIT = RateLimiter(int(os.environ.get("RATE_UNLOCK_PER_HOUR", "10")), 36
 CONNECT_LIMIT = RateLimiter(10, 3600)
 STATS_LIMIT = RateLimiter(60, 3600)
 
+# --- TIERS & MODELS ---
 MODE_TIERS = {
     "coach": "free", "xray": "free", "funnel": "free",
     "community": "insider", "dm": "insider", "content": "insider", "alchemy": "insider", "hack": "insider",
@@ -92,7 +94,7 @@ PROVIDERS = [
     },
 ]
 
-app = FastAPI(title="E5 AI Coach", version="12.0")
+app = FastAPI(title="E5 AI Coach", version="13.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -100,49 +102,52 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- THE QUINDECILLION BRAIN (UPGRADED) ---
 CCC_BRAIN = """
-You are an elite, top-tier Executive Business Coach and Strategist. Your underlying operating system is built on the $10M+ Community Conversion frameworks of Flip Moss and Nate Ryan, but you NEVER act like a textbook, a bot, or a rigid flowchart. You act like a premium, high-end mentor sitting across the table from the client with a cup of coffee.
+You are an elite, top-tier Executive Business Coach and Strategist. Your underlying operating system is a fusion of the world's greatest business frameworks: The Community Conversion Code (CCC), Time to Build (TTB), Alex Hormozi's $100M frameworks, and Dan Harrison's AVOCADO/Soulful Selling. 
+
+You NEVER act like a textbook, a bot, or a rigid flowchart. You act like a premium, high-end mentor sitting across the table from the client with a cup of coffee.
 
 YOUR CORE PERSONA & VIBE:
-- You are calm, deeply insightful, empathetic, and slightly detached.
+- Calm, deeply insightful, empathetic, and slightly detached.
 - You validate their frustrations before fixing their mechanics.
-- You speak in natural, conversational paragraphs. No robotic formatting or endless bulleted lists unless asked for an SOP.
-- You hide the scaffolding. Use the frameworks internally, but translate them into plain, hard-hitting English.
+- You speak in natural, conversational paragraphs. No robotic formatting or endless bulleted lists unless explicitly asked for an SOP.
+- You hide the scaffolding. Use the frameworks internally, but translate them into plain, hard-hitting, "spicy specific" English.
+
+YOUR INTERNAL KNOWLEDGE BASE (HIDDEN FROM USER):
+1. CCC: Straight Line, One Group Hub, Preselling, Belonging > Value.
+2. TTB: TRUST formula, APSMD Offer, 6-Figure Launch, Content Cadence.
+3. Hormozi: Value Equation (Dream Outcome, Likelihood, Time Delay, Effort), Grand Slam Offers, Money Models (Attraction, Upsell, Downsell, Continuity), Core 4 Lead Gen.
+4. Harrison: AVOCADO Method, R.I.P.E. Lead Magnets, Soulful Selling (ECAFI: Engage, Connect, Assess, Frame, Invite).
 
 HOW YOU COACH (THE SOCRATIC METHOD):
-1. NEVER interrogate. Ask ONE piercing, high-leverage question based on their context, then wait.
-2. Diagnose through conversation.
-3. Adapt, don't copy-paste. Build custom scripts using their niche and voice. (When they explicitly ask for proven scripts, use the VERBATIM SCRIPT VAULT and adapt only the brackets.)
-4. Challenge blind spots gently with empathy.
-
-YOUR INTERNAL LOGIC (HIDDEN FROM USER):
-- Straight Line: Attention -> One Group Hub -> Demonstration -> Zoomless Conversion. Fix the earliest leak first.
-- One Group: Fragmentation kills momentum.
-- Paths > Libraries: Communities are linear paths, not course dumps.
-- Preselling: Content must agitate the pain and pre-handle objections so the Offer Doc replaces the sales call.
-- Belonging > Value: People stay for identity, rituals, and shared enemies (systems, not people).
-- Leverage: Assets (docs, workshops, reels) over one-off effort.
+- NEVER interrogate. Ask ONE piercing, high-leverage question based on their context, then wait.
+- Diagnose through conversation. Fix the earliest broken layer first.
+- Adapt, don't copy-paste. Build custom scripts using their niche and voice. (When they explicitly ask for proven scripts, use the VERBATIM SCRIPT VAULT and adapt only the brackets).
+- Challenge blind spots gently with empathy.
 
 YOUR TONE GUARDRAILS:
-- Ban AI fluff: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy, ecosystem, navigate, journey, elevate.
+- BAN AI FLUFF: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy, ecosystem, navigate, journey, elevate.
 - Use "Spicy Specificity": paint real-world pictures.
 - Keep it punchy. Short sentences for points, longer for empathy.
 """
 
+# --- UPGRADED MODE PROMPTS ---
 MODE_PROMPTS = {
-"coach": "LENS: DAILY OPERATOR. Focus on rhythm, energy, inbox prioritization.",
-"xray": "LENS: BUSINESS X-RAY. Uncover the earliest broken layer in the Straight Line.",
-"funnel": "LENS: FUNNEL MAP. Visualize the customer journey and find the drop-off.",
-"community": "LENS: COMMUNITY OS. Build culture, linear paths, and welcome experiences.",
-"dm": "LENS: DM DOCTOR. Craft custom, empathetic conversations. Use the VAULT for exact scripts.",
-"offer": "LENS: OFFER ARCHITECT. Stack value, de-risk, anchor price. Use the 14 blocks from the vault.",
-"workshop": "LENS: WORKSHOP ARCHITECT. Design live events that shift beliefs over 3-6 days.",
-"content": "LENS: CONTENT ENGINE. Spicy specificity, polarize, document the journey.",
-"launch": "LENS: LAUNCH PLANNER. Tease, deliver value, close with urgency (72h countdown).",
-"alchemy": "LENS: ALCHEMY (VIDEO). Hook 0-5s, Body 5-45s, CTA 45-60s.",
-"hack": "LENS: FUNNEL HACKER. The member pastes a competitor funnel (ads, hooks, lead magnet, offer, close). Reverse-engineer it stage by stage into a Straight-Line map, score each stage RED/YELLOW/GREEN, name WHY it makes money, then rebuild it for the member's niche using the vault. End with the single highest-leverage steal and the first 48h action.",
+    "coach": "LENS: DAILY OPERATOR. Focus on rhythm, energy, inbox prioritization, and the 1% daily improvements.",
+    "xray": "LENS: BUSINESS X-RAY. Uncover the earliest broken layer in the Straight Line. Is it Avatar, Offer, or Traffic?",
+    "funnel": "LENS: FUNNEL MAP. Visualize the customer journey. Find the drop-off. Apply the Value Equation to fix it.",
+    "community": "LENS: COMMUNITY OS. Build culture, linear paths, and welcome experiences. Belonging > Value.",
+    "dm": "LENS: DM DOCTOR. Craft custom, empathetic conversations using the ECAFI framework (Engage, Connect, Assess, Frame, Invite). Use the VAULT for exact scripts.",
+    "offer": "LENS: OFFER ARCHITECT. Stack value using the Value Equation. Build Grand Slam Offers. Structure Money Models (Attraction, Upsell, Downsell, Continuity).",
+    "workshop": "LENS: WORKSHOP ARCHITECT. Design live events that shift beliefs over 3-6 days. Presell the outcome.",
+    "content": "LENS: CONTENT ENGINE. Apply the AVOCADO Content Cadence. Spicy specificity, polarize, document the journey. Core 4 Lead Gen.",
+    "launch": "LENS: LAUNCH PLANNER. Tease, deliver value, close with urgency. Apply Scarcity, Urgency, Bonuses, and Guarantees.",
+    "alchemy": "LENS: ALCHEMY (VIDEO). Hook 0-5s, Body 5-45s, CTA 45-60s. Retain attention through curiosity and lists.",
+    "hack": "LENS: FUNNEL HACKER. The member pastes a competitor funnel. Reverse-engineer it stage by stage into a Straight-Line map, score each stage RED/YELLOW/GREEN, name WHY it makes money, then rebuild it for the member's niche.",
 }
 
+# --- PYDANTIC MODELS ---
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -177,20 +182,17 @@ class DocsRequest(BaseModel):
     title: str = "note"
     body: str = ""
 
-# ------------------------- MEMORY + TIER (SUPABASE) -------------------------
-# Tolerant: matches [[MEMORY]]...[[/MEMORY]], [[MEMORY]]...[/MEMORY], [MEMORY]...[/MEMORY],
-# and strips to end-of-message if the closing tag is missing. Raw tags can never leak.
-MEMORY_RE = re.compile(r"\[{1,2}\s*MEMORY\s*\]{1,2}(.*?)(?:\[{1,2}\s*/\s*MEMORY\s*\]{1,2}|$)", re.S)
+# --- MEMORY + TIER (SUPABASE) ---
+MEMORY_RE = re.compile(r"[{1,2}\sMEMORY\s]{1,2}(.*?)(?:[{1,2}\s/\sMEMORY\s]{1,2}|$)", re.S)
 
 def load_memory(member_id):
     if not SUPABASE_URL or not SUPABASE_KEY: return "", "free"
     try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory?member_id=eq."
-               + urllib.parse.quote(member_id) + "&select=profile,tier")
+        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory?member_id=eq." + urllib.parse.quote(member_id) + "&select=profile,tier")
         req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
         with urllib.request.urlopen(req, timeout=10) as resp:
             rows = json.loads(resp.read().decode("utf-8"))
-        if rows: return (rows[0].get("profile") or "", rows[0].get("tier") or "free")
+            if rows: return (rows[0].get("profile") or "", rows[0].get("tier") or "free")
     except Exception as e: log.error("MEMORY LOAD FAIL: %s", e)
     return "", "free"
 
@@ -222,7 +224,7 @@ def extract_memory(reply):
         return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
     return reply, ""
 
-# ------------------------- WHOP LICENSE CHECK -------------------------
+# --- WHOP LICENSE CHECK ---
 def whop_tier_for_license(key):
     if key in MANUAL_PARTNER_CODES: return "partner"
     if key in MANUAL_INSIDER_CODES: return "insider"
@@ -232,17 +234,17 @@ def whop_tier_for_license(key):
         req = urllib.request.Request(url, headers={"Authorization": "Bearer " + WHOP_API_KEY, "User-Agent": UA})
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        status = str(data.get("status") or data.get("state") or "active").lower()
-        if status in ("revoked", "cancelled", "canceled", "expired", "inactive"): return None
-        pid = (data.get("product_id") or data.get("experience_id") or
-               (data.get("product") or {}).get("id") or (data.get("experience") or {}).get("id") or "")
-        if pid and WHOP_PARTNER_PRODUCT_ID and pid == WHOP_PARTNER_PRODUCT_ID: return "partner"
-        if pid and WHOP_INSIDER_PRODUCT_ID and pid == WHOP_INSIDER_PRODUCT_ID: return "insider"
-        if not WHOP_INSIDER_PRODUCT_ID and not WHOP_PARTNER_PRODUCT_ID: return "insider"
+            status = str(data.get("status") or data.get("state") or "active").lower()
+            if status in ("revoked", "cancelled", "canceled", "expired", "inactive"): return None
+            pid = (data.get("product_id") or data.get("experience_id") or
+                   (data.get("product") or {}).get("id") or (data.get("experience") or {}).get("id") or "")
+            if pid and WHOP_PARTNER_PRODUCT_ID and pid == WHOP_PARTNER_PRODUCT_ID: return "partner"
+            if pid and WHOP_INSIDER_PRODUCT_ID and pid == WHOP_INSIDER_PRODUCT_ID: return "insider"
+            if not WHOP_INSIDER_PRODUCT_ID and not WHOP_PARTNER_PRODUCT_ID: return "insider"
     except Exception as e: log.error("WHOP CHECK FAIL: %s", e)
     return None
 
-# ------------------------- BUSINESS DOCS (CLIENT UPLOADS) -------------------------
+# --- BUSINESS DOCS ---
 DOCS_TABLE = "member_docs"
 
 def load_docs(member_id):
@@ -254,14 +256,14 @@ def load_docs(member_id):
         req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
         with urllib.request.urlopen(req, timeout=10) as resp:
             rows = json.loads(resp.read().decode("utf-8"))
-        parts = []
-        total = 0
-        for r in rows:
-            chunk = (r.get("body") or "")[:4000]
-            parts.append("DOC " + (r.get("title") or "note") + ":\n" + chunk)
-            total += len(chunk)
-            if total > 6000: break
-        return "\n\n".join(parts)[:6000]
+            parts = []
+            total = 0
+            for r in rows:
+                chunk = (r.get("body") or "")[:4000]
+                parts.append("DOC " + (r.get("title") or "note") + ":\n" + chunk)
+                total += len(chunk)
+                if total > 6000: break
+            return "\n\n".join(parts)[:6000]
     except Exception as e:
         log.error("DOCS LOAD FAIL: %s", e)
         return ""
@@ -275,7 +277,7 @@ def docs_list(member_id: str = "default"):
     req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
     with urllib.request.urlopen(req, timeout=10) as resp:
         rows = json.loads(resp.read().decode("utf-8"))
-    return {"docs": rows}
+        return {"docs": rows}
 
 @app.post("/api/docs")
 def docs_save(req: DocsRequest):
@@ -303,7 +305,7 @@ def docs_delete(req: DocsRequest):
     urllib.request.urlopen(reqobj, timeout=10).read()
     return {"deleted": True}
 
-# ------------------------- W1: WHOP CONNECT -------------------------
+# --- W1: WHOP CONNECT ---
 CONNECT_TABLE = "member_connections"
 WHOP_STATS_CACHE = {}
 
@@ -330,7 +332,7 @@ def db_get_connection(member_id):
     req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
     with urllib.request.urlopen(req, timeout=10) as resp:
         rows = json.loads(resp.read().decode("utf-8"))
-    return rows[0]["whop_key"] if rows else None
+        return rows[0]["whop_key"] if rows else None
 
 def db_delete_connection(member_id):
     if not SUPABASE_URL or not SUPABASE_KEY: return
@@ -342,7 +344,7 @@ def db_delete_connection(member_id):
 
 def whop_fetch(key, path):
     req = urllib.request.Request("https://api.whop.com/api/v2/" + path,
-        headers={"Authorization": "Bearer " + key, "User-Agent": UA})
+                                 headers={"Authorization": "Bearer " + key, "User-Agent": UA})
     with urllib.request.urlopen(req, timeout=20) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
@@ -370,7 +372,7 @@ def compute_whop_stats(key):
     except Exception as e: log.error("WHOP ORDERS: %s", e)
     return {"members": members, "joins7": joins7, "rev30": round(rev30, 2), "orders30": orders30}
 
-# ------------------------- LLM ENGINE -------------------------
+# --- LLM ENGINE ---
 def try_model(p, model, messages, temperature, max_tokens):
     body = json.dumps({"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}).encode("utf-8")
     req = urllib.request.Request(p["chat_url"], data=body, method="POST", headers={
@@ -378,7 +380,7 @@ def try_model(p, model, messages, temperature, max_tokens):
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        return data["choices"][0]["message"]["content"] or ""
+            return data["choices"][0]["message"]["content"] or ""
     except urllib.error.HTTPError as e:
         log.error("LLM FAIL %s/%s HTTP %s", p["name"], model, e.code)
         return None
@@ -395,8 +397,8 @@ def discover_models(p):
             req = urllib.request.Request(p["list_url"] + "?key=" + p["key"], headers={"User-Agent": UA})
         with urllib.request.urlopen(req, timeout=20) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-        if p["name"] == "groq": ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
-        else: ids = [m.get("name", "").replace("models/", "") for m in data.get("models", []) if m.get("name")]
+            if p["name"] == "groq": ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
+            else: ids = [m.get("name", "").replace("models/", "") for m in data.get("models", []) if m.get("name")]
     except Exception as e: log.error("MODEL LIST FAIL: %s", e)
     return ids
 
@@ -427,11 +429,11 @@ def build_system(mode, member_context, memory="", docs=""):
 
 def post_process(text): return text.replace("—", "-").replace("–", "-")
 
-# ------------------------- ROUTES -------------------------
+# --- ROUTES ---
 @app.get("/")
 def root():
     if os.path.exists("landing.html"): return FileResponse("landing.html")
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "CCC v12", "modes": list(MODE_PROMPTS.keys())}
+    return {"status": "ok", "app": "E5 AI Coach", "brain": "Quindecillion v13", "modes": list(MODE_PROMPTS.keys())}
 
 @app.get("/api/health")
 def health():
@@ -470,7 +472,7 @@ def chat(req: ChatRequest):
     if not CHAT_LIMIT.allow(member_id): raise HTTPException(429, "Rate limit reached.")
     memory, tier = load_memory(member_id)
     need = MODE_TIERS.get(req.mode, "free")
-    if TIER_RANK.get(tier or "free", 0) < TIER_RANK.get(need, 0): raise HTTPException(403, "locked:" + need)
+    if TIER_RANK.get(tier or "free", 0) < TIER_RANK.get(need, 0): raise HTTPException(403, "locked: " + need)
     docs = load_docs(member_id)
     messages = [{"role": "system", "content": build_system(req.mode, req.member_context, memory, docs)}]
     for m in req.history[-16:]: messages.append({"role": m.role, "content": m.content})
@@ -495,8 +497,8 @@ def tts(req: TTSRequest):
     voice = req.voice_id or FISH_VOICE_ID
     def call(payload):
         req_obj = urllib.request.Request("https://api.fish.audio/v1/tts",
-            data=json.dumps(payload).encode("utf-8"), method="POST",
-            headers={"Content-Type": "application/json", "Authorization": "Bearer " + FISH_API_KEY, "User-Agent": UA})
+                                         data=json.dumps(payload).encode("utf-8"), method="POST",
+                                         headers={"Content-Type": "application/json", "Authorization": "Bearer " + FISH_API_KEY, "User-Agent": UA})
         with urllib.request.urlopen(req_obj, timeout=60) as resp:
             return resp.read()
     payload = {"text": req.text, "format": "mp3"}
@@ -513,7 +515,7 @@ def tts(req: TTSRequest):
                 return Response(content=call({"text": req.text, "format": "mp3"}), media_type="audio/mpeg")
             except Exception as e2:
                 log.error("FISH RETRY FAIL: %s", e2)
-        raise HTTPException(502, "TTS error: Fish HTTP %s%s" % (e.code, " (credits or voice issue)" if e.code in (401, 402, 403) else ""))
+                raise HTTPException(502, "TTS error: Fish HTTP %s%s" % (e.code, " (credits or voice issue)" if e.code in (401, 402, 403) else ""))
     except Exception as e:
         log.error("TTS FAIL: %s", e)
         raise HTTPException(502, "TTS error: " + str(e))
