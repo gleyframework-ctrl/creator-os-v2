@@ -1,831 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Income Engine — your $10K-level Community Conversion strategist. Journey, Business Map, Revenue Autopsy, 90-Day Sprint, live Whop data, business docs and AI coach in one command center.">
-<title>Income Engine — CCC Command Center</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{
- --bg-primary:#080C1A; --bg-surface:#0F1529; --bg-elevated:#192045; --bg-input:#0A1020;
- --border:#192045; --border-hover:#2A3A6A; --border-active:#F5A623;
- --gold:#F5A623; --gold-dim:#D48C1A;
- --gold-faint:rgba(245,166,35,.08); --gold-glow:rgba(245,166,35,.15); --gold-pulse:rgba(245,166,35,.3);
- --cyan:#00D4FF; --cyan-faint:rgba(0,212,255,.08);
- --success:#00E599; --success-faint:rgba(0,229,153,.08);
- --warning:#FFB800; --warning-faint:rgba(255,184,0,.08);
- --error:#FF4757; --error-faint:rgba(255,71,87,.08);
- --text-primary:#FFFFFF; --text-secondary:#8892B0; --text-muted:#4A5578;
- --font-sans:"Inter",ui-sans-serif,system-ui,sans-serif;
- --font-mono:"JetBrains Mono",ui-monospace,monospace;
- --r-card:12px; --r-hero:16px; --r-ctl:6px;
- --t-fast:120ms; --t-base:160ms; --t-slow:200ms; --t-meter:500ms;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:var(--bg-primary);color:var(--text-secondary);font-family:var(--font-sans);font-size:14px;-webkit-font-smoothing:antialiased;}
-button{font-family:var(--font-sans);}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:none;box-shadow:0 0 0 3px var(--gold-faint);border-color:var(--border-active);}
-.mono{font-family:var(--font-mono);}
-.vsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
-#topbar{height:52px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--bg-primary);position:relative;z-index:5;}
-.crumb{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;}
-.crumb b{color:var(--text-primary);font-weight:600;}
-.logotile{width:28px;height:28px;border-radius:6px;background:var(--gold);color:var(--bg-primary);font:700 11px var(--font-mono);display:flex;align-items:center;justify-content:center;}
-.tspace{flex:1;}
-.chipbtn{background:transparent;border:1px solid var(--border-hover);color:var(--text-secondary);border-radius:var(--r-ctl);padding:6px 10px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
-.chipbtn:hover{border-color:var(--gold-dim);background:var(--bg-elevated);color:var(--text-primary);}
-.kbd .k{border:1px solid var(--border-hover);border-radius:4px;padding:1px 6px;font-size:10px;font-family:var(--font-mono);}
-.livechip{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9999px;padding:6px 12px;font:500 11px var(--font-mono);color:var(--text-secondary);}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:dot-pulse 2s ease-in-out infinite;}
-.dotring{position:relative;}
-.dotring::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--success);animation:pulse-ring 1.5s ease-out infinite;}
-.btn-gold{background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg-primary);border:none;border-radius:var(--r-ctl);padding:9px 20px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 6px 20px -8px var(--gold-glow);transition:filter var(--t-fast) ease,box-shadow var(--t-base) ease;}
-.btn-gold:hover:not(:disabled){filter:brightness(1.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 6px 24px -8px var(--gold-pulse);}
-.btn-gold:active{transform:translateY(1px);}
-.btn-gold:disabled{opacity:.35;cursor:not-allowed;filter:none;}
-.btn-ghost{background:transparent;border:1px solid var(--border-hover);color:var(--text-primary);border-radius:var(--r-ctl);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--t-base) ease;}
-.btn-ghost:hover{background:var(--bg-elevated);border-color:var(--gold-dim);}
-.btn-goldline{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);border-radius:var(--r-ctl);padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--t-base) ease;}
-.btn-goldline:hover{background:var(--gold-faint);border-color:var(--gold);}
-#shell{display:flex;height:calc(100vh - 52px);}
-#rail{width:64px;background:var(--bg-surface);border-right:1px solid var(--border);overflow:hidden;transition:width var(--t-slow) ease-out;flex-shrink:0;display:flex;flex-direction:column;}
-#rail:hover,#shell.railwide #rail{width:220px;}
-.ritem{display:flex;align-items:center;gap:14px;padding:14px 22px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:all var(--t-base) ease;}
-.ritem .ric{font:600 12px var(--font-mono);width:20px;text-align:center;}
-.ritem .lbl{opacity:0;transition:opacity var(--t-base) ease;font-size:13px;font-weight:500;}
-#rail:hover .lbl,#shell.railwide .lbl{opacity:1;}
-.ritem:hover{color:var(--text-primary);}
-.ritem.on{color:var(--gold);background:var(--gold-faint);}
-.railfoot{margin-top:auto;padding:16px 22px;display:flex;gap:10px;align-items:center;font:500 10px var(--font-mono);color:var(--text-muted);white-space:nowrap;}
-.railfoot span:last-child{opacity:0;transition:opacity var(--t-base) ease;}
-#rail:hover .railfoot span:last-child,#shell.railwide .railfoot span:last-child{opacity:1;}
-#main{flex:1;overflow-y:auto;position:relative;}
-.hero{position:relative;margin:24px 32px 0;border:1px solid var(--border);border-radius:var(--r-hero);background:linear-gradient(180deg,var(--bg-surface),var(--bg-primary));overflow:hidden;padding:28px 32px;}
-.hgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.25;mask-image:radial-gradient(ellipse at 50% 0%,black,transparent 75%);pointer-events:none;}
-.aur{position:absolute;width:340px;height:200px;border-radius:50%;filter:blur(30px);z-index:0;animation:aurora 14s ease-in-out infinite;pointer-events:none;}
-.aur.a1{left:-60px;top:-80px;background:radial-gradient(circle,var(--gold-glow),transparent 70%);}
-.aur.a2{right:-60px;top:-80px;background:radial-gradient(circle,var(--cyan-faint),transparent 70%);animation-delay:-7s;}
-.hrow{position:relative;z-index:1;display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border:1px solid var(--border);border-radius:9999px;padding:4px 12px;margin-bottom:14px;}
-.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dot-pulse 2s infinite;}
-h1{font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--text-primary);margin-bottom:8px;}
-h1 span{color:var(--gold);}
-.hsub{max-width:560px;margin-bottom:20px;}
-.kpis{display:flex;gap:16px;flex-wrap:wrap;}
-.kpi{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 20px;min-width:130px;transition:border-color var(--t-base) ease;}
-.kpi:hover{border-color:var(--border-hover);}
-.kpi small{display:block;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
-.kpi .num{font:600 26px var(--font-mono);color:var(--gold);}
-.kpi .num.cy{color:var(--cyan);} .kpi .num.gr{color:var(--success);} .kpi .num.mut{color:var(--text-muted);}
-.ticker{position:relative;z-index:1;margin:22px -32px -28px;border-top:1px solid var(--border);overflow:hidden;background:var(--bg-primary);}
-.tk{display:inline-flex;gap:40px;white-space:nowrap;padding:10px 0;font:500 11px var(--font-mono);color:var(--text-muted);animation:ticker 40s linear infinite;}
-.stickybar{background:transparent;padding:16px 32px 0;margin-top:8px;}
-.minibar{position:sticky;top:0;z-index:6;background:rgba(8,12,26,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:10px 32px;display:none;align-items:center;gap:14px;flex-wrap:wrap;}
-.minibar.show{display:flex;}
-.minibar .mstep{font:600 11px var(--font-mono);color:var(--text-muted);}
-.minibar .mstep.on{color:var(--gold);}
-.quizgrid{display:grid;grid-template-columns:1fr;gap:10px;}
-@media (min-width:1280px){.quizgrid{grid-template-columns:1fr 1fr;}}
-.mapcta{position:sticky;bottom:0;z-index:5;background:linear-gradient(180deg,transparent,var(--bg-primary) 35%);padding:16px 0 6px;display:flex;align-items:center;gap:14px;}
-.mapcount{font:600 12px var(--font-mono);color:var(--text-secondary);}
-.section{margin:28px 32px;}
-.shead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
-.shead h3{font-size:14px;font-weight:600;color:var(--text-primary);}
-.shead small{color:var(--text-muted);font-size:12px;}
-.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:20px 24px;transition:border-color var(--t-base) ease,transform var(--t-base) ease;}
-.card:hover{border-color:var(--border-hover);}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
-.steps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.step{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:var(--r-ctl);padding:8px 14px;background:var(--bg-surface);}
-.step .n{width:24px;height:24px;border-radius:50%;border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;font:600 10px var(--font-mono);color:var(--text-muted);}
-.step .t{font-size:12px;font-weight:600;color:var(--text-secondary);}
-.step.done .n{border-color:var(--success);color:var(--success);background:var(--success-faint);}
-.step.active{border-color:var(--border-active);box-shadow:0 0 18px var(--gold-faint);position:relative;overflow:hidden;}
-.step.active::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--gold-faint) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;}
-.step.active .n{border-color:var(--gold);color:var(--gold);}
-.step.active .t{color:var(--gold);}
-.swire{width:18px;height:1px;background:var(--border);}
-.spot{position:relative;border:1px solid var(--border-active);border-radius:var(--r-card);background:linear-gradient(135deg,var(--gold-faint),var(--bg-surface) 55%);padding:20px 24px;overflow:hidden;}
-.spot::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,var(--gold-faint) 50%,transparent 65%);background-size:200% 100%;animation:shimmer 2.4s linear infinite;pointer-events:none;}
-.spot .ey{font:600 11px var(--font-mono);letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
-.spot h2{font-size:18px;color:var(--text-primary);margin-bottom:6px;}
-.spot p{font-size:12px;color:var(--text-secondary);}
-.mrow{margin-bottom:12px;}
-.mrow .mt{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:5px;}
-.mrow .mt .mono{color:var(--text-secondary);}
-.mtrack{height:6px;background:var(--bg-elevated);border-radius:9999px;overflow:hidden;}
-.mfill{height:100%;width:0;border-radius:9999px;background:var(--gold);transition:width var(--t-meter) ease;}
-.task{display:flex;align-items:center;gap:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-card);padding:14px 18px;margin-bottom:8px;transition:all var(--t-base) ease;animation:fadeUp .4s ease both;}
-.task:hover{border-color:var(--border-hover);transform:translateY(-1px);}
-.task.done{opacity:.5;}
-.task.done .tb b{text-decoration:line-through;}
-.task.next{border-color:var(--border-active);box-shadow:0 0 18px var(--gold-faint);}
-.check{width:26px;height:26px;min-width:26px;border-radius:50%;border:1px solid var(--border-hover);background:transparent;color:var(--bg-primary);font-weight:800;cursor:pointer;transition:all var(--t-base) ease;}
-.task.done .check{background:var(--success);border-color:var(--success);}
-.tb{flex:1;}
-.tb b{font-size:13px;color:var(--text-primary);display:block;}
-.tb small{font-size:12px;color:var(--text-muted);}
-.pill{border-radius:9999px;padding:2px 10px;font:600 10px var(--font-mono);letter-spacing:.06em;}
-.pill.warn{background:var(--warning-faint);color:var(--warning);}
-.pill.ok{background:var(--success-faint);color:var(--success);}
-.startbtn{background:transparent;border:1px solid var(--border-hover);color:var(--text-primary);border-radius:var(--r-ctl);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--t-base) ease;}
-.startbtn:hover{background:var(--bg-elevated);border-color:var(--gold-dim);}
-.startbtn.hot{border-color:var(--gold-dim);color:var(--gold);}
-.startbtn.hot:hover{background:var(--gold-faint);border-color:var(--gold);}
-input,textarea{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-ctl);color:var(--text-primary);font-size:14px;font-family:var(--font-sans);outline:none;transition:border-color var(--t-base) ease,box-shadow var(--t-base) ease;}
-input:focus,textarea:focus{border-color:var(--border-active);box-shadow:0 0 0 3px var(--gold-faint);}
-input::placeholder,textarea::placeholder{color:var(--text-muted);}
-#modes{display:flex;gap:8px;flex-wrap:wrap;margin:20px 32px 0;}
-.mchip{display:flex;align-items:center;gap:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:9999px;padding:7px 14px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all var(--t-base) ease;}
-.mchip .mi{font:600 10px var(--font-mono);color:var(--text-muted);}
-.mchip:hover{border-color:var(--border-hover);color:var(--text-primary);}
-.mchip.on{border-color:var(--border-active);color:var(--gold);background:var(--gold-faint);}
-.mchip.on .mi{color:var(--gold);}
-#chat{padding:20px 32px;display:flex;flex-direction:column;gap:14px;min-height:300px;}
-.msg{max-width:78%;padding:14px 18px;border-radius:var(--r-card);line-height:1.6;font-size:14px;white-space:pre-wrap;word-wrap:break-word;animation:fadeUp .22s ease-out;}
-.msg.user{align-self:flex-end;background:linear-gradient(180deg,var(--gold),var(--gold-dim));color:var(--bg-primary);font-weight:500;}
-.msg.ai{align-self:flex-start;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);}
-.msg.ai strong{color:var(--gold);}
-.msg.ai .h{color:var(--gold);font-weight:700;}
-.msg.ai .li{padding-left:12px;}
-.msg.ai pre{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-ctl);padding:10px;margin:8px 0;white-space:pre;overflow-x:auto;font-family:var(--font-mono);font-size:12px;}
-.speak{background:transparent;border:none;color:var(--text-muted);cursor:pointer;margin-left:10px;font:600 10px var(--font-mono);}
-.speak:hover{color:var(--gold);}
-.typing{display:flex;gap:5px;padding:14px 18px;align-self:flex-start;}
-.typing span{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:bnc 1.2s infinite;}
-.typing span:nth-child(2){animation-delay:.15s;}
-.typing span:nth-child(3){animation-delay:.3s;}
-#chatfoot{display:flex;gap:12px;padding:16px 32px;border-top:1px solid var(--border);background:var(--bg-surface);}
-#chatfoot textarea{flex:1;padding:12px 14px;height:52px;resize:none;}
-#doneBar{display:none;align-items:center;gap:10px;padding:10px 32px;background:var(--gold-faint);border-top:1px solid var(--gold-dim);font-size:13px;color:var(--text-secondary);}
-.mapwrap{margin:24px 32px;}
-.opt{background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);border-radius:9999px;padding:8px 16px;font-size:12px;cursor:pointer;transition:all var(--t-base) ease;}
-.opt.on{background:var(--gold-faint);border-color:var(--border-active);color:var(--gold);font-weight:600;}
-.ringbg{fill:none;stroke:var(--bg-elevated);stroke-width:10;}
-.ringfg{fill:none;stroke:var(--gold);stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.2s ease;}
-.leak{background:var(--error-faint);border:1px solid var(--error);border-radius:var(--r-card);padding:14px 18px;font-size:13px;color:var(--text-secondary);margin:16px 0;}
-.leak b{color:var(--error);}
-.autogrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
-@media (max-width:1100px){.autogrid{grid-template-columns:1fr;}}
-.slider{margin-bottom:18px;}
-.slider .mt{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px;}
-.slider .mt .mono{color:var(--text-primary);}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--bg-elevated);border-radius:9999px;outline:none;border:none;padding:0;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);box-shadow:0 0 0 1px var(--gold);}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg-primary);}
-.bigdelta{font:700 34px var(--font-mono);color:var(--gold);}
-.wstats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.wstat small{display:block;font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-.wstat .num{font:600 20px var(--font-mono);color:var(--gold);}
-.wstat .num.gr{color:var(--success);}
-.wstat .num.cy{color:var(--cyan);}
-.weeks{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-top:12px;}
-.wk{height:34px;border:1px solid var(--border);border-radius:6px;background:var(--bg-elevated);color:var(--text-muted);font:600 10px var(--font-mono);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--t-base) ease;}
-.wk.on{background:var(--gold);border-color:var(--gold);color:var(--bg-primary);}
-.umwrap{position:fixed;inset:0;background:rgba(8,12,26,.72);backdrop-filter:blur(4px);z-index:98;display:flex;align-items:center;justify-content:center;padding:20px;}
-.umodal{width:100%;max-width:420px;background:var(--bg-surface);border:1px solid var(--border-active);border-radius:16px;padding:24px;animation:fadeUp .25s ease-out;}
-.umodal h2{font-size:18px;color:var(--text-primary);margin-bottom:6px;}
-.umodal p{font-size:12px;color:var(--text-secondary);margin-bottom:14px;}
-.pal{position:fixed;top:76px;left:50%;transform:translateX(-50%);width:560px;max-width:92%;z-index:99;background:var(--bg-surface);border:1px solid var(--border-hover);border-radius:12px;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.85);animation:fadeUp .18s ease-out;}
-.pal input{width:100%;background:var(--bg-input);border:none;border-bottom:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:14px;}
-.pal input:focus{box-shadow:none;border-color:var(--border-active);}
-.palitem{padding:11px 16px;font-size:13px;color:var(--text-secondary);cursor:pointer;}
-.palitem.sel{background:var(--gold-faint);color:var(--gold);}
-#toast{position:fixed;bottom:20px;right:20px;background:var(--bg-surface);border:1px solid var(--border);border-left:3px solid var(--success);color:var(--text-primary);padding:12px 20px;border-radius:var(--r-card);font-weight:600;font-size:13px;opacity:0;transform:translateY(8px);transition:all .22s ease-out;z-index:99;}
-#toast.show{opacity:1;transform:none;}
-.confetti{position:fixed;top:-12px;width:3px;height:12px;z-index:98;animation:fall 1.5s linear forwards;border-radius:2px;}
-#tourCard{position:fixed;bottom:20px;right:20px;max-width:360px;width:92%;background:var(--bg-surface);border:1px solid var(--border-active);border-radius:var(--r-card);padding:18px;z-index:97;animation:fadeUp .3s ease-out;}
-#tourCard p{font-size:13px;line-height:1.55;margin-bottom:12px;color:var(--text-secondary);}
-.tour-hl{outline:2px solid var(--gold);box-shadow:0 0 24px var(--gold-glow);border-radius:var(--r-card);position:relative;z-index:96;}
-@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes pulse-ring{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.2);opacity:0}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes aurora{0%,100%{transform:translate3d(-4%,-2%,0) scale(1);opacity:.7}50%{transform:translate3d(4%,3%,0) scale(1.08);opacity:1}}
-@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@keyframes bnc{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
-@keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
-#modes{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;mask-image:linear-gradient(90deg,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);padding-bottom:4px;}
-#modes::-webkit-scrollbar{display:none;}
-.mchip{flex:0 0 auto;}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
-@media (max-width:1100px){.grid2{grid-template-columns:1fr;}}
-@media (max-width:900px){.kbd,.livechip{display:none;}}
-@media (max-width:768px){
- #shell{flex-direction:column;}
- #rail{width:100%;height:52px;flex-direction:row;overflow-x:auto;}
- #rail:hover{width:100%;}
- .ritem{padding:14px 16px;}
- .ritem .lbl{opacity:1;}
- .railfoot{display:none;}
- .hero,.section,#modes,.mapwrap{margin-left:16px;margin-right:16px;}
- .stickybar{padding:16px 16px 0;}
- .minibar{padding:10px 16px;}
- #chat,#chatfoot,#doneBar{padding-left:16px;padding-right:16px;}
- .ticker{margin:22px -16px -28px;}
- .opt,.mchip,.chipbtn,.startbtn{min-height:44px;}
- .weeks{grid-template-columns:repeat(6,1fr);}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Engine — CCC Command Center</title>
+    <style>
+        :root {
+            --bg-main: #09090b;
+            --bg-panel: #111114;
+            --bg-input: #18181b;
+            --border: #27272a;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --accent: #f59e0b; /* Amber for Income Engine vibe */
+            --accent-hover: #d97706;
+            --user-bubble: #f59e0b;
+            --user-text: #000000;
+            --ai-bubble: #27272a;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-section { margin-bottom: 20px; }
+        .nav-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-item:hover { background-color: var(--bg-input); color: var(--text-primary); }
+        .nav-item.active { background-color: rgba(245, 158, 11, 0.1); color: var(--accent); font-weight: 600; }
+        .tier-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--border);
+        }
+        .tier-insider { background: #3b82f6; color: white; }
+        .tier-partner { background: var(--accent); color: black; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* MAIN CHAT AREA */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-panel);
+        }
+
+        .header-title { font-size: 16px; font-weight: 600; }
+        .header-actions { display: flex; gap: 10px; }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-primary { background: var(--accent); color: black; border: none; font-weight: 600; }
+        .btn-primary:hover { background: var(--accent-hover); color: black; }
+
+        /* CHAT WINDOW */
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message { display: flex; gap: 12px; max-width: 85%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        
+        .avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .message.user .avatar { background: var(--accent); color: black; }
+
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            background: var(--ai-bubble);
+        }
+        .message.user .bubble { background: var(--user-bubble); color: var(--user-text); }
+
+        .bubble strong { font-weight: 700; }
+        .bubble ul, .bubble ol { margin-left: 20px; margin-top: 8px; }
+        .bubble code { background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+
+        /* INPUT AREA */
+        .input-area {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-panel);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            align-items: flex-end;
+        }
+
+        .input-container:focus-within { border-color: var(--accent); }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            max-height: 120px;
+            padding: 8px;
+            font-family: inherit;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+        .icon-btn:hover { color: var(--accent); background: rgba(245, 158, 11, 0.1); }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            width: 400px;
+            max-width: 90%;
+        }
+        .modal h3 { margin-bottom: 15px; font-size: 18px; }
+        .modal input {
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            background: var(--bg-input); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-primary);
+        }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* UTILS */
+        .hidden { display: none !important; }
+        .typing-indicator { font-style: italic; color: var(--text-secondary); font-size: 12px; margin-left: 44px; }
+    </style>
 </head>
 <body>
-<div id="topbar">
-  <div class="crumb"><div class="logotile">IE</div><span>Income Engine</span><span>/</span><b id="crumbSec">Dashboard</b></div>
-  <div class="tspace"></div>
-  <button class="chipbtn kbd" onclick="openPal()" aria-label="Command palette"><span>Ask the coach</span> <span class="k">⌘K</span></button>
-  <button class="chipbtn" onclick="toggleSb()" title="Pin sidebar" aria-label="Toggle sidebar">☰</button>
-  <button class="chipbtn" id="langBtn" onclick="setLang(lang==='en'?'ar':'en')" aria-label="Language">ع</button>
-  <div class="livechip"><span class="dot dotring"></span><span class="mono">api · online</span></div>
-  <button class="btn-gold" id="ctaBtn" onclick="startNext()">Start Next Step ↗</button>
-</div>
-<div id="shell">
-  <div id="rail">
-    <div class="ritem on" id="tabHome" onclick="showView('home')"><span class="ric">01</span><span class="lbl" id="lbHome">Journey</span></div>
-    <div class="ritem" id="tabMap" onclick="showView('map')"><span class="ric">02</span><span class="lbl" id="lbMap">Business Map</span></div>
-    <div class="ritem" id="tabChat" onclick="showView('chat')"><span class="ric">03</span><span class="lbl" id="lbChat">Coach</span></div>
-    <div class="ritem" id="tabAutopsy" onclick="showView('autopsy')"><span class="ric">04</span><span class="lbl" id="lbAutopsy">Autopsy</span></div>
-    <div class="ritem" id="tabSprint" onclick="showView('sprint')"><span class="ric">05</span><span class="lbl" id="lbSprint">Sprint</span></div>
-    <div class="railfoot"><span class="dot"></span><span id="sysTxt">SYS OK · v17</span></div>
-  </div>
-  <div id="main">
-    <div id="homeView"></div>
-    <div id="mapView" style="display:none"></div>
-    <div id="autopsyView" style="display:none"></div>
-    <div id="sprintView" style="display:none"></div>
-    <div id="chatView" style="display:none">
-      <h1 class="vsr">Coach</h1>
-      <div id="modes"></div>
-      <div id="chat"></div>
-      <div id="doneBar"><span id="doneTxt"></span><button class="btn-goldline" style="padding:6px 12px;font-size:12px" id="markBtn" onclick="markDone()">Mark done</button><button class="btn-ghost" style="padding:6px 12px;font-size:12px" id="laterBtn" onclick="hideDoneBar()">Later</button></div>
-      <div id="chatfoot">
-        <textarea id="input" placeholder="Describe your challenge or ask for guidance..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
-        <button class="btn-gold" id="send" onclick="send()">Send</button>
-        <button class="btn-ghost" onclick="exportChat()" title="Export" aria-label="Export session">↓</button>
-        <button class="btn-ghost" onclick="clearChat()" title="Clear" aria-label="Clear chat">✕</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div id="unlockModal" class="umwrap" style="display:none">
-  <div class="umodal">
-    <div class="eyebrow"><i></i><span class="mono">UNLOCK YOUR PLAN</span></div>
-    <h2 id="umTitle">Unlock your plan</h2>
-    <p id="umSub">Free → Insider → Partner. Your license key is shown in your Whop account after purchase.</p>
-    <input id="umKey" style="width:100%;padding:10px 12px" placeholder="Paste your Whop license key">
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn-gold" style="flex:1" onclick="unlockFromModal()">Unlock</button>
-      <button class="btn-ghost" onclick="closeUnlockModal()">Cancel</button>
-    </div>
-    <p id="umErr" style="color:var(--error);font-size:12px;margin-top:10px;display:none"></p>
-  </div>
-</div>
-<div id="toast"></div>
-<div id="pal" style="display:none" class="pal"><input id="palIn" placeholder="Type a command..." oninput="renderPal(this.value)" aria-label="Command search"><div id="palList"></div></div>
-<div id="tourCard" style="display:none"><p id="tourTxt"></p><div style="display:flex;gap:8px;justify-content:flex-end;align-items:center"><span id="tourStep" class="mono" style="margin-right:auto;color:var(--text-muted);font-size:11px"></span><button class="btn-ghost" id="tourSkip" onclick="endTour()">Skip</button><button class="btn-gold" id="tourNext" onclick="nextTour()">Next</button></div></div>
-<script>
-const API_URL = "";
-let lang = localStorage.getItem("lang") || "en";
-const CH = {
- en:{cta:"Start Next Step ↗",lbHome:"Journey",lbMap:"Business Map",lbChat:"Coach",lbAutopsy:"Autopsy",lbSprint:"Sprint",crumb:"Dashboard",next:"YOUR NEXT MOVE · CRITICAL PATH",prog:"Journey progress",steps:"steps",start:"Start",redo:"Redo",complete:"COMPLETE",phase:"Phase",mark:"Mark done",later:"Later",welcome:"Welcome to Income Engine. I remember you across sessions, so we never start from zero. Build your Business Map or hit Start on your next move.",toastStep:"Step complete. Momentum building.",toastPhase:"PHASE COMPLETE: ",mapTitle:"Your Business Map",mapSub:"6 taps. See your funnel, momentum and biggest leak - before you talk to the coach.",buildMap:"Build my Map",retake:"Retake",sendCoach:"Send my map to the coach",bigLeak:"Biggest leak",momentum:"MOMENTUM",openMap:"open map",answerAll:"Answer all 6 first.",lTraffic:"Traffic",lHub:"Hub",lNurture:"Nurture",lConversion:"Conversion",streak:"STREAK",tier:"TIER",pulse:"DAILY PULSE",log:"Log Today",plan:"PLAN",unlock:"Unlock Tier",lic:"Whop license key (buyers only)",ph:"Describe your challenge or ask for guidance...",send:"Send",kpiSteps:"STEPS DONE",funnel:"CONVERSION FUNNEL · LIVE",noMap:"No map yet. Build it to unlock your funnel.",buildCta:"Build Map",sys:"SYS OK · v17",pipe:"Pipeline Health",answered:" answered",autoEyebrow:"04 · REVENUE AUTOPSY",autoTitle:"See the money on your broken Straight Line.",autoSub:"Drag your real numbers. The doctrine shows what fixing the earliest leak pays.",sReach:"Targeted strangers / week",sJoin:"Join rate %",sMembers:"Current members",sOffer:"Members offered / month %",sPrice:"Offer price $",sClose:"Close rate %",rCurrent:"CURRENT · 90 DAYS",rFixed:"FIXED · 90 DAYS",rDelta:"LEFT ON THE TABLE",sendAutopsy:"Send my autopsy to the coach",whopTitle:"WHOP CONNECT",whopSub:"Plug your community. Live members, joins and revenue.",whopKeyPh:"Paste your Whop API key",connect:"Connect",disconnect:"Disconnect",sendWhop:"Send my live numbers to the coach",members:"MEMBERS",joins7:"JOINS / 7D",rev30:"REVENUE / 30D",orders30:"ORDERS / 30D",whopLocked:"Insider tier required to connect Whop.",connected:"Whop connected",disconnected:"Whop disconnected",docsTitle:"BUSINESS DOCS",docsSub:"Upload your business files (txt/md/csv/json or paste text). The coach reads them automatically before every answer.",docsPastePh:"or paste your business text here...",docsSave:"Save to coach",docsSaved:"Doc saved to coach",umTitle:"Unlock your plan",umSub:"Free → Insider → Partner. Your license key is shown in your Whop account after purchase.",sprintTitle:"Your 90-day money sprint.",sprintSub:"Three 30-day phases. Three priorities each. The coach builds it from your Map + your docs; you track the weeks.",genSprint:"Generate my 90-day plan",saveSprint:"Save last plan to my docs",weeksLabel:"WEEK TRACKER",sprintSaved:"Plan saved to your docs",sprintHint:"Tip: upload your Time-to-Build files in BUSINESS DOCS and the sprint will use them."},
- ar:{cta:"↗ ابدأ الخطوة التالية",lbHome:"الرحلة",lbMap:"خريطة العمل",lbChat:"المدرب",lbAutopsy:"التشريح",lbSprint:"السبرنت",crumb:"لوحة القيادة",next:"خطوتك التالية · المسار الحرج",prog:"تقدم الرحلة",steps:"خطوات",start:"ابدأ",redo:"إعادة",complete:"اكتمل",phase:"المرحلة",mark:"تم",later:"لاحقاً",welcome:"أهلاً بك في Income Engine. أتذكرك عبر الجلسات، فلا نبدأ من الصفر أبداً.",toastStep:"اكتملت الخطوة. الزخم يتصاعد.",toastPhase:"اكتملت المرحلة: ",mapTitle:"خريطة عملك",mapSub:"6 نقرات. شاهد قمعك وزخمك وأكبر تسريب قبل التحدث إلى المدرب.",buildMap:"ابنِ خريطتي",retake:"إعادة",sendCoach:"أرسل خريطتي إلى المدرب",bigLeak:"أكبر تسريب",momentum:"الزخم",openMap:"افتح الخريطة",answerAll:"أجب على الستة أولاً.",lTraffic:"الانتباه",lHub:"المركز",lNurture:"التربية",lConversion:"التحويل",streak:"السلسلة",tier:"الخطة",pulse:"النبض اليومي",log:"سجّل اليوم",plan:"الخطة",unlock:"فعّل الخطة",lic:"مفتاح ترخيص Whop (للمشترين)",ph:"صف تحديك أو اطلب التوجيه...",send:"أرسل",kpiSteps:"خطوات منجزة",funnel:"قمع التحويل · مباشر",noMap:"لا خريطة بعد. ابنِها لفتح قمعك.",buildCta:"ابنِ الخريطة",sys:"النظام يعمل · v17",pipe:"صحة المسار",answered:" مُجاب",autoEyebrow:"04 · تشريح الأرباح",autoTitle:"شاهد الأموال على خطك المستقيم المكسور.",autoSub:"اسحب أرقامك الحقيقية. يُظهر النظام ما يدفعه إصلاح أضعف حلقة.",sReach:"غرباء مستهدفون / أسبوع",sJoin:"نسبة الانضمام %",sMembers:"الأعضاء حالياً",sOffer:"يُقدَّم لهم العرض شهرياً %",sPrice:"سعر العرض $",sClose:"نسبة الإغلاق %",rCurrent:"الحالي · 90 يوماً",rFixed:"بعد الإصلاح · 90 يوماً",rDelta:"مال متروك على الطاولة",sendAutopsy:"أرسل تشريحي إلى المدرب",whopTitle:"ربط Whop",whopSub:"اربط مجتمعك. أعضاء وانضمامات وأرباح حية.",whopKeyPh:"الصق مفتاح Whop API",connect:"اربط",disconnect:"افصل",sendWhop:"أرسل أرقامي الحية إلى المدرب",members:"الأعضاء",joins7:"انضمامات / 7ي",rev30:"أرباح / 30ي",orders30:"طلبات / 30ي",whopLocked:"تتطلب خطة Insider لربط Whop.",connected:"تم ربط Whop",disconnected:"تم فصل Whop",docsTitle:"ملفات عملك",docsSub:"ارفع ملفات عملك (txt/md/csv/json أو لصق نص) ويقرؤها المدرب تلقائياً قبل كل إجابة.",docsPastePh:"أو الصق نص عملك هنا...",docsSave:"احفظ لدى المدرب",docsSaved:"تم حفظ الملف لدى المدرب",umTitle:"فعّل خطتك",umSub:"مجاني → إنسايدر → بارتنر. يظهر مفتاح الترخيص في حسابك على Whop بعد الشراء.",sprintTitle:"سبرنت الـ90 يوماً.",sprintSub:"ثلاث مراحل من 30 يوماً. ثلاث أولويات لكل مرحلة. يبنيها المدرب من خريطتك وملفاتك، وتتابع الأسابيع.",genSprint:"ابنِ خطة الـ90 يوماً",saveSprint:"احفظ آخر خطة في ملفاتي",weeksLabel:"متتبع الأسابيع",sprintSaved:"تم حفظ الخطة في ملفاتك",sprintHint:"نصيحة: ارفع ملفات Time-to-Build في BUSINESS DOCS وسيستخدمها السبرنت."}
-};
-const MODES = [
- {id:"coach", tier:"free", t:"Daily Operator", d:"90-min rhythm", t_ar:"المشغّل اليومي", d_ar:"روتين 90 دقيقة"},
- {id:"xray", tier:"free", t:"Business X-Ray", d:"revenue leaks", t_ar:"الأشعة السينية", d_ar:"تسريبات الأرباح"},
- {id:"funnel", tier:"free", t:"Funnel Map", d:"conversion leaks", t_ar:"خريطة القمع", d_ar:"تسريبات التحويل"},
- {id:"hack", tier:"insider", t:"Funnel Hacker", d:"steal & rebuild competitor funnels", t_ar:"هاكر القمع", d_ar:"اسرق وأعد بناء قمع المنافسين"},
- {id:"community", tier:"insider", t:"Community OS", d:"one group + MVC", t_ar:"نظام المجتمع", d_ar:"مجموعة واحدة"},
- {id:"dm", tier:"insider", t:"DM Doctor", d:"converting scripts", t_ar:"طبيب الرسائل", d_ar:"سكريبتات تحوّل"},
- {id:"offer", tier:"partner", t:"Offer Doc Builder", d:"10 pillars + 14 blocks", t_ar:"باني العرض", d_ar:"10 أركان"},
- {id:"workshop", tier:"partner", t:"Workshop Architect", d:"6-day belief arc", t_ar:"مهندس الورش", d_ar:"6 أيام"},
- {id:"content", tier:"insider", t:"Content Engine", d:"VAGEL + 7 frameworks", t_ar:"محرك المحتوى", d_ar:"VAGEL"},
- {id:"launch", tier:"partner", t:"Launch Planner", d:"21-day map", t_ar:"مخطط الإطلاق", d_ar:"21 يوماً"},
- {id:"alchemy", tier:"insider", t:"Alchemy", d:"60s video scripts", t_ar:"الخيمياء", d_ar:"فيديو 60 ثانية"},
-];
-const RANK = {free:0, insider:1, partner:2};
-const JOURNEY = [
- {name:"Diagnose", name_ar:"التشخيص", tasks:[
-   {id:"xray", t:"Run your Business X-Ray", t_ar:"شغّل الأشعة السينية", why:"Find the earliest broken layer", why_ar:"اعثر على أضعف طبقة", min:10, mode:"xray", prompt:"Run my Business X-Ray. Interview me one question at a time, then give me my RED/YELLOW/GREEN audit and the single first fix."}]},
- {name:"Foundation", name_ar:"الأساس", tasks:[
-   {id:"onegroup", t:"Make the One-Group decision", t_ar:"قرار المجموعة الواحدة", why:"Fragmentation kills momentum", why_ar:"التشتت يقتل الزخم", min:5, mode:"community", prompt:"Help me make the One-Group decision. Ask me what groups I currently run, then tell me exactly how to consolidate."},
-   {id:"welcome", t:"Write your Welcome Post", t_ar:"اكتب منشور الترحيب", why:"Sets expectations + pre-frames the DM", why_ar:"يضبط التوقعات", min:10, mode:"community", prompt:"Write my group Welcome Post with the honesty statement and DM pre-frame. Ask me my niche first."},
-   {id:"quickwin", t:"Install the 15-minute Quick Win", t_ar:"ركّب الفوز السريع", why:"Day-1 progress for new members", why_ar:"تقدم اليوم 1", min:15, mode:"community", prompt:"Help me design a 15-minute Quick Win path for a brand-new member in my niche."}]},
- {name:"Attention", name_ar:"الانتباه", tasks:[
-   {id:"vagel", t:"Build your VAGEL week", t_ar:"ابنِ أسبوع VAGEL", why:"Predictable trust-building content", why_ar:"محتوى يبني الثقة", min:10, mode:"content", prompt:"Build my VAGEL content calendar for this week using my niche and my story."},
-   {id:"reel", t:"Script your first reel", t_ar:"اكتب أول ريل", why:"Hook 0-5 / Body 5-45 / CTA 45-60", why_ar:"خطاف/جسم/CTA", min:10, mode:"alchemy", prompt:"Script my first short-form video with Hook 0-5s, Body 5-45s, CTA 45-60s. Ask me the topic first."},
-   {id:"cta", t:"Post with a Triple-Threat CTA", t_ar:"انشر بـ CTA ثلاثي", why:"Viewers into group members", why_ar:"مشاهدون إلى أعضاء", min:5, mode:"content", prompt:"Write my Triple-Threat comment CTA that drives people from my reel into my group."}]},
- {name:"Conversion", name_ar:"التحويل", tasks:[
-   {id:"dmflow", t:"Install the Hand-Raiser DM flow", t_ar:"ركّب تدفق Hand-Raiser", why:"Convert intent without pressure", why_ar:"حوّل النية بدون ضغط", min:10, mode:"dm", prompt:"Set up my Hand-Raiser DM flow step by step with exact scripts adapted to my niche."},
-   {id:"offerdoc", t:"Build your Offer Doc", t_ar:"ابنِ وثيقة العرض", why:"The doc that replaces the sales call", why_ar:"الوثيقة التي تغني عن المكالمة", min:30, mode:"offer", prompt:"Interview me and build my 14-block Offer Doc, one section at a time."}]},
- {name:"Scale", name_ar:"التوسع", tasks:[
-   {id:"launch", t:"Plan your 21-day launch", t_ar:"خطط لإطلاق 21 يوم", why:"Predictable revenue", why_ar:"أرباح متوقعة", min:20, mode:"launch", prompt:"Build my 21-day launch map: pre-promo, the drop, the push, 72h countdown."},
-   {id:"pulse", t:"Run your Daily Pulse", t_ar:"شغّل نبضك اليومي", why:"The 90-min rhythm compounds", why_ar:"الروتين يركّب النتائج", min:2, mode:"coach", prompt:"Set up my daily 90-minute rhythm and hold me accountable to it."}]},
-];
-const QUIZ = [
- {en:"How many targeted strangers see you each week?", ar:"كم غريباً مستهدفاً يراك أسبوعياً؟", opts:[["Barely any","بالكاد"],["Some","بعض"],["A lot","كثير"]]},
- {en:"Where does your audience live?", ar:"أين يعيش جمهورك؟", opts:[["Scattered","متفرق"],["One quiet group","مجموعة هادئة"],["One active group","مجموعة نشطة"]]},
- {en:"What happens when a new member joins?", ar:"ماذا يحدث عند انضمام عضو؟", opts:[["Nothing","لا شيء"],["Welcome post","ترحيب"],["Quick-win path","مسار فوز"]]},
- {en:"How often do you make an offer?", ar:"كم مرة تقدم عرضاً؟", opts:[["Rarely","نادراً"],["Sometimes","أحياناً"],["Most days","أغلب الأيام"]]},
- {en:"Do you have a written offer doc?", ar:"هل لديك وثيقة عرض؟", opts:[["No","لا"],["Rough","مسودة"],["Structured","منظمة"]]},
- {en:"Your daily 90-minute rhythm?", ar:"روتين 90 دقيقة؟", opts:[["Rarely","نادراً"],["Some days","بعض الأيام"],["Daily","يومياً"]]},
-];
-const CMDS = [
- {en:"Go to Journey", ar:"اذهب إلى الرحلة", run:()=>showView("home")},
- {en:"Go to Business Map", ar:"اذهب إلى خريطة العمل", run:()=>showView("map")},
- {en:"Run Revenue Autopsy", ar:"شغّل تشريح الأرباح", run:()=>showView("autopsy")},
- {en:"Go to 90-Day Sprint", ar:"اذهب إلى السبرنت", run:()=>showView("sprint")},
- {en:"Go to Coach", ar:"اذهب إلى المدرب", run:()=>showView("chat")},
- {en:"Start next step", ar:"ابدأ الخطوة التالية", run:()=>startNext()},
- {en:"Log Daily Pulse", ar:"سجّل النبض اليومي", run:()=>logDay()},
- {en:"Export session", ar:"صدّر الجلسة", run:()=>exportChat()},
- {en:"Unlock tier (Whop key)", ar:"فعّل الخطة (مفتاح Whop)", run:()=>unlockPrompt()},
- {en:"Switch language", ar:"بدّل اللغة", run:()=>setLang(lang==="en"?"ar":"en")},
- {en:"Clear chat", ar:"امسح المحادثة", run:()=>clearChat()},
-];
-let memberId = localStorage.getItem("member_id");
-if(!memberId){ memberId = "m-" + Math.random().toString(36).slice(2,10); localStorage.setItem("member_id", memberId); }
-let tier = localStorage.getItem("tier") || "free";
-let mode = "coach";
-let history = [];
-let habit = {c:false, com:false, conv:false};
-let done = JSON.parse(localStorage.getItem("journey_" + memberId) || "{}");
-let activeTask = null;
-let answers = [null,null,null,null,null,null];
-let palSel = 0, palFiltered = CMDS.slice();
-let auto = JSON.parse(localStorage.getItem("auto_" + memberId) || "null") || {reach:2000, join:2, members:150, offer:5, price:97, close:10};
-let whop = {connected:false, stats:null};
-let docs = [];
-let sprint = JSON.parse(localStorage.getItem("sprint_" + memberId) || "null") || {weeks:Array(12).fill(false)};
-let lastAI = "";
 
-function C(){ return CH[lang]; }
-function T(o,f){ return (lang==="ar" && o[f+"_ar"]) ? o[f+"_ar"] : o[f]; }
-function modeTier(id){ const m = MODES.find(x=>x.id===id); return m ? m.tier : "free"; }
-function money(n){ return (n<0?"-$":"$") + Math.abs(Math.round(n)).toLocaleString("en-US"); }
-function num(n){ return Math.round(n).toLocaleString("en-US"); }
-function escapeHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function toggleSb(){ document.getElementById("shell").classList.toggle("railwide"); }
-function setLang(l){ lang=l; localStorage.setItem("lang",l); document.documentElement.lang=l; document.documentElement.dir=(l==="ar")?"rtl":"ltr"; applyLang(); }
-function applyLang(){
-  const c=C();
-  document.getElementById("ctaBtn").textContent=c.cta;
-  document.getElementById("lbHome").textContent=c.lbHome;
-  document.getElementById("lbMap").textContent=c.lbMap;
-  document.getElementById("lbChat").textContent=c.lbChat;
-  document.getElementById("lbAutopsy").textContent=c.lbAutopsy;
-  document.getElementById("lbSprint").textContent=c.lbSprint;
-  document.getElementById("crumbSec").textContent=c.crumb;
-  document.getElementById("langBtn").textContent=(lang==="ar")?"EN":"ع";
-  document.getElementById("markBtn").textContent=c.mark;
-  document.getElementById("laterBtn").textContent=c.later;
-  document.getElementById("input").placeholder=c.ph;
-  document.getElementById("send").textContent=c.send;
-  document.getElementById("sysTxt").textContent=c.sys;
-  document.getElementById("umTitle").textContent=c.umTitle;
-  document.getElementById("umSub").textContent=c.umSub;
-  renderModes(); renderHome(); renderH(); renderStreak(); renderMap(); renderDocs();
-  if(document.getElementById("autopsyView").style.display!=="none") renderAutopsy();
-  if(document.getElementById("sprintView").style.display!=="none") renderSprint();
-}
-function doneCount(){ return JOURNEY.reduce((a,p)=>a+p.tasks.filter(t=>done[t.id]).length,0); }
-function savedMap(){ return JSON.parse(localStorage.getItem("map_"+memberId) || "null"); }
-function leakName(k){ const c=C(); return {t:c.lTraffic,h:c.lHub,n:c.lNurture,c:c.lConversion}[k]||k; }
-function showView(v){
-  document.getElementById("homeView").style.display=(v==="home")?"block":"none";
-  document.getElementById("mapView").style.display=(v==="map")?"block":"none";
-  document.getElementById("autopsyView").style.display=(v==="autopsy")?"block":"none";
-  document.getElementById("sprintView").style.display=(v==="sprint")?"block":"none";
-  document.getElementById("chatView").style.display=(v==="chat")?"block":"none";
-  document.getElementById("tabHome").classList.toggle("on",v==="home");
-  document.getElementById("tabMap").classList.toggle("on",v==="map");
-  document.getElementById("tabAutopsy").classList.toggle("on",v==="autopsy");
-  document.getElementById("tabSprint").classList.toggle("on",v==="sprint");
-  document.getElementById("tabChat").classList.toggle("on",v==="chat");
-  document.getElementById("doneBar").style.display="none";
-  document.getElementById("ctaBtn").className=(v==="home")?"btn-gold":"btn-ghost";
-  document.getElementById("crumbSec").textContent=(v==="home")?CH[lang].crumb:(v==="map")?CH[lang].lbMap:(v==="autopsy")?CH[lang].lbAutopsy:(v==="sprint")?CH[lang].lbSprint:CH[lang].lbChat;
-  if(v==="home") renderHome();
-  if(v==="map") renderMap();
-  if(v==="autopsy") renderAutopsy();
-  if(v==="sprint") renderSprint();
-  if(v==="chat"){ updateDoneBar(); renderChatEmpty(); }
-}
-function startNext(){ const n=nextTask(); if(n) startTaskById(n.id); else showView("chat"); }
-function findTask(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return t; return null; }
-function phaseOf(id){ for(const p of JOURNEY) for(const t of p.tasks) if(t.id===id) return p; return null; }
-function nextTask(){ for(const p of JOURNEY) for(const t of p.tasks) if(!done[t.id]) return t; return null; }
-function startTaskById(id){
-  const t=findTask(id); if(!t) return;
-  if(RANK[tier]<RANK[modeTier(t.mode)]){ showView("chat"); addMsg("Locked: "+T(t,"t")+" is a "+modeTier(t.mode).toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); unlockPrompt(); return; }
-  mode=t.mode; renderModes(); showView("chat"); activeTask=id;
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value=t.prompt; send();
-}
-function updateDoneBar(){
-  const bar=document.getElementById("doneBar");
-  if(activeTask && !done[activeTask]){ const t=findTask(activeTask); document.getElementById("doneTxt").textContent=(lang==="ar"?"انتهيت من ":"Finished ")+T(t,"t")+"?"; bar.style.display="flex"; }
-  else bar.style.display="none";
-}
-function hideDoneBar(){ document.getElementById("doneBar").style.display="none"; }
-function markDone(){ if(activeTask) completeTask(activeTask); hideDoneBar(); }
-function completeTask(id){
-  if(done[id]) return;
-  done[id]=true; localStorage.setItem("journey_"+memberId, JSON.stringify(done));
-  const p=phaseOf(id); const pd=p&&p.tasks.every(t=>done[t.id]);
-  if(pd){ toast(C().toastPhase+T(p,"name")); confetti(40); } else { toast(C().toastStep); confetti(18); }
-  renderHome(); renderH(); renderStreak(); updateDoneBar();
-}
-function toggleDone(id){ if(done[id]){ done[id]=false; localStorage.setItem("journey_"+memberId,JSON.stringify(done)); renderHome(); } else completeTask(id); }
-function toast(m,ok){ const t=document.getElementById("toast"); t.textContent=m; t.style.borderLeftColor=(ok===false)?"var(--error)":"var(--success)"; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),4000); }
-function confetti(n){ const cols=["#F5A623","#D48C1A","#FFE0B0","#00E599"]; for(let i=0;i<n;i++){ const c=document.createElement("div"); c.className="confetti"; c.style.left=Math.random()*100+"vw"; c.style.background=cols[Math.floor(Math.random()*cols.length)]; c.style.animationDelay=(Math.random()*0.4)+"s"; document.body.appendChild(c); setTimeout(()=>c.remove(),2000);} }
-function openPal(){ palFiltered=CMDS.slice(); palSel=0; document.getElementById("pal").style.display="block"; const i=document.getElementById("palIn"); i.value=""; renderPal(""); i.focus(); }
-function closePal(){ document.getElementById("pal").style.display="none"; }
-function renderPal(q){
-  q=(q||"").toLowerCase();
-  palFiltered=CMDS.filter(c=>c.en.toLowerCase().includes(q)||c.ar.includes(q));
-  if(palSel>=palFiltered.length) palSel=0;
-  document.getElementById("palList").innerHTML = palFiltered.map((c,i)=>'<div class="palitem'+(i===palSel?' sel':'')+'" onmousedown="event.preventDefault();palRun('+i+')">'+(lang==="ar"?c.ar:c.en)+'</div>').join("") || '<div class="palitem" style="opacity:.5">No matches</div>';
-}
-function palRun(i){ const c=palFiltered[i]; if(c){ closePal(); c.run(); } }
-function unlockPrompt(){ openUnlockModal(); }
-function openUnlockModal(){ document.getElementById("unlockModal").style.display="flex"; document.getElementById("umErr").style.display="none"; const i=document.getElementById("umKey"); i.value=""; setTimeout(()=>i.focus(),50); }
-function closeUnlockModal(){ document.getElementById("unlockModal").style.display="none"; }
-async function unlockFromModal(){
-  const k=(document.getElementById("umKey").value||"").trim(); if(!k) return;
-  const err=document.getElementById("umErr");
-  try{
-    const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:k})});
-    const d=await r.json();
-    if(!r.ok) throw new Error(d.detail||"invalid license");
-    tier=d.tier; localStorage.setItem("tier",tier);
-    closeUnlockModal(); renderModes(); renderHome();
-    toast("Unlocked: "+tier.toUpperCase()+" plan",true);
-    addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
-  }catch(e){ err.textContent=String(e.message); err.style.display="block"; }
-}
-async function unlock(){
-  const key=(document.getElementById("lic").value||"").trim(); if(!key) return;
-  try{
-    const r=await fetch(API_URL+"/api/unlock",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,license_key:key})});
-    const d=await r.json(); if(!r.ok) throw new Error(d.detail||"invalid license");
-    tier=d.tier; localStorage.setItem("tier",tier); renderModes(); renderHome();
-    toast("Unlocked: "+tier.toUpperCase()+" plan",true);
-    addMsg("Unlocked: "+tier.toUpperCase()+" plan. All "+tier+" modes are open.","ai");
-  }catch(e){ toast("Unlock failed: "+e.message,false); addMsg("Unlock failed: "+e.message,"ai"); }
-}
-function renderHome(){
-  const c=C(); const total=JOURNEY.reduce((a,p)=>a+p.tasks.length,0); const dc=doneCount(); const sm=savedMap(); const next=nextTask();
-  let h='<div class="hero"><div class="hgrid"></div><div class="aur a1"></div><div class="aur a2"></div><div class="hrow"><div><div class="eyebrow"><i></i>INCOME ENGINE · CCC V17</div><h1>'+(lang==="ar"?"محرك مجتمعك، <span>مُدار بالكامل.</span>":"Your community engine, <span>fully orchestrated.</span>")+'</h1><p class="hsub">'+(lang==="ar"?"11 وضعاً. 11 خطوة. سبرنت 90 يوماً. مسار واحد من التشخيص إلى الإطلاق.":"11 modes. 11 steps. A 90-day sprint. One straight line from diagnosis to launch.")+'</p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-goldline" onclick="startNext()">'+c.cta+'</button><button class="btn-ghost" onclick="showView(\'map\')">'+c.lbMap+'</button><button class="btn-ghost" onclick="showView(\'autopsy\')">'+c.lbAutopsy+'</button><button class="btn-ghost" onclick="showView(\'sprint\')">'+c.lbSprint+'</button></div></div><div class="kpis"><div class="kpi"><small>'+c.momentum+'</small><div class="num '+(sm?'':'mut')+'">'+(sm?sm.mom:"--")+'</div></div><div class="kpi"><small>'+c.streak+'</small><div class="num '+(calcStreak()>0?'gr':'mut')+'" id="streak">0d</div></div><div class="kpi"><small>'+c.kpiSteps+'</small><div class="num cy">'+dc+'/'+total+'</div></div><div class="kpi"><small>'+c.tier+'</small><div class="num" id="tierBadge">FREE</div></div></div></div><div class="ticker" aria-hidden="true"><div class="tk">'+tickerHTML()+'</div></div></div>';
-  h+='<div class="minibar" id="minibar"><span class="mono" style="color:var(--gold);font-weight:700">IE</span>'+JOURNEY.map((p,i)=>{const pd=p.tasks.filter(t=>done[t.id]).length;const on=pd===p.tasks.length||(next&&p.tasks.some(t=>t.id===next.id));return '<span class="mstep'+(on?' on':'')+'">0'+(i+1)+' '+T(p,"name")+'</span>';}).join('')+'<span class="mstep" style="margin-left:auto">'+dc+'/'+total+'</span></div>';
-  h+='<div class="stickybar" id="pipebar"><div class="shead" style="margin-bottom:10px"><h3>'+c.pipe+'</h3><small>'+c.prog+' · <span class="mono">'+dc+'/'+total+'</span></small></div><div class="steps">';
-  JOURNEY.forEach((p,i)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const st=pd===p.tasks.length?"done":(next&&p.tasks.some(t=>t.id===next.id)?"active":""); h+='<div class="step '+st+'"><span class="n">'+(pd===p.tasks.length?"✓":"0"+(i+1))+'</span><span class="t">'+T(p,"name")+'</span></div>'; if(i<JOURNEY.length-1) h+='<div class="swire"></div>'; });
-  h+='</div></div>';
-  if(next){ h+='<div class="section"><div class="spot"><div class="ey">'+c.next+'</div><h2>'+T(next,"t")+'</h2><p>'+T(next,"why")+' · <span class="mono">~'+next.min+' min</span></p></div></div>'; }
-  h+='<div class="section"><div class="grid2"><div style="display:grid;gap:16px"><div class="card" id="funnelCard">'+funnelHTML(sm)+'</div><div class="card" id="whopCard"></div></div><div style="display:grid;gap:16px"><div class="card" id="pulseCard">'+pulseHTML()+'</div><div class="card" id="planCard">'+planHTML()+'</div><div class="card" id="docsCard"></div></div></div></div>';
-  JOURNEY.forEach((p,pi)=>{ const pd=p.tasks.filter(t=>done[t.id]).length; const complete=pd===p.tasks.length;
-    h+='<div class="section" style="margin-top:8px"><div class="shead"><h3><span class="mono" style="color:var(--text-muted)">0'+(pi+1)+'</span> · '+T(p,"name")+(complete?' <span class="pill ok">'+c.complete+'</span>':'')+'</h3><small class="mono">'+pd+'/'+p.tasks.length+'</small></div>';
-    p.tasks.forEach((t,ti)=>{ const isD=!!done[t.id]; const locked=RANK[tier]<RANK[modeTier(t.mode)]; const isNext=next&&next.id===t.id;
-      h+='<div class="task'+(isD?" done":"")+(isNext?" next":"")+'" style="animation-delay:'+(ti*0.05)+'s"><button class="check" onclick="toggleDone(\''+t.id+'\')">'+(isD?"✓":"")+'</button><div class="tb"><b>'+T(t,"t")+'</b><small>'+T(t,"why")+' · <span class="mono">~'+t.min+'m</span></small></div>'+(locked?'<span class="pill warn">'+modeTier(t.mode).toUpperCase()+'</span>':'')+'<button class="startbtn'+(isNext?' hot':'')+'" onclick="startTaskById(\''+t.id+'\')">'+(locked?"LOCK":(isD?c.redo:c.start))+'</button></div>'; });
-    h+='</div>'; });
-  document.getElementById("homeView").innerHTML=h;
-  renderWhop(); renderDocs(); renderStreak();
-  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); },80); });
-}
-function tickerHTML(){
-  const sm=savedMap(); const n=nextTask();
-  const items=["API ONLINE","VAULT LOADED",whop.connected?"WHOP LIVE":"WHOP PENDING","MEM "+memberId.slice(2,8).toUpperCase(),"STREAK "+calcStreak()+"D","JOURNEY "+doneCount()+"/11",sm?("MOMENTUM "+sm.mom+"/100"):"MAP PENDING","TIER "+tier.toUpperCase(),n?("NEXT: "+T(n,"t").toUpperCase()):"ALL STEPS DONE"];
-  const row=items.map(i=>"<span>◆ "+i+"</span>").join("");
-  return row+row;
-}
-function funnelHTML(sm){
-  const c=C(); let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.funnel+'</h3><span class="pill ok">LIVE</span></div>';
-  if(!sm){ h+='<div style="text-align:center;padding:20px 0"><div class="mono" style="color:var(--text-muted);font-size:20px;margin-bottom:8px">◇</div><p style="font-size:12px;margin-bottom:12px">'+c.noMap+'</p><button class="btn-goldline" onclick="showView(\'map\')">'+c.buildCta+'</button></div>'; return h; }
-  const W=[22,55,95]; const col=s=>["var(--error)","var(--warning)","var(--success)"][s];
-  [[c.lTraffic,sm.t],[c.lHub,sm.h],[c.lNurture,sm.n],[c.lConversion,sm.c]].forEach(x=>{
-    h+='<div class="mrow"><div class="mt"><span>'+x[0]+'</span><span class="mono">'+x[1]+'/2</span></div><div class="mtrack"><div class="mfill" data-w="'+W[x[1]]+'" style="background:'+col(x[1])+'"></div></div></div>'; });
-  return h;
-}
-function pulseHTML(){
-  const c=C();
-  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.pulse+'</h3><span class="dot dotring"></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="opt" id="hC" onclick="toggleH(\'c\')">Content</button><button class="opt" id="hCom" onclick="toggleH(\'com\')">Community</button><button class="opt" id="hConv" onclick="toggleH(\'conv\')">Convos</button></div><button class="btn-ghost" style="width:100%" id="logBtn" onclick="logDay()">'+c.log+'</button>';
-}
-function planHTML(){
-  const c=C();
-  return '<div class="shead" style="margin-bottom:12px"><h3>'+c.plan+'</h3><span class="pill ok" id="memBadge">MEM</span></div><input id="lic" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.lic+'"><button class="btn-ghost" style="width:100%" onclick="unlock()">'+c.unlock+'</button>';
-}
-async function loadWhop(){
-  try{
-    const r=await fetch(API_URL+"/api/whop/stats?member_id="+encodeURIComponent(memberId));
-    const d=await r.json();
-    whop.connected=!!d.connected; whop.stats=d.stats||null;
-  }catch(e){ whop.connected=false; }
-  renderWhop();
-}
-function renderWhop(){
-  const c=C(); const el=document.getElementById("whopCard"); if(!el) return;
-  let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.whopTitle+'</h3>'+(whop.connected?'<span class="pill ok">LIVE</span>':'<span class="pill warn">OFF</span>')+'</div>';
-  if(!whop.connected){
-    h+='<p style="font-size:12px;margin-bottom:10px">'+c.whopSub+'</p><input id="wkey" style="width:100%;padding:9px 12px;margin-bottom:10px" placeholder="'+c.whopKeyPh+'"><button class="btn-goldline" style="width:100%" onclick="connectWhop()">'+c.connect+'</button>';
-  } else {
-    const s=whop.stats||{};
-    h+='<div class="wstats"><div class="wstat"><small>'+c.members+'</small><div class="num">'+num(s.members||0)+'</div></div><div class="wstat"><small>'+c.joins7+'</small><div class="num cy">'+num(s.joins7||0)+'</div></div><div class="wstat"><small>'+c.rev30+'</small><div class="num gr">$'+num(s.rev30||0)+'</div></div><div class="wstat"><small>'+c.orders30+'</small><div class="num">'+num(s.orders30||0)+'</div></div></div>';
-    h+='<div style="display:flex;gap:8px"><button class="btn-gold" style="flex:1" onclick="sendWhopToCoach()">'+c.sendWhop+'</button><button class="btn-ghost" onclick="disconnectWhop()">'+c.disconnect+'</button></div>';
-  }
-  el.innerHTML=h;
-}
-async function connectWhop(){
-  const el=document.getElementById("wkey"); const k=el?el.value.trim():""; if(!k) return;
-  try{
-    const r=await fetch(API_URL+"/api/connect/whop",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,key:k})});
-    const d=await r.json();
-    if(!r.ok) throw new Error(d.detail||"failed");
-    whop.connected=true; whop.stats=d.stats||null;
-    toast(C().connected,true); renderWhop();
-  }catch(e){
-    toast(String(e.message).indexOf("locked")>-1?C().whopLocked:e.message,false);
-  }
-}
-async function disconnectWhop(){
-  try{ await fetch(API_URL+"/api/connect/whop/disconnect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId})}); }catch(e){}
-  whop.connected=false; whop.stats=null;
-  toast(C().disconnected,true); renderWhop();
-}
-function sendWhopToCoach(){
-  const s=whop.stats||{};
-  mode="xray"; renderModes(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value="LIVE WHOP NUMBERS - members "+(s.members||0)+" | joins last 7d "+(s.joins7||0)+" | revenue 30d $"+(s.rev30||0)+" | orders 30d "+(s.orders30||0)+". Audit my real funnel and tell me the single biggest lever. Update my memory with these live numbers.";
-  send();
-}
-async function loadDocs(){
-  try{ const r=await fetch(API_URL+"/api/docs?member_id="+encodeURIComponent(memberId)); const d=await r.json(); docs=d.docs||[]; }catch(e){ docs=[]; }
-  renderDocs();
-}
-function renderDocs(){
-  const el=document.getElementById("docsCard"); if(!el) return;
-  const c=C();
-  let h='<div class="shead" style="margin-bottom:12px"><h3>'+c.docsTitle+'</h3><span class="pill ok">'+docs.length+'</span></div>';
-  h+='<p style="font-size:12px;margin-bottom:10px">'+c.docsSub+'</p>';
-  h+='<input type="file" id="docfile" accept=".txt,.md,.markdown,.csv,.json,.html" style="width:100%;margin-bottom:8px;color:var(--text-secondary)" onchange="readDocFile(this)">';
-  h+='<textarea id="docpaste" style="width:100%;height:70px;padding:9px 12px;margin-bottom:8px" placeholder="'+c.docsPastePh+'"></textarea>';
-  h+='<button class="btn-goldline" style="width:100%" onclick="saveDoc()">'+c.docsSave+'</button>';
-  if(docs.length){ h+='<div style="margin-top:10px">'; docs.forEach(d=>{ const t=String(d.title).replace(/'/g,""); h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px"><span class="mono" style="color:var(--text-secondary)">'+escapeHtml(d.title)+'</span><button class="btn-ghost" style="padding:3px 8px;font-size:10px" onclick="delDoc(\''+t+'\')">✕</button></div>'; }); h+='</div>'; }
-  el.innerHTML=h;
-}
-function readDocFile(inp){
-  const f=inp.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{ const p=document.getElementById("docpaste"); if(p) p.value=String(r.result).slice(0,20000); };
-  r.readAsText(f);
-}
-async function saveDoc(){
-  const p=document.getElementById("docpaste"); const body=p?p.value.trim():""; if(!body) return;
-  const f=document.getElementById("docfile");
-  const title=(f&&f.files[0]?f.files[0].name:"pasted-note");
-  try{
-    const r=await fetch(API_URL+"/api/docs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,title:title,body:body.slice(0,20000)})});
-    if(!r.ok) throw new Error(((await r.json()).detail)||"failed");
-    toast(C().docsSaved,true);
-    if(p) p.value=""; loadDocs();
-  }catch(e){ toast(String(e.message),false); }
-}
-async function delDoc(title){
-  try{ await fetch(API_URL+"/api/docs",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,title:title})}); }catch(e){}
-  loadDocs();
-}
-function ans(qi,oi){ answers[qi]=oi; renderMap(); }
-function buildMap(){
-  if(answers.some(a=>a===null)){ toast(C().answerAll,false); return; }
-  const t=answers[0],h=answers[1],n=answers[2],cc=Math.round((answers[3]+answers[4])/2),r=answers[5];
-  const mom=Math.round(((t+h+n+cc)/8)*80+(r/2)*20);
-  const layers={t:t,h:h,n:n,c:cc};
-  const leak=Object.keys(layers).reduce((a,b)=>layers[a]<=layers[b]?a:b);
-  localStorage.setItem("map_"+memberId, JSON.stringify({t,h,n,c:cc,mom,leak}));
-  confetti(18); renderMap(); renderHome();
-}
-function retakeMap(){ localStorage.removeItem("map_"+memberId); answers=[null,null,null,null,null,null]; renderMap(); }
-function sendMapToCoach(){
-  const sm=savedMap(); if(!sm) return;
-  mode="xray"; renderModes(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value="BUSINESS MAP RESULT - Momentum "+sm.mom+"/100 | Traffic "+sm.t+"/2 | Hub "+sm.h+"/2 | Nurture "+sm.n+"/2 | Conversion "+sm.c+"/2 | Biggest leak: "+leakName(sm.leak)+". Use this as my full picture and start coaching from the leak. Update my memory with these scores.";
-  send();
-}
-function renderMap(){
-  const c=C(); const sm=savedMap(); let h='<div class="mapwrap"><div class="eyebrow"><i></i>02 · BUSINESS MAP</div><h1 style="font-size:24px">'+c.mapTitle+'</h1><p class="hsub">'+c.mapSub+'</p>';
-  if(!sm){
-    h+='<div class="quizgrid">';
-    QUIZ.forEach((q,qi)=>{ h+='<div class="card" style="padding:16px 20px"><b style="font-size:13px;color:var(--text-primary)"><span class="mono" style="color:var(--text-muted)">0'+(qi+1)+'</span> '+(lang==="ar"?q.ar:q.en)+'</b><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'; q.opts.forEach((o,oi)=>{ h+='<button class="opt'+(answers[qi]===oi?" on":"")+'" onclick="ans('+qi+','+oi+')">'+(lang==="ar"?o[1]:o[0])+'</button>'; }); h+='</div></div>'; });
-    h+='</div>';
-    const n=answers.filter(a=>a!==null).length; const complete=n===QUIZ.length;
-    h+='<div class="mapcta"><span class="mapcount">'+n+'/'+QUIZ.length+c.answered+'</span><button class="btn-gold" '+(complete?'':'disabled title="'+c.answerAll+'"')+' onclick="buildMap()">'+c.buildMap+'</button></div>';
-  } else {
-    const W=[22,55,95]; const col=s=>["var(--error)","var(--warning)","var(--success)"][s];
-    h+='<div class="grid2"><div class="card" style="display:flex;align-items:center;justify-content:center"><div style="position:relative"><svg width="140" height="140"><circle cx="70" cy="70" r="58" class="ringbg"/><circle cx="70" cy="70" r="58" class="ringfg" id="ring" style="stroke-dasharray:364.4;stroke-dashoffset:364.4"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="mono" style="font-size:28px;font-weight:700;color:var(--gold)">'+sm.mom+'</span><span class="mono" style="font-size:10px;color:var(--text-muted)">/100</span></div></div></div><div class="card">';
-    [[c.lTraffic,sm.t],[c.lHub,sm.h],[c.lNurture,sm.n],[c.lConversion,sm.c]].forEach(x=>{ h+='<div class="mrow"><div class="mt"><span>'+x[0]+'</span><span class="mono">'+x[1]+'/2</span></div><div class="mtrack"><div class="mfill" data-w="'+W[x[1]]+'" style="background:'+col(x[1])+'"></div></div></div>'; });
-    h+='</div></div><div class="leak">◆ '+c.bigLeak+': <b>'+leakName(sm.leak)+'</b> — '+(lang==="ar"?"ابدأ الإصلاح من هنا.":"start fixing here.")+'</div><div style="display:flex;gap:10px"><button class="btn-ghost" onclick="retakeMap()">'+c.retake+'</button><button class="btn-gold" onclick="sendMapToCoach()">'+c.sendCoach+'</button></div>';
-  }
-  h+='</div>';
-  document.getElementById("mapView").innerHTML=h;
-  if(sm) requestAnimationFrame(()=>{ setTimeout(()=>{ document.querySelectorAll(".mfill").forEach(b=>{ if(b.dataset.w) b.style.width=b.dataset.w+"%"; }); const r=document.getElementById("ring"); if(r) r.style.strokeDashoffset=(364.4*(1-sm.mom/100)).toFixed(1); },80); });
-}
-function setAuto(k,v){ auto[k]=+v; localStorage.setItem("auto_"+memberId, JSON.stringify(auto)); computeAutopsy(); }
-function renderAutopsy(){
-  const c=C();
-  let h='<div class="mapwrap"><div class="eyebrow"><i></i>'+c.autoEyebrow+'</div><h1 style="font-size:24px">'+c.autoTitle+'</h1><p class="hsub">'+c.autoSub+'</p>';
-  h+='<div class="autogrid"><div class="card">';
-  h+=sliderHTML("reach",c.sReach,100,50000,100,auto.reach,num(auto.reach));
-  h+=sliderHTML("join",c.sJoin,0.5,10,0.5,auto.join,auto.join+"%");
-  h+=sliderHTML("members",c.sMembers,0,5000,10,auto.members,num(auto.members));
-  h+=sliderHTML("offer",c.sOffer,0,60,1,auto.offer,auto.offer+"%");
-  h+=sliderHTML("price",c.sPrice,10,2000,10,auto.price,"$"+auto.price);
-  h+=sliderHTML("close",c.sClose,1,50,1,auto.close,auto.close+"%");
-  h+='</div><div style="display:grid;gap:16px">';
-  h+='<div class="card"><div class="shead" style="margin-bottom:8px"><h3>'+c.rCurrent+'</h3></div><div id="aCur" style="font:600 26px var(--font-mono);color:var(--text-muted)">$0</div></div>';
-  h+='<div class="card" style="border-color:var(--border-active)"><div class="shead" style="margin-bottom:8px"><h3>'+c.rFixed+'</h3></div><div id="aFix" style="font:600 26px var(--font-mono);color:var(--gold)">$0</div></div>';
-  h+='<div class="card"><div class="shead" style="margin-bottom:8px"><h3>'+c.rDelta+'</h3><span class="pill ok" id="aPct">+0%</span></div><div class="bigdelta" id="aDelta">$0</div>';
-  h+='<div style="margin-top:14px"><button class="btn-gold" style="width:100%" onclick="sendAutopsyToCoach()">'+c.sendAutopsy+'</button></div></div>';
-  h+='</div></div></div>';
-  document.getElementById("autopsyView").innerHTML=h;
-  computeAutopsy();
-}
-function sliderHTML(k,label,min,max,step,val,disp){
-  return '<div class="slider"><div class="mt"><span>'+label+'</span><span class="mono" id="v_'+k+'">'+disp+'</span></div><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'" oninput="setAuto(\''+k+'\',this.value)" aria-label="'+label+'"></div>';
-}
-function computeCur90(){ return auto.members*(auto.offer/100)*(auto.close/100)*auto.price*3; }
-function computeFix90(){ const m90F=auto.members+(auto.reach*1.5)*(auto.join/100)*13*1.2; return m90F*(Math.min(auto.offer*2,60)/100)*(Math.min(auto.close*1.5,60)/100)*auto.price*3; }
-function computeAutopsy(){
-  const cur90=computeCur90(), fix90=computeFix90();
-  const delta=fix90-cur90;
-  const pct=cur90>0?Math.round(delta/cur90*100):(fix90>0?100:0);
-  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
-  set("v_reach",num(auto.reach)); set("v_join",auto.join+"%"); set("v_members",num(auto.members));
-  set("v_offer",auto.offer+"%"); set("v_price","$"+num(auto.price)); set("v_close",auto.close+"%");
-  set("aCur",money(cur90)); set("aFix",money(fix90));
-  set("aDelta",(delta>=0?"+":"")+money(delta));
-  set("aPct","+"+num(Math.min(Math.max(pct,0),999))+"%");
-}
-function sendAutopsyToCoach(){
-  mode="xray"; renderModes(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value="REVENUE AUTOPSY - reach "+auto.reach+"/wk | join "+auto.join+"% | members "+auto.members+" | offered "+auto.offer+"%/mo | price $"+auto.price+" | close "+auto.close+"%. Current 90d "+money(computeCur90())+" vs fixed "+money(computeFix90())+". Coach me on the single biggest lever first. Update my memory with these numbers.";
-  send();
-}
-/* ---------- 90-DAY SPRINT ---------- */
-function renderSprint(){
-  const c=C();
-  const doneW=sprint.weeks.filter(Boolean).length;
-  let h='<div class="mapwrap"><div class="eyebrow"><i></i>05 · '+c.lbSprint.toUpperCase()+'</div><h1 style="font-size:24px">'+c.sprintTitle+'</h1><p class="hsub">'+c.sprintSub+'</p>';
-  h+='<div class="autogrid"><div class="card"><div class="shead" style="margin-bottom:10px"><h3>'+c.genSprint+'</h3></div><p style="font-size:12px;margin-bottom:12px">'+c.sprintHint+'</p><button class="btn-gold" style="width:100%" onclick="genSprint()">'+c.genSprint+'</button><button class="btn-goldline" style="width:100%;margin-top:8px" onclick="saveSprintDoc()">'+c.saveSprint+'</button></div>';
-  h+='<div class="card"><div class="shead" style="margin-bottom:10px"><h3>'+c.weeksLabel+'</h3><span class="mono" style="color:var(--text-secondary)">'+doneW+'/12</span></div><div class="mtrack"><div class="mfill" style="width:'+Math.round(doneW/12*100)+'%"></div></div><div class="weeks">';
-  for(let i=0;i<12;i++){ h+='<button class="wk'+(sprint.weeks[i]?' on':'')+'" onclick="toggleWeek('+i+')">W'+(i+1)+'</button>'; }
-  h+='</div></div></div></div>';
-  document.getElementById("sprintView").innerHTML=h;
-}
-function toggleWeek(i){ sprint.weeks[i]=!sprint.weeks[i]; localStorage.setItem("sprint_"+memberId,JSON.stringify(sprint)); renderSprint(); }
-function genSprint(){
-  mode="coach"; renderModes(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value="Build my 90-day sprint plan in 3 phases (Days 1-30 Foundation, 31-60 Attention, 61-90 Conversion). Use my Business Map, my uploaded docs (including any Time-to-Build material), and give me exactly 3 priorities per phase with one measurable target each. End with the single first action for this week.";
-  send();
-}
-function saveSprintDoc(){
-  if(!lastAI){ toast("Ask the coach to build your sprint first.",false); return; }
-  fetch(API_URL+"/api/docs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({member_id:memberId,title:"90day-sprint-plan.txt",body:lastAI.slice(0,20000)})})
-  .then(r=>{ if(!r.ok) throw new Error("failed"); toast(C().sprintSaved,true); })
-  .catch(e=>toast(String(e.message),false));
-}
-function renderModes(){
-  const box=document.getElementById("modes"); box.innerHTML="";
-  MODES.forEach((m,i)=>{ const locked=RANK[tier]<RANK[m.tier];
-    const b=document.createElement("button"); b.className="mchip"+(m.id===mode?" on":"");
-    b.innerHTML='<span class="mi">0'+(i+1)+'</span>'+T(m,"t")+(locked?' <span class="pill warn">'+m.tier.toUpperCase()+'</span>':'');
-    b.onclick=()=>{ if(locked){ showView("chat"); addMsg("Locked: "+T(m,"t")+" is a "+m.tier.toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); return; } mode=m.id; renderModes(); addMsg((lang==="ar"?"تم التبديل إلى ":"Switched to ")+T(m,"t")+".","ai"); };
-    box.appendChild(b); });
-  const tb=document.getElementById("tierBadge"); if(tb) tb.textContent=tier.toUpperCase();
-  const mb=document.getElementById("memBadge"); if(mb) mb.textContent="MEM "+memberId.slice(2,6).toUpperCase();
-}
-function renderChatEmpty(){
-  const c=document.getElementById("chat");
-  const old=document.getElementById("qwrap"); if(old) old.remove();
-  if(history.length>0) return;
-  const chips=[["xray","Audit My Business","Run my Business X-Ray. Interview me one question at a time, then give me my audit and the single first fix."],["community","Build My Community","Help me set up the MVC 6 non-negotiables for my group. Ask me what I have first."],["dm","Write Converting DMs","Teach me the Hand-Raiser flow and write my first DM script for my niche."],["offer","Build My Offer","Interview me and build my 14-block Offer Doc, one section at a time."],["hack","Hack a Funnel","Paste a competitor funnel (ads, hooks, lead magnet, offer, close). Reverse-engineer it stage by stage and rebuild it for my niche."]];
-  const w=document.createElement("div"); w.id="qwrap"; w.style.cssText="display:flex;gap:8px;flex-wrap:wrap;";
-  chips.forEach(ch=>{ const b=document.createElement("button"); b.className="opt"; b.textContent=ch[1];
-    b.onclick=()=>{ w.remove(); if(RANK[tier]<RANK[modeTier(ch[0])]){ addMsg("Locked: "+ch[1]+" is a "+modeTier(ch[0]).toUpperCase()+" tier mode. Paste your Whop license key to unlock.","ai"); unlockPrompt(); return; } mode=ch[0]; renderModes(); document.getElementById("input").value=ch[2]; send(); };
-    w.appendChild(b); });
-  c.appendChild(w);
-}
-function fmt(text){
-  let s=String(text).replace(/\[{1,2}\s*MEMORY\s*\]{1,2}[\s\S]*?(?:\[{1,2}\s*\/\s*MEMORY\s*\]{1,2}|$)/g,"");
-  s=s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  s=s.replace(/```([\s\S]*?)```/g,function(m,c){return "<pre>"+c+"</pre>";});
-  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-  s=s.replace(/^###?\s?(.+)$/gm,"<span class='h'>$1</span>");
-  s=s.replace(/^[-*]\s+(.+)$/gm,"<span class='li'>• $1</span>");
-  return s;
-}
-function showTyping(){ const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="typing"; d.id="typing"; d.innerHTML="<span></span><span></span><span></span>"; c.appendChild(d); c.scrollTop=c.scrollHeight; }
-function hideTyping(){ const t=document.getElementById("typing"); if(t) t.remove(); }
-function addMsg(text,who){
-  const c=document.getElementById("chat"); const d=document.createElement("div"); d.className="msg "+who;
-  const s=document.createElement("span"); if(who==="ai") s.innerHTML=fmt(text); else s.textContent=text; d.appendChild(s);
-  if(who==="ai"){ const b=document.createElement("button"); b.className="speak"; b.textContent="▶ VOX"; b.setAttribute("aria-label","Play voice"); b.onclick=()=>speak(text); d.appendChild(b); }
-  c.appendChild(d); c.scrollTop=c.scrollHeight;
-}
-function speak(text){
-  fetch(API_URL+"/api/tts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:text.slice(0,600),member_id:memberId})})
-  .then(r=>{ if(!r.ok) throw new Error("TTS "+r.status); return r.blob(); })
-  .then(b=>{ const a=new Audio(URL.createObjectURL(b)); a.play(); })
-  .catch(e=>addMsg("Voice failed: "+e.message+". Retry.","ai"));
-}
-function exportChat(){
-  const lines=[]; document.querySelectorAll("#chat .msg").forEach(m=>{ lines.push((m.classList.contains("user")?"YOU:\n":"COACH:\n")+m.querySelector("span").textContent); });
-  const b=new Blob([lines.join("\n\n")],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="income-engine-session.txt"; a.click();
-}
-function ctxString(){ return localStorage.getItem("ctx_"+memberId)||""; }
-async function send(){
-  const inp=document.getElementById("input"); const text=inp.value.trim(); if(!text) return;
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  addMsg(text,"user"); history.push({role:"user",content:text}); inp.value=""; showTyping();
-  const wire=(lang==="ar")?("[Respond fully in Arabic] "+text):text;
-  try{
-    const r=await fetch(API_URL+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:wire,history:history.slice(-16),mode:mode,member_id:memberId,member_context:ctxString()})});
-    hideTyping();
-    if(r.status===403){ addMsg("Locked for your tier. Unlock with your Whop license key.","ai"); return; }
-    if(r.status===429){ addMsg("Rate limit reached. Retry in a few minutes.","ai"); return; }
-    const d=await r.json(); const reply=d.reply||d.response||d.message||"Error.";
-    lastAI=reply;
-    addMsg(reply,"ai"); history.push({role:"assistant",content:reply}); updateDoneBar();
-  }catch(e){ hideTyping(); addMsg("Connection error: "+e.message+". Retry.","ai"); }
-}
-async function loadTier(){ try{ const r=await fetch(API_URL+"/api/tier?member_id="+encodeURIComponent(memberId)); const d=await r.json(); if(d.tier){ tier=d.tier; localStorage.setItem("tier",tier);} }catch(e){} renderModes(); }
-function toggleH(k){ habit[k]=!habit[k]; renderH(); }
-function renderH(){ const a=document.getElementById("hC"),b=document.getElementById("hCom"),c=document.getElementById("hConv"); if(a){a.classList.toggle("on",habit.c);} if(b){b.classList.toggle("on",habit.com);} if(c){c.classList.toggle("on",habit.conv);} }
-function dayKey(d){ return d.toISOString().slice(0,10); }
-function calcStreak(){ const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); let s=0; const d=new Date(); if(!log[dayKey(d)]) d.setDate(d.getDate()-1); while(log[dayKey(d)]){s++;d.setDate(d.getDate()-1);} return s; }
-function renderStreak(){ const el=document.getElementById("streak"); if(el) el.textContent=calcStreak()+"d"; }
-function logDay(){
-  const log=JSON.parse(localStorage.getItem("habit_log")||"{}"); log[dayKey(new Date())]={c:habit.c,com:habit.com,conv:habit.conv}; localStorage.setItem("habit_log",JSON.stringify(log));
-  const s=calcStreak();
-  const msg="DAILY CHECK-IN - Content: "+(habit.c?"YES":"NO")+" | Community: "+(habit.com?"YES":"NO")+" | Conversations: "+(habit.conv?"YES":"NO")+" | Streak: "+s+" days. Act as my accountability coach: celebrate what I did, call out what I skipped with empathy, and give me ONE focus for tomorrow. Update my memory with this check-in and streak.";
-  habit={c:false,com:false,conv:false}; renderH(); showView("chat");
-  const q=document.getElementById("qwrap"); if(q) q.remove();
-  document.getElementById("input").value=msg; send();
-}
-function clearChat(){
-  const n=document.querySelectorAll("#chat .msg").length;
-  if(!confirm("Clear this session? "+n+" messages will be removed.")) return;
-  history=[]; document.getElementById("chat").innerHTML=""; addMsg(lang==="ar"?"تم المسح. على ماذا نعمل؟":"Chat cleared. What are we working on?","ai"); renderChatEmpty();
-}
-const TOUR=[
- {view:"home", sel:"#homeView", en:"Mission Control: your journey, momentum and critical path. Numbers first, prose second.", ar:"غرفة القيادة: رحلتك وزخمك ومسارك الحرج. الأرقام أولاً."},
- {view:"home", sel:"#docsCard", en:"Business Docs: upload your files once - the coach reads them before every answer.", ar:"ملفات عملك: ارفعها مرة ويقرؤها المدرب قبل كل إجابة."},
- {view:"sprint", sel:"#sprintView", en:"90-Day Sprint: the coach builds your 3-phase plan from your Map and docs; you track 12 weeks.", ar:"سبرنت 90 يوماً: يبني المدرب خطتك من خريطتك وملفاتك وتتابع 12 أسبوعاً."},
- {view:"autopsy", sel:"#autopsyView", en:"Revenue Autopsy: drag your numbers, see the money on the table, send it to the coach.", ar:"تشريح الأرباح: اسحب أرقامك، شاهد المال على الطاولة، وأرسله إلى المدرب."},
- {view:"chat", sel:"#chatfoot", en:"The Coach answers with typing dots, rich text and voice playback. Press ⌘K anywhere for the command palette.", ar:"المدرب يجيب مع نقاط كتابة ونص منسق وتشغيل صوتي. اضغط ⌘K في أي مكان."},
-];
-let tourI=0;
-function showTour(){
-  document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl"));
-  if(tourI>=TOUR.length){ endTour(); return; }
-  const s=TOUR[tourI];
-  showView(s.view);
-  setTimeout(()=>{ const el=document.querySelector(s.sel); if(el){ el.classList.add("tour-hl"); el.scrollIntoView({block:"center",behavior:"smooth"}); } },80);
-  document.getElementById("tourCard").style.display="block";
-  document.getElementById("tourTxt").textContent=(lang==="ar")?s.ar:s.en;
-  document.getElementById("tourStep").textContent=(tourI+1)+"/"+TOUR.length;
-}
-function nextTour(){ tourI++; showTour(); }
-function endTour(){ localStorage.setItem("tour_"+memberId,"1"); document.getElementById("tourCard").style.display="none"; document.querySelectorAll(".tour-hl").forEach(e=>e.classList.remove("tour-hl")); }
-document.addEventListener("keydown",e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){ e.preventDefault(); openPal(); return; }
-  if(document.getElementById("pal").style.display==="block"){
-    const v=document.getElementById("palIn").value;
-    if(e.key==="Escape") closePal();
-    else if(e.key==="ArrowDown"){ e.preventDefault(); palSel=Math.min(palSel+1,Math.max(palFiltered.length-1,0)); renderPal(v); }
-    else if(e.key==="ArrowUp"){ e.preventDefault(); palSel=Math.max(palSel-1,0); renderPal(v); }
-    else if(e.key==="Enter"){ e.preventDefault(); palRun(palSel); }
-  }
-});
-const urlP=new URLSearchParams(location.search);
-if(urlP.get("niche")||urlP.get("size")||urlP.get("leak")){
-  const ctx="Niche: "+(urlP.get("niche")||"?")+" | Audience size: "+(urlP.get("size")||"?")+" | Biggest leak: "+(urlP.get("leak")||"?");
-  localStorage.setItem("ctx_"+memberId,ctx);
-  const s=parseInt(urlP.get("size")||"0",10);
-  if(s){ auto.members=Math.min(5000,s); localStorage.setItem("auto_"+memberId,JSON.stringify(auto)); }
-}
-loadTier(); applyLang(); showView("home"); loadWhop(); loadDocs();
-document.getElementById("main").addEventListener("scroll",function(){
-  const mb=document.getElementById("minibar"); const sb=document.getElementById("pipebar");
-  if(mb&&sb){ mb.classList.toggle("show", this.scrollTop > (sb.offsetTop+sb.offsetHeight-60)); }
-});
-if(!localStorage.getItem("tour_"+memberId)) setTimeout(()=>{tourI=0;showTour();},800);
-const _ctx=ctxString();
-addMsg(_ctx?("Welcome to Income Engine. I already know your context: "+_ctx+". Let's fix the earliest leak first - hit Start or ask me anything."):C().welcome,"ai");
-renderChatEmpty();
-</script>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">⚡ Income Engine</div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Core Modes</div>
+            <div class="nav-item active" data-mode="coach"> Coach <span class="tier-badge">Free</span></div>
+            <div class="nav-item" data-mode="xray">🔍 Business X-Ray <span class="tier-badge">Free</span></div>
+            <div class="nav-item" data-mode="funnel"> Funnel Map <span class="tier-badge">Free</span></div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Growth Engines</div>
+            <div class="nav-item" data-mode="community">🏘️ Community OS <span class="tier-badge tier-insider">Insider</span></div>
+            <div class="nav-item" data-mode="dm">💬 DM Doctor <span class="tier-badge tier-insider">Insider</span></div>
+            <div class="nav-item" data-mode="content">📝 Content Engine <span class="tier-badge tier-insider">Insider</span></div>
+            <div class="nav-item" data-mode="alchemy">🎥 Alchemy (Video) <span class="tier-badge tier-insider">Insider</span></div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Scale & Launch</div>
+            <div class="nav-item" data-mode="offer">💎 Offer Architect <span class="tier-badge tier-partner">Partner</span></div>
+            <div class="nav-item" data-mode="workshop">🎤 Workshop Architect <span class="tier-badge tier-partner">Partner</span></div>
+            <div class="nav-item" data-mode="launch">🚀 Launch Planner <span class="tier-badge tier-partner">Partner</span></div>
+            <div class="nav-item" data-mode="hack">🕵️ Funnel Hacker <span class="tier-badge tier-insider">Insider</span></div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div><span class="status-dot"></span>API Online · v17</div>
+            <div style="margin-top: 8px; cursor: pointer;" onclick="openUnlockModal()"> Unlock Plan</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="header">
+            <div class="header-title" id="current-mode-title"> Coach</div>
+            <div class="header-actions">
+                <button class="btn" onclick="clearChat()">Clear Chat</button>
+                <button class="btn btn-primary" onclick="openUnlockModal()">Upgrade Tier</button>
+            </div>
+        </div>
+
+        <div class="chat-window" id="chat-window">
+            <div class="message">
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    Welcome to the <strong>Income Engine</strong>. I am your elite executive coach. <br><br>
+                    Select a mode from the sidebar to switch lenses (e.g., <em>Offer Architect</em>, <em>DM Doctor</em>, <em>Business X-Ray</em>).<br><br>
+                    What's the biggest bottleneck in your business today?
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator hidden" id="typing-indicator">Coach is thinking...</div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <button class="icon-btn" title="Upload Business Doc" onclick="document.getElementById('file-input').click()">📎</button>
+                <input type="file" id="file-input" class="hidden" accept=".txt,.md,.json" onchange="handleFileUpload(event)">
+                
+                <textarea id="user-input" placeholder="Ask the coach..." rows="1" onkeydown="handleEnter(event)"></textarea>
+                
+                <button class="icon-btn" title="Read Aloud" onclick="readLastMessage()">🔊</button>
+                <button class="icon-btn btn-primary" style="color: black;" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNLOCK MODAL -->
+    <div class="modal-overlay" id="unlock-modal">
+        <div class="modal">
+            <h3>Unlock Your Plan</h3>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;">
+                Free → Insider → Partner. Your license key is shown in your Whop account after purchase.
+            </p>
+            <input type="text" id="license-key-input" placeholder="Enter your Whop license key...">
+            <div class="modal-actions">
+                <button class="btn" onclick="closeUnlockModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitUnlock()">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- STATE ---
+        let currentMode = 'coach';
+        let memberId = localStorage.getItem('ttb_member_id') || 'default';
+        let chatHistory = [];
+        
+        // --- INIT ---
+        if (!localStorage.getItem('ttb_member_id')) {
+            localStorage.setItem('ttb_member_id', memberId);
+        }
+
+        // --- NAVIGATION ---
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                currentMode = item.dataset.mode;
+                document.getElementById('current-mode-title').innerText = item.innerText.split(' ')[0] + ' ' + item.innerText.split(' ')[1];
+            });
+        });
+
+        // --- CHAT LOGIC ---
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add user message to UI
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Show typing
+            document.getElementById('typing-indicator').classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        mode: currentMode,
+                        member_id: memberId,
+                        history: chatHistory.slice(-10) // Send last 10 for context
+                    })
+                });
+
+                const data = await res.json();
+                
+                if (res.ok) {
+                    appendMessage('ai', data.reply);
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendMessage('ai', `⚠️ Error: ${data.detail || 'Unknown error'}`);
+                }
+            } catch (err) {
+                appendMessage('ai', `⚠️ Network error: ${err.message}`);
+            } finally {
+                document.getElementById('typing-indicator').classList.add('hidden');
+            }
+        }
+
+        function appendMessage(role, text) {
+            const chatWindow = document.getElementById('chat-window');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            
+            // Basic markdown formatting
+            let formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+
+            msgDiv.innerHTML = `
+                <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
+                <div class="bubble">${formattedText}</div>
+            `;
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            document.getElementById('chat-window').innerHTML = `
+                <div class="message">
+                    <div class="avatar"></div>
+                    <div class="bubble">Chat cleared. Ready for the next session.</div>
+                </div>
+            `;
+        }
+
+        // --- TTS (TEXT TO SPEECH) ---
+        async function readLastMessage() {
+            if (chatHistory.length === 0) return;
+            const lastMsg = chatHistory[chatHistory.length - 1].content;
+            
+            try {
+                const res = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: lastMsg, member_id: memberId })
+                });
+                
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const audio = new Audio(URL.createObjectURL(blob));
+                    audio.play();
+                }
+            } catch (err) {
+                console.error('TTS Error:', err);
+            }
+        }
+
+        // --- FILE UPLOAD ---
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const text = await file.text();
+            try {
+                const res = await fetch('/api/docs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: file.name,
+                        body: text,
+                        member_id: memberId
+                    })
+                });
+                
+                if (res.ok) {
+                    appendMessage('ai', `📎 Successfully uploaded and indexed: <strong>${file.name}</strong>. I will use this context in our next conversation.`);
+                }
+            } catch (err) {
+                appendMessage('ai', `⚠️ Failed to upload file.`);
+            }
+            event.target.value = '';
+        }
+
+        // --- UNLOCK MODAL ---
+        function openUnlockModal() { document.getElementById('unlock-modal').classList.add('active'); }
+        function closeUnlockModal() { document.getElementById('unlock-modal').classList.remove('active'); }
+
+        async function submitUnlock() {
+            const key = document.getElementById('license-key-input').value.trim();
+            if (!key) return;
+
+            try {
+                const res = await fetch('/api/unlock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ license_key: key, member_id: memberId })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alert(`Success! You are now a ${data.tier} member.`);
+                    closeUnlockModal();
+                    // In a real app, you'd update UI badges here
+                } else {
+                    alert(`Error: ${data.detail}`);
+                }
+            } catch (err) {
+                alert('Network error.');
+            }
+        }
+
+        // Auto-resize textarea
+        document.getElementById('user-input').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    </script>
 </body>
 </html>
