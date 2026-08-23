@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E5 AI Coach – Quindecillion Executive</title>
+    <title>E5 AI Coach – Vigintillion Executive</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         /* ============================================================
-           RESET & BASE
+           VIGINTILLION BASE – ultra‑premium dark glassmorphism
            ============================================================ */
         *,
         *::before,
@@ -18,18 +18,19 @@
             box-sizing: border-box;
         }
         :root {
-            --bg-primary: #0a0e27;
-            --bg-secondary: #141a3a;
-            --bg-card: rgba(255, 255, 255, 0.04);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f1f5f9;
+            --bg-primary: #080c1a;
+            --bg-secondary: #0e1a2b;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.07);
+            --text-primary: #f0f4ff;
             --text-secondary: #94a3b8;
             --gold: #f59e0b;
             --gold-light: #fbbf24;
             --purple: #8b5cf6;
             --green: #4ade80;
-            --glass: rgba(255, 255, 255, 0.03);
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --glass: rgba(255, 255, 255, 0.02);
+            --shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            --radius: 28px;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -41,15 +42,15 @@
             align-items: center;
             padding: 16px;
             margin: 0;
+            background-image: radial-gradient(ellipse at 20% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 60%);
         }
-        /* main app container */
         .app {
             width: 100%;
             max-width: 1440px;
             height: 96vh;
             max-height: 1000px;
             background: var(--bg-secondary);
-            border-radius: 36px;
+            border-radius: var(--radius);
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             display: flex;
@@ -58,7 +59,6 @@
             position: relative;
             backdrop-filter: blur(20px);
         }
-        /* subtle glow */
         .app::before {
             content: '';
             position: absolute;
@@ -66,19 +66,17 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.05), transparent 60%);
+            background: radial-gradient(circle at 30% 20%, rgba(245, 158, 11, 0.04), transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
 
-        /* ============================================================
-           HEADER
-           ============================================================ */
+        /* ----- HEADER (with personalisation) ----- */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 28px;
+            padding: 14px 28px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
             position: relative;
@@ -104,7 +102,7 @@
             font-size: 20px;
             font-weight: 700;
             color: var(--bg-primary);
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
         }
         .logo-text {
             font-size: 20px;
@@ -183,9 +181,7 @@
             transform: translateY(0);
         }
 
-        /* ============================================================
-           TAB NAVIGATION
-           ============================================================ */
+        /* ----- TAB NAV ----- */
         .tab-nav {
             display: flex;
             gap: 2px;
@@ -221,9 +217,7 @@
             font-size: 16px;
         }
 
-        /* ============================================================
-           MAIN LAYOUT
-           ============================================================ */
+        /* ----- SIDEBAR ----- */
         .main-area {
             display: flex;
             flex: 1;
@@ -231,7 +225,6 @@
             position: relative;
             z-index: 1;
         }
-        /* sidebar (desktop) */
         .sidebar {
             width: 260px;
             background: rgba(255, 255, 255, 0.02);
@@ -312,21 +305,11 @@
         .mode-item.locked {
             opacity: 0.5;
         }
-        .mode-item .check {
-            margin-left: auto;
-            color: var(--green);
-            font-size: 12px;
-            display: none;
-        }
-        .mode-item.completed .check {
-            display: block;
-        }
-        /* progress indicator for framework completion in sidebar */
         .mode-item .progress-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            margin-left: 6px;
+            margin-left: auto;
         }
         .mode-item .progress-dot.complete {
             background: var(--green);
@@ -335,7 +318,29 @@
             background: var(--gold);
         }
 
-        /* chat / dashboard container */
+        /* tooltip on hover (mode description) */
+        .mode-item .tooltip {
+            display: none;
+            position: absolute;
+            left: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .mode-item:hover .tooltip {
+            display: block;
+        }
+
+        /* ----- CONTENT AREA (Dashboard + Chat) ----- */
         .content-area {
             flex: 1;
             display: flex;
@@ -344,10 +349,6 @@
             background: var(--bg-primary);
             position: relative;
         }
-
-        /* ============================================================
-           DASHBOARD VIEW
-           ============================================================ */
         .dashboard-view {
             display: none;
             flex-direction: column;
@@ -402,26 +403,39 @@
             color: var(--text-secondary);
             margin-top: 4px;
         }
-        .dash-card .progress-ring {
-            width: 80px;
-            height: 80px;
+
+        /* Health Ring */
+        .ring-container {
+            position: relative;
+            display: inline-block;
             margin: 0 auto;
         }
-        .dash-card .progress-ring svg {
+        .ring-container svg {
             transform: rotate(-90deg);
         }
-        .dash-card .progress-ring .bg {
+        .ring-container .bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.06);
-            stroke-width: 6;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 8;
         }
-        .dash-card .progress-ring .fg {
+        .ring-container .fg {
             fill: none;
             stroke: var(--gold);
-            stroke-width: 6;
+            stroke-width: 8;
             stroke-linecap: round;
             transition: stroke-dashoffset 0.8s ease;
         }
+        .ring-container .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Framework mini grid */
         .framework-grid-dash {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -453,36 +467,59 @@
             background: var(--gold);
             opacity: 0.4;
         }
+
+        /* Rule of 100 with mini calendar */
         .rule-100-tracker {
             display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
             margin-top: 6px;
         }
+        .rule-100-tracker .top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
         .rule-100-tracker .count {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--gold-light);
         }
-        .rule-100-tracker button {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 40px;
-            padding: 4px 16px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
+        .rule-100-tracker .streak {
+            font-size: 14px;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .rule-100-tracker button:hover {
-            background: rgba(245, 158, 11, 0.1);
-            border-color: var(--gold);
+        .rule-calendar {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .rule-calendar .day {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .rule-calendar .day.hit {
+            background: var(--green);
+            color: var(--bg-primary);
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
+        }
+        .rule-calendar .day.today {
+            border: 2px solid var(--gold);
         }
 
-        /* ============================================================
-           CHAT VIEW (unchanged mostly)
-           ============================================================ */
+        /* Chat */
         .chat-view {
             display: flex;
             flex-direction: column;
@@ -500,7 +537,6 @@
             flex-direction: column;
             gap: 16px;
         }
-        /* ... rest of chat styles ... */
         .message {
             display: flex;
             gap: 12px;
@@ -589,7 +625,7 @@
             }
         }
 
-        /* input bar */
+        /* Input bar */
         .input-bar {
             padding: 14px 24px 20px;
             border-top: 1px solid var(--border-color);
@@ -695,7 +731,8 @@
             background: var(--bg-card);
             color: var(--text-primary);
         }
-        /* status bar */
+
+        /* Status bar */
         .status-bar {
             padding: 4px 24px;
             font-size: 11px;
@@ -727,16 +764,14 @@
             }
         }
 
-        /* ============================================================
-           MODALS
-           ============================================================ */
+        /* ----- MODALS (Upgrade, Vault, Onboarding, ValueEq) ----- */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(12px);
             display: none;
             justify-content: center;
@@ -788,7 +823,7 @@
             font-size: 14px;
         }
 
-        /* framework grid in vault */
+        /* Framework Vault */
         .framework-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -806,10 +841,12 @@
             border: 1px solid var(--border-color);
             transition: all 0.2s;
             cursor: default;
+            position: relative;
         }
         .framework-card:hover {
             background: rgba(255, 255, 255, 0.07);
             border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
         .framework-card h4 {
             font-size: 15px;
@@ -877,7 +914,57 @@
             color: var(--green);
         }
 
-        /* upgrade modal */
+        /* Upgrade modal with toggle */
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .billing-toggle span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .billing-toggle .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+        }
+        .billing-toggle .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .billing-toggle .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transition: .3s;
+            border-radius: 34px;
+        }
+        .billing-toggle .slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .billing-toggle input:checked+.slider {
+            background: var(--gold);
+        }
+        .billing-toggle input:checked+.slider:before {
+            transform: translateX(22px);
+        }
         .tier-table {
             display: flex;
             flex-direction: column;
@@ -886,7 +973,7 @@
         }
         .tier-row {
             display: grid;
-            grid-template-columns: 1fr 2fr 2fr;
+            grid-template-columns: 1fr 2fr 1fr;
             padding: 12px 16px;
             background: var(--bg-card);
             border-radius: 12px;
@@ -909,48 +996,38 @@
             border-color: var(--gold);
             background: rgba(245, 158, 11, 0.05);
         }
-
-        /* ============================================================
-           ONBOARDING WIZARD
-           ============================================================ */
-        .onboarding-step {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .onboarding-step.active {
-            display: flex;
-        }
-        .onboarding-step label {
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        .onboarding-step input,
-        .onboarding-step select {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 10px 14px;
-            color: var(--text-primary);
-            font-size: 14px;
-            outline: none;
-            width: 100%;
-        }
-        .onboarding-step input:focus,
-        .onboarding-step select:focus {
-            border-color: var(--gold);
-        }
-        .onboarding-step .btn-group {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 8px;
+        .tier-row .popular {
+            font-size: 10px;
+            background: var(--gold);
+            color: var(--bg-primary);
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-weight: 600;
+            margin-left: 8px;
         }
 
-        /* ============================================================
-           VALUE EQUATION BUILDER (inside modal)
-           ============================================================ */
+        /* Onboarding progress dots */
+        .onboarding-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .onboarding-progress .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: background 0.3s;
+        }
+        .onboarding-progress .dot.active {
+            background: var(--gold);
+        }
+        .onboarding-progress .dot.done {
+            background: var(--green);
+        }
+
+        /* Value Eq sliders */
         .slider-group {
             margin: 12px 0;
         }
@@ -974,9 +1051,7 @@
             color: var(--gold-light);
         }
 
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
+        /* Responsive */
         @media (max-width: 1024px) {
             .app {
                 height: 100vh;
@@ -1045,7 +1120,6 @@
             }
         }
 
-        /* scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -1060,7 +1134,7 @@
             background: rgba(245, 158, 11, 0.5);
         }
 
-        /* confetti animation (simple) */
+        /* Confetti container */
         .confetti-container {
             position: fixed;
             top: 0;
@@ -1089,19 +1163,53 @@
                 opacity: 0;
             }
         }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            color: var(--text-primary);
+            font-size: 14px;
+            z-index: 3000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .toast.success {
+            border-left: 4px solid var(--green);
+        }
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+        .toast.info {
+            border-left: 4px solid var(--gold);
+        }
     </style>
 </head>
 <body>
 
     <div class="app" id="app">
 
-        <!-- ============ HEADER ============ -->
+        <!-- HEADER -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">E5</div>
-                <div class="logo-text">AI Coach <span class="logo-sub">Quindecillion</span></div>
+                <div class="logo-text">AI Coach <span class="logo-sub">Vigintillion</span></div>
             </div>
             <div class="header-actions">
+                <span id="businessNameDisplay" style="font-size:13px;color:var(--text-secondary);margin-right:4px;"></span>
                 <div class="tier-badge" id="tierBadge">
                     <i class="fas fa-crown"></i> <span id="tierLabel">FREE</span>
                 </div>
@@ -1110,16 +1218,16 @@
             </div>
         </header>
 
-        <!-- ============ TAB NAV ============ -->
+        <!-- TAB NAV -->
         <div class="tab-nav" id="tabNav">
             <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></button>
             <button class="tab-btn" data-tab="chat"><i class="fas fa-comment-dots"></i> <span>Chat</span></button>
         </div>
 
-        <!-- ============ MAIN AREA ============ -->
+        <!-- MAIN AREA -->
         <div class="main-area">
 
-            <!-- SIDEBAR (modes) -->
+            <!-- SIDEBAR -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-title">⚡ Modes</div>
                 <div class="mode-list" id="modeList"></div>
@@ -1128,42 +1236,59 @@
             <!-- CONTENT -->
             <div class="content-area">
 
-                <!-- DASHBOARD VIEW -->
+                <!-- DASHBOARD -->
                 <div class="dashboard-view active" id="dashboardView">
                     <div class="dash-grid">
-                        <!-- Health Score -->
-                        <div class="dash-card">
-                            <h4>Business Health <span id="healthScoreLabel">72</span></h4>
-                            <div class="value" id="healthScore">72</div>
-                            <div class="sub">Based on 4 frameworks completed</div>
+
+                        <!-- Health Ring -->
+                        <div class="dash-card" style="text-align:center;">
+                            <h4>Business Health</h4>
+                            <div class="ring-container">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle class="bg" cx="50" cy="50" r="40" />
+                                    <circle class="fg" id="healthRing" cx="50" cy="50" r="40"
+                                            stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                                </svg>
+                                <div class="center-text" id="healthScore">0</div>
+                            </div>
+                            <div class="sub" id="healthSub">Based on frameworks completed</div>
                         </div>
+
                         <!-- Frameworks Progress -->
                         <div class="dash-card">
-                            <h4>Frameworks <span id="fwProgressLabel">4/8</span></h4>
+                            <h4>Frameworks <span id="fwProgressLabel">0/8</span></h4>
                             <div class="framework-grid-dash" id="fwMiniGrid"></div>
                         </div>
+
                         <!-- Rule of 100 -->
                         <div class="dash-card">
-                            <h4>Rule of 100 <span id="ruleStreak">🔥 0d</span></h4>
+                            <h4>Rule of 100</h4>
                             <div class="rule-100-tracker">
-                                <span class="count" id="ruleCount">0</span>
-                                <span style="color:var(--text-secondary);font-size:13px;">actions today</span>
-                                <button id="ruleAddBtn"><i class="fas fa-plus"></i> Log +1</button>
-                                <button id="ruleResetBtn" style="background:transparent;border-color:transparent;color:var(--text-secondary);">Reset</button>
+                                <div class="top-row">
+                                    <span class="count" id="ruleCount">0</span>
+                                    <span style="color:var(--text-secondary);font-size:14px;">actions today</span>
+                                    <span class="streak" id="ruleStreak"><i class="fas fa-fire"></i> 0d</span>
+                                </div>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                    <button id="ruleAddBtn" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:40px;padding:4px 16px;color:var(--text-primary);cursor:pointer;transition:all 0.2s;font-size:13px;"><i class="fas fa-plus"></i> Log +1</button>
+                                    <button id="ruleResetBtn" style="background:transparent;border:1px solid transparent;color:var(--text-secondary);cursor:pointer;font-size:13px;">Reset</button>
+                                </div>
+                                <div class="rule-calendar" id="ruleCalendar"></div>
                             </div>
-                            <div class="sub" style="margin-top:6px;">Target: 100 actions/day</div>
                         </div>
+
                         <!-- Revenue Projection -->
                         <div class="dash-card">
                             <h4>Revenue Projection</h4>
                             <div class="value" id="revenueProjection">$0</div>
-                            <div class="sub">Based on monthly revenue: <input type="number" id="revenueInput" placeholder="e.g. 5000" style="width:80px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:4px 8px;color:var(--text-primary);" /> /mo</div>
+                            <div class="sub">Monthly revenue: <input type="number" id="revenueInput" placeholder="e.g. 5000" style="width:90px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:4px 8px;color:var(--text-primary);" /> /mo</div>
                         </div>
+
                         <!-- Next Best Action -->
                         <div class="dash-card" style="grid-column: 1 / -1;">
                             <h4>🎯 Next Best Action</h4>
                             <div id="nextAction" style="font-size:16px;margin-top:4px;">Complete your first framework to get started.</div>
-                            <div class="sub" style="margin-top:6px;">AI-recommended based on your progress</div>
+                            <div class="sub" style="margin-top:6px;">AI‑recommended based on your progress</div>
                         </div>
                     </div>
                 </div>
@@ -1174,7 +1299,7 @@
                         <div class="message ai">
                             <div class="avatar"><i class="fas fa-brain"></i></div>
                             <div class="bubble">
-                                <p><strong>Hello, I'm your Quindecillion Executive Coach.</strong></p>
+                                <p><strong>Hello, I'm your Vigintillion Executive Coach.</strong></p>
                                 <p>I have access to <strong>$20,000+</strong> worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.</p>
                                 <p>Select a mode or ask me anything about your business.</p>
                             </div>
@@ -1227,6 +1352,14 @@
             <button class="modal-close" id="closeUpgrade">&times;</button>
             <h2><i class="fas fa-crown"></i> Unlock More Power</h2>
             <p class="sub">Choose the tier that fits your business stage.</p>
+            <div class="billing-toggle">
+                <span>Monthly</span>
+                <label class="switch">
+                    <input type="checkbox" id="billingToggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Yearly <span style="color:var(--green);font-size:12px;">(save 20%)</span></span>
+            </div>
             <div class="tier-table" id="tierTable"></div>
             <div style="margin-top:20px;display:flex;gap:12px;justify-content:flex-end;">
                 <button class="btn-outline" id="upgradeCancel">Cancel</button>
@@ -1235,11 +1368,16 @@
         </div>
     </div>
 
-    <!-- ONBOARDING WIZARD -->
+    <!-- ONBOARDING -->
     <div class="modal-overlay" id="onboardingModal">
         <div class="modal" style="max-width:500px;">
             <h2>👋 Welcome to Your AI Coach</h2>
-            <p class="sub">Let's personalize your experience so I can give you the best advice.</p>
+            <p class="sub">Let's personalise your experience so I can give you the best advice.</p>
+            <div class="onboarding-progress" id="onboardProgress">
+                <span class="dot active" data-step="1"></span>
+                <span class="dot" data-step="2"></span>
+                <span class="dot" data-step="3"></span>
+            </div>
             <div class="onboarding-step active" data-step="1">
                 <label>What's your main business goal right now?</label>
                 <select id="onboardGoal">
@@ -1249,14 +1387,14 @@
                     <option value="retention">Reduce churn</option>
                     <option value="content">Create content that converts</option>
                 </select>
-                <div class="btn-group">
+                <div class="btn-group" style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
                     <button class="btn-primary" id="onboardNext1">Next</button>
                 </div>
             </div>
             <div class="onboarding-step" data-step="2">
                 <label>What's your current monthly revenue (approx)?</label>
                 <input type="number" id="onboardRevenue" placeholder="e.g. 5000" />
-                <div class="btn-group">
+                <div class="btn-group" style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
                     <button class="btn-outline" id="onboardBack2">Back</button>
                     <button class="btn-primary" id="onboardNext2">Next</button>
                 </div>
@@ -1270,7 +1408,7 @@
                     <option value="retention">High churn / low LTV</option>
                     <option value="time">Not enough time to execute</option>
                 </select>
-                <div class="btn-group">
+                <div class="btn-group" style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
                     <button class="btn-outline" id="onboardBack3">Back</button>
                     <button class="btn-primary" id="onboardFinish">Finish & Start</button>
                 </div>
@@ -1278,7 +1416,7 @@
         </div>
     </div>
 
-    <!-- VALUE EQUATION BUILDER MODAL -->
+    <!-- VALUE EQUATION BUILDER -->
     <div class="modal-overlay" id="valueEqModal">
         <div class="modal">
             <button class="modal-close" id="closeValueEq">&times;</button>
@@ -1312,30 +1450,35 @@
         </div>
     </div>
 
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
     <script>
         // ================================================================
-        //   CONFIG & STATE
+        //  VIGINTILLION APP – FULL LOGIC
         // ================================================================
+
+        // -------------------- CONFIG --------------------
         const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
         // For local: 'http://localhost:8000'
 
         const MODES = [
-            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
-            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
-            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free' },
-            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
-            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider' },
-            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider' },
-            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider' },
-            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
-            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
-            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
-            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
+            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free', desc: 'Daily operations, inbox, Rule of 100' },
+            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free', desc: 'Find the earliest broken layer' },
+            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free', desc: 'Visualise the customer journey' },
+            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider', desc: 'Build culture, rituals, belonging' },
+            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider', desc: 'Craft ECAFI & SOULFUL scripts' },
+            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider', desc: '7 content types, polarise, document' },
+            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider', desc: 'Hook, Body, CTA for short‑form' },
+            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider', desc: 'Reverse‑engineer competitor funnels' },
+            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner', desc: 'Grand Slam Offers, Value Equation' },
+            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner', desc: 'Live event design & close' },
+            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner', desc: '72h urgency, pipeline cleaning' },
         ];
 
         const FRAMEWORKS = [
             { id: 'avocado', name: 'AVOCADO Opening Offers', value: '$2,000+', tier: 'insider',
-            desc: '3-tier offers, R.I.P.E., ECAFI scripts' },
+            desc: '3‑tier offers, R.I.P.E., ECAFI scripts' },
             { id: 'money_models', name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner',
                 desc: 'Value Equation, Grand Slam, upsell/downsell' },
             { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider',
@@ -1349,12 +1492,24 @@
             { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free',
                 desc: 'Onboarding, activation, milestones' },
             { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner',
-                desc: 'Interactive tool to optimize offer value' },
+                desc: 'Interactive tool to optimise offer value' },
         ];
 
-        // ================================================================
-        //   DOM REFS
-        // ================================================================
+        // -------------------- STATE --------------------
+        let currentTier = 'free';
+        let currentMode = 'coach';
+        let isSending = false;
+        let messageCount = 0;
+        let frameworkProgress = {};
+        let rule100Count = 0;
+        let ruleStreakDays = 0;
+        let lastRuleDate = '';
+        let userRevenue = 0;
+        let businessName = '';
+        let onboarded = false;
+        let dailyHistory = {}; // { '2025-01-01': 85, ... }
+
+        // DOM refs
         const $ = id => document.getElementById(id);
         const tierLabel = $('tierLabel');
         const modeSelect = $('modeSelect');
@@ -1374,6 +1529,7 @@
         const upgradeCancel = $('upgradeCancel');
         const upgradeAction = $('upgradeAction');
         const tierTable = $('tierTable');
+        const billingToggle = $('billingToggle');
         const onboardingModal = $('onboardingModal');
         const valueEqModal = $('valueEqModal');
         const closeValueEq = $('closeValueEq');
@@ -1386,49 +1542,86 @@
         const dashboardView = $('dashboardView');
         const chatView = $('chatView');
         const healthScore = $('healthScore');
-        const healthScoreLabel = $('healthScoreLabel');
+        const healthRing = $('healthRing');
+        const healthSub = $('healthSub');
         const fwProgressLabel = $('fwProgressLabel');
         const fwMiniGrid = $('fwMiniGrid');
         const ruleCount = $('ruleCount');
         const ruleStreak = $('ruleStreak');
         const ruleAddBtn = $('ruleAddBtn');
         const ruleResetBtn = $('ruleResetBtn');
+        const ruleCalendar = $('ruleCalendar');
         const revenueInput = $('revenueInput');
         const revenueProjection = $('revenueProjection');
         const nextAction = $('nextAction');
+        const businessNameDisplay = $('businessNameDisplay');
+        const toast = $('toast');
 
-        // ================================================================
-        //   STATE
-        // ================================================================
-        let currentTier = 'free';
-        let currentMode = 'coach';
-        let isSending = false;
-        let messageCount = 0;
-        let frameworkProgress = {}; // { id: 'completed' | 'started' | 'locked' }
-        let rule100Count = 0;
-        let ruleStreakDays = 0;
-        let lastRuleDate = '';
-        let userRevenue = 0;
-        let onboarded = localStorage.getItem('e5_onboarded') === 'true';
+        // -------------------- LOCAL STORAGE --------------------
+        function loadLocalState() {
+            try {
+                const data = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
+                frameworkProgress = data.frameworkProgress || {};
+                rule100Count = data.rule100Count || 0;
+                ruleStreakDays = data.ruleStreakDays || 0;
+                lastRuleDate = data.lastRuleDate || '';
+                userRevenue = data.userRevenue || 0;
+                businessName = data.businessName || '';
+                onboarded = data.onboarded || false;
+                dailyHistory = data.dailyHistory || {};
+                if (userRevenue) revenueInput.value = userRevenue;
+                if (businessName) businessNameDisplay.textContent = `👋 ${businessName}`;
+                // Check if we need to reset daily count
+                const today = new Date().toDateString();
+                if (lastRuleDate !== today) {
+                    // Save yesterday's count to history
+                    if (lastRuleDate) {
+                        const dateKey = new Date(lastRuleDate).toISOString().slice(0,10);
+                        dailyHistory[dateKey] = rule100Count;
+                    }
+                    rule100Count = 0;
+                    lastRuleDate = today;
+                    saveLocalState();
+                }
+            } catch (e) { console.warn('Local storage load error', e); }
+        }
 
-        // ================================================================
-        //   INIT
-        // ================================================================
+        function saveLocalState() {
+            try {
+                localStorage.setItem('e5_coach_state', JSON.stringify({
+                    frameworkProgress,
+                    rule100Count,
+                    ruleStreakDays,
+                    lastRuleDate,
+                    userRevenue,
+                    businessName,
+                    onboarded,
+                    dailyHistory
+                }));
+            } catch (e) { console.warn('Local storage save error', e); }
+        }
+
+        // -------------------- TOAST --------------------
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // -------------------- INIT --------------------
         async function init() {
-            // Load local state
             loadLocalState();
-            // Populate modes
             populateModes();
-            // Fetch tier
             await fetchTier();
-            // Populate framework vault
             populateFrameworks();
-            // Update dashboard
             updateDashboard();
+
             // Show onboarding if not done
             if (!onboarded) {
                 onboardingModal.classList.add('open');
             }
+
             // Event listeners
             modeSelect.addEventListener('change', onModeChange);
             sendBtn.addEventListener('click', sendMessage);
@@ -1440,18 +1633,21 @@
             closeUpgrade.addEventListener('click', () => upgradeModal.classList.remove('open'));
             upgradeCancel.addEventListener('click', () => upgradeModal.classList.remove('open'));
             upgradeAction.addEventListener('click', () => {
-                alert('Upgrade flow: connect your Whop license key or visit our checkout page.');
+                showToast('Upgrade flow: connect your Whop license key.', 'info');
                 upgradeModal.classList.remove('open');
             });
-            docBtn.addEventListener('click', () => alert('Upload business documents (PDF/TXT) to personalize your coaching.'));
-            voiceBtn.addEventListener('click', () => alert('Text-to-Speech coming soon!'));
+            billingToggle.addEventListener('change', updatePrices);
+
+            docBtn.addEventListener('click', () => showToast('Upload business documents (PDF/TXT) to personalise coaching.', 'info'));
+            voiceBtn.addEventListener('click', () => showToast('Text‑to‑Speech coming soon!', 'info'));
             valueEqBtn.addEventListener('click', openValueEq);
             closeValueEq.addEventListener('click', () => valueEqModal.classList.remove('open'));
             closeValueEqBtn.addEventListener('click', () => valueEqModal.classList.remove('open'));
             saveValueEq.addEventListener('click', () => {
-                alert('Value Equation saved! (This would update your offer in the backend.)');
+                showToast('Value Equation saved! (Would update backend.)', 'success');
                 valueEqModal.classList.remove('open');
             });
+
             // Tab switching
             tabNav.addEventListener('click', (e) => {
                 const btn = e.target.closest('.tab-btn');
@@ -1468,28 +1664,41 @@
                     chatView.classList.add('active');
                 }
             });
+
             // Rule of 100
             ruleAddBtn.addEventListener('click', () => {
                 rule100Count++;
+                const today = new Date().toDateString();
+                if (lastRuleDate !== today) {
+                    // Save previous day
+                    if (lastRuleDate) {
+                        const dateKey = new Date(lastRuleDate).toISOString().slice(0,10);
+                        dailyHistory[dateKey] = rule100Count;
+                    }
+                    rule100Count = 1;
+                    lastRuleDate = today;
+                }
                 saveLocalState();
                 updateDashboard();
                 if (rule100Count >= 100) {
-                    // Celebration
                     fireConfetti();
-                    alert('🎉 You hit 100 actions today! Amazing!');
+                    showToast('🎉 You hit 100 actions today! Amazing!', 'success');
                 }
             });
             ruleResetBtn.addEventListener('click', () => {
                 rule100Count = 0;
                 saveLocalState();
                 updateDashboard();
+                showToast('Rule of 100 reset for today.', 'info');
             });
+
             // Revenue input
             revenueInput.addEventListener('input', () => {
                 userRevenue = parseFloat(revenueInput.value) || 0;
                 saveLocalState();
                 updateDashboard();
             });
+
             // Onboarding
             $('onboardNext1').addEventListener('click', () => goToStep(2));
             $('onboardBack2').addEventListener('click', () => goToStep(1));
@@ -1503,43 +1712,7 @@
             userInput.focus();
         }
 
-        // ================================================================
-        //   LOCAL STORAGE
-        // ================================================================
-        function loadLocalState() {
-            try {
-                const data = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
-                frameworkProgress = data.frameworkProgress || {};
-                rule100Count = data.rule100Count || 0;
-                ruleStreakDays = data.ruleStreakDays || 0;
-                lastRuleDate = data.lastRuleDate || '';
-                userRevenue = data.userRevenue || 0;
-                if (userRevenue) revenueInput.value = userRevenue;
-                // Check if we need to reset daily count
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    rule100Count = 0;
-                    lastRuleDate = today;
-                    saveLocalState();
-                }
-            } catch (e) { console.warn('Local storage load error', e); }
-        }
-
-        function saveLocalState() {
-            try {
-                localStorage.setItem('e5_coach_state', JSON.stringify({
-                    frameworkProgress,
-                    rule100Count,
-                    ruleStreakDays,
-                    lastRuleDate,
-                    userRevenue
-                }));
-            } catch (e) { console.warn('Local storage save error', e); }
-        }
-
-        // ================================================================
-        //   TIER
-        // ================================================================
+        // -------------------- TIER --------------------
         async function fetchTier() {
             try {
                 const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
@@ -1555,9 +1728,7 @@
             return order[userTier] >= order[required];
         }
 
-        // ================================================================
-        //   MODES
-        // ================================================================
+        // -------------------- MODES --------------------
         function populateModes() {
             // Dropdown
             modeSelect.innerHTML = '';
@@ -1577,7 +1748,6 @@
                 div.className = `mode-item ${m.id === currentMode ? 'active' : ''}`;
                 const tierOk = isTierAtLeast(currentTier, m.tier);
                 if (!tierOk) div.classList.add('locked');
-                // progress dot
                 const prog = frameworkProgress[m.id] || 'pending';
                 const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : '');
                 div.innerHTML = `
@@ -1585,15 +1755,15 @@
                     <span>${m.label}</span>
                     <span class="tier-tag ${m.tier}">${m.tier}</span>
                     <span class="progress-dot ${dotClass}"></span>
+                    <span class="tooltip">${m.desc}</span>
                 `;
                 div.addEventListener('click', () => {
                     if (!tierOk) {
-                        alert(`Upgrade to ${m.tier} tier to unlock ${m.label}.`);
+                        showToast(`Upgrade to ${m.tier} tier to unlock ${m.label}.`, 'error');
                         return;
                     }
                     modeSelect.value = m.id;
                     onModeChange();
-                    // Switch to chat tab
                     document.querySelector('.tab-btn[data-tab="chat"]').click();
                 });
                 modeList.appendChild(div);
@@ -1619,17 +1789,15 @@
             document.querySelectorAll('.mode-item').forEach((el, idx) => {
                 el.classList.toggle('active', MODES[idx].id === currentMode);
             });
-            // Mark mode as started
             if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
                 frameworkProgress[currentMode] = 'started';
                 saveLocalState();
                 updateDashboard();
                 updateSidebarLocks();
+                showToast(`Started ${MODES.find(m=>m.id===currentMode)?.label} mode.`, 'info');
             }
-            // Show a system message in chat
             const modeName = MODES.find(m => m.id === currentMode)?.label || currentMode;
             addMessage(`Switched to <strong>${modeName}</strong> mode. I'm ready to help.`, 'ai', true);
-            // Switch to chat tab
             document.querySelector('.tab-btn[data-tab="chat"]').click();
         }
 
@@ -1638,9 +1806,7 @@
             modeDisplay.textContent = `Mode: ${modeName}`;
         }
 
-        // ================================================================
-        //   CHAT
-        // ================================================================
+        // -------------------- CHAT --------------------
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text || isSending) return;
@@ -1671,11 +1837,6 @@
                     addMessage(reply, 'ai');
                     statusText.textContent = 'Ready';
                     messageCount++;
-                    // Check if AI mentions framework completion
-                    if (reply.includes('framework') && reply.includes('complete')) {
-                        // Auto-complete detection (simple)
-                        // could be improved with NLP
-                    }
                 }
             } catch (err) {
                 hideTyping();
@@ -1731,9 +1892,7 @@
             }
         }
 
-        // ================================================================
-        //   FRAMEWORK VAULT
-        // ================================================================
+        // -------------------- FRAMEWORK VAULT --------------------
         function populateFrameworks() {
             frameworkGrid.innerHTML = '';
             FRAMEWORKS.forEach(fw => {
@@ -1758,23 +1917,20 @@
                 const btn = card.querySelector('.action-btn');
                 btn.addEventListener('click', () => {
                     if (!unlocked) {
-                        alert(`Upgrade to ${fw.tier} tier to access ${fw.name}.`);
+                        showToast(`Upgrade to ${fw.tier} tier to access ${fw.name}.`, 'error');
                         return;
                     }
                     if (isDone) {
-                        alert(`You already completed ${fw.name}. Great job!`);
+                        showToast(`You already completed ${fw.name}. Great job!`, 'info');
                         return;
                     }
-                    // Mark as started/completed (toggle for demo)
-                    if (frameworkProgress[fw.id] === 'completed') {
-                        // do nothing
-                    } else if (frameworkProgress[fw.id] === 'started') {
+                    if (frameworkProgress[fw.id] === 'started') {
                         frameworkProgress[fw.id] = 'completed';
                         fireConfetti();
-                        alert(`🎉 You completed ${fw.name}! Amazing!`);
+                        showToast(`🎉 You completed ${fw.name}! Amazing!`, 'success');
                     } else {
                         frameworkProgress[fw.id] = 'started';
-                        alert(`Started ${fw.name}. You can continue in the chat.`);
+                        showToast(`Started ${fw.name}. You can continue in the chat.`, 'info');
                     }
                     saveLocalState();
                     populateFrameworks();
@@ -1785,17 +1941,20 @@
             });
         }
 
-        // ================================================================
-        //   DASHBOARD
-        // ================================================================
+        // -------------------- DASHBOARD --------------------
         function updateDashboard() {
-            // Count completed frameworks
             const total = FRAMEWORKS.length;
             const completed = FRAMEWORKS.filter(fw => frameworkProgress[fw.id] === 'completed').length;
             const started = FRAMEWORKS.filter(fw => frameworkProgress[fw.id] === 'started').length;
             const health = Math.round((completed / total) * 100);
             healthScore.textContent = health;
-            healthScoreLabel.textContent = health;
+            healthSub.textContent = `Based on ${completed} frameworks completed`;
+
+            // Animate ring
+            const circumference = 2 * Math.PI * 40; // 251.2
+            const offset = circumference - (health / 100) * circumference;
+            healthRing.style.strokeDashoffset = offset;
+
             fwProgressLabel.textContent = `${completed}/${total}`;
 
             // Mini grid
@@ -1814,15 +1973,31 @@
 
             // Rule of 100
             ruleCount.textContent = rule100Count;
-            const today = new Date().toDateString();
-            if (lastRuleDate === today) {
-                // streak update would be more complex; placeholder
+            // Update streak (simple: if we have history, compute)
+            let streak = 0;
+            const today = new Date().toISOString().slice(0,10);
+            // We'll just show current day's streak if >0
+            if (rule100Count >= 100) streak = 1;
+            ruleStreak.innerHTML = `<i class="fas fa-fire"></i> ${streak}d`;
+
+            // Mini calendar – last 7 days
+            ruleCalendar.innerHTML = '';
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().slice(0,10);
+                const count = dailyHistory[key] || 0;
+                const isToday = i === 0;
+                const div = document.createElement('div');
+                div.className = `day ${count >= 100 ? 'hit' : ''} ${isToday ? 'today' : ''}`;
+                div.textContent = d.getDate();
+                div.title = `${key}: ${count} actions`;
+                ruleCalendar.appendChild(div);
             }
 
-            // Revenue projection (simple multiplier)
+            // Revenue projection
             const rev = userRevenue || 0;
             if (rev > 0) {
-                // Assume 3x increase with frameworks (optimistic)
                 const projected = Math.round(rev * (1 + (completed / total) * 2));
                 revenueProjection.textContent = `$${projected.toLocaleString()}/mo`;
             } else {
@@ -1841,105 +2016,101 @@
             }
         }
 
-        // ================================================================
-        //   UPGRADE MODAL
-        // ================================================================
+        // -------------------- UPGRADE MODAL --------------------
         function openUpgradeModal() {
+            updatePrices();
+            upgradeModal.classList.add('open');
+        }
+
+        function updatePrices() {
+            const yearly = billingToggle.checked;
             const tiers = [
-                { name: 'Free', features: '3 modes, 30 msg/h, basic frameworks', price: '$0', current: currentTier ===
-                    'free' },
-                { name: 'Insider', features: '+5 modes, frameworks, unlimited chat', price: '$47/mo', current: currentTier ===
-                    'insider' },
-                { name: 'Partner', features: '+3 modes, money models, priority support', price: '$197/mo', current: currentTier ===
-                    'partner' },
+                { name: 'Free', features: '3 modes, 30 msg/h, basic frameworks', price: yearly ? '$0' : '$0',
+                current: currentTier === 'free' },
+                { name: 'Insider', features: '+5 modes, frameworks, unlimited chat', price: yearly ? '$40/mo' : '$47/mo',
+                    current: currentTier === 'insider' },
+                { name: 'Partner', features: '+3 modes, money models, priority support', price: yearly ? '$167/mo' :
+                        '$197/mo', current: currentTier === 'partner' },
             ];
             tierTable.innerHTML = '';
             tiers.forEach(t => {
                 const row = document.createElement('div');
                 row.className = `tier-row${t.current ? ' current' : ''}`;
                 row.innerHTML = `
-                    <span class="tier-name">${t.name} ${t.current ? '👈' : ''}</span>
+                    <span class="tier-name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="popular">Most Popular</span>' : ''}</span>
                     <span class="features">${t.features}</span>
                     <span class="price">${t.price}</span>
                 `;
                 tierTable.appendChild(row);
             });
-            upgradeModal.classList.add('open');
         }
 
-        // ================================================================
-        //   ONBOARDING
-        // ================================================================
+        // -------------------- ONBOARDING --------------------
         function goToStep(step) {
             document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
             document.querySelector(`.onboarding-step[data-step="${step}"]`).classList.add('active');
+            document.querySelectorAll('.onboarding-progress .dot').forEach(d => {
+                const s = parseInt(d.dataset.step);
+                d.classList.toggle('active', s === step);
+                d.classList.toggle('done', s < step);
+            });
         }
 
         function finishOnboarding() {
             const goal = $('onboardGoal').value;
             const revenue = parseFloat($('onboardRevenue').value) || 0;
             const bottleneck = $('onboardBottleneck').value;
+            const name = prompt('What\'s your business name? (optional)') || '';
             userRevenue = revenue;
+            businessName = name;
             if (revenue) revenueInput.value = revenue;
-            // Store in localStorage
+            if (name) businessNameDisplay.textContent = `👋 ${name}`;
             onboarded = true;
-            localStorage.setItem('e5_onboarded', 'true');
             saveLocalState();
             onboardingModal.classList.remove('open');
-            // Send a message to AI with context
-            const context = `My goal is ${goal}, my monthly revenue is $${revenue}, and my biggest bottleneck is ${bottleneck}.`;
+            const context = `My goal is ${goal}, my monthly revenue is $${revenue}, my biggest bottleneck is ${bottleneck}.`;
             addMessage(`Onboarding complete: ${context}`, 'ai', true);
-            // Optionally send to chat via API to store memory
-            // We could call /api/chat with a special message, but for now we just display.
             updateDashboard();
+            showToast('🎉 Welcome! You\'re all set up.', 'success');
         }
 
-        // ================================================================
-        //   VALUE EQUATION BUILDER
-        // ================================================================
+        // -------------------- VALUE EQUATION --------------------
         function openValueEq() {
-            // Set initial values from sliders
+            ['eqDream', 'eqLikelihood', 'eqTime', 'eqEffort'].forEach(id => {
+                const slider = $(id + 'Slider');
+                const display = $(id);
+                display.textContent = slider.value;
+            });
+            updateEqScore();
+            valueEqModal.classList.add('open');
+        }
+
+        function updateEqScore() {
             const dream = parseInt($('eqDreamSlider').value);
             const like = parseInt($('eqLikelihoodSlider').value);
             const time = parseInt($('eqTimeSlider').value);
             const effort = parseInt($('eqEffortSlider').value);
-            updateEqScore(dream, like, time, effort);
-            valueEqModal.classList.add('open');
-        }
-
-        function updateEqScore(dream, like, time, effort) {
             const score = (dream * like) / (time * effort);
             $('eqScore').textContent = Math.round(score * 10) / 10;
         }
 
-        // Slider listeners
         ['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
-            const slider = $(id);
-            slider.addEventListener('input', () => {
-                const dream = parseInt($('eqDreamSlider').value);
-                const like = parseInt($('eqLikelihoodSlider').value);
-                const time = parseInt($('eqTimeSlider').value);
-                const effort = parseInt($('eqEffortSlider').value);
-                // Update displays
-                $('eqDream').textContent = dream;
-                $('eqLikelihood').textContent = like;
-                $('eqTime').textContent = time;
-                $('eqEffort').textContent = effort;
-                updateEqScore(dream, like, time, effort);
+            $(id).addEventListener('input', () => {
+                const display = $(id.replace('Slider', ''));
+                display.textContent = $(id).value;
+                updateEqScore();
             });
         });
 
-        // ================================================================
-        //   CONFETTI
-        // ================================================================
+        // -------------------- CONFETTI --------------------
         function fireConfetti() {
             const container = document.createElement('div');
             container.className = 'confetti-container';
             document.body.appendChild(container);
+            const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
             for (let i = 0; i < 60; i++) {
                 const piece = document.createElement('div');
                 piece.className = 'confetti';
-                const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#4ade80', '#f472b6', '#60a5fa'];
                 piece.style.background = colors[Math.floor(Math.random() * colors.length)];
                 piece.style.left = Math.random() * 100 + '%';
                 piece.style.width = (Math.random() * 8 + 4) + 'px';
@@ -1951,9 +2122,7 @@
             setTimeout(() => container.remove(), 3000);
         }
 
-        // ================================================================
-        //   BOOT
-        // ================================================================
+        // -------------------- BOOT --------------------
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
