@@ -404,7 +404,6 @@
             .card-premium { padding: 14px 16px; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="ambient-bg"></div>
@@ -605,7 +604,7 @@
 
 <script>
 // ================================================================
-// QUATTUORTRIGINTILLION – Enhanced Core Logic
+// QUATTUORTRIGINTILLION – Enhanced Core Logic (FIXED)
 // ================================================================
 
 const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
@@ -709,7 +708,7 @@ function animateCounter(element, target, duration = 1200) {
 }
 
 // ================================================================
-// TOAST SYSTEM (Enhanced)
+// TOAST SYSTEM
 // ================================================================
 function showToast(msg, type = 'info') {
     const icons = { success: '✅', error: '⚠️', info: '💡' };
@@ -862,7 +861,7 @@ function isTierOk(userTier, required) {
 }
 
 // ================================================================
-// MODE POPULATION (Desktop + Mobile)
+// MODE POPULATION (Desktop + Mobile) – FIXED
 // ================================================================
 function populateModes() {
     const sel = $('modeSelect');
@@ -892,7 +891,8 @@ function renderModeList(container) {
         div.innerHTML = `<span class="icon"><i class="fas ${m.icon}"></i></span><span>${m.label}</span><span class="tier-tag ${m.tier}">${m.tier}</span><span class="dot ${dotClass}"></span>`;
         div.addEventListener('click', () => {
             if (!ok) { showToast('Upgrade to ' + m.tier + ' to unlock ' + m.label, 'error'); return; }
-            sel.value = m.id;
+            // ✅ FIXED: use global $('modeSelect') instead of undefined 'sel'
+            $('modeSelect').value = m.id;
             onModeChange();
             document.querySelector('.tab-btn[data-tab="chat"]').click();
             closeMobileSidebar();
@@ -1110,16 +1110,19 @@ function updateDashboard() {
     const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
     const health = Math.round((completed / total) * 100);
 
-    // Ring with animation
+    // Ring
     const healthEl = $('healthScore');
     animateCounter(healthEl, health, 1200);
     $('healthSub').textContent = completed + ' / ' + total + ' frameworks completed';
     const circ = 251.2;
     $('healthRing').style.strokeDashoffset = circ - (health / 100) * circ;
 
-    // Framework count
-    animateCounter($('fwCount'), completed, 800);
-    $('fwCount').textContent = completed + '/' + total;
+    // Framework count – animate then set full text
+    const fwEl = $('fwCount');
+    animateCounter(fwEl, completed, 800);
+    setTimeout(() => {
+        fwEl.textContent = completed + '/' + total;
+    }, 900);
     $('fwSub').textContent = completed === 0 ? 'Start your first framework' : completed + ' completed';
 
     // Strip
@@ -1162,7 +1165,7 @@ function updateDashboard() {
     // Next Best Action – contextual
     const nextActionEl = $('nextAction');
     if (completed === 0) {
-        nextActionEl.innerHTML = '🚀 <strong>Start with the Delivery Checklist</strong> — it's free and gives quick wins.';
+        nextActionEl.innerHTML = '🚀 <strong>Start with the Delivery Checklist</strong> — it\'s free and gives quick wins.';
     } else if (completed < 3) {
         nextActionEl.innerHTML = '📈 <strong>Complete AVOCADO Offers</strong> next to unlock lead generation power.';
     } else if (completed < 5 && currentTier === 'free') {
@@ -1170,7 +1173,7 @@ function updateDashboard() {
     } else if (completed < 8) {
         nextActionEl.innerHTML = '🏗️ <strong>Scale with Community OS</strong> — build retention that compounds.';
     } else {
-        nextActionEl.innerHTML = '👑 <strong>You're a Framework Master!</strong> Maintain your Rule of 100 streak.';
+        nextActionEl.innerHTML = '👑 <strong>You\'re a Framework Master!</strong> Maintain your Rule of 100 streak.';
     }
 
     // Badges
@@ -1220,7 +1223,7 @@ function finishOnboarding() {
     onboarded = true;
     saveState();
     $('onboardingModal').classList.remove('open');
-    showToast('🎉 Welcome! You're all set.', 'success');
+    showToast('🎉 Welcome! You\'re all set.', 'success');
     updatePersonalization();
     updateDashboard();
     addXP(50);
