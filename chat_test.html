@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E5 AI Coach | Trecentillion-X</title>
+    <title>Quindecillion AI Coach | Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,188 +11,371 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 500: '#f59e0b', 600: '#d97706', 900: '#78350f' },
-                        dark: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+                        brand: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            900: '#78350f',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
                     },
-                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
                 }
             }
         }
     </script>
     <style>
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-dark-950 text-slate-200 font-sans h-screen flex overflow-hidden">
+<body class="bg-dark-950 text-slate-200 font-sans h-screen flex overflow-hidden selection:bg-brand-500 selection:text-white">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-dark-900 border-r border-slate-800 flex flex-col hidden md:flex">
+    <aside class="w-72 bg-dark-900 border-r border-slate-800 flex flex-col hidden md:flex">
         <div class="p-6 border-b border-slate-800">
-            <h1 class="text-xl font-bold text-brand-500 tracking-tight">E5 AI COACH</h1>
-            <p class="text-xs text-slate-500 mt-1">Trecentillion-X Edition</p>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto p-4 space-y-6">
-            <div>
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Core Modes</h3>
-                <div class="space-y-1" id="mode-list">
-                    <!-- Modes injected via JS -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-900/50">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white tracking-tight">Quindecillion</h1>
+                    <p class="text-xs text-slate-400">Executive AI Coach</p>
                 </div>
             </div>
-            
-            <div>
-                <button onclick="toggleVault()" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    Framework Vault
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 space-y-6">
+            <!-- User Status -->
+            <div class="glass-panel rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Current Tier</span>
+                    <span id="user-tier-badge" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-700 text-slate-300">FREE</span>
+                </div>
+                <button onclick="openUnlockModal()" class="w-full mt-2 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-brand-900/30 flex items-center justify-center gap-2">
+                    <i class="fas fa-crown"></i> Unlock Partner
                 </button>
+            </div>
+
+            <!-- Modes -->
+            <div>
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">Operating Modes</h3>
+                <div id="modes-list" class="space-y-1">
+                    <!-- Modes injected via JS -->
+                    <div class="flex items-center justify-center p-4 text-slate-500">
+                        <i class="fas fa-circle-notch fa-spin mr-2"></i> Loading modes...
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="p-4 border-t border-slate-800">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold text-white">U</div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-white">User</p>
-                    <p class="text-xs text-brand-500" id="user-tier">Free Tier</p>
-                </div>
+            <div class="flex items-center gap-3 text-sm text-slate-400">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span>System Online · v18.0</span>
             </div>
-            <button onclick="toggleUnlock()" class="w-full py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg transition-colors">
-                Unlock Partner
-            </button>
-        </div.
+        </div>
     </aside>
 
     <!-- MAIN CHAT AREA -->
-    <main class="flex-1 flex flex-col relative">
-        <!-- Header -->
-        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-dark-900/50 backdrop-blur-md">
-            <div class="flex items-center gap-3">
-                <span class="text-lg font-semibold text-white" id="current-mode-title">Coach</span>
-                <span class="px-2 py-0.5 bg-slate-800 text-slate-400 text-xs rounded-full" id="rate-limit">30 msg/h</span>
+    <main class="flex-1 flex flex-col relative bg-dark-950">
+        <!-- Mobile Header -->
+        <header class="md:hidden h-16 border-b border-slate-800 flex items-center justify-between px-4 bg-dark-900">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-brain text-brand-500 text-xl"></i>
+                <span class="font-bold text-white">Quindecillion</span>
             </div>
-            <button class="md:hidden text-slate-400" onclick="document.querySelector('aside').classList.toggle('hidden')">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-.
-            </button>
+            <button class="text-slate-400"><i class="fas fa-bars text-xl"></i></button>
         </header>
 
-        <!-- Chat Messages -->
-        <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-            <div class="flex gap-4">
-                <div class="w-8 h-8 rounded-full bg-brand-600 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white">AI</div>
-                <div class="glass p-4 rounded-2xl rounded-tl-none max-w-3xl text-slate-300 leading-relaxed">
-                    Welcome to the E5 AI Coach. I have integrated the $100M Offers, Leads, Money Models, Retention, AVOCADO, and Time to Build frameworks. 
-                    <br><br>
-                    Select a mode from the sidebar or ask me anything about your business.
+        <!-- Chat Header -->
+        <header class="hidden md:flex h-16 border-b border-slate-800 items-center justify-between px-6 bg-dark-900/50 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <h2 id="current-mode-title" class="text-lg font-semibold text-white">Daily Operator</h2>
+                <span id="rate-limit-badge" class="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                    30 msg/h
+                </span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="clearChat()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Clear Chat">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+           8</div>
+        </header>
+
+        <!-- Messages Container -->
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth">
+            <!-- Welcome Message -->
+            <div class="flex gap-4 animate-slide-up">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex-shrink-0 flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl rounded-tl-none max-w-3xl text-slate-300 leading-relaxed">
+                    <p class="mb-2 font-semibold text-white">Welcome to the Quindecillion Command Center.</p>
+                    <p>I am your elite executive business coach. I have access to the complete $20,000+ framework library (TTB, AVOCADO, $100M Offers/Leads/Money Models).</p>
+                    <p class="mt-2">Select a mode from the sidebar, or ask me anything about your business. <span class="text-brand-400">What is your biggest bottleneck right now?</span></p>
                 </div>
             </div>
         </div>
 
-        <!-- Typing Indicator -->
+        <!-- Typing Indicator (Hidden by default) -->
         <div id="typing-indicator" class="hidden px-6 pb-2">
-            <div class="flex gap-2 items-center text-slate-500 text-sm">
-                <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            <div class="flex gap-2 items-center text-slate-500 text-sm ml-14">
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
                 <span class="ml-2">Analyzing frameworks...</span>
             </div>
         </div>
 
         <!-- Input Area -->
-        <div class="p-4 border-t border-slate-800 bg-dark-900">
+        <div class="p-4 md:p-6 border-t border-slate-800 bg-dark-900">
             <div class="max-w-4xl mx-auto relative">
-                <select id="mode-select" class="absolute left-2 top-2.5 bg-slate-800 text-slate-300 text-xs rounded px-2 py-1.5 border border-slate-700 focus:outline-none focus:border-brand-500">
-                    <!-- Options injected via JS -->
-                </select>
-                <textarea id="user-input" rows="1" placeholder="Ask your Quindecillion-X coach..." 
-                    class="w-full bg-slate-800/50 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none pl-24 pr-12 py-3 resize-none transition-all"
+                <div class="absolute left-3 top-3 z-10">
+                    <select id="mode-select" class="bg-slate-800 text-slate-300 text-xs font-semibold rounded-md px-2 py-1.5 border border-slate-700 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer">
+                        <!-- Options injected via JS -->
+                    </select>
+                </div>
+                <textarea 
+                    id="user-input" 
+                    rows="1" 
+                    placeholder="Ask your Quindecillion coach..." 
+                    class="w-full bg-slate-800/50 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none pl-28 pr-12 py-3 resize-none transition-all shadow-inner"
                     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
-                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                <button onclick="sendMessage()" class="absolute right-2 top-2 p-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+                ></textarea>
+                <button 
+                    onclick="sendMessage()" 
+                    id="send-btn"
+                    class="absolute right-2 top-2 p-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-all shadow-lg shadow-brand-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+            <p class="text-center text-xs text-slate-600 mt-2">AI can make mistakes. Verify critical business decisions.</p>
         </div>
     </main>
 
-    <!-- Unlock Modal -->
-    <div id="unlock-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="glass p-6 rounded-2xl w-full max-w-md border border-slate-700">
-            <h3 class="text-xl font-bold text-white mb-2">Unlock Partner Tier</h3>
-            <p class="text-slate-400 text-sm mb-4">Enter your Whop license key to access Offer, Workshop, and Launch modes.</p>
-            <input type="text" id="license-key" placeholder="XXXX-XXXX-XXXX" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white mb-4 focus:border-brand-500 focus:outline-none">
+    <!-- UNLOCK MODAL -->
+    <div id="unlock-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="glass-panel p-6 rounded-2xl w-full max-w-md border border-slate-700 shadow-2xl animate-slide-up">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-crown text-brand-500"></i> Unlock Your Plan
+                </h3>
+                <button onclick="closeUnlockModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+            <p class="text-slate-400 text-sm mb-4">
+                Upgrade from <span class="text-slate-300">Free</span> → <span class="text-blue-400">Insider</span> → <span class="text-brand-400">Partner</span>.<br>
+                Your license key is shown in your Whop account after purchase.
+            </p>
+            <input 
+                type="text" 
+                id="license-key-input" 
+                placeholder="XXXX-XXXX-XXXX-XXXX" 
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 mb-4 font-mono text-sm"
+            >
             <div class="flex gap-3 justify-end">
-                <button onclick="toggleUnlock()" class="px-4 py-2 text-slate-400 hover:text-white text-sm">Cancel</button>
-                <button onclick="unlockTier()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg">Unlock</button>
+                <button onclick="closeUnlockModal()" class="px-4 py-2 text-slate-400 hover:text-white text-sm font-medium transition-colors">Cancel</button>
+                <button onclick="unlockTier()" id="unlock-btn" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-brand-900/30 flex items-center gap-2">
+                    <span>Unlock</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        const MODES = {
-            "coach": "Daily Operator", "xray": "Business X-Ray", "funnel": "Funnel Map",
-            "community": "Community OS", "dm": "DM Doctor", "content": "Content Engine",
-            "alchemy": "Alchemy (Video)", "hack": "Funnel Hacker",
-            "offer": "Offer Architect", "workshop": "Workshop Architect", "launch": "Launch Planner"
-        };
-        const TIER_LOCKED = ["offer", "workshop", "launch"];
-        let currentTier = "free";
-        let currentMode = "coach";
+        // --- STATE ---
+        let currentMode = 'coach';
+        let memberId = localStorage.getItem('qc_member_id') || 'default';
         let chatHistory = [];
+        let currentTier = 'free';
 
-        // Initialize UI
-        function init() {
-            const modeList = document.getElementById('mode-list');
-            const modeSelect = document.getElementById('mode-select');
-            
-            for (const [key, label] of Object.entries(MODES)) {
-                // Sidebar
-                const btn = document.createElement('button');
-                btn.className = `w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${key === currentMode ? 'bg-brand-600/20 text-brand-500' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`;
-                btn.innerHTML = `<span>${label}</span> ${TIER_LOCKED.includes(key) ? '<span class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-slate-400">PRO</span>' : ''}`;
-                btn.onclick = () => setMode(key);
-                modeList.appendChild(btn);
-
-                // Dropdown
-                const opt = document.createElement('option');
-                opt.value = key;
-                opt.textContent = label;
-                modeSelect.appendChild(opt);
-            }
-            modeSelect.value = currentMode;
-            modeSelect.onchange = (e) => setMode(e.target.value);
+        if (!localStorage.getItem('qc_member_id')) {
+            localStorage.setItem('qc_member_id', memberId);
         }
 
-        function setMode(mode) {
-            if (TIER_LOCKED.includes(mode) && currentTier === "free") {
-                toggleUnlock();
-                return;
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchModes();
+            fetchTier();
+        });
+
+        // --- API CALLS ---
+        async function fetchModes() {
+            try {
+                const res = await fetch('/api/modes');
+                const data = await res.json();
+                renderModes(data.modes, data.tiers);
+            } catch (err) {
+                console.error("Failed to fetch modes", err);
             }
+        }
+
+        async function fetchTier() {
+            try {
+                const res = await fetch(`/api/tier?member_id=${memberId}`);
+                const data = await res.json();
+                currentTier = data.tier;
+                updateTierUI(currentTier);
+            } catch (err) {
+                console.error("Failed to fetch tier", err);
+            }
+        }
+
+        // --- UI RENDERING ---
+        function renderModes(modes, tiers) {
+            const listContainer = document.getElementById('modes-list');
+            const selectContainer = document.getElementById('mode-select');
+            
+            listContainer.innerHTML = '';
+            selectContainer.innerHTML = '';
+
+            const modeNames = {
+                'coach': 'Daily Operator',
+                'xray': 'Business X-Ray',
+                'funnel': 'Funnel Map',
+                'community': 'Community OS',
+                'dm': 'DM Doctor',
+                'content': 'Content Engine',
+                'alchemy': 'Alchemy (Video)',
+                'hack': 'Funnel Hacker',
+                'offer': 'Offer Architect',
+                'workshop': 'Workshop Architect',
+                'launch': 'Launch Planner'
+            };
+
+            modes.forEach(mode => {
+                const requiredTier = tiers[mode];
+                const isLocked = (requiredTier === 'insider' && currentTier === 'free') || 
+                                 (requiredTier === 'partner' && (currentTier === 'free' || currentTier === 'insider'));
+                
+                const displayName = modeNames[mode] || mode;
+
+                // Sidebar Item
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-3 py-2.5 text-sm rounded-lg transition-all flex justify-between items-center group ${
+                    mode === currentMode 
+                    ? 'bg-brand-600/20 text-brand-400 border border-brand-600/30' 
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`;
+                
+                let badgeHtml = '';
+                if (requiredTier === 'insider') badgeHtml = '<span class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30">INSIDER</span>';
+                if (requiredTier === 'partner') badgeHtml = '<span class="text-[10px] bg-brand-500/20 text-brand-400 px-1.5 py-0.5 rounded border border-brand-500/30">PARTNER</span>';
+
+                btn.innerHTML = `<span>${displayName}</span> ${badgeHtml}`;
+                
+                if (!isLocked) {
+                    btn.onclick = () => setMode(mode, displayName);
+                } else {
+                    btn.onclick = () => openUnlockModal();
+                }
+                
+                listContainer.appendChild(btn);
+
+                // Select Option
+                const opt = document.createElement('option');
+                opt.value = mode;
+                opt.textContent = displayName;
+                if (isLocked) {
+                    opt.disabled = true;
+                    opt.textContent += ` (🔒 ${requiredTier})`;
+                }
+                selectContainer.appendChild(opt);
+            });
+
+            selectContainer.value = currentMode;
+            selectContainer.onchange = (e) => {
+                const selectedMode = e.target.value;
+                const name = modeNames[selectedMode] || selectedMode;
+                setMode(selectedMode, name);
+            };
+        }
+
+        function setMode(mode, name) {
             currentMode = mode;
-            document.getElementById('current-mode-title').textContent = MODES[mode];
+            document.getElementById('current-mode-title').textContent = name;
             document.getElementById('mode-select').value = mode;
             
             // Update sidebar active state
-            const buttons = document.getElementById('mode-list').children;
-            Array.from(buttons).forEach((btn, idx) => {
-                const key = Object.keys(MODES)[idx];
-                btn.className = `w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex justify-between items-center ${key === mode ? 'bg-brand-600/20 text-brand-500' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`;
+            const buttons = document.getElementById('modes-list').children;
+            Array.from(buttons).forEach(btn => {
+                if (btn.textContent.includes(name)) {
+                    btn.className = 'w-full text-left px-3 py-2.5 text-sm rounded-lg transition-all flex justify-between items-center bg-brand-600/20 text-brand-400 border border-brand-600/30';
+                } else {
+                    btn.className = 'w-full text-left px-3 py-2.5 text-sm rounded-lg transition-all flex justify-between items-center text-slate-400 hover:bg-slate-800 hover:text-slate-200';
+                }
             });
         }
 
+        function updateTierUI(tier) {
+            const badge = document.getElementById('user-tier-badge');
+            badge.textContent = tier.toUpperCase();
+            
+            if (tier === 'insider') {
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30';
+            } else if (tier === 'partner') {
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30';
+            } else {
+                badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-slate-700 text-slate-300';
+            }
+            
+            // Re-render modes to unlock locked ones
+            fetchModes();
+        }
+
+        // --- CHAT LOGIC ---
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
 
+            // Add user message
             appendMessage('user', text);
             chatHistory.push({ role: 'user', content: text });
+            
             input.value = '';
             input.style.height = 'auto';
             
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
             document.getElementById('typing-indicator').classList.remove('hidden');
 
             try {
@@ -200,79 +383,129 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_message: text,
+                        message: text,
                         mode: currentMode,
-                        history: chatHistory.slice(-10)
+                        member_id: memberId,
+                        history: chatHistory.slice(-16) // Keep last 16 messages for context
                     })
                 });
 
                 const data = await res.json();
+
                 if (res.ok) {
                     appendMessage('ai', data.reply);
                     chatHistory.push({ role: 'assistant', content: data.reply });
-                    document.getElementById('rate-limit').textContent = `${data.remaining} msg/h`;
+                    
+                    // Update rate limit badge
+                    if (data.remaining !== undefined) {
+                        document.getElementById('rate-limit-badge').textContent = `${data.remaining} msg/h`;
+                    }
                 } else {
-                    appendMessage('ai', `⚠️ Error: ${data.detail}`);
+                    appendMessage('ai', `⚠️ **Error:** ${data.detail || 'Unknown error occurred'}`);
                 }
             } catch (err) {
-                appendMessage('ai', `⚠️ Network error. Is the backend running?`);
+                appendMessage('ai', `⚠️ **Network Error:** Could not connect to the Quindecillion backend.`);
             } finally {
                 document.getElementById('typing-indicator').classList.add('hidden');
+                sendBtn.disabled = false;
+                input.focus();
             }
         }
 
         function appendMessage(role, text) {
             const container = document.getElementById('chat-container');
             const div = document.createElement('div');
-            div.className = 'flex gap-4 animate-[fadeIn_0.3s_ease-out]';
+            div.className = `flex gap-4 animate-slide-up ${role === 'user' ? 'flex-row-reverse' : ''}`;
             
             const isAi = role === 'ai';
+            const avatarBg = isAi ? 'from-brand-400 to-brand-600' : 'from-slate-600 to-slate-700';
+            const icon = isAi ? 'fa-robot' : 'fa-user';
+            
+            // Simple markdown-like bold parsing
+            const formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
+                .replace(/\n/g, '<br>');
+
             div.innerHTML = `
-                <div class="w-8 h-8 rounded-full ${isAi ? 'bg-brand-600' : 'bg-slate-700'} flex-shrink-0 flex items-center justify-center text-xs font-bold text-white">
-                    ${isAi ? 'AI' : 'U'}
-                </div>
-                <div class="glass p-4 rounded-2xl ${isAi ? 'rounded-tl-none' : 'rounded-tr-none'} max-w-3xl text-slate-300 leading-relaxed whitespace-pre-wrap">
-                    ${text}
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${avatarBg} flex-shrink-0 flex items-center justify-center text-white shadow-lg">
+                    <i class="fas ${icon}"></i>
+                </
+                <div class="glass-panel p-4 rounded-2xl ${isAi ? 'rounded-tl-none' : 'rounded-tr-none'} max-w-3xl text-slate-300 leading-relaxed relative group">
+                    ${formattedText}
+                    ${isAi ? `<button onclick="speakText(this)" class="absolute -bottom-8 right-0 text-slate-500 hover:text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Read aloud"><i class="fas fa-volume-up"></i></button>` : ''}
                 </div>
             `;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
-        function toggleUnlock() {
-            const modal = document.getElementById('unlock-modal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+        function clearChat() {
+            chatHistory = [];
+            const container = document.getElementById('chat-container');
+            container.innerHTML = `
+                <div class="flex gap-4 animate-slide-up">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex-shrink-0 flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl rounded-tl-none max-w-3xl text-slate-300 leading-relaxed">
+                        <p class="mb-2 font-semibold text-white">Chat cleared.</p>
+                        <p>Ready for the next strategic directive. What is our focus?</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- TTS (Text to Speech) ---
+        function speakText(btn) {
+            const text = btn.parentElement.innerText.replace('Read aloud', '').trim();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- UNLOCK MODAL ---
+        function openUnlockModal() {
+            document.getElementById('unlock-modal').classList.remove('hidden');
+            document.getElementById('unlock-modal').classList.add('flex');
+        }
+
+        function closeUnlockModal() {
+            document.getElementById('unlock-modal').classList.add('hidden');
+            document.getElementById('unlock-modal').classList.remove('flex');
         }
 
         async function unlockTier() {
-            const key = document.getElementById('license-key').value;
+            const key = document.getElementById('license-key-input').value.trim();
+            if (!key) return;
+
+            const btn = document.getElementById('unlock-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
+
             try {
                 const res = await fetch('/api/unlock', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ license_key: key })
+                    body: JSON.stringify({ license_key: key, member_id: memberId })
                 });
                 const data = await res.json();
+
                 if (res.ok) {
                     currentTier = data.tier;
-                    document.getElementById('user-tier').textContent = data.tier.charAt(0).toUpperCase() + data.tier.slice(1) + " Tier";
-                    document.getElementById('user-tier').className = `text-xs font-semibold ${data.tier === 'partner' ? 'text-brand-500' : 'text-blue-400'}`;
-                    toggleUnlock();
-                    alert(`Successfully unlocked ${data.tier} tier!`);
+                    updateTierUI(currentTier);
+                    closeUnlockModal();
+                    appendMessage('ai', `🎉 **Upgrade Successful!** You are now on the **${currentTier.toUpperCase()}** tier. You now have access to premium frameworks and modes.`);
                 } else {
-                    alert(data.detail || "Invalid key");
+                    alert(`Unlock Failed: ${data.detail}`);
                 }
             } catch (err) {
-                alert("Network error");
+                alert("Network error during unlock.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Unlock</span><i class="fas fa-arrow-right text-xs"></i>';
             }
         }
-
-        function toggleVault() {
-            alert("Framework Vault: $100M Offers, Leads, Money Models, Retention, AVOCADO, TTB integrated into AI brain.");
-        }
-
-        init();
     </script>
 </body>
 </html>
