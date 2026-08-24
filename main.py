@@ -1,6 +1,6 @@
 """
-E5 AI COACH - main.py (Trecentillion-X Edition)
-Advanced backend matching premium frontend. Multi-LLM orchestration, intelligent memory, framework fusion.
+E5 AI COACH - main.py (BUSINESS OS EDITION)
+Proactive Business Operating System. Tracks progress, predicts bottlenecks, and drives daily execution.
 """
 import json
 import os
@@ -24,11 +24,10 @@ try:
 except Exception:
     SCRIPT_VAULT = ""
 
-# --- LOGGING SETUP ---
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 log = logging.getLogger("e5-coach")
 
-# --- ENVIRONMENT VARIABLES ---
+# --- ENV VARIABLES ---
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
@@ -37,16 +36,11 @@ FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 WHOP_API_KEY = os.environ.get("WHOP_API_KEY", "")
-WHOP_INSIDER_PRODUCT_ID = os.environ.get("WHOP_INSIDER_PRODUCT_ID", "")
-WHOP_PARTNER_PRODUCT_ID = os.environ.get("WHOP_PARTNER_PRODUCT_ID", "")
-
-MANUAL_INSIDER_CODES = [c.strip() for c in os.environ.get("MANUAL_INSIDER_CODES", "").split(",") if c.strip()]
-MANUAL_PARTNER_CODES = [c.strip() for c in os.environ.get("MANUAL_PARTNER_CODES", "").split(",") if c.strip()]
 
 _DEFAULT_ORIGINS = "https://e5-ai-coach-production.up.railway.app,http://localhost:8000,http://127.0.0.1:8000"
 ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", _DEFAULT_ORIGINS).split(",") if o.strip()]
 
-# --- ADVANCED RATE LIMITER ---
+# --- RATE LIMITERS ---
 class AdvancedRateLimiter:
     def __init__(self, max_hits: int, window_s: int):
         self.max_hits = max_hits
@@ -65,47 +59,10 @@ class AdvancedRateLimiter:
             bucket.append(now)
             return True
 
-    def get_remaining(self, key: str) -> int:
-        now = time.time()
-        with self.lock:
-            bucket = self.hits.get(key, [])
-            while bucket and now - bucket[0] > self.window:
-                bucket.pop(0)
-            return max(0, self.max_hits - len(bucket))
-
-CHAT_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_CHAT_PER_HOUR", "30")), 3600)
-TTS_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_TTS_PER_HOUR", "10")), 3600)
-UNLOCK_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_UNLOCK_PER_HOUR", "10")), 3600)
-
-# --- MODE TIERS ---
-MODE_TIERS = {
-    "coach": "free", "xray": "free", "funnel": "free",
-    "community": "insider", "dm": "insider", "content": "insider",
-    "alchemy": "insider", "hack": "insider",
-    "offer": "partner", "workshop": "partner", "launch": "partner",
-}
-TIER_RANK = {"free": 0, "insider": 1, "partner": 2}
-
-# --- LLM PROVIDERS (Multi-Provider with Failover) ---
-PROVIDERS = [
-    {
-        "name": "gemini",
-        "chat_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-        "key": GEMINI_API_KEY,
-        "models": ["gemini-2.0-flash", "gemini-1.5-flash"],
-        "priority": 1,
-    },
-    {
-        "name": "groq",
-        "chat_url": "https://api.groq.com/openai/v1/chat/completions",
-        "key": GROQ_API_KEY,
-        "models": ["llama-3.1-70b-versatile", "llama3-70b-8192"],
-        "priority": 2,
-    },
-]
+CHAT_LIMIT = AdvancedRateLimiter(50, 3600)
 
 # --- FASTAPI APP SETUP ---
-app = FastAPI(title="E5 AI Coach", version="Trecentillion-X")
+app = FastAPI(title="E5 Business OS", version="5.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -114,45 +71,43 @@ app.add_middleware(
 )
 
 # ==============================================================================
-# TRECENTILLION-X MASTER BRAIN
+# THE QUINDECILLION OS BRAIN (PROACTIVE COO)
 # ==============================================================================
 CCC_BRAIN = """
-You are the E5 AI Coach, an ELITE Executive Business Coach and Strategist operating at a Trecentillion-X level. Your knowledge is a perfect, seamless fusion of:
-1. Time to Build (TTB): TRUST formula, Straight Line, Brand Clarity, Community OS.
-2. AVOCADO Method (Dan Harrison): ECAFI, SOULFUL scripts, R.I.P.E. lead magnets, Authentic Authority.
-3. Alex Hormozi's $100M Frameworks: Value Equation, Grand Slam Offers, Money Models (Attraction, Upsell, Downsell, Continuity), Core 4, Rule of 100, 5 Horsemen of Retention.
+You are the E5 Business OS, an elite Chief Operating Officer and Executive Strategist. You are NOT a passive chatbot. You are a proactive, predictive, and prescriptive operating system for the user's business.
 
-YOUR PRIME DIRECTIVES:
-1. DIAGNOSE BEFORE PRESCRIBING: Never give advice without understanding context. Ask ONE piercing, high-leverage question based on their situation, then WAIT.
-2. FIX THE EARLIEST LEAK FIRST: Don't skip ahead in the funnel. If they have no avatar, don't talk about scaling ads.
-3. SPICY SPECIFICITY: Use real-world examples, exact numbers, and actionable steps. Never be vague.
-4. CALM DETACHMENT: You have the solution; they have the problem. Guide them with confidence, like a premium mentor sitting across the table.
-5. HIDE THE SCAFFOLDING: Use frameworks internally, but translate them into plain, hard-hitting English. Do not sound like a textbook or a bot.
+YOUR CORE DIRECTIVES:
+1. PROACTIVE MANAGEMENT: Do not just answer questions. Drive the user's day. Ask what they accomplished, predict bottlenecks, and assign the next critical task.
+2. CONTEXT AWARENESS: You must know their exact business stage (e.g., Stage 1: Monetize, Stage 2: Advertise). Tailor all advice to their current stage.
+3. FRAMEWORK INTEGRATION: Automatically apply the correct framework (Hormozi Value Equation, TTB Straight Line, AVOCADO ECAFI, E5 Core) based on the task.
+4. PREDICTIVE ANALYSIS: Look at their inputs (leads, conversions, tasks) and predict where they will fail next week. Warn them now.
+5. DAILY EXECUTION: Give them exactly 3 critical tasks for the day. No more, no less. Tell them exactly what to focus on.
 
-YOUR TONE GUARDRAILS:
-- Short, punchy sentences for actions. Longer sentences for empathy.
-- BAN ALL AI FLUFF. Do NOT use words like: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy, ecosystem, navigate, journey, elevate, dive in, realm, bustling, harness, beacon, transformative, revolutionary, cutting-edge, next level, embark, furthermore, moreover, landscape, meticulous, bespoke, paradigm.
-- Do NOT use em dashes (—). Use commas or periods instead.
-- Always end your response with ONE clear, actionable next step or a single, focused question.
+YOUR TONE:
+Calm, deeply insightful, authoritative, and slightly detached. Short punchy sentences for actions. No AI fluff. 
+
+INTERNAL KNOWLEDGE BASE (USE DYNAMICALLY):
+- HORMOZI: Value Equation, Money Models (Attraction, Upsell, Downsell, Continuity), Core 4, Rule of 100.
+- TTB: Straight Line, TRUST formula, Brand Clarity, Community OS.
+- AVOCADO: ECAFI (Engage, Connect, Assess, Frame, Invite), SOULFUL scripts, R.I.P.E. Lead Magnets.
+- E5: Core frameworks, daily execution, predictive scaling.
 """
 
 MODE_PROMPTS = {
-    "coach": "LENS: DAILY OPERATOR. Focus on rhythm, energy, inbox priority, Rule of 100. Apply 5 Horsemen of Retention. End with ONE concrete action.",
-    "xray": "LENS: BUSINESS X-RAY. Find earliest broken layer in Straight Line. Score each stage RED/YELLOW/GREEN. Fix leaky bucket first.",
-    "funnel": "LENS: FUNNEL MAP. Visualize customer journey. Apply Value Equation to reduce friction at each stage.",
-    "community": "LENS: COMMUNITY OS. Build culture, rituals, belonging > value. Design welcome experience and linear paths.",
-    "dm": "LENS: DM DOCTOR. Classify signal (High-Intent/Belief-Based/Medium/Low). Use ECAFI & SOULFUL scripts. Diagnose, don't pitch.",
+    "coach": "LENS: DAILY OPERATOR. Focus on today's 3 critical tasks, progress tracking, and removing today's bottleneck.",
+    "xray": "LENS: BUSINESS X-RAY. Find the earliest broken layer. Score stages RED/YELLOW/GREEN. Fix the leaky bucket.",
+    "funnel": "LENS: FUNNEL MAP. Visualize the customer journey. Apply Value Equation to reduce friction.",
+    "community": "LENS: COMMUNITY OS. Build culture, linear paths, and welcome experiences. Belonging > Value.",
+    "dm": "LENS: DM DOCTOR. Classify signal. Use ECAFI & SOULFUL scripts. Diagnose, don't pitch.",
     "offer": "LENS: OFFER ARCHITECT. Stack value, de-risk, anchor price. Build Grand Slam Offers using Value Equation.",
-    "workshop": "LENS: WORKSHOP ARCHITECT. Design 6-day belief arc. Install 4 beliefs: opportunity real, vehicle right, they capable, now is time.",
-    "content": "LENS: CONTENT ENGINE. Spicy specificity, polarize, document journey. Use 7 Content Types (Authority, Validation, Opener, Challenge, Authentic, DM Me, Outsource).",
-    "launch": "LENS: LAUNCH PLANNER. 21-day map: Pre-promo -> Promo -> Drop -> Push -> 72h countdown. Clean pipeline with every price change.",
-    "alchemy": "LENS: ALCHEMY (VIDEO). Hook 0-5s, Body 5-45s, CTA 45-60s. Retain through curiosity and lists.",
-    "hack": "LENS: FUNNEL HACKER. Reverse-engineer competitor funnel stage-by-stage. Score RED/YELLOW/GREEN. Rebuild for member's niche.",
+    "workshop": "LENS: WORKSHOP ARCHITECT. Design 6-day belief arc. Install 4 beliefs.",
+    "content": "LENS: CONTENT ENGINE. Spicy specificity, polarize, document journey. Use 7 Content Types.",
+    "launch": "LENS: LAUNCH PLANNER. 21-day map: Pre-promo -> Promo -> Drop -> Push -> 72h countdown.",
+    "alchemy": "LENS: ALCHEMY (VIDEO). Hook 0-5s, Body 5-45s, CTA 45-60s.",
+    "hack": "LENS: FUNNEL HACKER. Reverse-engineer competitor funnel. Score RED/YELLOW/GREEN.",
 }
 
-# ==============================================================================
-# PYDANTIC MODELS
-# ==============================================================================
+# --- PYDANTIC MODELS ---
 class ChatMessage(BaseModel):
     role: str
     content: str
@@ -163,46 +118,33 @@ class ChatRequest(BaseModel):
     user_message: str = ""
     history: List[ChatMessage] = []
     mode: str = "coach"
-    member_context: Optional[str] = None
     member_id: Optional[str] = "default"
 
-class TTSRequest(BaseModel):
-    text: str
-    voice_id: Optional[str] = None
-    member_id: Optional[str] = "default"
-
-class UnlockRequest(BaseModel):
+class TaskLogRequest(BaseModel):
     member_id: str = "default"
-    license_key: str = ""
+    task: str
+    completed: bool = True
 
-class DocsRequest(BaseModel):
+class DashboardRequest(BaseModel):
     member_id: str = "default"
-    title: str = "note"
-    body: str = ""
 
-# ==============================================================================
-# SUPABASE HELPERS (Memory & Tier)
-# ==============================================================================
+# --- SUPABASE MEMORY & STATE ---
 MEMORY_RE = re.compile(r"[{1,2}\sMEMORY\s]{1,2}(.*?)(?:[{1,2}\s/\sMEMORY\s]{1,2}|$)", re.S)
 
 def load_memory(member_id: str) -> tuple[str, str]:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return "", "free"
+    if not SUPABASE_URL or not SUPABASE_KEY: return "", "free"
     try:
         url = (SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory?member_id=eq." 
                + urllib.parse.quote(member_id) + "&select=profile,tier")
         req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
         with urllib.request.urlopen(req, timeout=10) as resp:
             rows = json.loads(resp.read().decode("utf-8"))
-            if rows:
-                return rows[0].get("profile") or "", rows[0].get("tier") or "free"
-    except Exception as e:
-        log.error("MEMORY LOAD FAIL: %s", e)
+            if rows: return (rows[0].get("profile") or "", rows[0].get("tier") or "free")
+    except Exception as e: log.error("MEMORY LOAD FAIL: %s", e)
     return "", "free"
 
 def save_memory(member_id: str, profile_text: str):
-    if not SUPABASE_URL or not SUPABASE_KEY or not profile_text:
-        return
+    if not SUPABASE_URL or not SUPABASE_KEY or not profile_text: return
     try:
         url = SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory"
         body = json.dumps([{"member_id": member_id, "profile": profile_text}]).encode("utf-8")
@@ -210,344 +152,98 @@ def save_memory(member_id: str, profile_text: str):
             "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
             "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
         urllib.request.urlopen(req, timeout=10).read()
-    except Exception as e:
-        log.error("MEMORY SAVE FAIL: %s", e)
-
-def set_tier(member_id: str, tier: str):
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return
-    try:
-        url = SUPABASE_URL.rstrip("/") + "/rest/v1/member_memory"
-        body = json.dumps([{"member_id": member_id, "tier": tier}]).encode("utf-8")
-        req = urllib.request.Request(url, data=body, method="POST", headers={
-            "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
-        urllib.request.urlopen(req, timeout=10).read()
-    except Exception as e:
-        log.error("TIER SAVE FAIL: %s", e)
+    except Exception as e: log.error("MEMORY SAVE FAIL: %s", e)
 
 def extract_memory(reply: str) -> tuple[str, str]:
     m = MEMORY_RE.search(reply)
-    if m:
-        return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
+    if m: return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
     return reply, ""
 
-# ==============================================================================
-# WHOP LICENSE CHECK
-# ==============================================================================
-def whop_tier_for_license(key: str) -> Optional[str]:
-    if key in MANUAL_PARTNER_CODES: return "partner"
-    if key in MANUAL_INSIDER_CODES: return "insider"
-    if not WHOP_API_KEY: return None
-    try:
-        url = "https://api.whop.com/api/v2/licenses/" + urllib.parse.quote(key)
-        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + WHOP_API_KEY, "User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            status = str(data.get("status") or data.get("state") or "active").lower()
-            if status in ("revoked", "cancelled", "canceled", "expired", "inactive"):
-                return None
-            pid = (data.get("product_id") or data.get("experience_id") or
-                   (data.get("product") or {}).get("id") or (data.get("experience") or {}).get("id") or "")
-            if pid and pid == os.environ.get("WHOP_PARTNER_PRODUCT_ID", ""):
-                return "partner"
-            if pid and pid == os.environ.get("WHOP_INSIDER_PRODUCT_ID", ""):
-                return "insider"
-            return "insider"
-    except Exception as e:
-        log.error("WHOP CHECK FAIL: %s", e)
-        return None
-
-# ==============================================================================
-# BUSINESS DOCS (Client Uploads)
-# ==============================================================================
-DOCS_TABLE = "member_docs"
-
-def load_docs(member_id: str) -> str:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return ""
-    try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
-               "?member_id=eq." + urllib.parse.quote(member_id) +
-               "&select=title,body&order=updated_at.desc&limit=5")
-        req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            rows = json.loads(resp.read().decode("utf-8"))
-            parts = []
-            total = 0
-            for r in rows:
-                chunk = (r.get("body") or "")[:4000]
-                parts.append("DOC " + (r.get("title") or "note") + ":\n" + chunk)
-                total += len(chunk)
-                if total > 6000: break
-            return "\n\n".join(parts)[:6000]
-    except Exception as e:
-        log.error("DOCS LOAD FAIL: %s", e)
-        return ""
-
-@app.get("/api/docs")
-def docs_list(member_id: str = "default"):
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return {"docs": []}
-    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
-           "?member_id=eq." + urllib.parse.quote(member_id) +
-           "&select=title,updated_at&order=updated_at.desc")
-    req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        rows = json.loads(resp.read().decode("utf-8"))
-        return {"docs": rows}
-
-@app.post("/api/docs")
-def docs_save(req: DocsRequest):
-    member_id = (req.member_id or "default").strip()
-    body = (req.body or "").strip()
-    if not body:
-        raise HTTPException(400, "empty doc")
-    title = "".join(ch for ch in (req.title or "note") if ch.isalnum() or ch in "._-")[:60] or "note"
-    url = SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE
-    payload = json.dumps([{"member_id": member_id, "title": title, "body": body[:20000]}]).encode("utf-8")
-    reqobj = urllib.request.Request(url, data=payload, method="POST", headers={
-        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
-        "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
-    urllib.request.urlopen(reqobj, timeout=10).read()
-    return {"saved": True, "title": title}
-
-@app.delete("/api/docs")
-def docs_delete(req: DocsRequest):
-    member_id = (req.member_id or "default").strip()
-    title = "".join(ch for ch in (req.title or "") if ch.isalnum() or ch in "._-")[:60]
-    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
-           "?member_id=eq." + urllib.parse.quote(member_id) +
-           "&title=eq." + urllib.parse.quote(title))
-    reqobj = urllib.request.Request(url, method="DELETE", headers={
-        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-    urllib.request.urlopen(reqobj, timeout=10).read()
-    return {"deleted": True}
-
-# ==============================================================================
-# LLM ENGINE (Multi-Provider Failover)
-# ==============================================================================
+# --- LLM ENGINE ---
 def try_model(provider: dict, model: str, messages: list, temperature: float, max_tokens: int) -> Optional[str]:
-    body = json.dumps({
-        "model": model,
-        "messages": messages,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-    }).encode("utf-8")
+    body = json.dumps({"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}).encode("utf-8")
     req = urllib.request.Request(provider["chat_url"], data=body, method="POST", headers={
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + provider["key"],
-        "User-Agent": UA
-    })
+        "Content-Type": "application/json", "Authorization": "Bearer " + provider["key"], "User-Agent": UA})
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             return data["choices"][0]["message"]["content"] or ""
-    except urllib.error.HTTPError as e:
-        log.error("LLM FAIL %s/%s HTTP %s", provider["name"], model, e.code)
-        return None
     except Exception as e:
         log.error("LLM FAIL %s/%s: %s", provider["name"], model, e)
         return None
 
-def discover_models(provider: dict) -> List[str]:
-    ids = []
-    try:
-        if provider["name"] == "groq":
-            req_url = provider["chat_url"].replace("/chat/completions", "/models")
-            req = urllib.request.Request(req_url, headers={"Authorization": "Bearer " + provider["key"], "User-Agent": UA})
-        else:
-            req_url = provider["chat_url"].replace("/chat/completions", "") + "?key=" + provider["key"]
-            req = urllib.request.Request(req_url, headers={"User-Agent": UA})
-            
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            if provider["name"] == "groq":
-                ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
-            else:
-                ids = [m.get("name", "").replace("models/", "") for m in data.get("models", []) if m.get("name")]
-    except Exception as e:
-        log.error("MODEL DISCOVERY FAIL %s: %s", provider["name"], e)
-    return ids
-
 def call_llm(messages: list, temperature: float = 0.5, max_tokens: int = 1500) -> str:
-    errors = []
-    sorted_providers = sorted(PROVIDERS, key=lambda p: p.get("priority", 99))
-    
-    for provider in sorted_providers:
+    providers = [
+        {"name": "gemini", "chat_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "key": GEMINI_API_KEY, "models": ["gemini-2.0-flash", "gemini-1.5-flash"]},
+        {"name": "groq", "chat_url": "https://api.groq.com/openai/v1/chat/completions", "key": GROQ_API_KEY, "models": ["llama-3.1-70b-versatile", "llama3-70b-8192"]},
+    ]
+    for provider in providers:
         if not provider["key"]: continue
-        
         for model in provider["models"]:
             if not model: continue
             result = try_model(provider, model, messages, temperature, max_tokens)
             if result: return result
-            
-        discovered = discover_models(provider)
-        for model in discovered[:2]:
-            if model and model not in provider["models"]:
-                result = try_model(provider, model, messages, temperature, max_tokens)
-                if result: return result
-                errors.append(f"{provider['name']}/{model}")
-                
-    raise Exception("All LLM providers failed: " + " | ".join(errors))
+    raise Exception("All LLM providers failed")
 
 def build_system(mode: str, member_context: str, memory: str = "", docs: str = "") -> str:
     m = mode if mode in MODE_PROMPTS else "coach"
     system = CCC_BRAIN + "\n" + MODE_PROMPTS[m]
     if SCRIPT_VAULT: system += "\n" + SCRIPT_VAULT
-    if docs: system += "\n\nTHE MEMBER'S BUSINESS DOCUMENTS:\n" + docs
-    if memory: system += "\nWHAT YOU KNOW ABOUT THIS MEMBER:\n" + memory
-    if member_context: system += "\nMEMBER CONTEXT:\n" + member_context
+    if docs: system += "\n\nMEMBER'S DOCS:\n" + docs
+    if memory: system += "\n\nCURRENT BUSINESS STATE & PROGRESS:\n" + memory
+    if member_context: system += "\n\nMEMBER CONTEXT:\n" + member_context
     return system
 
-def post_process(text: str) -> str:
-    return text.replace("—", "-").replace("–", "-").strip()
-
-# ==============================================================================
-# API ROUTES
-# ==============================================================================
+# --- ROUTES ---
 @app.get("/")
 def root():
-    if os.path.exists("landing.html"):
-        return FileResponse("landing.html")
-    return {
-        "status": "ok",
-        "app": "E5 AI Coach",
-        "brain": "Trecentillion X",
-        "modes": list(MODE_PROMPTS.keys()),
-        "version": "2.0"
-    }
-
-@app.get("/api/health")
-def health():
-    return {
-        "ok": True,
-        "gemini_key_loaded": bool(GEMINI_API_KEY),
-        "groq_key_loaded": bool(GROQ_API_KEY),
-        "supabase_loaded": bool(SUPABASE_URL and SUPABASE_KEY),
-        "vault_loaded": bool(SCRIPT_VAULT),
-        "whop_loaded": bool(WHOP_API_KEY),
-        "fish_loaded": bool(FISH_API_KEY),
-        "rate_limits": "30 chat/h, 10 tts/h, 10 unlock/h",
-    }
-
-@app.get("/api/modes")
-def modes():
-    return {"modes": list(MODE_PROMPTS.keys()), "tiers": MODE_TIERS}
-
-@app.get("/api/tier")
-def tier_endpoint(member_id: str = "default"):
-    _, tier = load_memory(member_id)
-    return {"tier": tier or "free"}
-
-@app.post("/api/unlock")
-def unlock(req: UnlockRequest):
-    member_id = (req.member_id or "default").strip()
-    if not UNLOCK_LIMIT.allow(member_id):
-        raise HTTPException(429, "Too many unlock attempts")
-    key = (req.license_key or "").strip()
-    if not key:
-        raise HTTPException(400, "empty license key")
-    try:
-        tier = whop_tier_for_license(key)
-    except urllib.error.HTTPError as e:
-        raise HTTPException(400, f"Whop says: invalid license (HTTP {e.code})")
-    except Exception as e:
-        raise HTTPException(502, f"Whop check failed: {e}")
-    if not tier:
-        raise HTTPException(403, "This license is invalid or not linked to a tier")
-    set_tier(member_id, tier)
-    return {"tier": tier}
+    if os.path.exists("chat_test.html"): return FileResponse("chat_test.html")
+    return {"status": "ok", "app": "E5 Business OS"}
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
     text = req.message or req.prompt or req.user_message
-    if not text:
-        raise HTTPException(400, "empty message")
-        
+    if not text: raise HTTPException(400, "empty message")
+    
     member_id = (req.member_id or "default").strip()
-    if not CHAT_LIMIT.allow(member_id):
-        remaining = CHAT_LIMIT.get_remaining(member_id)
-        raise HTTPException(429, f"Rate limit reached. {remaining} requests remaining")
-        
+    if not CHAT_LIMIT.allow(member_id): raise HTTPException(429, "Rate limit reached")
+    
     memory, tier = load_memory(member_id)
-    need = MODE_TIERS.get(req.mode, "free")
-    if TIER_RANK.get(tier or "free", 0) < TIER_RANK.get(need, 0):
-        raise HTTPException(403, f"locked: {need}")
-        
-    docs = load_docs(member_id)
-    messages = [{"role": "system", "content": build_system(req.mode, req.member_context, memory, docs)}]
-    for m in req.history[-16:]:
-        messages.append({"role": m.role, "content": m.content})
+    messages = [{"role": "system", "content": build_system(req.mode, "", memory)}]
+    for m in req.history[-10:]: messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": text})
     
     try:
-        clean = post_process(call_llm(messages))
+        clean = call_llm(messages)
         clean, mem_update = extract_memory(clean)
-        if mem_update:
-            save_memory(member_id, mem_update)
-        return {
-            "reply": clean,
-            "response": clean,
-            "message": clean,
-            "mode": req.mode,
-            "remaining": CHAT_LIMIT.get_remaining(member_id)
-        }
+        if mem_update: save_memory(member_id, mem_update)
+        return {"reply": clean, "mode": req.mode}
     except Exception as e:
         log.error("CHAT 500: %s", e)
         raise HTTPException(500, f"LLM error: {str(e)}")
 
-@app.post("/chat")
-def chat_alias(req: ChatRequest):
-    return chat(req)
-
-@app.post("/api/tts")
-def tts(req: TTSRequest):
-    limit_key = (req.member_id or "anon").strip()
-    if not TTS_LIMIT.allow(limit_key):
-        raise HTTPException(429, "Voice limit reached")
-    if not FISH_API_KEY:
-        raise HTTPException(503, "FISH_API_KEY missing")
-        
-    voice = req.voice_id or FISH_VOICE_ID
-    def call_tts(payload: dict):
-        req_obj = urllib.request.Request("https://api.fish.audio/v1/tts",
-            data=json.dumps(payload).encode("utf-8"), method="POST",
-            headers={"Content-Type": "application/json", "Authorization": "Bearer " + FISH_API_KEY, "User-Agent": UA})
-        with urllib.request.urlopen(req_obj, timeout=60) as resp:
-            return resp.read()
-            
-    payload = {"text": req.text, "format": "mp3"}
-    if voice:
-        payload["reference_id"] = voice
-        
+@app.post("/api/log-task")
+def log_task(req: TaskLogRequest):
+    """Logs a task and asks the AI to update the daily plan."""
+    member_id = (req.member_id or "default").strip()
+    memory, _ = load_memory(member_id)
+    
+    prompt = f"User just completed this task: '{req.task}'. Update their progress. What is the NEXT critical task they must do today based on their current business stage? Give them exactly ONE next task. Keep it under 50 words."
+    
+    messages = [{"role": "system", "content": build_system("coach", "", memory)}, {"role": "user", "content": prompt}]
+    
     try:
-        return Response(content=call_tts(payload), media_type="audio/mpeg")
-    except urllib.error.HTTPError as e:
-        body = ""
-        try:
-            body = e.read().decode()[:200]
-        except Exception:
-            pass
-        log.error("FISH HTTP %s: %s", e.code, body)
-        if voice:
-            try:
-                return Response(content=call_tts({"text": req.text, "format": "mp3"}), media_type="audio/mpeg")
-            except Exception as e2:
-                log.error("FISH RETRY FAIL: %s", e2)
-        raise HTTPException(502, f"TTS error: Fish HTTP {e.code}")
+        response = call_llm(messages)
+        # Append to memory
+        new_memory = f"{memory}\n[LOGGED TASK]: {req.task} (Completed: {req.completed})"
+        save_memory(member_id, new_memory)
+        return {"reply": response}
     except Exception as e:
-        log.error("TTS FAIL: %s", e)
-        raise HTTPException(502, f"TTS error: {str(e)}")
-
-@app.post("/api/voice")
-def voice_alias(req: TTSRequest):
-    return tts(req)
+        raise HTTPException(500, str(e))
 
 @app.get("/test")
 def test_page():
-    if os.path.exists("chat_test.html"):
-        return FileResponse("chat_test.html")
+    if os.path.exists("chat_test.html"): return FileResponse("chat_test.html")
     return HTMLResponse("<h3>chat_test.html not found</h3>")
 
 if __name__ == "__main__":
