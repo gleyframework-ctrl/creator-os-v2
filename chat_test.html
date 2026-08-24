@@ -2,571 +2,473 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>E5 AI Coach – Ducentillion Executive</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E5 AI Coach – Trecentillion Executive</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <style>
-        /* ============================================================
-           DUCENTILLION DESIGN SYSTEM – The Pinnacle
-        ============================================================ */
         :root {
-            /* Colors – Refined Palette */
-            --bg-primary: #050810;
-            --bg-secondary: #0a1120;
-            --bg-surface: rgba(15, 23, 42, 0.6);
-            --bg-card: rgba(30, 41, 59, 0.4);
-            --bg-card-hover: rgba(51, 65, 85, 0.5);
-            --bg-elevated: rgba(71, 85, 105, 0.3);
-            
-            /* Borders – Subtle & Refined */
-            --border-subtle: rgba(148, 163, 184, 0.08);
-            --border-medium: rgba(148, 163, 184, 0.12);
-            --border-gold: rgba(245, 158, 11, 0.15);
-            --border-glow: rgba(245, 158, 11, 0.25);
-            
-            /* Text – Perfect Hierarchy */
+            --bg-deep: #020617;
+            --bg-primary: #0f172a;
+            --bg-surface: rgba(30, 41, 59, 0.6);
+            --bg-card: rgba(51, 65, 85, 0.4);
+            --gold: #fbbf24;
+            --gold-glow: rgba(251, 191, 36, 0.4);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.3);
+            --purple: #a855f7;
+            --purple-glow: rgba(168, 85, 247, 0.3);
+            --green: #10b981;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --text-tertiary: #64748b;
-            --text-muted: #475569;
-            
-            /* Accents – Sophisticated */
-            --gold-primary: #f59e0b;
-            --gold-light: #fbbf24;
-            --gold-dark: #d97706;
-            --gold-glow: rgba(245, 158, 11, 0.15);
-            
-            --purple-primary: #8b5cf6;
-            --purple-glow: rgba(139, 92, 246, 0.12);
-            
-            --green-primary: #10b981;
-            --green-glow: rgba(16, 185, 129, 0.12);
-            
-            /* Shadows – Multi-Layer Depth */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-            --shadow-gold: 0 0 40px rgba(245, 158, 11, 0.15);
-            
-            /* Spacing – Perfect Rhythm */
-            --space-xs: 0.25rem;
-            --space-sm: 0.5rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
-            --space-3xl: 4rem;
-            
-            /* Typography – Perfect Scale */
-            --text-xs: 0.75rem;
-            --text-sm: 0.875rem;
-            --text-base: 1rem;
-            --text-lg: 1.125rem;
-            --text-xl: 1.25rem;
-            --text-2xl: 1.5rem;
-            --text-3xl: 2rem;
-            
-            /* Border Radius – Sophisticated Curves */
-            --radius-sm: 0.5rem;
-            --radius-md: 0.75rem;
-            --radius-lg: 1rem;
-            --radius-xl: 1.5rem;
-            --radius-2xl: 2rem;
-            --radius-full: 9999px;
-            
-            /* Transitions – Cinematic */
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-            --transition-bounce: 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            
-            /* Z-Index Scale */
-            --z-base: 0;
-            --z-dropdown: 100;
-            --z-sticky: 200;
-            --z-overlay: 300;
-            --z-modal: 400;
-            --z-toast: 500;
-            --z-tooltip: 600;
+            --text-muted: #64748b;
+            --border: rgba(148, 163, 184, 0.1);
+            --border-glow: rgba(251, 191, 36, 0.3);
+            --radius: 24px;
+            --shadow-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 100px rgba(251, 191, 36, 0.1);
         }
 
-        /* ============================================================
-           RESET & BASE
-        ============================================================ */
-        *, *::before, *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
             color: var(--text-primary);
-            line-height: 1.6;
-            overflow: hidden;
-            min-height: 100vh;
-            background-image: 
-                radial-gradient(ellipse at 20% 30%, rgba(245, 158, 11, 0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
-        }
-
-        /* Ambient Background Orbs */
-        .ambient-bg {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .ambient-bg::before,
-        .ambient-bg::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.03;
-            animation: ambientFloat 30s ease-in-out infinite;
-        }
-
-        .ambient-bg::before {
-            width: 800px;
-            height: 800px;
-            background: var(--gold-primary);
-            top: -20%;
-            left: -10%;
-        }
-
-        .ambient-bg::after {
-            width: 600px;
-            height: 600px;
-            background: var(--purple-primary);
-            bottom: -20%;
-            right: -10%;
-            animation-delay: -15s;
-        }
-
-        @keyframes ambientFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.95); }
-        }
-
-        /* ============================================================
-           APP CONTAINER
-        ============================================================ */
-        .app {
-            width: 100%;
-            max-width: 1600px;
-            height: 96vh;
-            max-height: 1100px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-2xl);
-            border: 1px solid var(--border-subtle);
-            box-shadow: var(--shadow-2xl), var(--shadow-gold);
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        /* 3D Ambient Background */
+        #ambient-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app-container {
+            position: relative;
             z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: 80px 1fr;
+            gap: 0;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
             backdrop-filter: blur(20px);
         }
 
-        /* ============================================================
-           HEADER – Ultra Refined
-        ============================================================ */
+        /* Animated Grid Background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(251, 191, 36, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(251, 191, 36, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* HEADER */
         .header {
+            grid-column: 1 / -1;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--space-lg) var(--space-2xl);
-            border-bottom: 1px solid var(--border-subtle);
-            flex-shrink: 0;
-            position: relative;
-            z-index: var(--z-sticky);
-            background: rgba(10, 17, 32, 0.8);
+            padding: 0 32px;
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
             backdrop-filter: blur(20px);
-            animation: slideDown 0.6s var(--transition-spring);
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-        }
-
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-xl);
-            font-weight: 800;
-            color: var(--bg-primary);
-            box-shadow: 0 0 30px var(--gold-glow);
-            transition: var(--transition-spring);
             position: relative;
             overflow: hidden;
         }
 
-        .logo-icon::before {
+        .header::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), var(--cyan), var(--gold), transparent);
+            animation: headerGlow 3s ease-in-out infinite;
         }
 
-        .logo:hover .logo-icon::before {
-            transform: translateX(100%);
+        @keyframes headerGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
-        .logo:hover .logo-icon {
-            transform: rotate(-5deg) scale(1.05);
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .logo-text {
-            font-size: var(--text-2xl);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--text-primary), var(--gold-light));
+        .logo-3d {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--bg-deep);
+            box-shadow: 0 0 40px var(--gold-glow);
+            animation: logoFloat 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-3d::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            animation: logoShine 3s infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+
+        @keyframes logoShine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .brand-text h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+            letter-spacing: -0.5px;
         }
 
-        .logo-sub {
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            font-weight: 500;
-            letter-spacing: 0.1em;
+        .brand-text span {
+            font-size: 11px;
+            color: var(--text-muted);
             text-transform: uppercase;
-            margin-left: var(--space-sm);
+            letter-spacing: 2px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: var(--space-md);
+            gap: 16px;
         }
 
-        .greeting {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            padding: var(--space-xs) var(--space-md);
+        .xp-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
             background: var(--bg-card);
-            border-radius: var(--radius-full);
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-base);
+            border-radius: 40px;
+            border: 1px solid var(--border);
         }
 
-        .greeting:hover {
-            border-color: var(--border-medium);
-            color: var(--text-primary);
+        .xp-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .xp-track {
+            width: 120px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--cyan));
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--gold-glow);
+            animation: xpPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes xpPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
         .tier-badge {
-            padding: var(--space-xs) var(--space-md);
-            border-radius: var(--radius-full);
-            font-size: var(--text-xs);
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(6, 182, 212, 0.2));
+            border: 1px solid var(--border-glow);
+            border-radius: 40px;
+            font-size: 12px;
             font-weight: 700;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid var(--border-gold);
-            color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: var(--space-xs);
-            cursor: default;
-            transition: var(--transition-spring);
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            animation: badgeGlow 3s ease-in-out infinite;
         }
 
-        .tier-badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--gold-glow);
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
         }
 
-        /* Buttons – Ultra Premium */
-        .btn {
+        .btn-holographic {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--bg-deep);
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            border: none;
-            border-radius: var(--radius-full);
-            font-weight: 600;
-            font-size: var(--text-sm);
-            cursor: pointer;
-            transition: var(--transition-base);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-sm) var(--space-lg);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .btn:hover::before {
-            transform: translateX(100%);
-        }
-
-        .btn-icon {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-        }
-
-        .btn-icon:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-medium);
-            color: var(--text-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-gold {
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            color: var(--bg-primary);
+            transition: all 0.3s;
             box-shadow: 0 4px 20px var(--gold-glow);
         }
 
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        /* ============================================================
-           TAB NAVIGATION – Refined
-        ============================================================ */
-        .tab-nav {
-            display: flex;
-            gap: var(--space-xs);
-            padding: var(--space-sm) var(--space-2xl);
-            border-bottom: 1px solid var(--border-subtle);
-            flex-shrink: 0;
-            background: rgba(10, 17, 32, 0.5);
-            position: relative;
-            z-index: var(--z-sticky);
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: var(--space-sm) var(--space-lg);
-            color: var(--text-tertiary);
-            font-weight: 600;
-            font-size: var(--text-sm);
-            cursor: pointer;
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            position: relative;
-        }
-
-        .tab-btn::after {
+        .btn-holographic::before {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--gold-primary);
-            transition: var(--transition-base);
-            transform: translateX(-50%);
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
         }
 
-        .tab-btn:hover {
-            color: var(--text-secondary);
-            background: var(--bg-card);
+        .btn-holographic:hover::before {
+            left: 100%;
         }
 
-        .tab-btn.active {
-            color: var(--gold-light);
+        .btn-holographic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--gold-glow);
         }
 
-        .tab-btn.active::after {
-            width: 80%;
-        }
-
-        /* ============================================================
-           MAIN LAYOUT
-        ============================================================ */
-        .main-area {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            z-index: var(--z-base);
-        }
-
-        /* Sidebar – Ultra Clean */
+        /* SIDEBAR */
         .sidebar {
-            width: 280px;
-            background: rgba(15, 23, 42, 0.4);
-            border-right: 1px solid var(--border-subtle);
-            padding: var(--space-lg) var(--space-md);
+            background: rgba(15, 23, 42, 0.6);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
             overflow-y: auto;
-            flex-shrink: 0;
-            transition: var(--transition-slow);
-            animation: slideRight 0.6s var(--transition-spring);
+            backdrop-filter: blur(20px);
         }
 
-        @keyframes slideRight {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        .sidebar-section {
+            margin-bottom: 32px;
         }
 
-        .sidebar-title {
-            font-size: var(--text-xs);
+        .section-title {
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-tertiary);
-            margin-bottom: var(--space-lg);
-            font-weight: 700;
-            padding-left: var(--space-md);
-        }
-
-        .mode-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xs);
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            padding-left: 12px;
+            font-weight: 600;
         }
 
         .mode-item {
             display: flex;
             align-items: center;
-            gap: var(--space-md);
-            padding: var(--space-md);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: var(--transition-base);
-            font-size: var(--text-sm);
-            font-weight: 500;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            position: relative;
-        }
-
-        .mode-item:hover {
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
             background: var(--bg-card);
-            color: var(--text-primary);
-            transform: translateX(4px);
-            border-color: var(--border-subtle);
-        }
-
-        .mode-item.active {
-            background: rgba(245, 158, 11, 0.08);
-            border-color: var(--border-gold);
-            color: var(--gold-light);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
-        }
-
-        .mode-item .icon {
-            width: 24px;
-            text-align: center;
-            font-size: var(--text-lg);
-        }
-
-        .mode-item .tier-tag {
-            font-size: 0.65rem;
-            background: rgba(255,255,255,0.05);
-            padding: 2px 8px;
-            border-radius: var(--radius-full);
-            color: var(--text-tertiary);
-            margin-left: auto;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-        }
-
-        .mode-item .tier-tag.free { background: rgba(16, 185, 129, 0.1); color: var(--green-primary); }
-        .mode-item .tier-tag.insider { background: rgba(245, 158, 11, 0.1); color: var(--gold-primary); }
-        .mode-item .tier-tag.partner { background: rgba(139, 92, 246, 0.1); color: var(--purple-primary); }
-
-        .mode-item.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .mode-item.locked:hover {
-            background: transparent;
-            transform: none;
-        }
-
-        .mode-item .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            margin-left: auto;
-            background: var(--text-muted);
-            transition: var(--transition-base);
-        }
-
-        .mode-item .dot.complete { background: var(--green-primary); box-shadow: 0 0 10px var(--green-glow); }
-        .mode-item .dot.partial { background: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); }
-
-        /* ============================================================
-           CONTENT AREA
-        ============================================================ */
-        .content-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
 
-        /* ============================================================
-           DASHBOARD – Ultra Premium
-        ============================================================ */
-        .dashboard-view {
-            display: none;
-            flex-direction: column;
-            padding: var(--space-2xl);
-            overflow-y: auto;
-            flex: 1;
-            gap: var(--space-xl);
-            animation: fadeIn 0.5s var(--transition-spring);
+        .mode-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(180deg, var(--gold), var(--cyan));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .dashboard-view.active {
+        .mode-item:hover::before {
+            opacity: 1;
+        }
+
+        .mode-item:hover {
+            transform: translateX(4px);
+            border-color: var(--border-glow);
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1);
+        }
+
+        .mode-item.active {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(6, 182, 212, 0.15));
+            border-color: var(--border-glow);
+        }
+
+        .mode-item.active::before {
+            opacity: 1;
+        }
+
+        .mode-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            border-radius: 10px;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--bg-deep);
+        }
+
+        .mode-info {
+            flex: 1;
+        }
+
+        .mode-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mode-tier {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .mode-tier.insider {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--gold);
+        }
+
+        .mode-tier.partner {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--purple);
+        }
+
+        .progress-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .progress-indicator.complete {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .progress-indicator.partial {
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 32px;
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--border-glow);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(6, 182, 212, 0.2));
+            border-color: var(--border-glow);
+            color: var(--gold);
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1);
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-pane.active {
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -574,365 +476,157 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Staggered Card Animation */
-        .dashboard-view > * {
-            opacity: 0;
-            animation: cardStagger 0.5s var(--transition-spring) forwards;
+        /* DASHBOARD GRID */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .dashboard-view > *:nth-child(1) { animation-delay: 0.05s; }
-        .dashboard-view > *:nth-child(2) { animation-delay: 0.10s; }
-        .dashboard-view > *:nth-child(3) { animation-delay: 0.15s; }
-        .dashboard-view > *:nth-child(4) { animation-delay: 0.20s; }
-        .dashboard-view > *:nth-child(5) { animation-delay: 0.25s; }
-
-        @keyframes cardStagger {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Primary Metric Card */
-        .primary-metric {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2xl);
-            padding: var(--space-2xl);
+        .metric-card {
             background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-xl);
-            flex-wrap: wrap;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
             position: relative;
             overflow: hidden;
-            transition: var(--transition-base);
             backdrop-filter: blur(20px);
+            transition: all 0.3s;
         }
 
-        .primary-metric::before {
+        .metric-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-            opacity: 0;
-            transition: opacity var(--transition-base);
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.05), transparent 70%);
+            pointer-events: none;
         }
 
-        .primary-metric:hover::before {
-            opacity: 0.3;
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-3d);
         }
 
-        .primary-metric:hover {
-            border-color: var(--border-gold);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-xl), var(--shadow-gold);
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .ring-wrap {
+        .metric-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--bg-deep);
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .metric-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .metric-chart {
+            margin-top: 16px;
+            height: 60px;
+        }
+
+        /* HEALTH RING */
+        .health-ring-container {
             position: relative;
-            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
         }
 
-        .ring-wrap svg {
+        .health-ring-svg {
             transform: rotate(-90deg);
         }
 
-        .ring-wrap .bg {
+        .health-ring-bg {
             fill: none;
             stroke: rgba(255,255,255,0.05);
-            stroke-width: 6;
+            stroke-width: 8;
         }
 
-        .ring-wrap .fg {
+        .health-ring-fg {
             fill: none;
-            stroke: var(--gold-primary);
-            stroke-width: 6;
+            stroke: url(#goldGradient);
+            stroke-width: 8;
             stroke-linecap: round;
-            transition: stroke-dashoffset 1.2s var(--transition-spring);
-            filter: drop-shadow(0 0 16px var(--gold-glow));
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 10px var(--gold-glow));
         }
 
-        .ring-wrap .center {
+        .health-ring-center {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: var(--text-3xl);
+            font-size: 28px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--gold);
         }
 
-        .primary-metric .info h2 {
-            font-size: var(--text-2xl);
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: var(--space-xs);
-        }
-
-        .primary-metric .info p {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            margin-bottom: var(--space-xs);
-        }
-
-        .primary-metric .info .sub {
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-        }
-
-        .primary-metric .quick-actions {
+        /* CHAT INTERFACE */
+        .chat-container {
             display: flex;
-            gap: var(--space-md);
-            margin-left: auto;
-            flex-wrap: wrap;
-        }
-
-        /* Secondary Grid */
-        .secondary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-lg);
-        }
-
-        @media (max-width: 1200px) {
-            .secondary-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 768px) {
-            .secondary-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Premium Card */
-        .card-premium {
+            flex-direction: column;
+            height: 100%;
             background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-xl);
-            padding: var(--space-xl);
-            transition: var(--transition-base);
-            position: relative;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             overflow: hidden;
             backdrop-filter: blur(20px);
-        }
-
-        .card-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-            opacity: 0;
-            transition: opacity var(--transition-base);
-        }
-
-        .card-premium:hover::before {
-            opacity: 0.3;
-        }
-
-        .card-premium:hover {
-            border-color: var(--border-gold);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .card-premium h4 {
-            font-size: var(--text-xs);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-tertiary);
-            font-weight: 700;
-            margin-bottom: var(--space-md);
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .card-premium .value {
-            font-size: var(--text-3xl);
-            font-weight: 800;
-            color: var(--text-primary);
-            transition: var(--transition-spring);
-        }
-
-        .card-premium:hover .value {
-            transform: scale(1.05);
-        }
-
-        .card-premium .sub {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            margin-top: var(--space-xs);
-        }
-
-        /* Framework Strip */
-        .fw-strip {
-            display: flex;
-            gap: var(--space-sm);
-            flex-wrap: wrap;
-            margin-top: var(--space-md);
-        }
-
-        .fw-strip .dot {
-            width: 32px;
-            height: 8px;
-            border-radius: var(--radius-sm);
-            background: rgba(255,255,255,0.05);
-            transition: var(--transition-base);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .fw-strip .dot.done {
-            background: var(--green-primary);
-            box-shadow: 0 0 12px var(--green-glow);
-            animation: dotPulse 2s ease-in-out infinite;
-        }
-
-        .fw-strip .dot.partial {
-            background: var(--gold-primary);
-            box-shadow: 0 0 12px var(--gold-glow);
-        }
-
-        @keyframes dotPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Rule of 100 */
-        .rule-row {
-            display: flex;
-            align-items: center;
-            gap: var(--space-md);
-            flex-wrap: wrap;
-            margin-bottom: var(--space-md);
-        }
-
-        .rule-row .count {
-            font-size: var(--text-3xl);
-            font-weight: 800;
-            color: var(--gold-light);
-            transition: var(--transition-spring);
-        }
-
-        .rule-row .streak {
-            font-size: var(--text-xs);
-            color: var(--gold-light);
-            padding: var(--space-xs) var(--space-md);
-            background: rgba(245, 158, 11, 0.1);
-            border-radius: var(--radius-full);
-            border: 1px solid var(--border-gold);
-        }
-
-        .rule-row button {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-full);
-            padding: var(--space-xs) var(--space-md);
-            color: var(--text-secondary);
-            font-size: var(--text-xs);
-            cursor: pointer;
-            transition: var(--transition-base);
-            font-weight: 600;
-        }
-
-        .rule-row button:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-medium);
-            color: var(--text-primary);
-            transform: translateY(-1px);
-        }
-
-        /* Mini Calendar */
-        .mini-cal {
-            display: flex;
-            gap: var(--space-xs);
-            margin-top: var(--space-md);
-        }
-
-        .mini-cal .day {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            border: 1px solid transparent;
-            transition: var(--transition-base);
-        }
-
-        .mini-cal .day.hit {
-            background: var(--green-primary);
-            color: var(--bg-primary);
-            border-color: var(--green-primary);
-            box-shadow: 0 0 12px var(--green-glow);
-            animation: hitPop 0.4s var(--transition-spring);
-        }
-
-        .mini-cal .day.today {
-            border-color: var(--gold-primary);
-        }
-
-        @keyframes hitPop {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
-
-        /* Next Action Card */
-        .next-action-card {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(139, 92, 246, 0.05));
-            border: 1px solid var(--border-gold);
-        }
-
-        .next-action-card:hover {
-            border-color: var(--border-gold);
-        }
-
-        .next-action-card #nextAction {
-            font-size: var(--text-lg);
-            font-weight: 600;
-            margin-top: var(--space-xs);
-            color: var(--text-primary);
-        }
-
-        /* ============================================================
-           CHAT VIEW – Ultra Refined
-        ============================================================ */
-        .chat-view {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .chat-view.active {
-            display: flex;
-            animation: fadeIn 0.4s var(--transition-base);
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: var(--space-2xl);
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: var(--space-lg);
+            gap: 16px;
         }
 
         .message {
             display: flex;
-            gap: var(--space-md);
+            gap: 12px;
             max-width: 75%;
-            animation: messageIn 0.4s var(--transition-spring);
+            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
@@ -941,2017 +635,1183 @@
             flex-direction: row-reverse;
         }
 
-        .message .avatar {
-            width: 36px;
-            height: 36px;
+        .message-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--text-sm);
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-spring);
+            font-size: 18px;
+            flex-shrink: 0;
         }
 
-        .message.ai .avatar {
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            color: var(--bg-primary);
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
             box-shadow: 0 0 20px var(--gold-glow);
         }
 
-        .message.user .avatar {
-            background: linear-gradient(135deg, var(--purple-primary), #6d28d9);
-            color: white;
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
         }
 
-        .message .bubble {
-            background: var(--bg-surface);
-            padding: var(--space-md) var(--space-lg);
-            border-radius: var(--radius-xl);
-            font-size: var(--text-sm);
-            line-height: 1.7;
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-base);
-            backdrop-filter: blur(10px);
-        }
-
-        .message .bubble:hover {
-            border-color: var(--border-medium);
-        }
-
-        .message.user .bubble {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.2);
-        }
-
-        /* Typing Indicator */
-        .typing {
-            display: flex;
-            gap: var(--space-xs);
-            padding: var(--space-md) var(--space-lg);
-            background: var(--bg-surface);
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--border-subtle);
-            width: fit-content;
-        }
-
-        .typing span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--gold-light);
-            animation: typingWave 1.4s ease-in-out infinite;
-        }
-
-        .typing span:nth-child(2) { animation-delay: 0.15s; }
-        .typing span:nth-child(3) { animation-delay: 0.3s; }
-
-        @keyframes typingWave {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-8px); }
-        }
-
-        /* Status Bar */
-        .status-bar {
-            padding: var(--space-xs) var(--space-2xl);
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            border-top: 1px solid var(--border-subtle);
-            display: flex;
-            justify-content: space-between;
-            background: rgba(10, 17, 32, 0.5);
-            flex-shrink: 0;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green-primary);
-            margin-right: var(--space-sm);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Input Bar */
-        .input-bar {
-            padding: var(--space-lg) var(--space-2xl);
-            border-top: 1px solid var(--border-subtle);
-            display: flex;
-            gap: var(--space-md);
-            align-items: center;
-            flex-wrap: wrap;
-            background: rgba(10, 17, 32, 0.5);
-        }
-
-        .input-bar .mode-selector {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-
-        .input-bar .mode-selector select {
+        .message-bubble {
             background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-full);
-            padding: var(--space-sm) var(--space-md);
-            color: var(--text-primary);
-            font-size: var(--text-sm);
-            font-weight: 600;
-            outline: none;
-            cursor: pointer;
-            transition: var(--transition-base);
-            min-width: 140px;
-        }
-
-        .input-bar .mode-selector select:hover {
-            border-color: var(--border-medium);
-        }
-
-        .input-bar .mode-selector select:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .input-wrapper {
-            flex: 2;
-            display: flex;
-            gap: var(--space-md);
-            min-width: 200px;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-full);
-            padding: var(--space-md) var(--space-lg);
-            color: var(--text-primary);
-            font-size: var(--text-sm);
-            outline: none;
-            transition: var(--transition-base);
-        }
-
-        .input-wrapper input::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        .input-wrapper input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .input-wrapper button {
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            border: none;
-            border-radius: var(--radius-full);
-            padding: var(--space-md) var(--space-xl);
-            font-weight: 700;
-            color: var(--bg-primary);
-            font-size: var(--text-sm);
-            cursor: pointer;
-            transition: var(--transition-spring);
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-            box-shadow: 0 4px 20px var(--gold-glow);
-        }
-
-        .input-wrapper button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
-        }
-
-        .input-wrapper button:active {
-            transform: scale(0.98);
-        }
-
-        .input-wrapper button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .input-actions {
-            display: flex;
-            gap: var(--space-sm);
-        }
-
-        .input-actions button {
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-full);
-            padding: var(--space-sm) var(--space-md);
-            color: var(--text-tertiary);
-            cursor: pointer;
-            transition: var(--transition-base);
-            font-size: var(--text-sm);
-        }
-
-        .input-actions button:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-color: var(--border-medium);
-        }
-
-        /* ============================================================
-           MODALS – Ultra Premium
-        ============================================================ */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(20px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: var(--z-modal);
-            padding: var(--space-2xl);
-            opacity: 0;
-            transition: opacity var(--transition-base);
-        }
-
-        .modal-overlay.open {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-2xl);
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: var(--space-2xl);
-            box-shadow: var(--shadow-2xl);
-            position: relative;
-            transform: scale(0.95) translateY(20px);
-            opacity: 0;
-            transition: all var(--transition-spring);
-        }
-
-        .modal-overlay.open .modal {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: var(--space-lg);
-            right: var(--space-lg);
-            background: transparent;
-            border: none;
-            color: var(--text-tertiary);
-            font-size: var(--text-2xl);
-            cursor: pointer;
-            transition: var(--transition-spring);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .modal-close:hover {
-            color: var(--text-primary);
-            background: var(--bg-card);
-            transform: rotate(90deg);
-        }
-
-        .modal h2 {
-            font-size: var(--text-2xl);
-            font-weight: 800;
-            margin-bottom: var(--space-sm);
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .modal p.sub {
-            color: var(--text-secondary);
-            margin-bottom: var(--space-xl);
-            font-size: var(--text-sm);
-        }
-
-        /* Framework Grid */
-        .fw-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--space-lg);
-        }
-
-        @media (max-width: 768px) {
-            .fw-grid { grid-template-columns: 1fr; }
-        }
-
-        .fw-card {
-            background: var(--bg-surface);
-            border-radius: var(--radius-xl);
-            padding: var(--space-lg);
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-base);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 14px;
+            line-height: 1.6;
             position: relative;
             overflow: hidden;
         }
 
-        .fw-card::before {
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2));
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input-container {
+            padding: 20px 24px;
+            background: rgba(15, 23, 42, 0.6);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 14px 24px;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-send {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--gold), var(--cyan));
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--bg-deep);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px var(--gold-glow);
+        }
+
+        .btn-send:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 30px var(--gold-glow);
+        }
+
+        /* FRAMEWORK VAULT */
+        .vault-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .framework-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .framework-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
-            opacity: 0;
-            transition: opacity var(--transition-base);
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--cyan));
+            transform: scaleX(0);
+            transition: transform 0.3s;
         }
 
-        .fw-card:hover::before {
-            opacity: 0.3;
+        .framework-card:hover::before {
+            transform: scaleX(1);
         }
 
-        .fw-card:hover {
-            border-color: var(--border-gold);
+        .framework-card:hover {
             transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
+            border-color: var(--border-glow);
+            box-shadow: 0 12px 40px rgba(251, 191, 36, 0.15);
         }
 
-        .fw-card h4 {
-            font-size: var(--text-base);
-            font-weight: 700;
+        .framework-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--space-xs);
+            margin-bottom: 12px;
         }
 
-        .fw-card p {
-            font-size: var(--text-sm);
-            color: var(--text-secondary);
-            margin: var(--space-xs) 0;
-        }
-
-        .fw-card .meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            margin-top: var(--space-md);
-        }
-
-        .fw-card .meta .val {
-            color: var(--gold-light);
+        .framework-name {
+            font-size: 16px;
             font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .fw-card .meta .tier {
-            padding: var(--space-xs) var(--space-md);
-            border-radius: var(--radius-full);
-            font-size: 0.65rem;
+        .framework-value {
+            font-size: 12px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--gold);
+            background: rgba(251, 191, 36, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
         }
 
-        .fw-card .meta .tier.free { background: rgba(16, 185, 129, 0.1); color: var(--green-primary); }
-        .fw-card .meta .tier.insider { background: rgba(245, 158, 11, 0.1); color: var(--gold-primary); }
-        .fw-card .meta .tier.partner { background: rgba(139, 92, 246, 0.1); color: var(--purple-primary); }
-
-        .fw-card .btn {
-            margin-top: var(--space-md);
-            width: 100%;
-            justify-content: center;
-        }
-
-        .fw-card .btn.done {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--green-primary);
-            color: var(--green-primary);
-        }
-
-        /* Upgrade Modal */
-        .billing-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-md);
-            margin-bottom: var(--space-xl);
-        }
-
-        .billing-toggle span {
-            font-size: var(--text-sm);
+        .framework-desc {
+            font-size: 13px;
             color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
         }
 
-        .billing-toggle .switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-        }
-
-        .billing-toggle .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .billing-toggle .slider {
-            position: absolute;
-            inset: 0;
+        .framework-progress {
+            height: 6px;
             background: rgba(255,255,255,0.1);
-            transition: var(--transition-base);
-            border-radius: var(--radius-full);
-            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
         }
 
-        .billing-toggle .slider:before {
-            content: "";
-            position: absolute;
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
-            transition: var(--transition-spring);
-            border-radius: 50%;
+        .framework-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--cyan));
+            border-radius: 10px;
+            transition: width 1s;
         }
 
-        .billing-toggle input:checked + .slider {
-            background: var(--gold-primary);
+        .framework-status {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
         }
 
-        .billing-toggle input:checked + .slider:before {
-            transform: translateX(22px);
-        }
-
-        .tier-table {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-md);
-            margin: var(--space-xl) 0;
-        }
-
-        .tier-row {
+        /* ACHIEVEMENTS */
+        .achievements-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            padding: var(--space-md) var(--space-lg);
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .achievement-badge {
             background: var(--bg-surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-subtle);
-            align-items: center;
-            font-size: var(--text-sm);
-            transition: var(--transition-base);
-        }
-
-        .tier-row:hover {
-            border-color: var(--border-medium);
-            transform: translateX(4px);
-        }
-
-        .tier-row .name {
-            font-weight: 700;
-        }
-
-        .tier-row .features {
-            color: var(--text-secondary);
-            font-size: var(--text-xs);
-        }
-
-        .tier-row .price {
-            font-weight: 700;
-            color: var(--gold-light);
-            text-align: right;
-        }
-
-        .tier-row.current {
-            border-color: var(--gold-primary);
-            background: rgba(245, 158, 11, 0.05);
-        }
-
-        .tier-row .pop {
-            font-size: 0.65rem;
-            background: var(--gold-primary);
-            color: var(--bg-primary);
-            padding: 2px 8px;
-            border-radius: var(--radius-full);
-            font-weight: 800;
-            margin-left: var(--space-sm);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: var(--space-md);
-            justify-content: flex-end;
-            margin-top: var(--space-xl);
-        }
-
-        /* Onboarding */
-        .onboard-progress {
-            display: flex;
-            justify-content: center;
-            gap: var(--space-md);
-            margin-bottom: var(--space-xl);
-        }
-
-        .onboard-progress .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            transition: var(--transition-base);
-        }
-
-        .onboard-progress .dot.active {
-            background: var(--gold-primary);
-            box-shadow: 0 0 16px var(--gold-glow);
-        }
-
-        .onboard-progress .dot.done {
-            background: var(--green-primary);
-        }
-
-        .onboard-step {
-            display: none;
-            flex-direction: column;
-            gap: var(--space-md);
-        }
-
-        .onboard-step.active {
-            display: flex;
-            animation: fadeIn 0.4s var(--transition-base);
-        }
-
-        .onboard-step label {
-            font-size: var(--text-sm);
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .onboard-step select,
-        .onboard-step input {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md);
-            color: var(--text-primary);
-            font-size: var(--text-sm);
-            outline: none;
-            width: 100%;
-            transition: var(--transition-base);
-        }
-
-        .onboard-step select:focus,
-        .onboard-step input:focus {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-
-        .onboard-step .btn-group {
-            display: flex;
-            gap: var(--space-md);
-            justify-content: flex-end;
-            margin-top: var(--space-md);
-        }
-
-        /* Value Equation */
-        .eq-slider {
-            margin: var(--space-md) 0;
-        }
-
-        .eq-slider label {
-            display: flex;
-            justify-content: space-between;
-            font-size: var(--text-sm);
-            font-weight: 600;
-        }
-
-        .eq-slider input[type="range"] {
-            width: 100%;
-            margin: var(--space-xs) 0;
-            accent-color: var(--gold-primary);
-            background: var(--bg-card);
-            height: 4px;
-            border-radius: var(--radius-full);
-            outline: none;
-            cursor: pointer;
-        }
-
-        .eq-slider .val {
-            font-weight: 700;
-            color: var(--gold-light);
-        }
-
-        .eq-score-box {
-            background: var(--bg-surface);
-            padding: var(--space-xl);
-            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
             text-align: center;
-            margin-top: var(--space-lg);
-            border: 1px solid var(--border-subtle);
-            transition: var(--transition-base);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .eq-score-box:hover {
-            border-color: var(--border-medium);
+        .achievement-badge.unlocked {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
         }
 
-        .eq-score-box .label {
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+        .achievement-badge.unlocked::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.1), transparent 70%);
+            animation: badgeShine 3s infinite;
         }
 
-        .eq-score-box .score {
-            font-size: var(--text-4xl, 2.5rem);
-            font-weight: 800;
-            color: var(--gold-light);
-            transition: var(--transition-spring);
+        @keyframes badgeShine {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
-        .eq-score-box .formula {
-            font-size: var(--text-xs);
-            color: var(--text-tertiary);
-            margin-top: var(--space-xs);
+        .achievement-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            filter: grayscale(100%);
+            opacity: 0.5;
+            transition: all 0.3s;
         }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: var(--space-2xl);
-            right: var(--space-2xl);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md) var(--space-xl);
-            box-shadow: var(--shadow-2xl);
+        .achievement-badge.unlocked .achievement-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .achievement-name {
+            font-size: 13px;
+            font-weight: 700;
             color: var(--text-primary);
-            font-size: var(--text-sm);
-            z-index: var(--z-toast);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all var(--transition-spring);
-            pointer-events: none;
-            max-width: 400px;
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--gold), var(--cyan));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--gold), var(--cyan));
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .metric-value {
+                font-size: 28px;
+            }
+        }
+
+        /* LOADING ANIMATION */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-deep);
+            z-index: 9999;
             display: flex;
             align-items: center;
-            gap: var(--space-md);
+            justify-content: center;
+            transition: opacity 0.5s;
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .toast.success { border-left: 4px solid var(--green-primary); }
-        .toast.error { border-left: 4px solid #ef4444; }
-        .toast.info { border-left: 4px solid var(--gold-primary); }
-
-        .toast .toast-icon {
-            font-size: var(--text-lg);
+        .loader-circle {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(251, 191, 36, 0.1);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        /* Confetti */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* CONFETTI */
         .confetti-container {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            z-index: var(--z-tooltip);
+            z-index: 9998;
             overflow: hidden;
         }
 
         .confetti {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            animation: confettiFall linear forwards;
+            width: 10px;
+            height: 10px;
+            background: var(--gold);
+            animation: confettiFall 3s linear forwards;
         }
 
         @keyframes confettiFall {
             0% {
-                transform: translateY(-10px) rotate(0deg) rotateX(0deg) rotateY(0deg);
+                transform: translateY(-100vh) rotate(0deg);
                 opacity: 1;
             }
             100% {
-                transform: translateY(100vh) rotate(720deg) rotateX(360deg) rotateY(180deg);
+                transform: translateY(100vh) rotate(720deg);
                 opacity: 0;
             }
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(245, 158, 11, 0.2);
-            border-radius: var(--radius-full);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(245, 158, 11, 0.4);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .app {
-                height: 100vh;
-                max-height: none;
-                border-radius: 0;
-            }
-
-            .header {
-                padding: var(--space-md) var(--space-xl);
-            }
-
-            .tab-nav {
-                padding: var(--space-sm) var(--space-xl);
-                overflow-x: auto;
-            }
-
-            .tab-btn span {
-                display: none;
-            }
-
-            .secondary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .sidebar {
-                display: none;
-            }
-
-            .mobile-menu-btn {
-                display: flex !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-actions .btn-icon span {
-                display: none;
-            }
-
-            .greeting {
-                display: none;
-            }
-
-            .input-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .input-bar .mode-selector {
-                width: 100%;
-            }
-
-            .input-wrapper {
-                width: 100%;
-            }
-
-            .input-actions {
-                justify-content: flex-end;
-            }
-
-            .secondary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .primary-metric {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .primary-metric .quick-actions {
-                margin-left: 0;
-                justify-content: center;
-            }
-
-            .chat-messages {
-                padding: var(--space-lg);
-            }
-
-            .message {
-                max-width: 90%;
-            }
-
-            .modal {
-                padding: var(--space-xl);
-            }
-
-            .tier-row {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: var(--space-xs);
-            }
-
-            .tier-row .price {
-                text-align: center;
-            }
-
-            .fw-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo-text {
-                font-size: var(--text-xl);
-            }
-
-            .logo-icon {
-                width: 36px;
-                height: 36px;
-                font-size: var(--text-lg);
-            }
-
-            .tier-badge {
-                font-size: 0.65rem;
-                padding: var(--space-xs) var(--space-sm);
-            }
-
-            .btn {
-                padding: var(--space-xs) var(--space-md);
-                font-size: var(--text-xs);
-            }
-
-            .dashboard-view {
-                padding: var(--space-lg);
-            }
-
-            .chat-messages {
-                padding: var(--space-md);
-            }
-
-            .status-bar {
-                font-size: 0.65rem;
-                padding: var(--space-xs) var(--space-lg);
-            }
-
-            .input-bar {
-                padding: var(--space-md) var(--space-lg);
-            }
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            left: var(--space-md);
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: var(--z-sticky);
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-full);
-            padding: var(--space-md);
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: var(--text-lg);
-            transition: var(--transition-base);
-            backdrop-filter: blur(12px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .mobile-menu-btn:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-        }
-
-        .mobile-menu-btn.active {
-            color: var(--gold-light);
-            border-color: var(--border-gold);
-        }
-
-        /* Mobile Bottom Sheet */
-        .sidebar-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: var(--z-overlay);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-base);
-        }
-
-        .sidebar-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .sidebar-bottom-sheet {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70vh;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-            border-top: 1px solid var(--border-subtle);
-            padding: var(--space-xl);
-            transform: translateY(100%);
-            transition: transform var(--transition-spring);
-            z-index: var(--z-modal);
-            overflow-y: auto;
-            display: none;
-        }
-
-        .sidebar-bottom-sheet.open {
-            transform: translateY(0);
-        }
-
-        .sidebar-bottom-sheet .sheet-handle {
-            width: 48px;
-            height: 4px;
-            background: var(--text-tertiary);
-            border-radius: var(--radius-full);
-            margin: 0 auto var(--space-xl);
-            opacity: 0.5;
+        /* SVG DEFINITIONS */
+        .svg-defs {
+            position: absolute;
+            width: 0;
+            height: 0;
         }
     </style>
 </head>
 <body>
-    <div class="ambient-bg"></div>
-
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <div class="sidebar-bottom-sheet" id="mobileSidebar">
-        <div class="sheet-handle"></div>
-        <div class="sidebar-title">⚡ Modes</div>
-        <div class="mode-list" id="mobileModeList"></div>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-circle"></div>
     </div>
 
-    <div class="app" id="app">
-        <!-- HEADER -->
+    <!-- 3D Ambient Canvas -->
+    <canvas id="ambient-canvas"></canvas>
+    
+    <!-- Grid Background -->
+    <div class="grid-bg"></div>
+
+    <!-- SVG Definitions -->
+    <svg class="svg-defs">
+        <defs>
+            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Confetti Container -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Header -->
         <header class="header">
-            <div class="logo">
-                <div class="logo-icon">E5</div>
-                <div class="logo-text">AI Coach<span class="logo-sub">Ducentillion</span></div>
+            <div class="logo-section">
+                <div class="logo-3d">E5</div>
+                <div class="brand-text">
+                    <h1>AI Coach</h1>
+                    <span>Trecentillion Edition</span>
+                </div>
             </div>
             <div class="header-actions">
-                <span class="greeting" id="greeting">👋 Welcome</span>
-                <div class="tier-badge" id="tierBadge">
-                    <i class="fas fa-crown"></i>
-                    <span id="tierLabel">FREE</span>
+                <div class="xp-bar-container">
+                    <span class="xp-label">LVL <span id="userLevel">1</span></span>
+                    <div class="xp-track">
+                        <div class="xp-fill" id="xpBar" style="width: 0%"></div>
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted);"><span id="userXP">0</span> XP</span>
                 </div>
-                <button class="btn btn-icon" id="vaultBtn">
-                    <i class="fas fa-book"></i>
-                    <span>Vault</span>
+                <div class="tier-badge" id="tierBadge">FREE</div>
+                <button class="btn-holographic" onclick="openVault()">
+                    <i class="fas fa-vault"></i> Vault
                 </button>
-                <button class="btn btn-gold" id="upgradeBtn">
-                    <i class="fas fa-rocket"></i>
-                    <span>Upgrade</span>
+                <button class="btn-holographic" onclick="openUpgrade()">
+                    <i class="fas fa-crown"></i> Upgrade
                 </button>
             </div>
         </header>
 
-        <!-- TAB NAV -->
-        <nav class="tab-nav" id="tabNav">
-            <button class="tab-btn active" data-tab="dashboard">
-                <i class="fas fa-chart-pie"></i>
-                <span>Dashboard</span>
-            </button>
-            <button class="tab-btn" data-tab="chat">
-                <i class="fas fa-comment-dots"></i>
-                <span>Chat</span>
-            </button>
-        </nav>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title"> Modes</div>
+                <div id="modeList"></div>
+            </div>
+            <div class="sidebar-section">
+                <div class="section-title">🏆 Achievements</div>
+                <div id="achievementsList"></div>
+            </div>
+        </aside>
 
-        <!-- MAIN -->
-        <div class="main-area">
-            <!-- SIDEBAR -->
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-title">⚡ Modes</div>
-                <div class="mode-list" id="modeList"></div>
-            </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tabs -->
+            <div class="content-tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="tab-btn" onclick="switchTab('chat')">
+                    <i class="fas fa-comments"></i> AI Coach
+                </button>
+                <button class="tab-btn" onclick="switchTab('frameworks')">
+                    <i class="fas fa-layer-group"></i> Frameworks
+                </button>
+            </div>
 
-            <!-- CONTENT -->
-            <div class="content-area">
-                <!-- DASHBOARD -->
-                <div class="dashboard-view active" id="dashboardView">
-                    <!-- Primary Metric -->
-                    <div class="primary-metric">
-                        <div class="ring-wrap">
-                            <svg width="100" height="100" viewBox="0 0 100 100">
-                                <circle class="bg" cx="50" cy="50" r="42" />
-                                <circle class="fg" id="healthRing" cx="50" cy="50" r="42" 
-                                    stroke-dasharray="263.9" stroke-dashoffset="263.9" />
-                            </svg>
-                            <div class="center" id="healthScore">0</div>
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Dashboard Tab -->
+                <div class="tab-pane active" id="dashboardTab">
+                    <div class="dashboard-grid">
+                        <!-- Health Score -->
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Business Health</div>
+                                <div class="metric-icon"><i class="fas fa-heartbeat"></i></div>
+                            </div>
+                            <div class="health-ring-container">
+                                <svg class="health-ring-svg" width="120" height="120">
+                                    <circle class="health-ring-bg" cx="60" cy="60" r="50"></circle>
+                                    <circle class="health-ring-fg" id="healthRing" cx="60" cy="60" r="50"></circle>
+                                </svg>
+                                <div class="health-ring-center" id="healthScore">0</div>
+                            </div>
+                            <div style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
+                                Based on frameworks completed
+                            </div>
                         </div>
-                        <div class="info">
-                            <h2 id="welcomeTitle">Your Business Health</h2>
-                            <p id="welcomeSub">Complete frameworks to grow your score</p>
-                            <div class="sub" id="healthSub">0 / 8 frameworks completed</div>
-                        </div>
-                        <div class="quick-actions">
-                            <button class="btn btn-icon" id="quickXRay">
-                                <i class="fas fa-search"></i>
-                                <span>X-Ray</span>
-                            </button>
-                            <button class="btn btn-icon" id="quickOffer">
-                                <i class="fas fa-coins"></i>
-                                <span>Offer</span>
-                            </button>
-                            <button class="btn btn-icon" id="quickDM">
-                                <i class="fas fa-comment"></i>
-                                <span>DM</span>
-                            </button>
-                        </div>
-                    </div>
 
-                    <!-- Secondary Grid -->
-                    <div class="secondary-grid">
                         <!-- Frameworks -->
-                        <div class="card-premium">
-                            <h4>
-                                <i class="fas fa-layer-group"></i>
-                                Frameworks
-                            </h4>
-                            <div class="value" id="fwCount">0/8</div>
-                            <div class="sub" id="fwSub">Completed</div>
-                            <div class="fw-strip" id="fwStrip"></div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Frameworks</div>
+                                <div class="metric-icon"><i class="fas fa-book"></i></div>
+                            </div>
+                            <div class="metric-value" id="frameworkCount">0/8</div>
+                            <div class="metric-subtitle">Completed</div>
+                            <canvas class="metric-chart" id="frameworkChart"></canvas>
                         </div>
 
                         <!-- Rule of 100 -->
-                        <div class="card-premium">
-                            <h4>
-                                <i class="fas fa-fire"></i>
-                                Rule of 100
-                            </h4>
-                            <div class="rule-row">
-                                <span class="count" id="ruleCount">0</span>
-                                <span style="font-size: var(--text-xs); color: var(--text-secondary);">actions today</span>
-                                <span class="streak" id="ruleStreak">
-                                    <i class="fas fa-fire"></i>
-                                    0d
-                                </span>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Rule of 100</div>
+                                <div class="metric-icon"><i class="fas fa-fire"></i></div>
                             </div>
-                            <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
-                                <button id="ruleAddBtn">
-                                    <i class="fas fa-plus"></i>
-                                    Log +1
+                            <div class="metric-value" id="ruleCount">0</div>
+                            <div class="metric-subtitle">Actions today</div>
+                            <div style="margin-top: 12px; display: flex; gap: 8px;">
+                                <button class="btn-holographic" style="padding: 8px 16px; font-size: 12px;" onclick="logAction()">
+                                    <i class="fas fa-plus"></i> Log +1
                                 </button>
-                                <button id="ruleResetBtn">Reset</button>
+                                <button class="tab-btn" style="padding: 8px 16px; font-size: 12px;" onclick="resetRule()">
+                                    Reset
+                                </button>
                             </div>
-                            <div class="mini-cal" id="ruleCalendar"></div>
                         </div>
 
                         <!-- Revenue -->
-                        <div class="card-premium">
-                            <h4>
-                                <i class="fas fa-chart-line"></i>
-                                Revenue Projection
-                            </h4>
-                            <div class="value" id="revenueProjection">$0</div>
-                            <div class="sub">
-                                Monthly: 
-                                <input type="number" id="revenueInput" placeholder="5000" 
-                                    style="width: 80px; background: var(--bg-card); border: 1px solid var(--border-subtle); 
-                                    border-radius: var(--radius-sm); padding: var(--space-xs) var(--space-sm); 
-                                    color: var(--text-primary); font-size: var(--text-xs);" />
-                                /mo
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Revenue Projection</div>
+                                <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
+                            </div>
+                            <div class="metric-value" id="revenueProjection">$0</div>
+                            <div class="metric-subtitle">Monthly projection</div>
+                            <div style="margin-top: 12px;">
+                                <input type="number" id="revenueInput" placeholder="Current monthly revenue" 
+                                    style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 13px;">
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Next Action -->
-                        <div class="card-premium next-action-card">
-                            <h4>
-                                <i class="fas fa-bullseye"></i>
-                                🎯 Next Best Action
-                            </h4>
-                            <div id="nextAction" style="font-size: var(--text-lg); font-weight: 600; margin-top: var(--space-xs); color: var(--text-primary);">
-                                Complete your first framework to get started.
-                            </div>
-                            <div class="sub" style="margin-top: var(--space-xs);">
-                                AI‑recommended based on your progress
-                            </div>
+                    <!-- Next Best Action -->
+                    <div class="metric-card" style="margin-bottom: 24px;">
+                        <div class="metric-header">
+                            <div class="metric-title">🎯 Next Best Action</div>
+                            <div class="metric-icon"><i class="fas fa-bullseye"></i></div>
                         </div>
+                        <div id="nextAction" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
+                            Complete your first framework to get started
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            AI-recommended based on your progress and business stage
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Chart -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-title">Activity Over Time</div>
+                            <div class="metric-icon"><i class="fas fa-chart-area"></i></div>
+                        </div>
+                        <canvas id="activityChart" style="height: 200px; margin-top: 16px;"></canvas>
                     </div>
                 </div>
 
-                <!-- CHAT -->
-                <div class="chat-view" id="chatView">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai">
-                            <div class="avatar">
-                                <i class="fas fa-brain"></i>
+                <!-- Chat Tab -->
+                <div class="tab-pane" id="chatTab">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai">
+                                <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                                <div class="message-bubble">
+                                    <strong>Welcome to your Trecentillion AI Coach!</strong><br><br>
+                                    I'm your elite business strategist with access to $20,000+ worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.<br><br>
+                                    I'm here to help you scale your business using the most advanced strategies. What's your biggest challenge right now?
+                                </div>
                             </div>
-                            <div class="bubble">
-                                <p><strong>Hello, I'm your Ducentillion Executive Coach.</strong></p>
-                                <p>I have access to <strong>$20,000+</strong> of proven frameworks.</p>
-                                <p>Select a mode or ask me anything.</p>
-                            </div>
                         </div>
-                    </div>
-
-                    <div class="status-bar">
-                        <div>
-                            <span class="status-dot"></span>
-                            <span id="statusText">Ready</span>
-                        </div>
-                        <div>
-                            <span id="rateDisplay">30 msg/h</span>
-                            ·
-                            <span id="modeDisplay">Coach</span>
-                        </div>
-                    </div>
-
-                    <div class="input-bar">
-                        <div class="mode-selector">
-                            <select id="modeSelect"></select>
-                        </div>
-                        <div class="input-wrapper">
-                            <input type="text" id="userInput" placeholder="Ask anything..." autocomplete="off" />
-                            <button id="sendBtn">
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about your business..." onkeypress="handleChatKeypress(event)">
+                            <button class="btn-send" onclick="sendMessage()">
                                 <i class="fas fa-paper-plane"></i>
-                                <span>Send</span>
-                            </button>
-                        </div>
-                        <div class="input-actions">
-                            <button id="docBtn" title="Upload docs">
-                                <i class="fas fa-file-upload"></i>
-                            </button>
-                            <button id="voiceBtn" title="TTS">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                            <button id="valueEqBtn" title="Value Equation">
-                                <i class="fas fa-calculator"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- MODALS -->
-    <div class="modal-overlay" id="vaultModal">
-        <div class="modal">
-            <button class="modal-close" id="closeVault">&times;</button>
-            <h2>📚 Framework <span class="gold">Vault</span></h2>
-            <p class="sub">Every framework from our $20,000+ library.</p>
-            <div class="fw-grid" id="frameworkGrid"></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="upgradeModal">
-        <div class="modal">
-            <button class="modal-close" id="closeUpgrade">&times;</button>
-            <h2>👑 Unlock <span class="gold">More Power</span></h2>
-            <p class="sub">Choose the tier that fits your business.</p>
-            <div class="billing-toggle">
-                <span>Monthly</span>
-                <label class="switch">
-                    <input type="checkbox" id="billingToggle">
-                    <span class="slider"></span>
-                </label>
-                <span>Yearly <span style="color: var(--green-primary); font-size: var(--text-xs);">(save 20%)</span></span>
-            </div>
-            <div class="tier-table" id="tierTable"></div>
-            <div class="modal-actions">
-                <button class="btn btn-icon" id="upgradeCancel">Cancel</button>
-                <button class="btn btn-gold" id="upgradeAction">Upgrade Now</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="onboardingModal">
-        <div class="modal" style="max-width: 500px;">
-            <h2>👋 Welcome to <span class="gold">AI Coach</span></h2>
-            <p class="sub">Let's personalise your experience.</p>
-            <div class="onboard-progress" id="onboardProgress">
-                <span class="dot active" data-step="1"></span>
-                <span class="dot" data-step="2"></span>
-                <span class="dot" data-step="3"></span>
-            </div>
-            <div class="onboard-step active" data-step="1">
-                <label>What's your main business goal?</label>
-                <select id="onboardGoal">
-                    <option value="leads">Get more leads</option>
-                    <option value="offer">Build a better offer</option>
-                    <option value="scale">Scale revenue</option>
-                    <option value="retention">Reduce churn</option>
-                </select>
-                <div class="btn-group">
-                    <button class="btn btn-gold" id="onboardNext1">Next</button>
+                <!-- Frameworks Tab -->
+                <div class="tab-pane" id="frameworksTab">
+                    <div class="vault-grid" id="frameworkGrid"></div>
                 </div>
             </div>
-            <div class="onboard-step" data-step="2">
-                <label>Monthly revenue (approx)?</label>
-                <input type="number" id="onboardRevenue" placeholder="e.g. 5000" />
-                <div class="btn-group">
-                    <button class="btn btn-icon" id="onboardBack2">Back</button>
-                    <button class="btn btn-gold" id="onboardNext2">Next</button>
-                </div>
-            </div>
-            <div class="onboard-step" data-step="3">
-                <label>Biggest bottleneck right now?</label>
-                <select id="onboardBottleneck">
-                    <option value="traffic">Not enough leads</option>
-                    <option value="conversion">Low conversion</option>
-                    <option value="offer">Weak offer</option>
-                    <option value="retention">High churn</option>
-                </select>
-                <div class="btn-group">
-                    <button class="btn btn-icon" id="onboardBack3">Back</button>
-                    <button class="btn btn-gold" id="onboardFinish">Finish & Start</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="valueEqModal">
-        <div class="modal">
-            <button class="modal-close" id="closeValueEq">&times;</button>
-            <h2>⚖️ Value <span class="gold">Equation</span></h2>
-            <p class="sub">Adjust sliders to see your offer's value change.</p>
-            <div class="eq-slider">
-                <label>
-                    Dream Outcome
-                    <span class="val" id="eqDream">8</span>
-                </label>
-                <input type="range" min="1" max="10" value="8" id="eqDreamSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>
-                    Perceived Likelihood
-                    <span class="val" id="eqLikelihood">7</span>
-                </label>
-                <input type="range" min="1" max="10" value="7" id="eqLikelihoodSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>
-                    Time Delay (lower=better)
-                    <span class="val" id="eqTime">5</span>
-                </label>
-                <input type="range" min="1" max="10" value="5" id="eqTimeSlider" />
-            </div>
-            <div class="eq-slider">
-                <label>
-                    Effort (lower=better)
-                    <span class="val" id="eqEffort">5</span>
-                </label>
-                <input type="range" min="1" max="10" value="5" id="eqEffortSlider" />
-            </div>
-            <div class="eq-score-box">
-                <div class="label">Value Equation Score</div>
-                <div class="score" id="eqScore">56</div>
-                <div class="formula">(Dream × Likelihood) ÷ (Time × Effort)</div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-icon" id="closeValueEqBtn">Close</button>
-                <button class="btn btn-gold" id="saveValueEq">Save & Apply</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="toast" id="toast">
-        <span class="toast-icon" id="toastIcon"></span>
-        <span id="toastText"></span>
+        </main>
     </div>
 
     <script>
-        // ============================================================
-        // DUCENTILLION APP – Complete Logic
-        // ============================================================
-        
+        // ==================== STATE ====================
         const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
-        
+        let currentMode = 'coach';
+        let currentTier = 'free';
+        let frameworkProgress = {};
+        let userXP = 0;
+        let userLevel = 1;
+        let rule100Count = 0;
+        let userRevenue = 0;
+        let achievements = [];
+        let chatHistory = [];
+
         const MODES = [
-            { id: 'coach', label: 'Coach', icon: 'fa-brain', tier: 'free' },
-            { id: 'xray', label: 'Business X-Ray', icon: 'fa-search', tier: 'free' },
-            { id: 'funnel', label: 'Funnel Map', icon: 'fa-route', tier: 'free' },
+            { id: 'coach', label: 'Daily Operator', icon: 'fa-brain', tier: 'free' },
+            { id: 'xray', label: 'Business X-Ray', icon: 'fa-stethoscope', tier: 'free' },
+            { id: 'funnel', label: 'Funnel Map', icon: 'fa-filter', tier: 'free' },
             { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
-            { id: 'dm', label: 'DM Doctor', icon: 'fa-comment-dots', tier: 'insider' },
-            { id: 'content', label: 'Content Engine', icon: 'fa-pen-fancy', tier: 'insider' },
-            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-film', tier: 'insider' },
+            { id: 'dm', label: 'DM Doctor', icon: 'fa-comments', tier: 'insider' },
+            { id: 'content', label: 'Content Engine', icon: 'fa-pen-nib', tier: 'insider' },
+            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-video', tier: 'insider' },
             { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
             { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
             { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
             { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
         ];
-        
+
         const FRAMEWORKS = [
-            { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider' },
-            { id: 'money_models', name: '$100M + Money Models', value: '$5,000+', tier: 'partner' },
-            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider' },
-            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner' },
-            { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider' },
-            { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider' },
-            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free' },
-            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner' },
+            { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider', desc: '3-tier offers, R.I.P.E., ECAFI scripts' },
+            { id: 'money_models', name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner', desc: 'Value Equation, Grand Slam Offer' },
+            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider', desc: 'Core 4 Advertising, Rule of 100' },
+            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner', desc: 'Green to Ripe, 5 Horsemen' },
+            { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider', desc: 'Brand Clarity, TRUST formula' },
+            { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider', desc: 'Conversational selling scripts' },
+            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free', desc: 'Onboarding, activation points' },
+            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner', desc: 'Interactive value optimizer' },
         ];
-        
-        // State
-        let currentTier = 'free';
-        let currentMode = 'coach';
-        let isSending = false;
-        let frameworkProgress = {};
-        let rule100Count = 0;
-        let ruleStreakDays = 0;
-        let lastRuleDate = '';
-        let userRevenue = 0;
-        let businessName = '';
-        let onboarded = false;
-        let dailyHistory = {};
-        
-        // DOM helpers
-        const $ = id => document.getElementById(id);
-        const toast = $('toast');
-        const toastIcon = $('toastIcon');
-        const toastText = $('toastText');
-        let toastTimeout;
-        
-        // ============================================================
-        // UTILITIES
-        // ============================================================
-        
-        function showToast(msg, type = 'info') {
-            const icons = { success: '✅', error: '⚠️', info: '💡' };
-            toastIcon.textContent = icons[type] || '💡';
-            toastText.textContent = msg;
-            toast.className = 'toast ' + type + ' show';
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => toast.classList.remove('show'), 3200);
-        }
-        
-        function getTimeBasedGreeting() {
-            const hour = new Date().getHours();
-            if (hour < 12) return 'Good morning';
-            if (hour < 17) return 'Good afternoon';
-            return 'Good evening';
-        }
-        
-        function animateCounter(element, target, duration = 1200) {
-            const start = parseInt(element.textContent) || 0;
-            if (start === target) return;
-            const startTime = performance.now();
-            
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                const current = Math.round(start + (target - start) * eased);
-                element.textContent = current;
-                if (progress < 1) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
-        }
-        
-        // ============================================================
-        // LOCAL STORAGE
-        // ============================================================
-        
-        function loadState() {
-            try {
-                const d = JSON.parse(localStorage.getItem('e5_coach_state') || '{}');
-                frameworkProgress = d.frameworkProgress || {};
-                rule100Count = d.rule100Count || 0;
-                ruleStreakDays = d.ruleStreakDays || 0;
-                lastRuleDate = d.lastRuleDate || '';
-                userRevenue = d.userRevenue || 0;
-                businessName = d.businessName || '';
-                onboarded = d.onboarded || false;
-                dailyHistory = d.dailyHistory || {};
-                
-                if (userRevenue) $('revenueInput').value = userRevenue;
-                updatePersonalization();
-                
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    if (lastRuleDate) {
-                        const key = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[key] = rule100Count;
-                    }
-                    rule100Count = 0;
-                    lastRuleDate = today;
-                    saveState();
+
+        const ACHIEVEMENTS = [
+            { id: 'first_framework', name: 'First Steps', icon: '🎯', desc: 'Complete your first framework', xp: 100 },
+            { id: 'streak_3', name: 'On Fire', icon: '🔥', desc: '3-day streak', xp: 150 },
+            { id: 'streak_7', name: 'Unstoppable', icon: '⚡', desc: '7-day streak', xp: 300 },
+            { id: 'framework_master', name: 'Framework Master', icon: '🎓', desc: 'Complete all frameworks', xp: 500 },
+            { id: 'insider', name: 'Insider', icon: '⭐', desc: 'Upgrade to Insider', xp: 200 },
+            { id: 'partner', name: 'Partner', icon: '', desc: 'Upgrade to Partner', xp: 500 },
+        ];
+
+        // ==================== 3D AMBIENT BACKGROUND ====================
+        function initAmbientBackground() {
+            const canvas = document.getElementById('ambient-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const particleCount = 100;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 3 + 1;
+                    this.color = Math.random() > 0.5 ? '#fbbf24' : '#06b6d4';
                 }
-            } catch (e) {
-                console.warn('Load error', e);
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Draw connections
+                particles.forEach((p1, i) => {
+                    particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = p1.color;
+                            ctx.globalAlpha = 0.1 * (1 - distance / 150);
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                        }
+                    });
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // ==================== INITIALIZATION ====================
+        async function init() {
+            initAmbientBackground();
+            loadState();
+            renderModes();
+            renderFrameworks();
+            renderAchievements();
+            updateDashboard();
+            await fetchTier();
+            
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+
+            // Initialize charts
+            initCharts();
+        }
+
+        // ==================== STATE MANAGEMENT ====================
+        function loadState() {
+            const saved = localStorage.getItem('e5_coach_state');
+            if (saved) {
+                const data = JSON.parse(saved);
+                frameworkProgress = data.frameworkProgress || {};
+                userXP = data.userXP || 0;
+                userLevel = data.userLevel || 1;
+                rule100Count = data.rule100Count || 0;
+                userRevenue = data.userRevenue || 0;
+                achievements = data.achievements || [];
             }
         }
-        
+
         function saveState() {
-            try {
-                localStorage.setItem('e5_coach_state', JSON.stringify({
-                    frameworkProgress, rule100Count, ruleStreakDays, lastRuleDate,
-                    userRevenue, businessName, onboarded, dailyHistory
-                }));
-            } catch (e) {
-                console.warn('Save error', e);
-            }
+            localStorage.setItem('e5_coach_state', JSON.stringify({
+                frameworkProgress,
+                userXP,
+                userLevel,
+                rule100Count,
+                userRevenue,
+                achievements
+            }));
         }
-        
-        function updatePersonalization() {
-            if (businessName) {
-                const greeting = getTimeBasedGreeting();
-                $('greeting').textContent = '👋 ' + greeting + ', ' + businessName;
-                $('welcomeTitle').textContent = greeting + ', ' + businessName;
-            }
-        }
-        
-        // ============================================================
-        // TIER & MODES
-        // ============================================================
-        
+
+        // ==================== API CALLS ====================
         async function fetchTier() {
             try {
                 const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
                 const data = await res.json();
                 currentTier = data.tier || 'free';
-                $('tierLabel').textContent = currentTier.toUpperCase();
-                updateSidebar();
-                updateMobileSidebar();
+                document.getElementById('tierBadge').textContent = currentTier.toUpperCase();
+                renderModes();
             } catch (e) {
-                console.warn('Tier fetch failed', e);
+                console.error('Tier fetch failed', e);
             }
         }
-        
-        function isTierOk(userTier, required) {
-            const order = { free: 0, insider: 1, partner: 2 };
-            return order[userTier] >= order[required];
-        }
-        
-        function populateModes() {
-            const sel = $('modeSelect');
-            sel.innerHTML = '';
-            MODES.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.textContent = m.label + ' (' + m.tier + ')';
-                sel.appendChild(opt);
-            });
-            sel.value = currentMode;
-            
-            renderModeList($('modeList'));
-            renderModeList($('mobileModeList'));
-        }
-        
-        function renderModeList(container) {
-            if (!container) return;
-            container.innerHTML = '';
-            MODES.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'mode-item';
-                const ok = isTierOk(currentTier, m.tier);
-                if (!ok) div.classList.add('locked');
-                if (m.id === currentMode) div.classList.add('active');
-                
-                const prog = frameworkProgress[m.id] || 'pending';
-                const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending');
-                
-                div.innerHTML = `
-                    <span class="icon"><i class="fas ${m.icon}"></i></span>
-                    <span>${m.label}</span>
-                    <span class="tier-tag ${m.tier}">${m.tier}</span>
-                    <span class="dot ${dotClass}"></span>
-                `;
-                
-                div.addEventListener('click', () => {
-                    if (!ok) {
-                        showToast('Upgrade to ' + m.tier + ' to unlock ' + m.label, 'error');
-                        return;
-                    }
-                    $('modeSelect').value = m.id;
-                    onModeChange();
-                    document.querySelector('.tab-btn[data-tab="chat"]').click();
-                    closeMobileSidebar();
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add user message
+            addMessage(text, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            try {
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        mode: currentMode,
+                        member_id: 'default'
+                    })
                 });
+
+                const data = await res.json();
+                hideTyping();
+
+                if (data.reply) {
+                    addMessage(data.reply, 'ai');
+                    addXP(25); // XP for each chat
+                }
+            } catch (e) {
+                hideTyping();
+                addMessage('️ Connection error. Please try again.', 'ai');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `message ${sender}`;
+            message.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas ${sender === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
+                </div>
+                <div class="message-bubble">${text}</div>
+            `;
+            container.appendChild(message);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatMessages');
+            const typing = document.createElement('div');
+            typing.className = 'message ai';
+            typing.id = 'typingIndicator';
+            typing.innerHTML = `
+                <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function handleChatKeypress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        // ==================== XP & LEVELING ====================
+        function addXP(amount) {
+            userXP += amount;
+            const nextLevel = userLevel * 300;
+            
+            if (userXP >= nextLevel) {
+                userLevel++;
+                userXP -= nextLevel;
+                fireConfetti();
+                showNotification(`🎉 Level Up! You're now Level ${userLevel}`, 'success');
+            }
+            
+            updateXPBar();
+            saveState();
+        }
+
+        function updateXPBar() {
+            const nextLevel = userLevel * 300;
+            const percentage = (userXP / nextLevel) * 100;
+            document.getElementById('xpBar').style.width = percentage + '%';
+            document.getElementById('userLevel').textContent = userLevel;
+            document.getElementById('userXP').textContent = userXP;
+        }
+
+        // ==================== RENDERING ====================
+        function renderModes() {
+            const container = document.getElementById('modeList');
+            container.innerHTML = '';
+
+            MODES.forEach(mode => {
+                const isUnlocked = isTierUnlocked(mode.tier);
+                const div = document.createElement('div');
+                div.className = `mode-item ${mode.id === currentMode ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                div.onclick = () => selectMode(mode);
+                div.innerHTML = `
+                    <div class="mode-icon">
+                        <i class="fas ${mode.icon}"></i>
+                    </div>
+                    <div class="mode-info">
+                        <div class="mode-name">${mode.label}</div>
+                    </div>
+                    <span class="mode-tier ${mode.tier}">${mode.tier}</span>
+                    <div class="progress-indicator ${frameworkProgress[mode.id] || 'pending'}"></div>
+                `;
                 container.appendChild(div);
             });
         }
-        
-        function updateSidebar() {
-            document.querySelectorAll('.mode-item').forEach((item, idx) => {
-                const m = MODES[idx % MODES.length];
-                const ok = isTierOk(currentTier, m.tier);
-                item.classList.toggle('locked', !ok);
-                
-                const prog = frameworkProgress[m.id] || 'pending';
-                const dot = item.querySelector('.dot');
-                if (dot) {
-                    dot.className = 'dot ' + (prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending'));
-                }
-            });
-        }
-        
-        function updateMobileSidebar() {
-            renderModeList($('mobileModeList'));
-        }
-        
-        function onModeChange() {
-            currentMode = $('modeSelect').value;
-            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            
-            document.querySelectorAll('.mode-item').forEach((el, idx) => {
-                const m = MODES[idx % MODES.length];
-                el.classList.toggle('active', m.id === currentMode);
-            });
-            
-            if (!frameworkProgress[currentMode] || frameworkProgress[currentMode] === 'pending') {
-                frameworkProgress[currentMode] = 'started';
-                saveState();
-                updateDashboard();
-                updateSidebar();
-                showToast('Started ' + MODES.find(m => m.id === currentMode)?.label + ' mode', 'info');
-            }
-            
-            addMessage('Switched to <strong>' + (MODES.find(m => m.id === currentMode)?.label || currentMode) + '</strong> mode.', 'ai', true);
-            document.querySelector('.tab-btn[data-tab="chat"]').click();
-        }
-        
-        // ============================================================
-        // CHAT
-        // ============================================================
-        
-        async function sendMessage() {
-            const text = $('userInput').value.trim();
-            if (!text || isSending) return;
-            
-            isSending = true;
-            $('sendBtn').disabled = true;
-            $('userInput').value = '';
-            
-            addMessage(text, 'user');
-            $('statusText').textContent = 'Thinking...';
-            showTyping();
-            
-            try {
-                const res = await fetch(API_BASE + '/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, mode: currentMode, member_id: 'default' })
-                });
-                
-                const data = await res.json();
-                hideTyping();
-                
-                if (data.error) {
-                    addMessage('⚠️ ' + data.error, 'ai', true);
-                    $('statusText').textContent = 'Error';
-                } else {
-                    const reply = data.reply || data.response || 'No response.';
-                    addMessage(reply, 'ai');
-                    $('statusText').textContent = 'Ready';
-                }
-            } catch (err) {
-                hideTyping();
-                addMessage('⚠️ Connection error', 'ai', true);
-                $('statusText').textContent = 'Offline';
-            } finally {
-                isSending = false;
-                $('sendBtn').disabled = false;
-                $('userInput').focus();
-            }
-        }
-        
-        function addMessage(text, sender, isHTML = false) {
-            const div = document.createElement('div');
-            div.className = 'message ' + sender;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            if (isHTML) bubble.innerHTML = text;
-            else bubble.textContent = text;
-            
-            div.appendChild(avatar);
-            div.appendChild(bubble);
-            $('chatMessages').appendChild(div);
-            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-        }
-        
-        let typingEl = null;
-        
-        function showTyping() {
-            if (typingEl) return;
-            const div = document.createElement('div');
-            div.className = 'message ai';
-            div.id = 'typingIndicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.innerHTML = '<i class="fas fa-brain"></i>';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'typing';
-            bubble.innerHTML = '<span></span><span></span><span></span>';
-            
-            div.appendChild(avatar);
-            div.appendChild(bubble);
-            $('chatMessages').appendChild(div);
-            $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-            typingEl = div;
-        }
-        
-        function hideTyping() {
-            if (typingEl) {
-                typingEl.remove();
-                typingEl = null;
-            }
-        }
-        
-        // ============================================================
-        // DASHBOARD
-        // ============================================================
-        
-        function updateDashboard() {
-            const total = FRAMEWORKS.length;
-            const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
-            const health = Math.round((completed / total) * 100);
-            
-            // Ring
-            $('healthScore').textContent = health;
-            $('healthSub').textContent = completed + ' / ' + total + ' frameworks completed';
-            const circ = 263.9;
-            $('healthRing').style.strokeDashoffset = circ - (health / 100) * circ;
-            
-            // Framework count
-            $('fwCount').textContent = completed + '/' + total;
-            $('fwSub').textContent = completed === 0 ? 'Start your first framework' : completed + ' completed';
-            
-            // Strip
-            const strip = $('fwStrip');
-            strip.innerHTML = '';
-            FRAMEWORKS.forEach(f => {
-                const d = document.createElement('span');
-                d.className = 'dot';
-                const s = frameworkProgress[f.id] || 'pending';
-                d.classList.add(s === 'completed' ? 'done' : (s === 'started' ? 'partial' : ''));
-                strip.appendChild(d);
-            });
-            
-            // Rule
-            $('ruleCount').textContent = rule100Count;
-            const streak = rule100Count >= 100 ? 1 : 0;
-            $('ruleStreak').innerHTML = '<i class="fas fa-fire"></i> ' + streak + 'd';
-            
-            // Calendar
-            const cal = $('ruleCalendar');
-            cal.innerHTML = '';
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const key = d.toISOString().slice(0, 10);
-                const count = dailyHistory[key] || 0;
-                const div = document.createElement('span');
-                div.className = 'day';
-                if (count >= 100) div.classList.add('hit');
-                if (i === 0) div.classList.add('today');
-                div.textContent = d.getDate();
-                cal.appendChild(div);
-            }
-            
-            // Revenue
-            const rev = userRevenue || 0;
-            $('revenueProjection').textContent = rev > 0 ? '$' + Math.round(rev * (1 + (completed / total) * 2)).toLocaleString() + '/mo' : '$0/mo';
-            
-            // Next action
-            if (completed === 0) {
-                $('nextAction').textContent = '🚀 Start with the Delivery Checklist (free)';
-            } else if (completed < 3) {
-                $('nextAction').textContent = '📈 Complete AVOCADO Offers next';
-            } else if (completed < 5) {
-                $('nextAction').textContent = '💰 Unlock Partner tier for Money Models';
-            } else {
-                $('nextAction').textContent = '🏆 Scale with Community OS and Launch Planner';
-            }
-        }
-        
-        // ============================================================
-        // FRAMEWORK VAULT
-        // ============================================================
-        
-        function populateVault() {
-            const grid = $('frameworkGrid');
-            grid.innerHTML = '';
+
+        function renderFrameworks() {
+            const container = document.getElementById('frameworkGrid');
+            container.innerHTML = '';
+
             FRAMEWORKS.forEach(fw => {
-                const card = document.createElement('div');
-                card.className = 'fw-card';
-                const ok = isTierOk(currentTier, fw.tier);
-                const status = frameworkProgress[fw.id] || 'pending';
-                const done = status === 'completed';
-                const started = status === 'started';
-                
-                card.style.opacity = ok ? '1' : '0.4';
-                card.innerHTML = `
-                    <h4>${fw.name} ${done ? '✅' : (ok ? (started ? '⏳' : '') : '🔒')}</h4>
-                    <p style="font-size: var(--text-xs); color: var(--text-secondary);">${fw.value}</p>
-                    <div class="meta">
-                        <span class="val">${fw.value}</span>
-                        <span class="tier ${fw.tier}">${fw.tier}</span>
+                const isUnlocked = isTierUnlocked(fw.tier);
+                const progress = frameworkProgress[fw.id] || 'pending';
+                const div = document.createElement('div');
+                div.className = 'framework-card';
+                div.onclick = () => startFramework(fw);
+                div.innerHTML = `
+                    <div class="framework-header">
+                        <div class="framework-name">${fw.name}</div>
+                        <div class="framework-value">${fw.value}</div>
                     </div>
-                    <button class="btn ${done ? 'done' : ''}">${done ? 'Completed' : (ok ? (started ? 'Resume' : 'Start') : 'Locked')}</button>
+                    <div class="framework-desc">${fw.desc}</div>
+                    <div class="framework-progress">
+                        <div class="framework-progress-fill" style="width: ${progress === 'completed' ? 100 : progress === 'started' ? 50 : 0}%"></div>
+                    </div>
+                    <div class="framework-status">
+                        ${progress === 'completed' ? '✅ Completed' : progress === 'started' ? ' In Progress' : isUnlocked ? '🔓 Available' : '🔒 Locked'}
+                    </div>
                 `;
-                
-                const btn = card.querySelector('.btn');
-                btn.addEventListener('click', () => {
-                    if (!ok) {
-                        showToast('Upgrade to ' + fw.tier + ' for ' + fw.name, 'error');
-                        return;
-                    }
-                    if (done) {
-                        showToast('Already completed ' + fw.name, 'info');
-                        return;
-                    }
-                    if (frameworkProgress[fw.id] === 'started') {
-                        frameworkProgress[fw.id] = 'completed';
-                        showToast('🎉 Completed ' + fw.name + '!', 'success');
-                        fireConfetti();
-                    } else {
-                        frameworkProgress[fw.id] = 'started';
-                        showToast('Started ' + fw.name, 'info');
-                    }
-                    saveState();
-                    populateVault();
-                    updateDashboard();
-                    updateSidebar();
-                });
-                grid.appendChild(card);
+                container.appendChild(div);
             });
         }
-        
-        // ============================================================
-        // UPGRADE & ONBOARDING
-        // ============================================================
-        
-        function openUpgrade() {
-            const yearly = $('billingToggle').checked;
-            const tiers = [
-                { name: 'Free', features: '3 modes, 30 msg/h', price: yearly ? '$0' : '$0', current: currentTier === 'free' },
-                { name: 'Insider', features: '+5 modes, frameworks', price: yearly ? '$40/mo' : '$47/mo', current: currentTier === 'insider' },
-                { name: 'Partner', features: '+3 modes, money models', price: yearly ? '$167/mo' : '$197/mo', current: currentTier === 'partner' },
-            ];
-            
-            const table = $('tierTable');
-            table.innerHTML = '';
-            tiers.forEach(t => {
-                const row = document.createElement('div');
-                row.className = 'tier-row' + (t.current ? ' current' : '');
-                row.innerHTML = `
-                    <span class="name">${t.name} ${t.current ? '👈' : ''} ${t.name === 'Insider' ? '<span class="pop">Popular</span>' : ''}</span>
-                    <span class="features">${t.features}</span>
-                    <span class="price">${t.price}</span>
+
+        function renderAchievements() {
+            const container = document.getElementById('achievementsList');
+            container.innerHTML = '';
+
+            ACHIEVEMENTS.forEach(ach => {
+                const isUnlocked = achievements.includes(ach.id);
+                const div = document.createElement('div');
+                div.className = `achievement-badge ${isUnlocked ? 'unlocked' : ''}`;
+                div.innerHTML = `
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-name">${ach.name}</div>
+                    <div class="achievement-desc">${ach.desc}</div>
                 `;
-                table.appendChild(row);
-            });
-            $('upgradeModal').classList.add('open');
-        }
-        
-        function goToStep(step) {
-            document.querySelectorAll('.onboard-step').forEach(el => el.classList.remove('active'));
-            document.querySelector('.onboard-step[data-step="' + step + '"]').classList.add('active');
-            
-            document.querySelectorAll('.onboard-progress .dot').forEach(d => {
-                const s = parseInt(d.dataset.step);
-                d.classList.toggle('active', s === step);
-                d.classList.toggle('done', s < step);
+                container.appendChild(div);
             });
         }
-        
-        function finishOnboarding() {
-            const revenue = parseFloat($('onboardRevenue').value) || 0;
-            const name = prompt('Business name? (optional)') || '';
-            
-            userRevenue = revenue;
-            businessName = name;
-            if (revenue) $('revenueInput').value = revenue;
-            
-            onboarded = true;
+
+        function isTierUnlocked(tier) {
+            const tiers = { free: 0, insider: 1, partner: 2 };
+            return tiers[currentTier] >= tiers[tier];
+        }
+
+        function selectMode(mode) {
+            if (!isTierUnlocked(mode.tier)) {
+                showNotification(`Upgrade to ${mode.tier} to unlock this mode`, 'error');
+                return;
+            }
+            currentMode = mode.id;
+            renderModes();
+            switchTab('chat');
+            addMessage(`Switched to <strong>${mode.label}</strong> mode. How can I help you?`, 'ai');
+        }
+
+        function startFramework(fw) {
+            if (!isTierUnlocked(fw.tier)) {
+                showNotification(`Upgrade to ${fw.tier} to access this framework`, 'error');
+                return;
+            }
+
+            if (frameworkProgress[fw.id] === 'completed') {
+                showNotification('You already completed this framework!', 'info');
+                return;
+            }
+
+            if (frameworkProgress[fw.id] === 'started') {
+                frameworkProgress[fw.id] = 'completed';
+                addXP(100);
+                checkAchievements();
+                fireConfetti();
+                showNotification(`🎉 Completed ${fw.name}!`, 'success');
+            } else {
+                frameworkProgress[fw.id] = 'started';
+                addXP(50);
+                showNotification(`Started ${fw.name}`, 'info');
+            }
+
             saveState();
-            $('onboardingModal').classList.remove('open');
-            showToast('🎉 Welcome! You\'re all set.', 'success');
-            updatePersonalization();
+            renderFrameworks();
+            renderModes();
             updateDashboard();
         }
-        
-        // ============================================================
-        // VALUE EQUATION
-        // ============================================================
-        
-        function openValueEq() {
-            ['eqDream', 'eqLikelihood', 'eqTime', 'eqEffort'].forEach(id => {
-                const slider = $(id + 'Slider');
-                $(id).textContent = slider.value;
-            });
-            updateEqScore();
-            $('valueEqModal').classList.add('open');
-        }
-        
-        function updateEqScore() {
-            const dream = parseInt($('eqDreamSlider').value);
-            const like = parseInt($('eqLikelihoodSlider').value);
-            const time = parseInt($('eqTimeSlider').value);
-            const effort = parseInt($('eqEffortSlider').value);
-            const score = (dream * like) / (time * effort);
-            $('eqScore').textContent = Math.round(score * 10) / 10;
-        }
-        
-        ['eqDreamSlider', 'eqLikelihoodSlider', 'eqTimeSlider', 'eqEffortSlider'].forEach(id => {
-            $(id).addEventListener('input', () => {
-                $(id.replace('Slider', '')).textContent = $(id).value;
-                updateEqScore();
-            });
-        });
-        
-        // ============================================================
-        // MOBILE & CONFETTI
-        // ============================================================
-        
-        function openMobileSidebar() {
-            $('sidebarOverlay').classList.add('open');
-            $('mobileSidebar').classList.add('open');
-            $('mobileMenuBtn').classList.add('active');
-        }
-        
-        function closeMobileSidebar() {
-            $('sidebarOverlay').classList.remove('open');
-            $('mobileSidebar').classList.remove('open');
-            $('mobileMenuBtn').classList.remove('active');
-        }
-        
-        function fireConfetti() {
-            const container = document.createElement('div');
-            container.className = 'confetti-container';
-            document.body.appendChild(container);
+
+        function checkAchievements() {
+            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
             
-            const colors = ['#f59e0b', '#fbbf24', '#8b5cf6', '#10b981', '#f472b6', '#60a5fa'];
-            for (let i = 0; i < 80; i++) {
-                const p = document.createElement('div');
-                p.className = 'confetti';
-                p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                p.style.left = Math.random() * 100 + '%';
-                p.style.width = (Math.random() * 6 + 4) + 'px';
-                p.style.height = (Math.random() * 6 + 4) + 'px';
-                p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
-                p.style.animationDelay = (Math.random() * 0.8) + 's';
-                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                container.appendChild(p);
+            if (completed >= 1 && !achievements.includes('first_framework')) {
+                achievements.push('first_framework');
+                addXP(ACHIEVEMENTS.find(a => a.id === 'first_framework').xp);
+                showNotification('🏆 Achievement Unlocked: First Steps!', 'success');
             }
-            setTimeout(() => container.remove(), 3500);
+            
+            if (completed === FRAMEWORKS.length && !achievements.includes('framework_master')) {
+                achievements.push('framework_master');
+                addXP(ACHIEVEMENTS.find(a => a.id === 'framework_master').xp);
+                showNotification('🎓 Achievement Unlocked: Framework Master!', 'success');
+            }
+
+            renderAchievements();
         }
-        
-        // ============================================================
-        // INIT
-        // ============================================================
-        
-        async function init() {
-            loadState();
-            populateModes();
-            await fetchTier();
-            populateVault();
+
+        // ==================== DASHBOARD ====================
+        function updateDashboard() {
+            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
+            const total = FRAMEWORKS.length;
+            const health = Math.round((completed / total) * 100);
+
+            // Update health ring
+            const ring = document.getElementById('healthRing');
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference - (health / 100) * circumference;
+            ring.style.strokeDashoffset = offset;
+            document.getElementById('healthScore').textContent = health;
+
+            // Update framework count
+            document.getElementById('frameworkCount').textContent = `${completed}/${total}`;
+
+            // Update next action
+            const nextAction = document.getElementById('nextAction');
+            if (completed === 0) {
+                nextAction.textContent = '🚀 Start with the Delivery Checklist (Free)';
+            } else if (completed < 3) {
+                nextAction.textContent = '📈 Complete AVOCADO Offers to unlock lead generation';
+            } else if (completed < 5) {
+                nextAction.textContent = '💰 Upgrade to Partner for $100M Offers framework';
+            } else {
+                nextAction.textContent = ' Scale with Community OS and Launch Planner';
+            }
+
+            // Update charts
+            updateCharts();
+        }
+
+        function logAction() {
+            rule100Count++;
+            if (rule100Count >= 100) {
+                fireConfetti();
+                showNotification('🎉 Hit 100 actions!', 'success');
+                addXP(50);
+            }
+            saveState();
             updateDashboard();
-            
-            if (!onboarded) {
-                setTimeout(() => $('onboardingModal').classList.add('open'), 600);
-            }
-            
-            // Events
-            $('modeSelect').addEventListener('change', onModeChange);
-            $('sendBtn').addEventListener('click', sendMessage);
-            $('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-            
-            $('vaultBtn').addEventListener('click', () => $('vaultModal').classList.add('open'));
-            $('closeVault').addEventListener('click', () => $('vaultModal').classList.remove('open'));
-            $('vaultModal').addEventListener('click', e => { if (e.target === e.currentTarget) $('vaultModal').classList.remove('open'); });
-            
-            $('upgradeBtn').addEventListener('click', openUpgrade);
-            $('closeUpgrade').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
-            $('upgradeCancel').addEventListener('click', () => $('upgradeModal').classList.remove('open'));
-            $('upgradeAction').addEventListener('click', () => {
-                showToast('Upgrade: connect your Whop license key.', 'info');
-                $('upgradeModal').classList.remove('open');
-            });
-            $('billingToggle').addEventListener('change', openUpgrade);
-            
-            $('docBtn').addEventListener('click', () => showToast('Upload docs to personalise coaching.', 'info'));
-            $('voiceBtn').addEventListener('click', () => showToast('Text-to-Speech coming soon.', 'info'));
-            $('valueEqBtn').addEventListener('click', openValueEq);
-            $('closeValueEq').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
-            $('closeValueEqBtn').addEventListener('click', () => $('valueEqModal').classList.remove('open'));
-            $('saveValueEq').addEventListener('click', () => {
-                showToast('Value Equation saved!', 'success');
-                $('valueEqModal').classList.remove('open');
-            });
-            
-            $('quickXRay').addEventListener('click', () => { $('modeSelect').value = 'xray'; onModeChange(); });
-            $('quickOffer').addEventListener('click', () => {
-                if (!isTierOk(currentTier, 'partner')) {
-                    showToast('Upgrade to Partner for Offer Architect', 'error');
-                    return;
-                }
-                $('modeSelect').value = 'offer';
-                onModeChange();
-            });
-            $('quickDM').addEventListener('click', () => {
-                if (!isTierOk(currentTier, 'insider')) {
-                    showToast('Upgrade to Insider for DM Doctor', 'error');
-                    return;
-                }
-                $('modeSelect').value = 'dm';
-                onModeChange();
-            });
-            
-            $('ruleAddBtn').addEventListener('click', () => {
-                rule100Count++;
-                const today = new Date().toDateString();
-                if (lastRuleDate !== today) {
-                    if (lastRuleDate) {
-                        const key = new Date(lastRuleDate).toISOString().slice(0, 10);
-                        dailyHistory[key] = rule100Count;
+        }
+
+        function resetRule() {
+            rule100Count = 0;
+            saveState();
+            updateDashboard();
+        }
+
+        // ==================== CHARTS ====================
+        let frameworkChart, activityChart;
+
+        function initCharts() {
+            // Framework progress chart
+            const ctx1 = document.getElementById('frameworkChart').getContext('2d');
+            frameworkChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Locked'],
+                    datasets: [{
+                        data: [0, 0, 8],
+                        backgroundColor: ['#10b981', '#fbbf24', 'rgba(255,255,255,0.1)'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     }
-                    rule100Count = 1;
-                    lastRuleDate = today;
-                }
-                saveState();
-                updateDashboard();
-                if (rule100Count >= 100) {
-                    fireConfetti();
-                    showToast('🎉 Hit 100 actions!', 'success');
                 }
             });
-            
-            $('ruleResetBtn').addEventListener('click', () => {
-                rule100Count = 0;
-                saveState();
-                updateDashboard();
-                showToast('Reset for today.', 'info');
-            });
-            
-            $('revenueInput').addEventListener('input', () => {
-                userRevenue = parseFloat($('revenueInput').value) || 0;
-                saveState();
-                updateDashboard();
-            });
-            
-            $('onboardNext1').addEventListener('click', () => goToStep(2));
-            $('onboardBack2').addEventListener('click', () => goToStep(1));
-            $('onboardNext2').addEventListener('click', () => goToStep(3));
-            $('onboardBack3').addEventListener('click', () => goToStep(2));
-            $('onboardFinish').addEventListener('click', finishOnboarding);
-            
-            $('tabNav').addEventListener('click', e => {
-                const btn = e.target.closest('.tab-btn');
-                if (!btn) return;
-                const tab = btn.dataset.tab;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                if (tab === 'dashboard') {
-                    $('dashboardView').classList.add('active');
-                    $('chatView').classList.remove('active');
-                    updateDashboard();
-                } else {
-                    $('dashboardView').classList.remove('active');
-                    $('chatView').classList.add('active');
+
+            // Activity chart
+            const ctx2 = document.getElementById('activityChart').getContext('2d');
+            activityChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Actions',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b' }
+                        }
+                    }
                 }
             });
-            
-            $('mobileMenuBtn').addEventListener('click', () => {
-                if ($('mobileSidebar').classList.contains('open')) {
-                    closeMobileSidebar();
-                } else {
-                    openMobileSidebar();
-                }
-            });
-            
-            $('sidebarOverlay').addEventListener('click', closeMobileSidebar);
-            
-            currentMode = $('modeSelect').value;
-            $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || currentMode;
-            $('userInput').focus();
         }
-        
-        document.addEventListener('DOMContentLoaded', init);
+
+        function updateCharts() {
+            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
+            const started = Object.values(frameworkProgress).filter(p => p === 'started').length;
+            const locked = FRAMEWORKS.length - completed - started;
+
+            frameworkChart.data.datasets[0].data = [completed, started, locked];
+            frameworkChart.update();
+
+            // Update activity chart with rule count
+            const today = new Date().getDay();
+            activityChart.data.datasets[0].data[today] = rule100Count;
+            activityChart.update();
+        }
+
+        // ==================== UTILITIES ====================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            event.target.closest('.tab-btn').classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+
+        function openVault() {
+            switchTab('frameworks');
+        }
+
+        function openUpgrade() {
+            showNotification('Upgrade modal coming soon!', 'info');
+        }
+
+        function showNotification(message, type) {
+            const div = document.createElement('div');
+            div.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 32px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'rgba(16, 185, 129, 0.9)' : type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(251, 191, 36, 0.9)'};
+                border-radius: 12px;
+                color: white;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                backdrop-filter: blur(10px);
+            `;
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        function fireConfetti() {
+            const container = document.getElementById('confettiContainer');
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = ['#fbbf24', '#06b6d4', '#a855f7', '#10b981'][Math.floor(Math.random() * 4)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        // Initialize app
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
