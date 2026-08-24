@@ -1,94 +1,283 @@
-<!-- 🌌 GOOGOL-PLEX DASHBOARD UI (Add this inside your main container) -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-    <!-- Omni Audit Card -->
-    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
-        <h3 class="text-amber-400 font-bold mb-2 flex items-center"><i class="fas fa-stethoscope mr-2"></i> Omni-Audit</h3>
-        <div class="space-y-2 text-sm text-slate-300">
-            <input type="number" id="audit-leads" placeholder="Leads/mo" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <input type="number" id="audit-close" placeholder="Close Rate %" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <input type="number" id="audit-ltv" placeholder="Avg LTV $" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <input type="text" id="audit-pain" placeholder="Biggest Pain Point" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <button onclick="runOmniAudit()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded mt-2">Run Omni-Audit</button>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E5 AI Coach | Gatekeeper OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { brand: { 500: '#f59e0b', 600: '#d97706' }, dark: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' } } } }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-dark-950 text-slate-200 font-sans h-screen flex overflow-hidden">
+
+    <!-- GATEKEEPER OVERLAY (Blocks app until onboarding is done) -->
+    <div id="gatekeeper-overlay" class="fixed inset-0 bg-dark-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-brand-500/20">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Initialize Your Business OS</h2>
+                    <p class="text-slate-400 text-sm mt-1">The AI needs context to be proactive. Answer these 4 questions.</p>
+                </div>
+                <div class="text-brand-500 font-mono text-sm" id="step-indicator">Step 1/4</div>
+            </div>
+
+            <!-- Step 1: Identity -->
+            <div class="quiz-step" data-step="1">
+                <label class="block text-sm font-medium text-slate-300 mb-2">What is your Business Name & Niche?</label>
+                <input type="text" id="q-biz-name" placeholder="e.g., Apex Fitness" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-brand-500 focus:outline-none">
+                <input type="text" id="q-niche" placeholder="e.g., High-ticket B2B Coaching" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-brand-500 focus:outline-none">
+            </div>
+
+            <!-- Step 2: Avatar & Offer -->
+            <div class="quiz-step hidden" data-step="2">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Who is your Dream Client & what is your Core Offer?</label>
+                <input type="text" id="q-avatar" placeholder="e.g., Gym owners doing $10k/mo" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-brand-500 focus:outline-none">
+                <input type="text" id="q-offer" placeholder="e.g., 12-week scaling program" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-brand-500 focus:outline-none">
+            </div>
+
+            <!-- Step 3: Metrics -->
+            <div class="quiz-step hidden" data-step="3">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Current Monthly Revenue vs. Goal</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-500">Current ($)</label>
+                        <input type="number" id="q-current-rev" placeholder="5000" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500">Goal ($)</label>
+                        <input type="number" id="q-goal-rev" placeholder="50000" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-brand-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Bottleneck -->
+            <div class="quiz-step hidden" data-step="4">
+                <label class="block text-sm font-medium text-slate-300 mb-2">What is your #1 Biggest Bottleneck right now?</label>
+                <select id="q-bottleneck" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4 focus:border-brand-500 focus:outline-none">
+                    <option value="Leads">I need more leads/traffic</option>
+                    <option value="Offer">My offer isn't converting</option>
+                    <option value="Sales">I get leads but can't close them</option>
+                    <option value="Delivery">I have clients but churn is high</option>
+                </select>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Current Business Stage?</label>
+                <select id="q-stage" class="w-full bg-dark-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-brand-500 focus:outline-none">
+                    <option value="Idea">Just an idea / Pre-launch</option>
+                    <option value="Launched">Launched but inconsistent</option>
+                    <option value="Scaling">Consistent revenue, ready to scale</option>
+                </select>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="btn-prev" class="px-6 py-2 text-slate-400 hover:text-white hidden">Back</button>
+                <button id="btn-next" class="px-6 py-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg ml-auto">Next</button>
+                <button id="btn-submit" class="px-6 py-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg ml-auto hidden">Unlock AI Coach</button>
+            </div>
         </div>
-        <div id="audit-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
     </div>
 
-    <!-- Daily 100 Card -->
-    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
-        <h3 class="text-green-400 font-bold mb-2 flex items-center"><i class="fas fa-bullseye mr-2"></i> Rule of 100 Generator</h3>
-        <div class="space-y-2 text-sm text-slate-300">
-            <select id="d100-stage" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-                <option>Lead Gen</option><option>Scaling</option><option>Retention</option>
-            </select>
-            <input type="text" id="d100-niche" placeholder="Your Niche (e.g., B2B SaaS)" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <button onclick="generateDaily100()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded mt-2">Generate Daily 100</button>
+    <!-- MAIN APP UI (Hidden until onboarded) -->
+    <div id="main-app" class="flex-1 flex flex-col relative hidden">
+        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-dark-900/50 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">E5</div>
+                <h1 class="text-lg font-semibold text-white">AI Coach</h1>
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-400" id="user-context-display">Loading context...</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <select id="mode-select" class="bg-slate-800 text-slate-300 text-xs rounded px-2 py-1.5 border border-slate-700 focus:outline-none">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+        </header>
+
+        <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-brand-600 flex-shrink-0 flex items-center justify-center text-white font-bold">AI</div>
+                <div class="glass p-4 rounded-2xl rounded-tl-none max-w-3xl text-slate-300 leading-relaxed">
+                    <p class="mb-2 font-semibold text-white">Welcome back.</p>
+                    <p>I've analyzed your business context. Based on your bottleneck (<span id="ai-bottleneck-display" class="text-brand-500">loading...</span>), here is your immediate focus: Let's diagnose your current lead flow. What specific numbers are you seeing this week?</p>
+                </div>
+            </div>
         </div>
-        <div id="d100-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
+
+        <div id="typing-indicator" class="hidden px-6 pb-2">
+            <div class="flex gap-2 items-center text-slate-500 text-sm ml-14">
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-brand-500 rounded-full typing-dot"></div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 bg-dark-900">
+            <div class="max-w-4xl mx-auto relative">
+                <textarea id="user-input" rows="1" placeholder="Ask your AI Coach..." class="w-full bg-slate-800/50 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none px-4 py-3 pr-12 resize-none" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                <button onclick="sendMessage()" class="absolute right-2 top-2 p-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
 
-    <!-- Closing Roleplay Card -->
-    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
-        <h3 class="text-purple-400 font-bold mb-2 flex items-center"><i class="fas fa-chess mr-2"></i> Closing Roleplay</h3>
-        <div class="space-y-2 text-sm text-slate-300">
-            <select id="rp-scenario" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-                <option>Price Objection</option><option>Need to think about it</option><option>Need to ask my partner</option>
-            </select>
-            <input type="text" id="rp-message" placeholder="What you just said to the prospect..." class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
-            <button onclick="runRoleplay()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded mt-2">Simulate Prospect</button>
-        </div>
-        <div id="rp-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
-    </div>
-</div>
+    <script>
+        const API_BASE = ''; // Same origin
+        let memberId = localStorage.getItem('e5_member_id') || 'default';
+        let chatHistory = [];
+        let currentMode = 'coach';
+        let currentStep = 1;
 
-<script>
-// 🌌 GOOGOL-PLEX JAVASCRIPT FUNCTIONS
-async function runOmniAudit() {
-    const btn = event.target; btn.innerText = "Analyzing...";
-    const payload = {
-        current_leads_per_month: parseInt(document.getElementById('audit-leads').value) || 0,
-        close_rate_percent: parseFloat(document.getElementById('audit-close').value) || 0,
-        average_ltv: parseFloat(document.getElementById('audit-ltv').value) || 0,
-        biggest_pain_point: document.getElementById('audit-pain').value || "Unknown"
-    };
-    try {
-        const res = await fetch('/api/omni-audit', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        const data = await res.json();
-        const resultDiv = document.getElementById('audit-result');
-        resultDiv.innerText = data.audit;
-        resultDiv.classList.remove('hidden');
-    } catch(e) { console.error(e); }
-    btn.innerText = "Run Omni-Audit";
-}
+        if (!localStorage.getItem('e5_member_id')) localStorage.setItem('e5_member_id', memberId);
 
-async function generateDaily100() {
-    const btn = event.target; btn.innerText = "Generating...";
-    const payload = {
-        current_stage: document.getElementById('d100-stage').value,
-        niche: document.getElementById('d100-niche').value
-    };
-    try {
-        const res = await fetch('/api/daily-100', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        const data = await res.json();
-        const resultDiv = document.getElementById('d100-result');
-        resultDiv.innerText = data.daily_plan;
-        resultDiv.classList.remove('hidden');
-    } catch(e) { console.error(e); }
-    btn.innerText = "Generate Daily 100";
-}
+        // --- GATEKEEPER LOGIC ---
+        async function initApp() {
+            try {
+                const res = await fetch(`${API_BASE}/api/check-onboarding?member_id=${memberId}`);
+                const data = await res.json();
+                
+                if (!data.onboarded) {
+                    document.getElementById('gatekeeper-overlay').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('hidden');
+                } else {
+                    document.getElementById('gatekeeper-overlay').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.getElementById('user-context-display').textContent = `${data.profile.niche} | $${data.profile.current_monthly_revenue}/mo`;
+                    document.getElementById('ai-bottleneck-display').textContent = data.profile.biggest_bottleneck;
+                }
+            } catch (e) {
+                console.error("Init error", e);
+                document.getElementById('gatekeeper-overlay').classList.remove('hidden');
+            }
+            loadModes();
+        }
 
-async function runRoleplay() {
-    const btn = event.target; btn.innerText = "Simulating...";
-    const payload = {
-        scenario: document.getElementById('rp-scenario').value,
-        user_message: document.getElementById('rp-message').value
-    };
-    try {
-        const res = await fetch('/api/roleplay', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        const data = await res.json();
-        const resultDiv = document.getElementById('rp-result');
-        resultDiv.innerText = data.roleplay_response;
-        resultDiv.classList.remove('hidden');
-    } catch(e) { console.error(e); }
-    btn.innerText = "Simulate Prospect";
-}
-</script>
+        // Quiz Navigation
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (currentStep < 4) {
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.add('hidden');
+                currentStep++;
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.remove('hidden');
+                document.getElementById('step-indicator').textContent = `Step ${currentStep}/4`;
+                document.getElementById('btn-prev').classList.remove('hidden');
+                if (currentStep === 4) {
+                    document.getElementById('btn-next').classList.add('hidden');
+                    document.getElementById('btn-submit').classList.remove('hidden');
+                }
+            }
+        });
+
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            if (currentStep > 1) {
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.add('hidden');
+                currentStep--;
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.remove('hidden');
+                document.getElementById('step-indicator').textContent = `Step ${currentStep}/4`;
+                if (currentStep === 1) document.getElementById('btn-prev').classList.add('hidden');
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-submit').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('btn-submit').addEventListener('click', async () => {
+            const payload = {
+                member_id: memberId,
+                business_name: document.getElementById('q-biz-name').value,
+                niche: document.getElementById('q-niche').value,
+                target_avatar: document.getElementById('q-avatar').value,
+                core_offer: document.getElementById('q-offer').value,
+                current_monthly_revenue: parseFloat(document.getElementById('q-current-rev').value) || 0,
+                revenue_goal: parseFloat(document.getElementById('q-goal-rev').value) || 10000,
+                biggest_bottleneck: document.getElementById('q-bottleneck').value,
+                business_stage: document.getElementById('q-stage').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/onboarding`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    document.getElementById('gatekeeper-overlay').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.getElementById('user-context-display').textContent = `${payload.niche} | $${payload.current_monthly_revenue}/mo`;
+                    document.getElementById('ai-bottleneck-display').textContent = payload.biggest_bottleneck;
+                }
+            } catch (e) { alert("Error saving profile"); }
+        });
+
+        // --- CHAT LOGIC ---
+        async function loadModes() {
+            try {
+                const res = await fetch(`${API_BASE}/api/modes`);
+                const data = await res.json();
+                const select = document.getElementById('mode-select');
+                select.innerHTML = '';
+                data.modes.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m; opt.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+                    select.appendChild(opt);
+                });
+                select.onchange = (e) => currentMode = e.target.value;
+            } catch (e) {}
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+            input.value = ''; input.style.height = 'auto';
+            document.getElementById('typing-indicator').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, mode: currentMode, member_id: memberId, history: chatHistory.slice(-10) })
+                });
+                const data = await res.json();
+                document.getElementById('typing-indicator').classList.add('hidden');
+                
+                if (res.ok) {
+                    appendMessage('ai', data.reply);
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendMessage('ai', `⚠️ ${data.detail}`);
+                }
+            } catch (err) {
+                document.getElementById('typing-indicator').classList.add('hidden');
+                appendMessage('ai', `⚠️ Network error.`);
+            }
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `flex gap-4 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            const isAi = role === 'ai';
+            div.innerHTML = `
+                <div class="w-10 h-10 rounded-full ${isAi ? 'bg-brand-600' : 'bg-slate-700'} flex-shrink-0 flex items-center justify-center text-white font-bold">${isAi ? 'AI' : 'U'}</div>
+                <div class="glass p-4 rounded-2xl ${isAi ? 'rounded-tl-none' : 'rounded-tr-none'} max-w-3xl text-slate-300 leading-relaxed whitespace-pre-wrap">${text.replace(/\n/g, '<br>')}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
