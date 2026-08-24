@@ -1,1817 +1,875 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E5 AI Coach – Trecentillion Executive</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --bg-deep: #020617;
-            --bg-primary: #0f172a;
-            --bg-surface: rgba(30, 41, 59, 0.6);
-            --bg-card: rgba(51, 65, 85, 0.4);
-            --gold: #fbbf24;
-            --gold-glow: rgba(251, 191, 36, 0.4);
-            --cyan: #06b6d4;
-            --cyan-glow: rgba(6, 182, 212, 0.3);
-            --purple: #a855f7;
-            --purple-glow: rgba(168, 85, 247, 0.3);
-            --green: #10b981;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(148, 163, 184, 0.1);
-            --border-glow: rgba(251, 191, 36, 0.3);
-            --radius: 24px;
-            --shadow-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 100px rgba(251, 191, 36, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* 3D Ambient Background */
-        #ambient-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .app-container {
-            position: relative;
-            z-index: 1;
-            width: 100vw;
-            height: 100vh;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            grid-template-rows: 80px 1fr;
-            gap: 0;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
-            backdrop-filter: blur(20px);
-        }
-
-        /* Animated Grid Background */
-        .grid-bg {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(251, 191, 36, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(251, 191, 36, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        /* HEADER */
-        .header {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 32px;
-            background: rgba(15, 23, 42, 0.8);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), var(--cyan), var(--gold), transparent);
-            animation: headerGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes headerGlow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .logo-3d {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--bg-deep);
-            box-shadow: 0 0 40px var(--gold-glow);
-            animation: logoFloat 3s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .logo-3d::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg);
-            animation: logoShine 3s infinite;
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(2deg); }
-        }
-
-        @keyframes logoShine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .brand-text h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-text span {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .xp-bar-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border-radius: 40px;
-            border: 1px solid var(--border);
-        }
-
-        .xp-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gold);
-        }
-
-        .xp-track {
-            width: 120px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .xp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold), var(--cyan));
-            border-radius: 10px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px var(--gold-glow);
-            animation: xpPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes xpPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .tier-badge {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(6, 182, 212, 0.2));
-            border: 1px solid var(--border-glow);
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            backdrop-filter: blur(10px);
-            animation: badgeGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes badgeGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
-            50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.4); }
-        }
-
-        .btn-holographic {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border: none;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--bg-deep);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px var(--gold-glow);
-        }
-
-        .btn-holographic::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-holographic:hover::before {
-            left: 100%;
-        }
-
-        .btn-holographic:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--gold-glow);
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            background: rgba(15, 23, 42, 0.6);
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
-            overflow-y: auto;
-            backdrop-filter: blur(20px);
-        }
-
-        .sidebar-section {
-            margin-bottom: 32px;
-        }
-
-        .section-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            padding-left: 12px;
-            font-weight: 600;
-        }
-
-        .mode-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mode-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: linear-gradient(180deg, var(--gold), var(--cyan));
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .mode-item:hover::before {
-            opacity: 1;
-        }
-
-        .mode-item:hover {
-            transform: translateX(4px);
-            border-color: var(--border-glow);
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1);
-        }
-
-        .mode-item.active {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(6, 182, 212, 0.15));
-            border-color: var(--border-glow);
-        }
-
-        .mode-item.active::before {
-            opacity: 1;
-        }
-
-        .mode-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: var(--bg-deep);
-        }
-
-        .mode-info {
-            flex: 1;
-        }
-
-        .mode-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .mode-tier {
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--green);
-            font-weight: 700;
-        }
-
-        .mode-tier.insider {
-            background: rgba(251, 191, 36, 0.2);
-            color: var(--gold);
-        }
-
-        .mode-tier.partner {
-            background: rgba(168, 85, 247, 0.2);
-            color: var(--purple);
-        }
-
-        .progress-indicator {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--text-muted);
-            margin-left: auto;
-        }
-
-        .progress-indicator.complete {
-            background: var(--green);
-            box-shadow: 0 0 10px var(--green);
-            animation: pulse 2s infinite;
-        }
-
-        .progress-indicator.partial {
-            background: var(--gold);
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* MAIN CONTENT */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .content-tabs {
-            display: flex;
-            gap: 8px;
-            padding: 16px 32px;
-            background: rgba(15, 23, 42, 0.4);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tab-btn {
-            padding: 10px 24px;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab-btn:hover {
-            border-color: var(--border-glow);
-            color: var(--text-primary);
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(6, 182, 212, 0.2));
-            border-color: var(--border-glow);
-            color: var(--gold);
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.1);
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-        }
-
-        .tab-pane {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .tab-pane.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* DASHBOARD GRID */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .metric-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            transition: all 0.3s;
-        }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.05), transparent 70%);
-            pointer-events: none;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
-            box-shadow: var(--shadow-3d);
-        }
-
-        .metric-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .metric-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .metric-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--bg-deep);
-        }
-
-        .metric-value {
-            font-size: 36px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .metric-subtitle {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .metric-chart {
-            margin-top: 16px;
-            height: 60px;
-        }
-
-        /* HEALTH RING */
-        .health-ring-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-        }
-
-        .health-ring-svg {
-            transform: rotate(-90deg);
-        }
-
-        .health-ring-bg {
-            fill: none;
-            stroke: rgba(255,255,255,0.05);
-            stroke-width: 8;
-        }
-
-        .health-ring-fg {
-            fill: none;
-            stroke: url(#goldGradient);
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 314;
-            stroke-dashoffset: 314;
-            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            filter: drop-shadow(0 0 10px var(--gold-glow));
-        }
-
-        .health-ring-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--gold);
-        }
-
-        /* CHAT INTERFACE */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .message {
-            display: flex;
-            gap: 12px;
-            max-width: 75%;
-            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .message.ai .message-avatar {
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            box-shadow: 0 0 20px var(--gold-glow);
-        }
-
-        .message.user .message-avatar {
-            background: linear-gradient(135deg, var(--purple), var(--cyan));
-        }
-
-        .message-bubble {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .message.user .message-bubble {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2));
-            border-color: rgba(168, 85, 247, 0.3);
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 16px 20px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            width: fit-content;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--gold);
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        .chat-input-container {
-            padding: 20px 24px;
-            background: rgba(15, 23, 42, 0.6);
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 14px 24px;
-            font-size: 14px;
-            color: var(--text-primary);
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .chat-input:focus {
-            border-color: var(--border-glow);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .btn-send {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--gold), var(--cyan));
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--bg-deep);
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px var(--gold-glow);
-        }
-
-        .btn-send:hover {
-            transform: scale(1.1) rotate(15deg);
-            box-shadow: 0 8px 30px var(--gold-glow);
-        }
-
-        /* FRAMEWORK VAULT */
-        .vault-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .framework-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .framework-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--gold), var(--cyan));
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-
-        .framework-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .framework-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-glow);
-            box-shadow: 0 12px 40px rgba(251, 191, 36, 0.15);
-        }
-
-        .framework-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .framework-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .framework-value {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--gold);
-            background: rgba(251, 191, 36, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-
-        .framework-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .framework-progress {
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-
-        .framework-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold), var(--cyan));
-            border-radius: 10px;
-            transition: width 1s;
-        }
-
-        .framework-status {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        /* ACHIEVEMENTS */
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .achievement-badge {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .achievement-badge.unlocked {
-            border-color: var(--border-glow);
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
-        }
-
-        .achievement-badge.unlocked::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.1), transparent 70%);
-            animation: badgeShine 3s infinite;
-        }
-
-        @keyframes badgeShine {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .achievement-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-            filter: grayscale(100%);
-            opacity: 0.5;
-            transition: all 0.3s;
-        }
-
-        .achievement-badge.unlocked .achievement-icon {
-            filter: grayscale(0%);
-            opacity: 1;
-            animation: iconFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .achievement-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .achievement-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--gold), var(--cyan));
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, var(--gold), var(--cyan));
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .metric-value {
-                font-size: 28px;
-            }
-        }
-
-        /* LOADING ANIMATION */
-        .loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-deep);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s;
-        }
-
-        .loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loader-circle {
-            width: 80px;
-            height: 80px;
-            border: 4px solid rgba(251, 191, 36, 0.1);
-            border-top-color: var(--gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* CONFETTI */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9998;
-            overflow: hidden;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: var(--gold);
-            animation: confettiFall 3s linear forwards;
-        }
-
-        @keyframes confettiFall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* SVG DEFINITIONS */
-        .svg-defs {
-            position: absolute;
-            width: 0;
-            height: 0;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>E5 AI Coach — Trecentillion</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050810;--surface:#0d1628;--card:rgba(255,255,255,0.03);
+  --card-hover:rgba(255,255,255,0.06);--border:rgba(255,255,255,0.06);
+  --border-hover:rgba(255,255,255,0.12);--text:#edf2f7;--text-2:#8899bb;
+  --text-3:#445566;--gold:#fbbf24;--gold-2:#f59e0b;--gold-glow:rgba(251,191,36,0.25);
+  --purple:#8b5cf6;--green:#4ade80;--radius:20px;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+body{display:flex;justify-content:center;align-items:center;padding:12px;
+  background:radial-gradient(ellipse at 20% 30%,rgba(251,191,36,0.04),transparent 55%),
+             radial-gradient(ellipse at 80% 70%,rgba(139,92,246,0.03),transparent 50%)}
+
+/* === LOADER (failsafe hides after 3s) === */
+.loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.5s}
+.loader.hidden{opacity:0;pointer-events:none}
+.loader-ring{width:50px;height:50px;border:3px solid rgba(251,191,36,0.1);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* === APP === */
+.app{width:100%;max-width:1400px;height:96vh;max-height:1000px;background:var(--surface);
+  border-radius:var(--radius);border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* === HEADER === */
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;
+  border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);backdrop-filter:blur(12px);flex-shrink:0;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--gold-2));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--bg);
+  box-shadow:0 0 30px var(--gold-glow)}
+.logo-text{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.logo-text span{color:var(--gold)}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.greeting{font-size:12px;color:var(--text-2);padding:5px 14px;background:var(--card);
+  border-radius:40px;border:1px solid var(--border)}
+.tier{font-size:10px;font-weight:600;padding:4px 12px;border-radius:40px;
+  background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);color:var(--gold);
+  display:flex;align-items:center;gap:4px}
+.btn{background:transparent;border:1px solid var(--border);color:var(--text-2);
+  padding:6px 14px;border-radius:40px;font-size:12px;font-weight:500;cursor:pointer;
+  transition:all 0.25s var(--ease);display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--card-hover);border-color:var(--border-hover);color:var(--text)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));border:none;color:var(--bg);
+  font-weight:600;box-shadow:0 4px 20px var(--gold-glow)}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(251,191,36,0.4)}
+
+/* === TABS === */
+.tabs{display:flex;gap:0;padding:0 24px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.1);flex-shrink:0}
+.tab{background:none;border:none;padding:10px 18px;color:var(--text-3);font-size:12px;font-weight:500;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all 0.25s;display:flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text-2)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* === LAYOUT === */
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:230px;background:rgba(255,255,255,0.015);border-right:1px solid var(--border);
+  padding:16px 10px;overflow-y:auto;flex-shrink:0}
+.sidebar-title{font-size:9px;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-3);
+  margin-bottom:10px;padding-left:8px;font-weight:600}
+.mode{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;
+  font-size:11px;font-weight:500;color:var(--text-2);transition:all 0.2s;border:1px solid transparent;margin-bottom:2px}
+.mode:hover{background:var(--card);color:var(--text)}
+.mode.active{background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.15);color:var(--gold)}
+.mode .ic{width:18px;text-align:center;font-size:11px}
+.mode .tag{font-size:7px;padding:1px 6px;border-radius:20px;margin-left:auto;
+  text-transform:uppercase;letter-spacing:0.04em;font-weight:600}
+.mode .tag.free{background:rgba(74,222,128,0.1);color:var(--green)}
+.mode .tag.insider{background:rgba(251,191,36,0.1);color:var(--gold)}
+.mode .tag.partner{background:rgba(139,92,246,0.1);color:#c084fc}
+.mode.locked{opacity:0.35;cursor:not-allowed}
+.mode .dot{width:4px;height:4px;border-radius:50%;margin-left:4px}
+.mode .dot.done{background:var(--green);box-shadow:0 0 6px var(--green)}
+.mode .dot.part{background:var(--gold)}
+
+.content{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg);overflow:hidden}
+.view{display:none;flex-direction:column;flex:1;min-height:0}
+.view.active{display:flex}
+
+/* === DASHBOARD === */
+.dashboard{padding:20px 24px;overflow-y:auto;flex:1;gap:16px}
+.dashboard>*{animation:fadeUp 0.5s var(--ease) both}
+.dashboard>*:nth-child(1){animation-delay:0.05s}
+.dashboard>*:nth-child(2){animation-delay:0.12s}
+.dashboard>*:nth-child(3){animation-delay:0.19s}
+.dashboard>*:nth-child(4){animation-delay:0.26s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.hero{display:flex;align-items:center;gap:24px;padding:20px 24px;background:var(--card);
+  border:1px solid var(--border);border-radius:16px;flex-wrap:wrap}
+.ring-wrap{position:relative;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-wrap .bg{fill:none;stroke:rgba(255,255,255,0.04);stroke-width:5}
+.ring-wrap .fg{fill:none;stroke:var(--gold);stroke-width:5;stroke-linecap:round;
+  transition:stroke-dashoffset 1.2s var(--ease);filter:drop-shadow(0 0 12px var(--gold-glow))}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:24px;font-weight:700;color:var(--text)}
+.hero-info{flex:1;min-width:200px}
+.hero-info h2{font-size:18px;font-weight:600;margin-bottom:4px}
+.hero-info p{font-size:13px;color:var(--text-2);margin-bottom:4px}
+.hero-info .sub{font-size:11px;color:var(--text-3)}
+.hero-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;transition:all 0.25s}
+.card:hover{border-color:var(--border-hover)}
+.card h4{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-3);
+  font-weight:600;margin-bottom:6px}
+.card .val{font-size:22px;font-weight:700}
+.card .sub{font-size:11px;color:var(--text-2);margin-top:2px}
+.card.full{grid-column:1/-1}
+
+.fw-strip{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.fw-strip .d{width:24px;height:6px;border-radius:4px;background:rgba(255,255,255,0.04)}
+.fw-strip .d.done{background:var(--green);box-shadow:0 0 10px rgba(74,222,128,0.3)}
+.fw-strip .d.part{background:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
+
+.rule-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rule-row .ct{font-size:24px;font-weight:700;color:var(--gold)}
+.rule-row .streak{font-size:11px;color:var(--gold);padding:2px 10px;
+  background:rgba(251,191,36,0.08);border-radius:40px}
+.rule-row button{background:var(--card);border:1px solid var(--border);border-radius:40px;
+  padding:4px 12px;color:var(--text-2);font-size:11px;cursor:pointer;transition:all 0.2s}
+.rule-row button:hover{background:var(--card-hover);color:var(--text)}
+.cal{display:flex;gap:4px;margin-top:8px}
+.cal .day{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.03);
+  display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);
+  border:1px solid transparent}
+.cal .day.hit{background:var(--green);color:var(--bg);border-color:var(--green)}
+.cal .day.today{border-color:var(--gold)}
+
+/* === CHAT === */
+.chat{flex:1;display:flex;flex-direction:column;min-height:0}
+.messages{flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:10px;max-width:80%;animation:msgIn 0.35s var(--ease) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg .av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-size:11px;background:var(--card);border:1px solid var(--border)}
+.msg.ai .av{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--bg);box-shadow:0 0 16px var(--gold-glow)}
+.msg.user .av{background:linear-gradient(135deg,var(--purple),#6d28d9);color:#fff}
+.msg .bub{background:var(--card);padding:10px 14px;border-radius:14px;font-size:13px;
+  line-height:1.6;border:1px solid var(--border)}
+.msg.user .bub{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.15)}
+.typing{display:flex;gap:4px;padding:10px 14px;background:var(--card);border-radius:14px;
+  border:1px solid var(--border);width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:0.15s}
+.typing span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.status{padding:4px 24px;font-size:10px;color:var(--text-3);border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;background:rgba(0,0,0,0.15);flex-shrink:0}
+.status .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);
+  margin-right:4px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.input-bar{padding:10px 24px 14px;border-top:1px solid var(--border);display:flex;gap:8px;
+  align-items:center;flex-wrap:wrap;background:rgba(0,0,0,0.15)}
+.input-bar select{background:var(--card);border:1px solid var(--border);border-radius:40px;
+  padding:6px 12px;color:var(--text);font-size:11px;outline:none;cursor:pointer;min-width:120px}
+.input-bar input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:40px;
+  padding:7px 14px;color:var(--text);font-size:13px;outline:none;min-width:120px}
+.input-bar input::placeholder{color:var(--text-3)}
+.input-bar input:focus{border-color:rgba(251,191,36,0.3)}
+.send{background:linear-gradient(135deg,var(--gold),var(--gold-2));border:none;border-radius:40px;
+  padding:7px 18px;font-weight:600;color:var(--bg);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;gap:4px;transition:all 0.2s}
+.send:hover{transform:scale(1.03);box-shadow:0 4px 20px var(--gold-glow)}
+.send:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.tools{display:flex;gap:4px}
+.tools button{background:transparent;border:1px solid var(--border);border-radius:40px;
+  padding:5px 10px;color:var(--text-3);cursor:pointer;font-size:12px;transition:all 0.2s}
+.tools button:hover{background:var(--card);color:var(--text)}
+
+/* === MODALS === */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);
+  display:none;justify-content:center;align-items:center;z-index:2000;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;position:relative}
+.modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text-3);
+  font-size:20px;cursor:pointer}
+.modal h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.modal h2 span{color:var(--gold)}
+.modal .sub{color:var(--text-2);font-size:13px;margin-bottom:18px}
+.fw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.fw-grid{grid-template-columns:1fr}}
+.fw-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;transition:all 0.2s}
+.fw-card:hover{border-color:var(--border-hover)}
+.fw-card h4{font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.fw-card p{font-size:11px;color:var(--text-2);margin:4px 0}
+.fw-card .meta{display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:6px}
+.fw-card .meta .v{color:var(--gold);font-weight:600}
+.fw-card .meta .t{padding:1px 8px;border-radius:40px;font-size:8px;font-weight:600}
+.fw-card .meta .t.free{background:rgba(74,222,128,0.1);color:var(--green)}
+.fw-card .meta .t.insider{background:rgba(251,191,36,0.1);color:var(--gold)}
+.fw-card .meta .t.partner{background:rgba(139,92,246,0.1);color:#c084fc}
+.fw-card button{margin-top:8px;width:100%;background:transparent;border:1px solid var(--border);
+  border-radius:40px;padding:4px 12px;font-size:10px;color:var(--text-2);cursor:pointer;transition:all 0.2s}
+.fw-card button:hover{background:rgba(251,191,36,0.06);border-color:var(--gold);color:var(--text)}
+.fw-card button.done{background:rgba(74,222,128,0.08);border-color:var(--green);color:var(--green)}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:10px 18px;font-size:13px;z-index:3000;transform:translateY(80px);
+  opacity:0;transition:all 0.4s var(--ease);max-width:360px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.err{border-left:3px solid #ef4444}
+.toast.info{border-left:3px solid var(--gold)}
+
+/* Confetti */
+.confetti-box{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
+.confetti{position:absolute;width:6px;height:6px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(251,191,36,0.2);border-radius:10px}
+
+/* Responsive */
+@media(max-width:900px){.sidebar{display:none}}
+@media(max-width:600px){
+  .app{border-radius:0;height:100vh;max-height:none}
+  .header{padding:10px 14px}
+  .tabs{padding:0 14px}
+  .dashboard{padding:14px}
+  .messages{padding:12px 14px}
+  .input-bar{padding:10px 14px 12px}
+  .hero{flex-direction:column;text-align:center}
+  .hero-actions{justify-content:center}
+}
+</style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loader" id="loader">
-        <div class="loader-circle"></div>
-    </div>
 
-    <!-- 3D Ambient Canvas -->
-    <canvas id="ambient-canvas"></canvas>
+<!-- Loader with 3s failsafe -->
+<div class="loader" id="loader"><div class="loader-ring"></div></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">E5</div>
+      <div class="logo-text">AI <span>Coach</span></div>
+    </div>
+    <div class="header-right">
+      <span class="greeting" id="greet"> Welcome</span>
+      <div class="tier"><i class="fas fa-crown"></i> <span id="tierLbl">FREE</span></div>
+      <button class="btn" id="vaultBtn"><i class="fas fa-book"></i> Vault</button>
+      <button class="btn btn-gold" id="upBtn"><i class="fas fa-rocket"></i> Upgrade</button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-view="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
+    <button class="tab" data-view="chat"><i class="fas fa-comment-dots"></i> Chat</button>
+  </div>
+
+  <div class="main">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">⚡ Modes</div>
+      <div id="modeList"></div>
+    </aside>
+
+    <div class="content">
+      <!-- DASHBOARD VIEW -->
+      <div class="view active" id="dashboardView">
+        <div class="dashboard">
+          <div class="hero">
+            <div class="ring-wrap">
+              <svg width="80" height="80" viewBox="0 0 100 100">
+                <circle class="bg" cx="50" cy="50" r="40"/>
+                <circle class="fg" id="ring" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+              </svg>
+              <div class="ring-center" id="health">0</div>
+            </div>
+            <div class="hero-info">
+              <h2 id="welcome">Your Business Health</h2>
+              <p id="welcomeSub">Complete frameworks to grow your score</p>
+              <div class="sub" id="healthSub">0 / 8 frameworks completed</div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn" data-quick="xray"><i class="fas fa-search"></i> X-Ray</button>
+              <button class="btn" data-quick="dm"><i class="fas fa-comment"></i> DM</button>
+              <button class="btn" data-quick="offer"><i class="fas fa-coins"></i> Offer</button>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <h4>Frameworks</h4>
+              <div class="val" id="fwCount">0/8</div>
+              <div class="sub" id="fwSub">Start your first framework</div>
+              <div class="fw-strip" id="fwStrip"></div>
+            </div>
+            <div class="card">
+              <h4>Rule of 100</h4>
+              <div class="rule-row">
+                <span class="ct" id="ruleCt">0</span>
+                <span style="font-size:11px;color:var(--text-2)">actions today</span>
+                <span class="streak" id="streak"><i class="fas fa-fire"></i> 0d</span>
+              </div>
+              <div class="rule-row" style="margin-top:6px">
+                <button id="ruleAdd"><i class="fas fa-plus"></i> Log +1</button>
+                <button id="ruleReset">Reset</button>
+              </div>
+              <div class="cal" id="cal"></div>
+            </div>
+            <div class="card">
+              <h4>Revenue Projection</h4>
+              <div class="val" id="revProj">$0</div>
+              <div class="sub">Monthly: <input type="number" id="revIn" placeholder="5000" 
+                style="width:70px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 6px;color:var(--text);font-size:11px"> /mo</div>
+            </div>
+            <div class="card full">
+              <h4>🎯 Next Best Action</h4>
+              <div id="nextAct" style="font-size:14px;font-weight:500;margin-top:4px">Complete your first framework to get started.</div>
+              <div class="sub" style="margin-top:4px">AI‑recommended based on your progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT VIEW -->
+      <div class="view" id="chatView">
+        <div class="chat">
+          <div class="messages" id="msgs">
+            <div class="msg ai">
+              <div class="av"><i class="fas fa-brain"></i></div>
+              <div class="bub">
+                <p><strong>Welcome. I'm your executive coach.</strong></p>
+                <p>I have access to <strong>$20,000+</strong> of proven frameworks from Hormozi, Harrison, and Noske.</p>
+                <p>I don't give generic advice. I diagnose first, then prescribe. What's your biggest bottleneck right now?</p>
+              </div>
+            </div>
+          </div>
+          <div class="status">
+            <div><span class="dot"></span><span id="statusTxt">Ready</span></div>
+            <div><span id="rateTxt">30 msg/h</span> · <span id="modeTxt">Coach</span></div>
+          </div>
+          <div class="input-bar">
+            <select id="modeSel"></select>
+            <input id="userIn" placeholder="Ask anything..." autocomplete="off">
+            <button class="send" id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+            <div class="tools">
+              <button id="voiceBtn" title="TTS"><i class="fas fa-volume-up"></i></button>
+              <button id="eqBtn" title="Value Equation"><i class="fas fa-calculator"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VAULT MODAL -->
+<div class="modal-bg" id="vaultModal">
+  <div class="modal">
+    <button class="modal-close" id="closeVault">&times;</button>
+    <h2>📚 Framework <span>Vault</span></h2>
+    <p class="sub">Every framework from our $20,000+ library. Start, resume, or complete.</p>
+    <div class="fw-grid" id="fwGrid"></div>
+  </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-bg" id="upModal">
+  <div class="modal">
+    <button class="modal-close" id="closeUp">&times;</button>
+    <h2> Unlock <span>More Power</span></h2>
+    <p class="sub">Choose the tier that fits your business stage.</p>
+    <div id="tierTable"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn" id="upCancel">Cancel</button>
+      <button class="btn btn-gold" id="upAction">Upgrade Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- VALUE EQ MODAL -->
+<div class="modal-bg" id="eqModal">
+  <div class="modal">
+    <button class="modal-close" id="closeEq">&times;</button>
+    <h2>️ Value <span>Equation</span></h2>
+    <p class="sub">Adjust sliders to see your offer's value change.</p>
+    <div style="margin:8px 0"><label style="display:flex;justify-content:space-between;font-size:13px">Dream Outcome <span id="eqD" style="color:var(--gold);font-weight:600">8</span></label>
+      <input type="range" min="1" max="10" value="8" id="eqDS" style="width:100%;accent-color:var(--gold)"></div>
+    <div style="margin:8px 0"><label style="display:flex;justify-content:space-between;font-size:13px">Likelihood <span id="eqL" style="color:var(--gold);font-weight:600">7</span></label>
+      <input type="range" min="1" max="10" value="7" id="eqLS" style="width:100%;accent-color:var(--gold)"></div>
+    <div style="margin:8px 0"><label style="display:flex;justify-content:space-between;font-size:13px">Time Delay (lower=better) <span id="eqT" style="color:var(--gold);font-weight:600">5</span></label>
+      <input type="range" min="1" max="10" value="5" id="eqTS" style="width:100%;accent-color:var(--gold)"></div>
+    <div style="margin:8px 0"><label style="display:flex;justify-content:space-between;font-size:13px">Effort (lower=better) <span id="eqE" style="color:var(--gold);font-weight:600">5</span></label>
+      <input type="range" min="1" max="10" value="5" id="eqES" style="width:100%;accent-color:var(--gold)"></div>
+    <div style="background:var(--card);padding:14px;border-radius:10px;text-align:center;margin-top:10px">
+      <div style="font-size:12px;color:var(--text-2)">Value Equation Score</div>
+      <div style="font-size:32px;font-weight:700;color:var(--gold)" id="eqScore">56</div>
+      <div style="font-size:11px;color:var(--text-3)">(Dream × Likelihood) ÷ (Time × Effort)</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+      <button class="btn" id="eqClose">Close</button>
+      <button class="btn btn-gold" id="eqSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// TRECENTILLION — Bulletproof, Real-Coach Experience
+// ============================================================
+const API = 'https://e5-ai-coach-production.up.railway.app';
+
+const MODES = [
+  {id:'coach',label:'Coach',icon:'fa-brain',tier:'free'},
+  {id:'xray',label:'Business X-Ray',icon:'fa-search',tier:'free'},
+  {id:'funnel',label:'Funnel Map',icon:'fa-route',tier:'free'},
+  {id:'community',label:'Community OS',icon:'fa-users',tier:'insider'},
+  {id:'dm',label:'DM Doctor',icon:'fa-comment-dots',tier:'insider'},
+  {id:'content',label:'Content Engine',icon:'fa-pen-fancy',tier:'insider'},
+  {id:'alchemy',label:'Alchemy (Video)',icon:'fa-film',tier:'insider'},
+  {id:'hack',label:'Funnel Hacker',icon:'fa-code',tier:'insider'},
+  {id:'offer',label:'Offer Architect',icon:'fa-coins',tier:'partner'},
+  {id:'workshop',label:'Workshop Architect',icon:'fa-chalkboard-teacher',tier:'partner'},
+  {id:'launch',label:'Launch Planner',icon:'fa-rocket',tier:'partner'},
+];
+
+const FRAMEWORKS = [
+  {id:'avocado',name:'AVOCADO Offers',value:'$2,000+',tier:'insider'},
+  {id:'money_models',name:'$100M + Money Models',value:'$5,000+',tier:'partner'},
+  {id:'leads',name:'$100M Leads',value:'$3,000+',tier:'insider'},
+  {id:'community_os',name:'Community OS',value:'$10,000+',tier:'partner'},
+  {id:'ttb',name:'Time to Build',value:'$2,500+',tier:'insider'},
+  {id:'soulful',name:'SOULFUL Sales',value:'$1,500+',tier:'insider'},
+  {id:'delivery',name:'Delivery Checklist',value:'$1,000+',tier:'free'},
+  {id:'value_eq',name:'Value Equation Builder',value:'$1,200+',tier:'partner'},
+];
+
+// State
+let state = {
+  tier:'free', mode:'coach', sending:false,
+  progress:{}, rule:0, streak:0, lastDate:'',
+  revenue:0, name:'', daily:{}
+};
+
+// Safe DOM getter
+const $ = id => document.getElementById(id);
+const safe = (id, fn) => { const el = $(id); if (el) fn(el); };
+
+// Toast
+let toastTimer;
+function toast(msg, type='info') {
+  safe('toast', t => {
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.className = 'toast', 2800);
+  });
+}
+
+// Confetti
+function confetti() {
+  const box = document.createElement('div');
+  box.className = 'confetti-box';
+  document.body.appendChild(box);
+  const colors = ['#fbbf24','#f59e0b','#8b5cf6','#4ade80','#f472b6','#60a5fa'];
+  for (let i=0;i<60;i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti';
+    p.style.cssText = `background:${colors[i%colors.length]};left:${Math.random()*100}%;
+      width:${Math.random()*6+4}px;height:${Math.random()*6+4}px;
+      animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*0.8}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'}`;
+    box.appendChild(p);
+  }
+  setTimeout(() => box.remove(), 3500);
+}
+
+// Storage
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem('e5_state') || '{}');
+    Object.assign(state, d);
+    if (state.lastDate !== new Date().toDateString()) {
+      if (state.lastDate) state.daily[state.lastDate] = state.rule;
+      state.rule = 0;
+      state.lastDate = new Date().toDateString();
+      saveState();
+    }
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem('e5_state', JSON.stringify(state)); } catch(e) {}
+}
+
+// Tier check
+function tierOk(required) {
+  const order = {free:0,insider:1,partner:2};
+  return order[state.tier] >= order[required];
+}
+
+// Populate modes
+function populateModes() {
+  const sel = $('modeSel');
+  const list = $('modeList');
+  if (!sel || !list) return;
+  
+  sel.innerHTML = '';
+  list.innerHTML = '';
+  
+  MODES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = m.label + ' (' + m.tier + ')';
+    sel.appendChild(opt);
     
-    <!-- Grid Background -->
-    <div class="grid-bg"></div>
-
-    <!-- SVG Definitions -->
-    <svg class="svg-defs">
-        <defs>
-            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-            </linearGradient>
-        </defs>
-    </svg>
-
-    <!-- Confetti Container -->
-    <div class="confetti-container" id="confettiContainer"></div>
-
-    <!-- Main App -->
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-section">
-                <div class="logo-3d">E5</div>
-                <div class="brand-text">
-                    <h1>AI Coach</h1>
-                    <span>Trecentillion Edition</span>
-                </div>
-            </div>
-            <div class="header-actions">
-                <div class="xp-bar-container">
-                    <span class="xp-label">LVL <span id="userLevel">1</span></span>
-                    <div class="xp-track">
-                        <div class="xp-fill" id="xpBar" style="width: 0%"></div>
-                    </div>
-                    <span style="font-size: 11px; color: var(--text-muted);"><span id="userXP">0</span> XP</span>
-                </div>
-                <div class="tier-badge" id="tierBadge">FREE</div>
-                <button class="btn-holographic" onclick="openVault()">
-                    <i class="fas fa-vault"></i> Vault
-                </button>
-                <button class="btn-holographic" onclick="openUpgrade()">
-                    <i class="fas fa-crown"></i> Upgrade
-                </button>
-            </div>
-        </header>
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <div class="section-title"> Modes</div>
-                <div id="modeList"></div>
-            </div>
-            <div class="sidebar-section">
-                <div class="section-title">🏆 Achievements</div>
-                <div id="achievementsList"></div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Tabs -->
-            <div class="content-tabs">
-                <button class="tab-btn active" onclick="switchTab('dashboard')">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </button>
-                <button class="tab-btn" onclick="switchTab('chat')">
-                    <i class="fas fa-comments"></i> AI Coach
-                </button>
-                <button class="tab-btn" onclick="switchTab('frameworks')">
-                    <i class="fas fa-layer-group"></i> Frameworks
-                </button>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content">
-                <!-- Dashboard Tab -->
-                <div class="tab-pane active" id="dashboardTab">
-                    <div class="dashboard-grid">
-                        <!-- Health Score -->
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <div class="metric-title">Business Health</div>
-                                <div class="metric-icon"><i class="fas fa-heartbeat"></i></div>
-                            </div>
-                            <div class="health-ring-container">
-                                <svg class="health-ring-svg" width="120" height="120">
-                                    <circle class="health-ring-bg" cx="60" cy="60" r="50"></circle>
-                                    <circle class="health-ring-fg" id="healthRing" cx="60" cy="60" r="50"></circle>
-                                </svg>
-                                <div class="health-ring-center" id="healthScore">0</div>
-                            </div>
-                            <div style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                                Based on frameworks completed
-                            </div>
-                        </div>
-
-                        <!-- Frameworks -->
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <div class="metric-title">Frameworks</div>
-                                <div class="metric-icon"><i class="fas fa-book"></i></div>
-                            </div>
-                            <div class="metric-value" id="frameworkCount">0/8</div>
-                            <div class="metric-subtitle">Completed</div>
-                            <canvas class="metric-chart" id="frameworkChart"></canvas>
-                        </div>
-
-                        <!-- Rule of 100 -->
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <div class="metric-title">Rule of 100</div>
-                                <div class="metric-icon"><i class="fas fa-fire"></i></div>
-                            </div>
-                            <div class="metric-value" id="ruleCount">0</div>
-                            <div class="metric-subtitle">Actions today</div>
-                            <div style="margin-top: 12px; display: flex; gap: 8px;">
-                                <button class="btn-holographic" style="padding: 8px 16px; font-size: 12px;" onclick="logAction()">
-                                    <i class="fas fa-plus"></i> Log +1
-                                </button>
-                                <button class="tab-btn" style="padding: 8px 16px; font-size: 12px;" onclick="resetRule()">
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Revenue -->
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <div class="metric-title">Revenue Projection</div>
-                                <div class="metric-icon"><i class="fas fa-dollar-sign"></i></div>
-                            </div>
-                            <div class="metric-value" id="revenueProjection">$0</div>
-                            <div class="metric-subtitle">Monthly projection</div>
-                            <div style="margin-top: 12px;">
-                                <input type="number" id="revenueInput" placeholder="Current monthly revenue" 
-                                    style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 13px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Next Best Action -->
-                    <div class="metric-card" style="margin-bottom: 24px;">
-                        <div class="metric-header">
-                            <div class="metric-title">🎯 Next Best Action</div>
-                            <div class="metric-icon"><i class="fas fa-bullseye"></i></div>
-                        </div>
-                        <div id="nextAction" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">
-                            Complete your first framework to get started
-                        </div>
-                        <div style="font-size: 13px; color: var(--text-secondary);">
-                            AI-recommended based on your progress and business stage
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity Chart -->
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-title">Activity Over Time</div>
-                            <div class="metric-icon"><i class="fas fa-chart-area"></i></div>
-                        </div>
-                        <canvas id="activityChart" style="height: 200px; margin-top: 16px;"></canvas>
-                    </div>
-                </div>
-
-                <!-- Chat Tab -->
-                <div class="tab-pane" id="chatTab">
-                    <div class="chat-container">
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="message ai">
-                                <div class="message-avatar"><i class="fas fa-robot"></i></div>
-                                <div class="message-bubble">
-                                    <strong>Welcome to your Trecentillion AI Coach!</strong><br><br>
-                                    I'm your elite business strategist with access to $20,000+ worth of proven frameworks from Alex Hormozi, Dan Harrison, and Tom Noske.<br><br>
-                                    I'm here to help you scale your business using the most advanced strategies. What's your biggest challenge right now?
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat-input-container">
-                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about your business..." onkeypress="handleChatKeypress(event)">
-                            <button class="btn-send" onclick="sendMessage()">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Frameworks Tab -->
-                <div class="tab-pane" id="frameworksTab">
-                    <div class="vault-grid" id="frameworkGrid"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // ==================== STATE ====================
-        const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
-        let currentMode = 'coach';
-        let currentTier = 'free';
-        let frameworkProgress = {};
-        let userXP = 0;
-        let userLevel = 1;
-        let rule100Count = 0;
-        let userRevenue = 0;
-        let achievements = [];
-        let chatHistory = [];
-
-        const MODES = [
-            { id: 'coach', label: 'Daily Operator', icon: 'fa-brain', tier: 'free' },
-            { id: 'xray', label: 'Business X-Ray', icon: 'fa-stethoscope', tier: 'free' },
-            { id: 'funnel', label: 'Funnel Map', icon: 'fa-filter', tier: 'free' },
-            { id: 'community', label: 'Community OS', icon: 'fa-users', tier: 'insider' },
-            { id: 'dm', label: 'DM Doctor', icon: 'fa-comments', tier: 'insider' },
-            { id: 'content', label: 'Content Engine', icon: 'fa-pen-nib', tier: 'insider' },
-            { id: 'alchemy', label: 'Alchemy (Video)', icon: 'fa-video', tier: 'insider' },
-            { id: 'hack', label: 'Funnel Hacker', icon: 'fa-code', tier: 'insider' },
-            { id: 'offer', label: 'Offer Architect', icon: 'fa-coins', tier: 'partner' },
-            { id: 'workshop', label: 'Workshop Architect', icon: 'fa-chalkboard-teacher', tier: 'partner' },
-            { id: 'launch', label: 'Launch Planner', icon: 'fa-rocket', tier: 'partner' },
-        ];
-
-        const FRAMEWORKS = [
-            { id: 'avocado', name: 'AVOCADO Offers', value: '$2,000+', tier: 'insider', desc: '3-tier offers, R.I.P.E., ECAFI scripts' },
-            { id: 'money_models', name: '$100M Offers + Money Models', value: '$5,000+', tier: 'partner', desc: 'Value Equation, Grand Slam Offer' },
-            { id: 'leads', name: '$100M Leads', value: '$3,000+', tier: 'insider', desc: 'Core 4 Advertising, Rule of 100' },
-            { id: 'community_os', name: 'Community OS', value: '$10,000+', tier: 'partner', desc: 'Green to Ripe, 5 Horsemen' },
-            { id: 'ttb', name: 'Time to Build', value: '$2,500+', tier: 'insider', desc: 'Brand Clarity, TRUST formula' },
-            { id: 'soulful', name: 'SOULFUL Sales', value: '$1,500+', tier: 'insider', desc: 'Conversational selling scripts' },
-            { id: 'delivery', name: 'Delivery Checklist', value: '$1,000+', tier: 'free', desc: 'Onboarding, activation points' },
-            { id: 'value_eq', name: 'Value Equation Builder', value: '$1,200+', tier: 'partner', desc: 'Interactive value optimizer' },
-        ];
-
-        const ACHIEVEMENTS = [
-            { id: 'first_framework', name: 'First Steps', icon: '🎯', desc: 'Complete your first framework', xp: 100 },
-            { id: 'streak_3', name: 'On Fire', icon: '🔥', desc: '3-day streak', xp: 150 },
-            { id: 'streak_7', name: 'Unstoppable', icon: '⚡', desc: '7-day streak', xp: 300 },
-            { id: 'framework_master', name: 'Framework Master', icon: '🎓', desc: 'Complete all frameworks', xp: 500 },
-            { id: 'insider', name: 'Insider', icon: '⭐', desc: 'Upgrade to Insider', xp: 200 },
-            { id: 'partner', name: 'Partner', icon: '', desc: 'Upgrade to Partner', xp: 500 },
-        ];
-
-        // ==================== 3D AMBIENT BACKGROUND ====================
-        function initAmbientBackground() {
-            const canvas = document.getElementById('ambient-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            const particleCount = 100;
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.vx = (Math.random() - 0.5) * 0.5;
-                    this.vy = (Math.random() - 0.5) * 0.5;
-                    this.size = Math.random() * 3 + 1;
-                    this.color = Math.random() > 0.5 ? '#fbbf24' : '#06b6d4';
-                }
-
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                }
-
-                draw() {
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = 0.3;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.globalAlpha = 1;
-                }
-            }
-
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                particles.forEach(particle => {
-                    particle.update();
-                    particle.draw();
-                });
-
-                // Draw connections
-                particles.forEach((p1, i) => {
-                    particles.slice(i + 1).forEach(p2 => {
-                        const dx = p1.x - p2.x;
-                        const dy = p1.y - p2.y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < 150) {
-                            ctx.beginPath();
-                            ctx.strokeStyle = p1.color;
-                            ctx.globalAlpha = 0.1 * (1 - distance / 150);
-                            ctx.lineWidth = 1;
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                            ctx.globalAlpha = 1;
-                        }
-                    });
-                });
-
-                requestAnimationFrame(animate);
-            }
-
-            animate();
-
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-        }
-
-        // ==================== INITIALIZATION ====================
-        async function init() {
-            initAmbientBackground();
-            loadState();
-            renderModes();
-            renderFrameworks();
-            renderAchievements();
-            updateDashboard();
-            await fetchTier();
-            
-            // Hide loader
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-            }, 1000);
-
-            // Initialize charts
-            initCharts();
-        }
-
-        // ==================== STATE MANAGEMENT ====================
-        function loadState() {
-            const saved = localStorage.getItem('e5_coach_state');
-            if (saved) {
-                const data = JSON.parse(saved);
-                frameworkProgress = data.frameworkProgress || {};
-                userXP = data.userXP || 0;
-                userLevel = data.userLevel || 1;
-                rule100Count = data.rule100Count || 0;
-                userRevenue = data.userRevenue || 0;
-                achievements = data.achievements || [];
-            }
-        }
-
-        function saveState() {
-            localStorage.setItem('e5_coach_state', JSON.stringify({
-                frameworkProgress,
-                userXP,
-                userLevel,
-                rule100Count,
-                userRevenue,
-                achievements
-            }));
-        }
-
-        // ==================== API CALLS ====================
-        async function fetchTier() {
-            try {
-                const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
-                const data = await res.json();
-                currentTier = data.tier || 'free';
-                document.getElementById('tierBadge').textContent = currentTier.toUpperCase();
-                renderModes();
-            } catch (e) {
-                console.error('Tier fetch failed', e);
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Add user message
-            addMessage(text, 'user');
-            input.value = '';
-
-            // Show typing indicator
-            showTyping();
-
-            try {
-                const res = await fetch(`${API_BASE}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: text,
-                        mode: currentMode,
-                        member_id: 'default'
-                    })
-                });
-
-                const data = await res.json();
-                hideTyping();
-
-                if (data.reply) {
-                    addMessage(data.reply, 'ai');
-                    addXP(25); // XP for each chat
-                }
-            } catch (e) {
-                hideTyping();
-                addMessage('️ Connection error. Please try again.', 'ai');
-            }
-        }
-
-        function addMessage(text, sender) {
-            const container = document.getElementById('chatMessages');
-            const message = document.createElement('div');
-            message.className = `message ${sender}`;
-            message.innerHTML = `
-                <div class="message-avatar">
-                    <i class="fas ${sender === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
-                </div>
-                <div class="message-bubble">${text}</div>
-            `;
-            container.appendChild(message);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function showTyping() {
-            const container = document.getElementById('chatMessages');
-            const typing = document.createElement('div');
-            typing.className = 'message ai';
-            typing.id = 'typingIndicator';
-            typing.innerHTML = `
-                <div class="message-avatar"><i class="fas fa-robot"></i></div>
-                <div class="typing-indicator">
-                    <span></span><span></span><span></span>
-                </div>
-            `;
-            container.appendChild(typing);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function hideTyping() {
-            const typing = document.getElementById('typingIndicator');
-            if (typing) typing.remove();
-        }
-
-        function handleChatKeypress(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
-
-        // ==================== XP & LEVELING ====================
-        function addXP(amount) {
-            userXP += amount;
-            const nextLevel = userLevel * 300;
-            
-            if (userXP >= nextLevel) {
-                userLevel++;
-                userXP -= nextLevel;
-                fireConfetti();
-                showNotification(`🎉 Level Up! You're now Level ${userLevel}`, 'success');
-            }
-            
-            updateXPBar();
-            saveState();
-        }
-
-        function updateXPBar() {
-            const nextLevel = userLevel * 300;
-            const percentage = (userXP / nextLevel) * 100;
-            document.getElementById('xpBar').style.width = percentage + '%';
-            document.getElementById('userLevel').textContent = userLevel;
-            document.getElementById('userXP').textContent = userXP;
-        }
-
-        // ==================== RENDERING ====================
-        function renderModes() {
-            const container = document.getElementById('modeList');
-            container.innerHTML = '';
-
-            MODES.forEach(mode => {
-                const isUnlocked = isTierUnlocked(mode.tier);
-                const div = document.createElement('div');
-                div.className = `mode-item ${mode.id === currentMode ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
-                div.onclick = () => selectMode(mode);
-                div.innerHTML = `
-                    <div class="mode-icon">
-                        <i class="fas ${mode.icon}"></i>
-                    </div>
-                    <div class="mode-info">
-                        <div class="mode-name">${mode.label}</div>
-                    </div>
-                    <span class="mode-tier ${mode.tier}">${mode.tier}</span>
-                    <div class="progress-indicator ${frameworkProgress[mode.id] || 'pending'}"></div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function renderFrameworks() {
-            const container = document.getElementById('frameworkGrid');
-            container.innerHTML = '';
-
-            FRAMEWORKS.forEach(fw => {
-                const isUnlocked = isTierUnlocked(fw.tier);
-                const progress = frameworkProgress[fw.id] || 'pending';
-                const div = document.createElement('div');
-                div.className = 'framework-card';
-                div.onclick = () => startFramework(fw);
-                div.innerHTML = `
-                    <div class="framework-header">
-                        <div class="framework-name">${fw.name}</div>
-                        <div class="framework-value">${fw.value}</div>
-                    </div>
-                    <div class="framework-desc">${fw.desc}</div>
-                    <div class="framework-progress">
-                        <div class="framework-progress-fill" style="width: ${progress === 'completed' ? 100 : progress === 'started' ? 50 : 0}%"></div>
-                    </div>
-                    <div class="framework-status">
-                        ${progress === 'completed' ? '✅ Completed' : progress === 'started' ? ' In Progress' : isUnlocked ? '🔓 Available' : '🔒 Locked'}
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function renderAchievements() {
-            const container = document.getElementById('achievementsList');
-            container.innerHTML = '';
-
-            ACHIEVEMENTS.forEach(ach => {
-                const isUnlocked = achievements.includes(ach.id);
-                const div = document.createElement('div');
-                div.className = `achievement-badge ${isUnlocked ? 'unlocked' : ''}`;
-                div.innerHTML = `
-                    <div class="achievement-icon">${ach.icon}</div>
-                    <div class="achievement-name">${ach.name}</div>
-                    <div class="achievement-desc">${ach.desc}</div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function isTierUnlocked(tier) {
-            const tiers = { free: 0, insider: 1, partner: 2 };
-            return tiers[currentTier] >= tiers[tier];
-        }
-
-        function selectMode(mode) {
-            if (!isTierUnlocked(mode.tier)) {
-                showNotification(`Upgrade to ${mode.tier} to unlock this mode`, 'error');
-                return;
-            }
-            currentMode = mode.id;
-            renderModes();
-            switchTab('chat');
-            addMessage(`Switched to <strong>${mode.label}</strong> mode. How can I help you?`, 'ai');
-        }
-
-        function startFramework(fw) {
-            if (!isTierUnlocked(fw.tier)) {
-                showNotification(`Upgrade to ${fw.tier} to access this framework`, 'error');
-                return;
-            }
-
-            if (frameworkProgress[fw.id] === 'completed') {
-                showNotification('You already completed this framework!', 'info');
-                return;
-            }
-
-            if (frameworkProgress[fw.id] === 'started') {
-                frameworkProgress[fw.id] = 'completed';
-                addXP(100);
-                checkAchievements();
-                fireConfetti();
-                showNotification(`🎉 Completed ${fw.name}!`, 'success');
-            } else {
-                frameworkProgress[fw.id] = 'started';
-                addXP(50);
-                showNotification(`Started ${fw.name}`, 'info');
-            }
-
-            saveState();
-            renderFrameworks();
-            renderModes();
-            updateDashboard();
-        }
-
-        function checkAchievements() {
-            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
-            
-            if (completed >= 1 && !achievements.includes('first_framework')) {
-                achievements.push('first_framework');
-                addXP(ACHIEVEMENTS.find(a => a.id === 'first_framework').xp);
-                showNotification('🏆 Achievement Unlocked: First Steps!', 'success');
-            }
-            
-            if (completed === FRAMEWORKS.length && !achievements.includes('framework_master')) {
-                achievements.push('framework_master');
-                addXP(ACHIEVEMENTS.find(a => a.id === 'framework_master').xp);
-                showNotification('🎓 Achievement Unlocked: Framework Master!', 'success');
-            }
-
-            renderAchievements();
-        }
-
-        // ==================== DASHBOARD ====================
-        function updateDashboard() {
-            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
-            const total = FRAMEWORKS.length;
-            const health = Math.round((completed / total) * 100);
-
-            // Update health ring
-            const ring = document.getElementById('healthRing');
-            const circumference = 2 * Math.PI * 50;
-            const offset = circumference - (health / 100) * circumference;
-            ring.style.strokeDashoffset = offset;
-            document.getElementById('healthScore').textContent = health;
-
-            // Update framework count
-            document.getElementById('frameworkCount').textContent = `${completed}/${total}`;
-
-            // Update next action
-            const nextAction = document.getElementById('nextAction');
-            if (completed === 0) {
-                nextAction.textContent = '🚀 Start with the Delivery Checklist (Free)';
-            } else if (completed < 3) {
-                nextAction.textContent = '📈 Complete AVOCADO Offers to unlock lead generation';
-            } else if (completed < 5) {
-                nextAction.textContent = '💰 Upgrade to Partner for $100M Offers framework';
-            } else {
-                nextAction.textContent = ' Scale with Community OS and Launch Planner';
-            }
-
-            // Update charts
-            updateCharts();
-        }
-
-        function logAction() {
-            rule100Count++;
-            if (rule100Count >= 100) {
-                fireConfetti();
-                showNotification('🎉 Hit 100 actions!', 'success');
-                addXP(50);
-            }
-            saveState();
-            updateDashboard();
-        }
-
-        function resetRule() {
-            rule100Count = 0;
-            saveState();
-            updateDashboard();
-        }
-
-        // ==================== CHARTS ====================
-        let frameworkChart, activityChart;
-
-        function initCharts() {
-            // Framework progress chart
-            const ctx1 = document.getElementById('frameworkChart').getContext('2d');
-            frameworkChart = new Chart(ctx1, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Completed', 'In Progress', 'Locked'],
-                    datasets: [{
-                        data: [0, 0, 8],
-                        backgroundColor: ['#10b981', '#fbbf24', 'rgba(255,255,255,0.1)'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            // Activity chart
-            const ctx2 = document.getElementById('activityChart').getContext('2d');
-            activityChart = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Actions',
-                        data: [0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#fbbf24',
-                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#64748b' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#64748b' }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateCharts() {
-            const completed = Object.values(frameworkProgress).filter(p => p === 'completed').length;
-            const started = Object.values(frameworkProgress).filter(p => p === 'started').length;
-            const locked = FRAMEWORKS.length - completed - started;
-
-            frameworkChart.data.datasets[0].data = [completed, started, locked];
-            frameworkChart.update();
-
-            // Update activity chart with rule count
-            const today = new Date().getDay();
-            activityChart.data.datasets[0].data[today] = rule100Count;
-            activityChart.update();
-        }
-
-        // ==================== UTILITIES ====================
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-            
-            event.target.closest('.tab-btn').classList.add('active');
-            document.getElementById(tab + 'Tab').classList.add('active');
-        }
-
-        function openVault() {
-            switchTab('frameworks');
-        }
-
-        function openUpgrade() {
-            showNotification('Upgrade modal coming soon!', 'info');
-        }
-
-        function showNotification(message, type) {
-            const div = document.createElement('div');
-            div.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 32px;
-                padding: 16px 24px;
-                background: ${type === 'success' ? 'rgba(16, 185, 129, 0.9)' : type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(251, 191, 36, 0.9)'};
-                border-radius: 12px;
-                color: white;
-                font-weight: 600;
-                z-index: 9999;
-                animation: slideIn 0.3s ease;
-                backdrop-filter: blur(10px);
-            `;
-            div.textContent = message;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 3000);
-        }
-
-        function fireConfetti() {
-            const container = document.getElementById('confettiContainer');
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.background = ['#fbbf24', '#06b6d4', '#a855f7', '#10b981'][Math.floor(Math.random() * 4)];
-                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                container.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 4000);
-            }
-        }
-
-        // Initialize app
-        window.addEventListener('DOMContentLoaded', init);
-    </script>
+    const div = document.createElement('div');
+    const ok = tierOk(m.tier);
+    div.className = 'mode' + (m.id===state.mode?' active':'') + (ok?'':' locked');
+    const prog = state.progress[m.id] || '';
+    const dot = prog==='done'?'done':prog==='started'?'part':'';
+    div.innerHTML = `<span class="ic"><i class="fas ${m.icon}"></i></span>
+      <span>${m.label}</span>
+      <span class="tag ${m.tier}">${m.tier}</span>
+      ${dot?`<span class="dot ${dot}"></span>`:''}`;
+    div.addEventListener('click', () => {
+      if (!ok) { toast('Upgrade to '+m.tier+' to unlock '+m.label,'err'); return; }
+      sel.value = m.id;
+      switchMode(m.id);
+      switchView('chat');
+    });
+    list.appendChild(div);
+  });
+  
+  sel.value = state.mode;
+}
+
+function updateModeUI() {
+  document.querySelectorAll('.mode').forEach((el,i) => {
+    if (MODES[i]) el.classList.toggle('active', MODES[i].id===state.mode);
+  });
+  safe('modeTxt', t => t.textContent = MODES.find(m=>m.id===state.mode)?.label || 'Coach');
+}
+
+function switchMode(id) {
+  state.mode = id;
+  if (!state.progress[id]) {
+    state.progress[id] = 'started';
+    saveState();
+    toast('Started '+MODES.find(m=>m.id===id)?.label+' mode','info');
+  }
+  updateModeUI();
+  updateDashboard();
+  addMsg('Switched to <strong>'+MODES.find(m=>m.id===id)?.label+'</strong> mode. What are you working on?','ai',true);
+}
+
+// Chat
+async function sendMsg() {
+  if (state.sending) return;
+  const input = $('userIn');
+  const text = input?.value?.trim();
+  if (!text) return;
+  
+  state.sending = true;
+  safe('sendBtn', b => b.disabled = true);
+  if (input) input.value = '';
+  
+  addMsg(text, 'user');
+  safe('statusTxt', t => t.textContent = 'Thinking...');
+  showTyping();
+  
+  try {
+    const res = await fetch(API+'/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:text, mode:state.mode, member_id:'default'})
+    });
+    hideTyping();
+    const data = await res.json();
+    if (data.error) {
+      addMsg('⚠️ '+data.error,'ai',true);
+      safe('statusTxt', t => t.textContent = 'Error');
+    } else {
+      const reply = data.reply || data.response || data.message || 'No response.';
+      addMsg(reply,'ai');
+      safe('statusTxt', t => t.textContent = 'Ready');
+    }
+  } catch(e) {
+    hideTyping();
+    addMsg('⚠️ Connection error. Please try again.','ai');
+    safe('statusTxt', t => t.textContent = 'Offline');
+  } finally {
+    state.sending = false;
+    safe('sendBtn', b => b.disabled = false);
+    if (input) input.focus();
+  }
+}
+
+function addMsg(text, sender, isHTML=false) {
+  const msgs = $('msgs');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'msg ' + sender;
+  const av = document.createElement('div');
+  av.className = 'av';
+  av.innerHTML = sender==='ai'?'<i class="fas fa-brain"></i>':'<i class="fas fa-user"></i>';
+  const bub = document.createElement('div');
+  bub.className = 'bub';
+  if (isHTML) bub.innerHTML = text; else bub.textContent = text;
+  div.appendChild(av);
+  div.appendChild(bub);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+let typingEl = null;
+function showTyping() {
+  if (typingEl) return;
+  const msgs = $('msgs');
+  if (!msgs) return;
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg ai';
+  typingEl.innerHTML = `<div class="av"><i class="fas fa-brain"></i></div>
+    <div class="typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(typingEl);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function hideTyping() {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+// Vault
+function populateVault() {
+  const grid = $('fwGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  FRAMEWORKS.forEach(fw => {
+    const ok = tierOk(fw.tier);
+    const prog = state.progress[fw.id] || '';
+    const done = prog==='done';
+    const started = prog==='started';
+    const card = document.createElement('div');
+    card.className = 'fw-card';
+    card.style.opacity = ok ? '1' : '0.4';
+    card.innerHTML = `<h4>${fw.name} ${done?'✅':ok?(started?'':''):'🔒'}</h4>
+      <p>${fw.value}</p>
+      <div class="meta"><span class="v">${fw.value}</span><span class="t ${fw.tier}">${fw.tier}</span></div>
+      <button class="${done?'done':''}">${done?'Completed':ok?(started?'Resume':'Start'):'Locked'}</button>`;
+    card.querySelector('button').addEventListener('click', () => {
+      if (!ok) { toast('Upgrade to '+fw.tier,'err'); return; }
+      if (done) { toast('Already completed','info'); return; }
+      if (state.progress[fw.id]==='started') {
+        state.progress[fw.id] = 'done';
+        confetti();
+        toast(' Completed '+fw.name+'!','ok');
+      } else {
+        state.progress[fw.id] = 'started';
+        toast('Started '+fw.name,'info');
+      }
+      saveState();
+      populateVault();
+      updateDashboard();
+      populateModes();
+    });
+    grid.appendChild(card);
+  });
+}
+
+// Dashboard
+function updateDashboard() {
+  const total = FRAMEWORKS.length;
+  const done = FRAMEWORKS.filter(f => state.progress[f.id]==='done').length;
+  const health = Math.round((done/total)*100);
+  
+  safe('health', el => el.textContent = health);
+  safe('ring', el => el.style.strokeDashoffset = 251.2 - (health/100)*251.2);
+  safe('healthSub', el => el.textContent = done+' / '+total+' frameworks completed');
+  safe('fwCount', el => el.textContent = done+'/'+total);
+  safe('fwSub', el => el.textContent = done===0?'Start your first framework':done+' completed');
+  
+  // Strip
+  safe('fwStrip', el => {
+    el.innerHTML = '';
+    FRAMEWORKS.forEach(f => {
+      const d = document.createElement('span');
+      const p = state.progress[f.id] || '';
+      d.className = 'd' + (p==='done'?' done':p==='started'?' part':'');
+      el.appendChild(d);
+    });
+  });
+  
+  // Rule
+  safe('ruleCt', el => el.textContent = state.rule);
+  const streak = state.rule >= 100 ? 1 : 0;
+  safe('streak', el => el.innerHTML = '<i class="fas fa-fire"></i> '+streak+'d');
+  
+  // Calendar
+  safe('cal', el => {
+    el.innerHTML = '';
+    for (let i=6;i>=0;i--) {
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const key = d.toISOString().slice(0,10);
+      const ct = state.daily[key] || 0;
+      const div = document.createElement('span');
+      div.className = 'day' + (ct>=100?' hit':'') + (i===0?' today':'');
+      div.textContent = d.getDate();
+      el.appendChild(div);
+    }
+  });
+  
+  // Revenue
+  const rev = state.revenue || 0;
+  safe('revProj', el => el.textContent = rev>0 ? '$'+Math.round(rev*(1+(done/total)*2)).toLocaleString()+'/mo' : '$0/mo');
+  
+  // Next action
+  let next = '🚀 Start with the Delivery Checklist (free)';
+  if (done>=1 && done<3) next = '📈 Complete AVOCADO Offers next';
+  else if (done>=3 && done<5 && state.tier==='free') next = '💎 Upgrade to Insider for DM Doctor';
+  else if (done>=5) next = '🏆 Scale with Community OS and Launch Planner';
+  safe('nextAct', el => el.textContent = next);
+}
+
+// View switching
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  safe(name+'View', el => el.classList.add('active'));
+  document.querySelector(`.tab[data-view="${name}"]`)?.classList.add('active');
+  if (name==='dashboard') updateDashboard();
+}
+
+// Upgrade modal
+function openUpgrade() {
+  const table = $('tierTable');
+  if (!table) return;
+  const tiers = [
+    {name:'Free',feat:'3 modes, 30 msg/h',price:'$0',cur:state.tier==='free'},
+    {name:'Insider',feat:'+5 modes, frameworks',price:'$47/mo',cur:state.tier==='insider'},
+    {name:'Partner',feat:'+3 modes, money models',price:'$197/mo',cur:state.tier==='partner'},
+  ];
+  table.innerHTML = tiers.map(t => 
+    `<div style="display:grid;grid-template-columns:1fr 2fr 1fr;padding:10px 14px;background:var(--card);
+      border:1px solid ${t.cur?'var(--gold)':'var(--border)'};border-radius:10px;margin-bottom:6px;align-items:center">
+      <div style="font-weight:600;font-size:13px">${t.name} ${t.cur?'👈':''}</div>
+      <div style="font-size:12px;color:var(--text-2)">${t.feat}</div>
+      <div style="font-weight:600;color:var(--gold);text-align:right;font-size:13px">${t.price}</div>
+    </div>`).join('');
+  safe('upModal', m => m.classList.add('open'));
+}
+
+// Value Equation
+function updateEq() {
+  const d = +$('eqDS').value, l = +$('eqLS').value, t = +$('eqTS').value, e = +$('eqES').value;
+  safe('eqD', el => el.textContent = d);
+  safe('eqL', el => el.textContent = l);
+  safe('eqT', el => el.textContent = t);
+  safe('eqE', el => el.textContent = e);
+  safe('eqScore', el => el.textContent = Math.round((d*l)/(t*e)*10)/10);
+}
+
+// Init — wrapped in try/catch with failsafe
+async function init() {
+  try {
+    loadState();
+    populateModes();
+    populateVault();
+    updateDashboard();
+    updateModeUI();
+    
+    // Greeting
+    if (state.name) {
+      const hr = new Date().getHours();
+      const sal = hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+      safe('greet', el => el.textContent = sal+', '+state.name);
+      safe('welcome', el => el.textContent = sal+', '+state.name);
+    }
+    safe('tierLbl', el => el.textContent = state.tier.toUpperCase());
+    if (state.revenue) safe('revIn', el => el.value = state.revenue);
+    
+    // Events
+    safe('sendBtn', b => b.addEventListener('click', sendMsg));
+    safe('userIn', el => el.addEventListener('keydown', e => { if (e.key==='Enter') sendMsg(); }));
+    safe('modeSel', el => el.addEventListener('change', () => switchMode(el.value)));
+    
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchView(t.dataset.view)));
+    
+    safe('vaultBtn', b => b.addEventListener('click', () => safe('vaultModal', m => m.classList.add('open'))));
+    safe('closeVault', b => b.addEventListener('click', () => safe('vaultModal', m => m.classList.remove('open'))));
+    safe('vaultModal', m => m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); }));
+    
+    safe('upBtn', b => b.addEventListener('click', openUpgrade));
+    safe('closeUp', b => b.addEventListener('click', () => safe('upModal', m => m.classList.remove('open'))));
+    safe('upCancel', b => b.addEventListener('click', () => safe('upModal', m => m.classList.remove('open'))));
+    safe('upAction', b => b.addEventListener('click', () => { toast('Connect your Whop license key','info'); safe('upModal', m => m.classList.remove('open')); }));
+    
+    safe('ruleAdd', b => b.addEventListener('click', () => {
+      state.rule++;
+      if (state.lastDate !== new Date().toDateString()) {
+        if (state.lastDate) state.daily[state.lastDate] = state.rule;
+        state.rule = 1;
+        state.lastDate = new Date().toDateString();
+      }
+      saveState();
+      updateDashboard();
+      if (state.rule >= 100) { confetti(); toast('🎉 Hit 100 actions!','ok'); }
+    }));
+    safe('ruleReset', b => b.addEventListener('click', () => { state.rule=0; saveState(); updateDashboard(); toast('Reset','info'); }));
+    safe('revIn', el => el.addEventListener('input', () => { state.revenue = parseFloat(el.value)||0; saveState(); updateDashboard(); }));
+    
+    document.querySelectorAll('[data-quick]').forEach(b => b.addEventListener('click', () => {
+      const mode = b.dataset.quick;
+      const m = MODES.find(x=>x.id===mode);
+      if (m && !tierOk(m.tier)) { toast('Upgrade to '+m.tier,'err'); return; }
+      safe('modeSel', el => el.value = mode);
+      switchMode(mode);
+    }));
+    
+    safe('voiceBtn', b => b.addEventListener('click', async () => {
+      const last = document.querySelector('.msg.ai .bub');
+      if (!last) { toast('No reply yet','info'); return; }
+      try {
+        const res = await fetch(API+'/api/tts', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({text:last.innerText.slice(0,500)})
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          new Audio(URL.createObjectURL(blob)).play();
+          toast('🔊 Playing...','info');
+        } else toast('TTS unavailable','err');
+      } catch(e) { toast('TTS error','err'); }
+    }));
+    
+    safe('eqBtn', b => b.addEventListener('click', () => { updateEq(); safe('eqModal', m => m.classList.add('open')); }));
+    safe('closeEq', b => b.addEventListener('click', () => safe('eqModal', m => m.classList.remove('open'))));
+    safe('eqClose', b => b.addEventListener('click', () => safe('eqModal', m => m.classList.remove('open'))));
+    safe('eqSave', b => b.addEventListener('click', () => { toast('Saved!','ok'); safe('eqModal', m => m.classList.remove('open')); }));
+    ['eqDS','eqLS','eqTS','eqES'].forEach(id => safe(id, el => el.addEventListener('input', updateEq)));
+    
+    // Close modals on backdrop click
+    ['vaultModal','upModal','eqModal'].forEach(id => {
+      safe(id, m => m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); }));
+    });
+    
+  } catch(e) {
+    console.error('Init error:', e);
+  } finally {
+    // ALWAYS hide loader — even if init failed
+    setTimeout(() => safe('loader', l => l.classList.add('hidden')), 300);
+  }
+}
+
+// 3-second failsafe — if loader still showing, force hide
+setTimeout(() => safe('loader', l => l.classList.add('hidden')), 3000);
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
