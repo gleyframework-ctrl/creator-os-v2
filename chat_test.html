@@ -1,569 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E5 AI Coach - Googoltradrekachiliaplex OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root {
-            --bg: #070b14;
-            --surface: #0d1628;
-            --card: rgba(255,255,255,0.03);
-            --border: rgba(255,255,255,0.05);
-            --gold: #f59e0b;
-            --gold-light: #fbbf24;
-            --gold-glow: rgba(245,158,11,0.2);
-            --purple: #8b5cf6;
-            --green: #4ade80;
-            --red: #f87171;
-            --text: #edf2f7;
-            --text-secondary: #8899bb;
-            --text-muted: #445566;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 16px;
-        }
-        .app {
-            max-width: 1440px;
-            margin: 0 auto;
-            background: var(--surface);
-            border-radius: 28px;
-            border: 1px solid var(--border);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-            overflow: hidden;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 28px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(12px);
-        }
-        .logo { display: flex; align-items: center; gap: 10px; }
-        .logo-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; font-weight: 800; color: var(--bg);
-        }
-        .logo-text { font-size: 18px; font-weight: 700; }
-        .logo-text span { color: var(--gold-light); }
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .tier-badge {
-            padding: 4px 14px; border-radius: 40px; font-size: 10px; font-weight: 600;
-            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.15);
-            color: var(--gold-light);
-        }
-        .btn-gold {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border: none; color: var(--bg); padding: 6px 18px; border-radius: 40px;
-            font-weight: 600; font-size: 12px; cursor: pointer;
-            box-shadow: 0 4px 20px var(--gold-glow); transition: 0.3s;
-        }
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245,158,11,0.35); }
-        .main { display: flex; min-height: calc(100vh - 140px); }
-        .sidebar {
-            width: 220px; background: rgba(255,255,255,0.015);
-            border-right: 1px solid var(--border); padding: 16px 10px;
-        }
-        .sidebar-title {
-            font-size: 8px; text-transform: uppercase; letter-spacing: 0.15em;
-            color: var(--text-muted); margin-bottom: 12px; font-weight: 600; padding-left: 6px;
-        }
-        .mode-item {
-            display: flex; align-items: center; gap: 8px; padding: 6px 10px;
-            border-radius: 8px; cursor: pointer; transition: 0.3s; font-size: 11px;
-            font-weight: 500; color: var(--text-secondary); border: 1px solid transparent;
-        }
-        .mode-item:hover { background: var(--card); color: var(--text); }
-        .mode-item.active {
-            background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.1);
-            color: var(--gold-light);
-        }
-        .mode-item .dot {
-            width: 4px; height: 4px; border-radius: 50%; margin-left: auto;
-        }
-        .mode-item .dot.complete { background: var(--green); }
-        .mode-item .dot.partial { background: var(--gold); }
-        .mode-item .dot.pending { background: var(--text-muted); }
-        .content {
-            flex: 1; padding: 20px 28px; overflow-y: auto; background: var(--bg);
-        }
-        .dash-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px; margin-bottom: 20px;
-        }
-        .card {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 18px 20px; transition: 0.3s;
-            backdrop-filter: blur(12px);
-        }
-        .card:hover { border-color: rgba(245,158,11,0.1); transform: translateY(-2px); }
-        .card h4 {
-            font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
-            color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-        }
-        .card .value { font-size: 26px; font-weight: 700; color: var(--text); }
-        .card .sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-        .progress-bar {
-            width: 100%; height: 8px; background: rgba(255,255,255,0.05);
-            border-radius: 4px; overflow: hidden; margin: 8px 0;
-        }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
-            border-radius: 4px; transition: width 0.5s ease;
-        }
-        .task-list { list-style: none; padding: 0; margin-top: 8px; }
-        .task-list li {
-            display: flex; align-items: center; gap: 10px; padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .task-list li input[type="checkbox"] {
-            width: 16px; height: 16px; accent-color: var(--gold);
-            cursor: pointer; border-radius: 4px;
-        }
-        .insight {
-            background: rgba(245,158,11,0.05); border-left: 3px solid var(--gold);
-            padding: 10px 14px; border-radius: 8px; margin: 6px 0;
-        }
-        .insight .severity { font-weight: 600; color: var(--gold-light); }
-        .chat-container {
-            margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;
-        }
-        .chat-messages {
-            max-height: 300px; overflow-y: auto; padding: 8px 0;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .message {
-            display: flex; gap: 10px; max-width: 78%; animation: fadeIn 0.3s;
-        }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
-        .message .avatar {
-            width: 28px; height: 28px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; background: var(--card); border: 1px solid var(--border);
-        }
-        .message.ai .avatar {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: var(--bg);
-        }
-        .message.user .avatar {
-            background: linear-gradient(135deg, var(--purple), #6d28d9);
-            color: white;
-        }
-        .message .bubble {
-            background: var(--card); padding: 10px 16px; border-radius: 14px;
-            font-size: 13px; line-height: 1.6; border: 1px solid var(--border);
-        }
-        .message.user .bubble {
-            background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.12);
-        }
-        .input-bar { display: flex; gap: 8px; margin-top: 12px; }
-        .input-bar select {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 40px; padding: 6px 12px; color: var(--text);
-            font-size: 11px; outline: none; min-width: 100px;
-        }
-        .input-bar input {
-            flex: 1; background: var(--card); border: 1px solid var(--border);
-            border-radius: 40px; padding: 7px 14px; color: var(--text);
-            font-size: 13px; outline: none;
-        }
-        .input-bar button {
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border: none; border-radius: 40px; padding: 7px 18px; font-weight: 600;
-            color: var(--bg); cursor: pointer; transition: 0.3s;
-        }
-        .status-bar {
-            padding: 4px 0; font-size: 10px; color: var(--text-muted);
-            display: flex; justify-content: space-between; border-top: 1px solid var(--border);
-            margin-top: 8px;
-        }
-        @keyframes fadeIn {
-            from { opacity:0; transform: translateY(6px); }
-            to { opacity:1; transform: translateY(0); }
-        }
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .dash-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-<div class="app" id="app">
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">E5</div>
-            <div class="logo-text">AI <span>Coach</span></div>
+<!-- 🌌 GOOGOL-PLEX DASHBOARD UI (Add this inside your main container) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <!-- Omni Audit Card -->
+    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
+        <h3 class="text-amber-400 font-bold mb-2 flex items-center"><i class="fas fa-stethoscope mr-2"></i> Omni-Audit</h3>
+        <div class="space-y-2 text-sm text-slate-300">
+            <input type="number" id="audit-leads" placeholder="Leads/mo" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <input type="number" id="audit-close" placeholder="Close Rate %" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <input type="number" id="audit-ltv" placeholder="Avg LTV $" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <input type="text" id="audit-pain" placeholder="Biggest Pain Point" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <button onclick="runOmniAudit()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded mt-2">Run Omni-Audit</button>
         </div>
-        <div class="header-actions">
-            <span style="font-size:12px;color:var(--text-secondary);">👋 Welcome</span>
-            <div class="tier-badge" id="tierBadge">FREE</div>
-            <button class="btn-gold" id="upgradeBtn"><i class="fas fa-rocket"></i> Upgrade</button>
+        <div id="audit-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
+    </div>
+
+    <!-- Daily 100 Card -->
+    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
+        <h3 class="text-green-400 font-bold mb-2 flex items-center"><i class="fas fa-bullseye mr-2"></i> Rule of 100 Generator</h3>
+        <div class="space-y-2 text-sm text-slate-300">
+            <select id="d100-stage" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+                <option>Lead Gen</option><option>Scaling</option><option>Retention</option>
+            </select>
+            <input type="text" id="d100-niche" placeholder="Your Niche (e.g., B2B SaaS)" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <button onclick="generateDaily100()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded mt-2">Generate Daily 100</button>
         </div>
-    </header>
-    <div class="main">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-title">⚡ Modes</div>
-            <div id="modeList"></div>
-        </aside>
-        <div class="content" id="content">
-            <div class="dash-grid">
-                <div class="card" style="grid-column:1/-1;">
-                    <h4><i class="fas fa-flag"></i> Today's Mission</h4>
-                    <div id="dailyPlan"></div>
-                    <ul class="task-list" id="taskList"></ul>
-                    <button class="btn-gold" style="margin-top:8px;font-size:11px;padding:4px 16px;" id="refreshBriefing">
-                        <i class="fas fa-sync"></i> Refresh Briefing
-                    </button>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-chart-line"></i> Rule of 100</h4>
-                    <div class="value" id="ruleCount">0</div>
-                    <div class="sub">Actions today <span id="streakDisplay">🔥 0d</span></div>
-                    <div class="progress-bar"><div class="progress-fill" id="ruleProgress" style="width:0%"></div></div>
-                    <button class="btn-gold" style="font-size:11px;padding:2px 12px;margin-top:6px;" id="logActionBtn">
-                        <i class="fas fa-plus"></i> Log +1
-                    </button>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-heart"></i> Business Health</h4>
-                    <div class="value" id="healthScore">0</div>
-                    <div class="sub" id="healthSub">0/8 frameworks completed</div>
-                    <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap;" id="fwStrip"></div>
-                </div>
-                <div class="card">
-                    <h4><i class="fas fa-dollar-sign"></i> Revenue</h4>
-                    <div class="value" id="revenueDisplay">$0</div>
-                    <div class="sub">Goal: <span id="revenueGoal">$10,000</span></div>
-                    <div class="progress-bar"><div class="progress-fill" id="revenueProgress" style="width:0%"></div></div>
-                </div>
-                <div class="card" style="grid-column:1/-1;">
-                    <h4><i class="fas fa-eye"></i> Predictive Insights</h4>
-                    <div id="insightsContainer"></div>
-                </div>
-                <div class="card" style="grid-column:1/-1;">
-                    <h4><i class="fas fa-share-alt"></i> Social Draft</h4>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <select id="socialPlatform" style="background:var(--card);border:1px solid var(--border);border-radius:40px;padding:4px 12px;color:var(--text);font-size:12px;">
-                            <option value="linkedin">LinkedIn</option>
-                            <option value="twitter">Twitter/X</option>
-                            <option value="instagram">Instagram</option>
-                        </select>
-                        <input type="text" id="socialTopic" placeholder="Topic (e.g., lead generation)" style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:40px;padding:4px 12px;color:var(--text);font-size:12px;" />
-                        <button class="btn-gold" id="generateDraftBtn" style="font-size:11px;padding:4px 16px;">Generate Draft</button>
-                    </div>
-                    <div id="socialDraftOutput" style="margin-top:8px;background:var(--card);padding:10px;border-radius:12px;font-size:13px;white-space:pre-wrap;display:none;"></div>
-                </div>
-            </div>
-            <div class="chat-container">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        <div class="avatar"><i class="fas fa-brain"></i></div>
-                        <div class="bubble">
-                            <p><strong>Hello, I'm your Googoltradrekachiliaplex Coach.</strong> I have $20,000+ of frameworks. Let's build your business.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-bar">
-                    <select id="modeSelect"></select>
-                    <input type="text" id="userInput" placeholder="Ask or tell me about your progress..." autocomplete="off" />
-                    <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
-                </div>
-                <div class="status-bar">
-                    <span id="statusText">Ready</span>
-                    <span id="modeDisplay">Coach</span>
-                </div>
-            </div>
+        <div id="d100-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
+    </div>
+
+    <!-- Closing Roleplay Card -->
+    <div class="bg-dark-800 border border-slate-700 rounded-xl p-4">
+        <h3 class="text-purple-400 font-bold mb-2 flex items-center"><i class="fas fa-chess mr-2"></i> Closing Roleplay</h3>
+        <div class="space-y-2 text-sm text-slate-300">
+            <select id="rp-scenario" class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+                <option>Price Objection</option><option>Need to think about it</option><option>Need to ask my partner</option>
+            </select>
+            <input type="text" id="rp-message" placeholder="What you just said to the prospect..." class="w-full bg-dark-900 border border-slate-600 rounded px-2 py-1">
+            <button onclick="runRoleplay()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded mt-2">Simulate Prospect</button>
         </div>
+        <div id="rp-result" class="mt-3 text-xs text-slate-400 whitespace-pre-wrap hidden"></div>
     </div>
 </div>
 
 <script>
-const API_BASE = 'https://e5-ai-coach-production.up.railway.app';
-const MODES = [
-    {id:'coach', label:'Coach', icon:'fa-brain', tier:'free'},
-    {id:'xray', label:'X-Ray', icon:'fa-search', tier:'free'},
-    {id:'funnel', label:'Funnel Map', icon:'fa-route', tier:'free'},
-    {id:'community', label:'Community OS', icon:'fa-users', tier:'insider'},
-    {id:'dm', label:'DM Doctor', icon:'fa-comment-dots', tier:'insider'},
-    {id:'content', label:'Content Engine', icon:'fa-pen-fancy', tier:'insider'},
-    {id:'alchemy', label:'Alchemy', icon:'fa-film', tier:'insider'},
-    {id:'hack', label:'Funnel Hacker', icon:'fa-code', tier:'insider'},
-    {id:'offer', label:'Offer Architect', icon:'fa-coins', tier:'partner'},
-    {id:'workshop', label:'Workshop Architect', icon:'fa-chalkboard-teacher', tier:'partner'},
-    {id:'launch', label:'Launch Planner', icon:'fa-rocket', tier:'partner'},
-];
-const FRAMEWORKS = [
-    {id:'avocado', name:'AVOCADO Offers', tier:'insider'},
-    {id:'money_models', name:'$100M Money Models', tier:'partner'},
-    {id:'leads', name:'$100M Leads', tier:'insider'},
-    {id:'community_os', name:'Community OS', tier:'partner'},
-    {id:'ttb', name:'Time to Build', tier:'insider'},
-    {id:'soulful', name:'SOULFUL Sales', tier:'insider'},
-    {id:'delivery', name:'Delivery Checklist', tier:'free'},
-    {id:'value_eq', name:'Value Equation', tier:'partner'},
-];
-
-let currentTier = 'free';
-let currentMode = 'coach';
-let frameworkProgress = JSON.parse(localStorage.getItem('fwProgress') || '{}');
-let ruleCount = parseInt(localStorage.getItem('ruleCount')) || 0;
-let streak = 0;
-let dailyHistory = JSON.parse(localStorage.getItem('dailyHistory') || '{}');
-let revenue = parseFloat(localStorage.getItem('revenue')) || 0;
-let revenueGoal = parseFloat(localStorage.getItem('revenueGoal')) || 10000;
-
-const $ = id => document.getElementById(id);
-
-async function fetchTier() {
+// 🌌 GOOGOL-PLEX JAVASCRIPT FUNCTIONS
+async function runOmniAudit() {
+    const btn = event.target; btn.innerText = "Analyzing...";
+    const payload = {
+        current_leads_per_month: parseInt(document.getElementById('audit-leads').value) || 0,
+        close_rate_percent: parseFloat(document.getElementById('audit-close').value) || 0,
+        average_ltv: parseFloat(document.getElementById('audit-ltv').value) || 0,
+        biggest_pain_point: document.getElementById('audit-pain').value || "Unknown"
+    };
     try {
-        const res = await fetch(`${API_BASE}/api/tier?member_id=default`);
+        const res = await fetch('/api/omni-audit', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
-        currentTier = data.tier || 'free';
-        $('tierBadge').textContent = currentTier.toUpperCase();
-        renderModes();
-    } catch(e) { console.warn('Tier fetch failed', e); }
+        const resultDiv = document.getElementById('audit-result');
+        resultDiv.innerText = data.audit;
+        resultDiv.classList.remove('hidden');
+    } catch(e) { console.error(e); }
+    btn.innerText = "Run Omni-Audit";
 }
 
-function renderModes() {
-    const select = $('modeSelect');
-    const sidebar = $('modeList');
-    select.innerHTML = '';
-    sidebar.innerHTML = '';
-    MODES.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.label + ' (' + m.tier + ')';
-        select.appendChild(opt);
-        const div = document.createElement('div');
-        div.className = 'mode-item';
-        const ok = isTierOk(currentTier, m.tier);
-        if (!ok) div.classList.add('locked');
-        if (m.id === currentMode) div.classList.add('active');
-        const prog = frameworkProgress[m.id] || 'pending';
-        const dotClass = prog === 'completed' ? 'complete' : (prog === 'started' ? 'partial' : 'pending');
-        div.innerHTML = `<span class="icon"><i class="fas ${m.icon}"></i></span><span>${m.label}</span><span style="font-size:7px;padding:1px 6px;border-radius:20px;background:rgba(255,255,255,0.04);color:var(--text-muted);margin-left:auto;">${m.tier}</span><span class="dot ${dotClass}"></span>`;
-        div.addEventListener('click', () => {
-            if (!ok) { alert('Upgrade to ' + m.tier + ' for ' + m.label); return; }
-            $('modeSelect').value = m.id;
-            onModeChange();
-        });
-        sidebar.appendChild(div);
-    });
-    $('modeSelect').value = currentMode;
-}
-
-function isTierOk(userTier, required) {
-    const order = { free:0, insider:1, partner:2 };
-    return order[userTier] >= order[required];
-}
-
-async function fetchDailyBriefing() {
+async function generateDaily100() {
+    const btn = event.target; btn.innerText = "Generating...";
+    const payload = {
+        current_stage: document.getElementById('d100-stage').value,
+        niche: document.getElementById('d100-niche').value
+    };
     try {
-        const res = await fetch(`${API_BASE}/api/daily-briefing`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ member_id: 'default' })
-        });
+        const res = await fetch('/api/daily-100', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
-        if (data.plan) {
-            $('dailyPlan').innerHTML = `<p style="font-size:14px;color:var(--text-secondary);margin-bottom:6px;">${data.plan.split('\n').slice(0,3).join('<br>')}</p>`;
-            const taskList = $('taskList');
-            taskList.innerHTML = '';
-            const tasks = data.tasks || ['No tasks generated. Click Refresh.'];
-            tasks.forEach(t => {
-                const li = document.createElement('li');
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.addEventListener('change', async function() {
-                    if (this.checked) {
-                        const res2 = await fetch(`${API_BASE}/api/task/complete`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ member_id: 'default', task_id: t })
-                        });
-                        const data2 = await res2.json();
-                        if (data2.feedback) {
-                            addMessage(data2.feedback, 'ai', true);
-                            if (data2.new_task) {
-                                const newLi = document.createElement('li');
-                                const newCb = document.createElement('input');
-                                newCb.type = 'checkbox';
-                                newLi.appendChild(newCb);
-                                newLi.appendChild(document.createTextNode(data2.new_task));
-                                taskList.appendChild(newLi);
-                            }
-                        }
-                        fetchPredictiveInsights();
-                        updateDashboard();
-                    }
-                });
-                li.appendChild(cb);
-                li.appendChild(document.createTextNode(t));
-                taskList.appendChild(li);
-            });
-        }
-    } catch(e) { console.warn('Briefing fetch failed', e); }
+        const resultDiv = document.getElementById('d100-result');
+        resultDiv.innerText = data.daily_plan;
+        resultDiv.classList.remove('hidden');
+    } catch(e) { console.error(e); }
+    btn.innerText = "Generate Daily 100";
 }
 
-async function fetchPredictiveInsights() {
+async function runRoleplay() {
+    const btn = event.target; btn.innerText = "Simulating...";
+    const payload = {
+        scenario: document.getElementById('rp-scenario').value,
+        user_message: document.getElementById('rp-message').value
+    };
     try {
-        const res = await fetch(`${API_BASE}/api/predictive-insight?member_id=default`);
+        const res = await fetch('/api/roleplay', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
-        const container = $('insightsContainer');
-        container.innerHTML = '';
-        if (data.insights && data.insights.length > 0) {
-            data.insights.forEach(ins => {
-                const div = document.createElement('div');
-                div.className = 'insight';
-                div.innerHTML = `<span class="severity">${ins.severity.toUpperCase()}:</span> ${ins.message} <span style="font-size:12px;color:var(--gold-light);cursor:pointer;text-decoration:underline;" onclick="alert('${ins.action}')">${ins.action}</span>`;
-                container.appendChild(div);
-            });
-        } else {
-            container.innerHTML = '<div style="color:var(--green);">✅ No critical issues detected. Keep going!</div>';
-        }
-        if (data.health_score !== undefined) {
-            $('healthScore').textContent = data.health_score;
-        }
-    } catch(e) { console.warn('Insights fetch failed', e); }
+        const resultDiv = document.getElementById('rp-result');
+        resultDiv.innerText = data.roleplay_response;
+        resultDiv.classList.remove('hidden');
+    } catch(e) { console.error(e); }
+    btn.innerText = "Simulate Prospect";
 }
-
-$('generateDraftBtn').addEventListener('click', async () => {
-    const platform = $('socialPlatform').value;
-    const topic = $('socialTopic').value || 'business growth';
-    try {
-        const res = await fetch(`${API_BASE}/api/social/draft`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ member_id: 'default', platform: platform, topic: topic })
-        });
-        const data = await res.json();
-        const output = $('socialDraftOutput');
-        output.style.display = 'block';
-        output.textContent = data.draft || 'No draft generated.';
-    } catch(e) { alert('Error generating draft'); }
-});
-
-function onModeChange() {
-    currentMode = $('modeSelect').value;
-    $('modeDisplay').textContent = MODES.find(m => m.id === currentMode)?.label || 'Coach';
-    renderModes();
-}
-
-async function sendMessage() {
-    const text = $('userInput').value.trim();
-    if (!text) return;
-    addMessage(text, 'user');
-    $('userInput').value = '';
-    $('statusText').textContent = 'Thinking...';
-    try {
-        const res = await fetch(`${API_BASE}/api/chat`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, mode: currentMode, member_id: 'default' })
-        });
-        const data = await res.json();
-        if (data.reply) {
-            addMessage(data.reply, 'ai', true);
-        } else {
-            addMessage('No response', 'ai', true);
-        }
-        $('statusText').textContent = 'Ready';
-        fetchPredictiveInsights();
-        updateDashboard();
-    } catch(e) {
-        addMessage('️ Connection error', 'ai', true);
-        $('statusText').textContent = 'Offline';
-    }
-}
-
-function addMessage(text, sender, isHTML = false) {
-    const div = document.createElement('div');
-    div.className = 'message ' + sender;
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.innerHTML = sender === 'ai' ? '<i class="fas fa-brain"></i>' : '<i class="fas fa-user"></i>';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    if (isHTML) bubble.innerHTML = text;
-    else bubble.textContent = text;
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    $('chatMessages').appendChild(div);
-    $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-}
-
-$('sendBtn').addEventListener('click', sendMessage);
-$('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-$('modeSelect').addEventListener('change', onModeChange);
-$('refreshBriefing').addEventListener('click', fetchDailyBriefing);
-
-$('logActionBtn').addEventListener('click', () => {
-    ruleCount++;
-    const today = new Date().toDateString();
-    const dateKey = new Date().toISOString().slice(0,10);
-    dailyHistory[dateKey] = (dailyHistory[dateKey] || 0) + 1;
-    localStorage.setItem('ruleCount', ruleCount);
-    localStorage.setItem('dailyHistory', JSON.stringify(dailyHistory));
-    updateDashboard();
-    if (ruleCount >= 100) alert('🎉 You hit 100 actions today!');
-});
-
-function updateDashboard() {
-    $('ruleCount').textContent = ruleCount;
-    $('ruleProgress').style.width = Math.min((ruleCount/100)*100, 100) + '%';
-    let streakDays = 0;
-    const today = new Date().toISOString().slice(0,10);
-    for (let i=0; i<7; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().slice(0,10);
-        if (dailyHistory[key] && dailyHistory[key] >= 100) streakDays++;
-        else break;
-    }
-    $('streakDisplay').textContent = ' ' + streakDays + 'd';
-    const total = FRAMEWORKS.length;
-    const completed = FRAMEWORKS.filter(f => frameworkProgress[f.id] === 'completed').length;
-    $('healthSub').textContent = completed + '/' + total + ' frameworks completed';
-    const strip = $('fwStrip');
-    strip.innerHTML = '';
-    FRAMEWORKS.forEach(f => {
-        const dot = document.createElement('span');
-        const s = frameworkProgress[f.id] || 'pending';
-        dot.style.cssText = `width:24px;height:6px;border-radius:4px;background:${s==='completed'?'var(--green)':s==='started'?'var(--gold)':'rgba(255,255,255,0.04)'};`;
-        strip.appendChild(dot);
-    });
-    $('revenueDisplay').textContent = '$' + revenue.toLocaleString();
-    $('revenueGoal').textContent = '$' + revenueGoal.toLocaleString();
-    $('revenueProgress').style.width = Math.min((revenue/revenueGoal)*100, 100) + '%';
-}
-
-async function init() {
-    await fetchTier();
-    renderModes();
-    updateDashboard();
-    fetchDailyBriefing();
-    fetchPredictiveInsights();
-    if (localStorage.getItem('fwProgress')) {
-        frameworkProgress = JSON.parse(localStorage.getItem('fwProgress'));
-    }
-    $('modeSelect').value = currentMode;
-    onModeChange();
-}
-
-init();
 </script>
-</body>
-</html>
