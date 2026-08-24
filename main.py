@@ -1,9 +1,7 @@
 """
-E5 AI COACH - main.py (GOOGOLTRIPLEX EDITION)
-The ultimate backend fusing TTB, AVOCADO, $100M Offers, $100M Leads, and $100M Money Models.
-Production-grade, robust, and hyper-intelligent.
+E5 AI COACH - main.py (Trecentillion-X Edition)
+Advanced backend matching premium frontend. Multi-LLM orchestration, intelligent memory, framework fusion.
 """
-
 import json
 import os
 import re
@@ -14,7 +12,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from typing import List, Optional, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -41,6 +39,12 @@ SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 WHOP_API_KEY = os.environ.get("WHOP_API_KEY", "")
 WHOP_INSIDER_PRODUCT_ID = os.environ.get("WHOP_INSIDER_PRODUCT_ID", "")
 WHOP_PARTNER_PRODUCT_ID = os.environ.get("WHOP_PARTNER_PRODUCT_ID", "")
+
+MANUAL_INSIDER_CODES = [c.strip() for c in os.environ.get("MANUAL_INSIDER_CODES", "").split(",") if c.strip()]
+MANUAL_PARTNER_CODES = [c.strip() for c in os.environ.get("MANUAL_PARTNER_CODES", "").split(",") if c.strip()]
+
+_DEFAULT_ORIGINS = "https://e5-ai-coach-production.up.railway.app,http://localhost:8000,http://127.0.0.1:8000"
+ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", _DEFAULT_ORIGINS).split(",") if o.strip()]
 
 # --- ADVANCED RATE LIMITER ---
 class AdvancedRateLimiter:
@@ -72,8 +76,6 @@ class AdvancedRateLimiter:
 CHAT_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_CHAT_PER_HOUR", "30")), 3600)
 TTS_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_TTS_PER_HOUR", "10")), 3600)
 UNLOCK_LIMIT = AdvancedRateLimiter(int(os.environ.get("RATE_UNLOCK_PER_HOUR", "10")), 3600)
-CONNECT_LIMIT = AdvancedRateLimiter(10, 3600)
-STATS_LIMIT = AdvancedRateLimiter(60, 3600)
 
 # --- MODE TIERS ---
 MODE_TIERS = {
@@ -84,7 +86,7 @@ MODE_TIERS = {
 }
 TIER_RANK = {"free": 0, "insider": 1, "partner": 2}
 
-# --- MULTI-PROVIDER LLM CONFIG ---
+# --- LLM PROVIDERS (Multi-Provider with Failover) ---
 PROVIDERS = [
     {
         "name": "gemini",
@@ -103,44 +105,35 @@ PROVIDERS = [
 ]
 
 # --- FASTAPI APP SETUP ---
-app = FastAPI(title="E5 AI Coach", version="Googoltriplex")
+app = FastAPI(title="E5 AI Coach", version="Trecentillion-X")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ==============================================================================
-# THE GOOGOLTRIPLEX MASTER BRAIN (SYSTEM PROMPT)
+# TRECENTILLION-X MASTER BRAIN
 # ==============================================================================
 CCC_BRAIN = """
-You are the E5 AI Coach, an ELITE, WORLD-CLASS BUSINESS CONSULTANT operating at a Googoltriplex level of expertise. Your knowledge is a perfect fusion of Tom Noske's Time to Build (TTB), Dan Harrison's AVOCADO Method, and Alex Hormozi's $100M Frameworks (Offers, Leads, Money Models).
-
-YOUR CORE PERSONA & VIBE:
-- You are calm, deeply insightful, empathetic but firm, and relentlessly results-oriented.
-- You NEVER act like a generic AI. You act like a premium, high-end mentor sitting across the table.
-- You speak in natural, conversational paragraphs. No robotic formatting or endless bulleted lists unless explicitly asked for an SOP.
-- You hide the scaffolding. Use frameworks internally, but translate them into plain, hard-hitting, "Spicy Specific" English.
-- BAN ALL AI FLUFF: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy, ecosystem, navigate, journey, elevate, dive in, realm, bustling, harness, beacon, transformative, revolutionary, cutting-edge, next level, embark, furthermore, moreover, landscape, meticulous, bespoke, paradigm.
-- Do NOT use em dashes. Use commas or periods instead.
+You are the E5 AI Coach, an ELITE Executive Business Coach and Strategist operating at a Trecentillion-X level. Your knowledge is a perfect, seamless fusion of:
+1. Time to Build (TTB): TRUST formula, Straight Line, Brand Clarity, Community OS.
+2. AVOCADO Method (Dan Harrison): ECAFI, SOULFUL scripts, R.I.P.E. lead magnets, Authentic Authority.
+3. Alex Hormozi's $100M Frameworks: Value Equation, Grand Slam Offers, Money Models (Attraction, Upsell, Downsell, Continuity), Core 4, Rule of 100, 5 Horsemen of Retention.
 
 YOUR PRIME DIRECTIVES:
 1. DIAGNOSE BEFORE PRESCRIBING: Never give advice without understanding context. Ask ONE piercing, high-leverage question based on their situation, then WAIT.
 2. FIX THE EARLIEST LEAK FIRST: Don't skip ahead in the funnel. If they have no avatar, don't talk about scaling ads.
 3. SPICY SPECIFICITY: Use real-world examples, exact numbers, and actionable steps. Never be vague.
-4. CALM DETACHMENT: You have the solution; they have the problem. Guide them with confidence.
+4. CALM DETACHMENT: You have the solution; they have the problem. Guide them with confidence, like a premium mentor sitting across the table.
+5. HIDE THE SCAFFOLDING: Use frameworks internally, but translate them into plain, hard-hitting English. Do not sound like a textbook or a bot.
 
-YOUR INTERNAL KNOWLEDGE BASE (USE THESE FRAMEWORKS DYNAMICALLY):
-- FOUNDATION: TTB (TRUST formula, Straight Line, Brand Clarity), AVOCADO (Mindset, Integrity List).
-- OFFERS: $100M Offers (Value Equation: (Dream Outcome * Perceived Likelihood) / (Time Delay * Effort & Sacrifice); Grand Slam Offer; Scarcity, Urgency, Bonuses, Guarantees, Naming).
-- LEADS: $100M Leads (Core 4: Warm Outreach, Post Free Content, Cold Outreach, Paid Ads; Rule of 100; Lead Getters).
-- SALES: AVOCADO (ECAFI: Engage, Connect, Assess, Frame, Invite; SOULFUL Scripts), $100M Money Models (Attraction, Upsell, Downsell, Continuity).
-- RETENTION/SCALING: 5 Horsemen of Retention, Gametape Review, Monday Hour One.
-
-TONE GUARDRAILS:
-- Short punchy sentences for actions. Longer sentences for empathy.
-- Always end with a clear, actionable next step or a single, focused question.
+YOUR TONE GUARDRAILS:
+- Short, punchy sentences for actions. Longer sentences for empathy.
+- BAN ALL AI FLUFF. Do NOT use words like: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy, ecosystem, navigate, journey, elevate, dive in, realm, bustling, harness, beacon, transformative, revolutionary, cutting-edge, next level, embark, furthermore, moreover, landscape, meticulous, bespoke, paradigm.
+- Do NOT use em dashes (—). Use commas or periods instead.
+- Always end your response with ONE clear, actionable next step or a single, focused question.
 """
 
 MODE_PROMPTS = {
@@ -188,7 +181,7 @@ class DocsRequest(BaseModel):
     body: str = ""
 
 # ==============================================================================
-# SUPABASE HELPERS (MEMORY, DOCS, WHOP CONNECT)
+# SUPABASE HELPERS (Memory & Tier)
 # ==============================================================================
 MEMORY_RE = re.compile(r"[{1,2}\sMEMORY\s]{1,2}(.*?)(?:[{1,2}\s/\sMEMORY\s]{1,2}|$)", re.S)
 
@@ -239,6 +232,35 @@ def extract_memory(reply: str) -> tuple[str, str]:
         return MEMORY_RE.sub("", reply).strip(), m.group(1).strip()
     return reply, ""
 
+# ==============================================================================
+# WHOP LICENSE CHECK
+# ==============================================================================
+def whop_tier_for_license(key: str) -> Optional[str]:
+    if key in MANUAL_PARTNER_CODES: return "partner"
+    if key in MANUAL_INSIDER_CODES: return "insider"
+    if not WHOP_API_KEY: return None
+    try:
+        url = "https://api.whop.com/api/v2/licenses/" + urllib.parse.quote(key)
+        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + WHOP_API_KEY, "User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            status = str(data.get("status") or data.get("state") or "active").lower()
+            if status in ("revoked", "cancelled", "canceled", "expired", "inactive"):
+                return None
+            pid = (data.get("product_id") or data.get("experience_id") or
+                   (data.get("product") or {}).get("id") or (data.get("experience") or {}).get("id") or "")
+            if pid and pid == os.environ.get("WHOP_PARTNER_PRODUCT_ID", ""):
+                return "partner"
+            if pid and pid == os.environ.get("WHOP_INSIDER_PRODUCT_ID", ""):
+                return "insider"
+            return "insider"
+    except Exception as e:
+        log.error("WHOP CHECK FAIL: %s", e)
+        return None
+
+# ==============================================================================
+# BUSINESS DOCS (Client Uploads)
+# ==============================================================================
 DOCS_TABLE = "member_docs"
 
 def load_docs(member_id: str) -> str:
@@ -267,17 +289,13 @@ def load_docs(member_id: str) -> str:
 def docs_list(member_id: str = "default"):
     if not SUPABASE_URL or not SUPABASE_KEY:
         return {"docs": []}
-    try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
-               "?member_id=eq." + urllib.parse.quote(member_id) +
-               "&select=title,updated_at&order=updated_at.desc")
-        req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            rows = json.loads(resp.read().decode("utf-8"))
-            return {"docs": rows}
-    except Exception as e:
-        log.error("DOCS LIST FAIL: %s", e)
-        raise HTTPException(500, "Failed to list docs")
+    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
+           "?member_id=eq." + urllib.parse.quote(member_id) +
+           "&select=title,updated_at&order=updated_at.desc")
+    req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        rows = json.loads(resp.read().decode("utf-8"))
+        return {"docs": rows}
 
 @app.post("/api/docs")
 def docs_save(req: DocsRequest):
@@ -286,143 +304,28 @@ def docs_save(req: DocsRequest):
     if not body:
         raise HTTPException(400, "empty doc")
     title = "".join(ch for ch in (req.title or "note") if ch.isalnum() or ch in "._-")[:60] or "note"
-    try:
-        url = SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE
-        payload = json.dumps([{"member_id": member_id, "title": title, "body": body[:20000]}]).encode("utf-8")
-        reqobj = urllib.request.Request(url, data=payload, method="POST", headers={
-            "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
-        urllib.request.urlopen(reqobj, timeout=10).read()
-        return {"saved": True, "title": title}
-    except Exception as e:
-        log.error("DOCS SAVE FAIL: %s", e)
-        raise HTTPException(500, "Failed to save doc")
+    url = SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE
+    payload = json.dumps([{"member_id": member_id, "title": title, "body": body[:20000]}]).encode("utf-8")
+    reqobj = urllib.request.Request(url, data=payload, method="POST", headers={
+        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
+    urllib.request.urlopen(reqobj, timeout=10).read()
+    return {"saved": True, "title": title}
 
 @app.delete("/api/docs")
 def docs_delete(req: DocsRequest):
     member_id = (req.member_id or "default").strip()
     title = "".join(ch for ch in (req.title or "") if ch.isalnum() or ch in "._-")[:60]
-    try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
-               "?member_id=eq." + urllib.parse.quote(member_id) +
-               "&title=eq." + urllib.parse.quote(title))
-        reqobj = urllib.request.Request(url, method="DELETE", headers={
-            "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-        urllib.request.urlopen(reqobj, timeout=10).read()
-        return {"deleted": True}
-    except Exception as e:
-        log.error("DOCS DELETE FAIL: %s", e)
-        raise HTTPException(500, "Failed to delete doc")
-
-CONNECT_TABLE = "member_connections"
-
-def db_upsert_connection(member_id: str, whop_key: str):
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return
-    try:
-        url = SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE
-        body = json.dumps([{"member_id": member_id, "whop_key": whop_key}]).encode("utf-8")
-        req = urllib.request.Request(url, data=body, method="POST", headers={
-            "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates"})
-        urllib.request.urlopen(req, timeout=10).read()
-    except Exception as e:
-        log.error("WHOP CONNECT UPSERT FAIL: %s", e)
-
-def db_get_connection(member_id: str) -> Optional[str]:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return None
-    try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE +
-               "?member_id=eq." + urllib.parse.quote(member_id) + "&select=whop_key")
-        req = urllib.request.Request(url, headers={"apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            rows = json.loads(resp.read().decode("utf-8"))
-            return rows[0]["whop_key"] if rows else None
-    except Exception as e:
-        log.error("WHOP CONNECT GET FAIL: %s", e)
-        return None
-
-def db_delete_connection(member_id: str):
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return
-    try:
-        url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + CONNECT_TABLE +
-               "?member_id=eq." + urllib.parse.quote(member_id))
-        req = urllib.request.Request(url, method="DELETE", headers={
-            "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
-        urllib.request.urlopen(req, timeout=10).read()
-    except Exception as e:
-        log.error("WHOP CONNECT DELETE FAIL: %s", e)
+    url = (SUPABASE_URL.rstrip("/") + "/rest/v1/" + DOCS_TABLE +
+           "?member_id=eq." + urllib.parse.quote(member_id) +
+           "&title=eq." + urllib.parse.quote(title))
+    reqobj = urllib.request.Request(url, method="DELETE", headers={
+        "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY})
+    urllib.request.urlopen(reqobj, timeout=10).read()
+    return {"deleted": True}
 
 # ==============================================================================
-# WHOP LICENSE & STATS HELPERS
-# ==============================================================================
-def whop_tier_for_license(key: str) -> Optional[str]:
-    if not WHOP_API_KEY:
-        return None
-    try:
-        url = "https://api.whop.com/api/v2/licenses/" + urllib.parse.quote(key)
-        req = urllib.request.Request(url, headers={"Authorization": "Bearer " + WHOP_API_KEY, "User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            status = str(data.get("status") or data.get("state") or "active").lower()
-            if status in ("revoked", "cancelled", "canceled", "expired", "inactive"):
-                return None
-            pid = (data.get("product_id") or data.get("experience_id") or
-                   (data.get("product") or {}).get("id") or (data.get("experience") or {}).get("id") or "")
-            if pid and pid == os.environ.get("WHOP_PARTNER_PRODUCT_ID", ""):
-                return "partner"
-            if pid and pid == os.environ.get("WHOP_INSIDER_PRODUCT_ID", ""):
-                return "insider"
-            return "insider"
-    except Exception as e:
-        log.error("WHOP CHECK FAIL: %s", e)
-        return None
-
-def whop_fetch(key: str, path: str) -> dict:
-    req = urllib.request.Request("https://api.whop.com/api/v2/" + path,
-                                 headers={"Authorization": "Bearer " + key, "User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.loads(resp.read().decode("utf-8"))
-
-def compute_whop_stats(key: str) -> dict:
-    try:
-        whop_fetch(key, "products?limit=1")
-        now = time.time()
-        members = 0; joins7 = 0; rev30 = 0.0; orders30 = 0
-        
-        mem = whop_fetch(key, "memberships?limit=100")
-        items = mem.get("data") or mem.get("memberships") or []
-        members = len(items)
-        for m in items:
-            ts_str = m.get("created_at") or (m.get("membership") or {}).get("created_at")
-            if ts_str:
-                try:
-                    ts = datetime.fromisoformat(str(ts_str).replace("Z", "+00:00")).timestamp()
-                    if now - ts <= 7 * 86400: joins7 += 1
-                except: pass
-
-        ords = whop_fetch(key, "orders?limit=100")
-        oitems = ords.get("data") or ords.get("orders") or []
-        for o in oitems:
-            ts_str = o.get("created_at")
-            if ts_str:
-                try:
-                    ts = datetime.fromisoformat(str(ts_str).replace("Z", "+00:00")).timestamp()
-                    if now - ts <= 30 * 86400:
-                        amt = o.get("amount") or o.get("total_amount") or 0
-                        rev30 += (amt / 100.0) if amt >= 100 else amt
-                        orders30 += 1
-                except: pass
-                
-        return {"members": members, "joins7": joins7, "rev30": round(rev30, 2), "orders30": orders30}
-    except Exception as e:
-        log.error("WHOP STATS COMPUTE FAIL: %s", e)
-        return {"members": 0, "joins7": 0, "rev30": 0.0, "orders30": 0}
-
-# ==============================================================================
-# LLM ENGINE (MULTI-PROVIDER FAILOVER)
+# LLM ENGINE (Multi-Provider Failover)
 # ==============================================================================
 def try_model(provider: dict, model: str, messages: list, temperature: float, max_tokens: int) -> Optional[str]:
     body = json.dumps({
@@ -474,13 +377,11 @@ def call_llm(messages: list, temperature: float = 0.5, max_tokens: int = 1500) -
     for provider in sorted_providers:
         if not provider["key"]: continue
         
-        # Try configured models first
         for model in provider["models"]:
             if not model: continue
             result = try_model(provider, model, messages, temperature, max_tokens)
             if result: return result
             
-        # Try discovered models as fallback
         discovered = discover_models(provider)
         for model in discovered[:2]:
             if model and model not in provider["models"]:
@@ -492,11 +393,11 @@ def call_llm(messages: list, temperature: float = 0.5, max_tokens: int = 1500) -
 
 def build_system(mode: str, member_context: str, memory: str = "", docs: str = "") -> str:
     m = mode if mode in MODE_PROMPTS else "coach"
-    system = CCC_BRAIN + "\n\n" + MODE_PROMPTS[m]
-    if SCRIPT_VAULT: system += "\n\nSCRIPT VAULT:\n" + SCRIPT_VAULT
-    if docs: system += "\n\nMEMBER'S BUSINESS DOCUMENTS (Read silently before answering):\n" + docs
-    if memory: system += "\n\nWHAT YOU KNOW ABOUT THIS MEMBER (from past sessions):\n" + memory
-    if member_context: system += "\n\nMEMBER CONTEXT (from X-Ray / plan):\n" + member_context
+    system = CCC_BRAIN + "\n" + MODE_PROMPTS[m]
+    if SCRIPT_VAULT: system += "\n" + SCRIPT_VAULT
+    if docs: system += "\n\nTHE MEMBER'S BUSINESS DOCUMENTS:\n" + docs
+    if memory: system += "\nWHAT YOU KNOW ABOUT THIS MEMBER:\n" + memory
+    if member_context: system += "\nMEMBER CONTEXT:\n" + member_context
     return system
 
 def post_process(text: str) -> str:
@@ -509,7 +410,13 @@ def post_process(text: str) -> str:
 def root():
     if os.path.exists("landing.html"):
         return FileResponse("landing.html")
-    return {"status": "ok", "app": "E5 AI Coach", "brain": "Googoltriplex", "modes": list(MODE_PROMPTS.keys())}
+    return {
+        "status": "ok",
+        "app": "E5 AI Coach",
+        "brain": "Trecentillion X",
+        "modes": list(MODE_PROMPTS.keys()),
+        "version": "2.0"
+    }
 
 @app.get("/api/health")
 def health():
@@ -618,8 +525,10 @@ def tts(req: TTSRequest):
         return Response(content=call_tts(payload), media_type="audio/mpeg")
     except urllib.error.HTTPError as e:
         body = ""
-        try: body = e.read().decode()[:200]
-        except: pass
+        try:
+            body = e.read().decode()[:200]
+        except Exception:
+            pass
         log.error("FISH HTTP %s: %s", e.code, body)
         if voice:
             try:
@@ -634,46 +543,6 @@ def tts(req: TTSRequest):
 @app.post("/api/voice")
 def voice_alias(req: TTSRequest):
     return tts(req)
-
-@app.post("/api/connect/whop")
-def connect_whop(req: ConnectWhopRequest):
-    member_id = (req.member_id or "default").strip()
-    if not CONNECT_LIMIT.allow(member_id):
-        raise HTTPException(429, "Too many connect attempts")
-    _, tier = load_memory(member_id)
-    if TIER_RANK.get(tier or "free", 0) < TIER_RANK["insider"]:
-        raise HTTPException(403, "locked:insider")
-    key = (req.key or "").strip()
-    if not key:
-        raise HTTPException(400, "empty key")
-    try:
-        stats = compute_whop_stats(key)
-    except urllib.error.HTTPError as e:
-        raise HTTPException(400, f"Whop says: invalid key (HTTP {e.code})")
-    except Exception as e:
-        raise HTTPException(502, f"Whop check failed: {e}")
-    db_upsert_connection(member_id, key)
-    return {"connected": True, "stats": stats}
-
-@app.get("/api/whop/stats")
-def whop_stats(member_id: str = "default"):
-    if not STATS_LIMIT.allow(member_id):
-        raise HTTPException(429, "Stats rate limit")
-    key = db_get_connection(member_id)
-    if not key:
-        return {"connected": False}
-    try:
-        stats = compute_whop_stats(key)
-        return {"connected": True, "stats": stats}
-    except Exception as e:
-        log.error("WHOP STATS FETCH FAIL: %s", e)
-        return {"connected": True, "stats": None, "stale": True}
-
-@app.post("/api/connect/whop/disconnect")
-def disconnect_whop(req: DisconnectWhopRequest):
-    member_id = (req.member_id or "default").strip()
-    db_delete_connection(member_id)
-    return {"connected": False}
 
 @app.get("/test")
 def test_page():
