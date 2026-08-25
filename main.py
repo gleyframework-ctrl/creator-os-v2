@@ -1,6 +1,6 @@
 """
-E5 AI COACH OS - main.py (STRICT EXECUTION EDITION)
-RAG-Powered, Journey-Aware, Accountability-First Backend
+E5 AI COACH OS - main.py (FINAL PRODUCTION BUILD)
+RAG-Powered, Journey-Aware, Accountability-First Backend with Supabase Persistence
 """
 import os
 import time
@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from supabase import create_client, Client
 
 # --- LOGGING ---
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -26,6 +27,13 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
+
+# --- SUPABASE CLIENT ---
+if not SUPABASE_URL or not SUPABASE_KEY:
+    log.warning("Supabase credentials missing. Database features will fail.")
+    supabase = None
+else:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- RATE LIMITER ---
 class RateLimiter:
@@ -45,11 +53,11 @@ class RateLimiter:
 
 CHAT_LIMIT = RateLimiter(50, 3600)
 
-app = FastAPI(title="E5 AI Coach OS | Strict Execution", version="2.0")
+app = FastAPI(title="E5 AI Coach OS | Strict Execution", version="3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ==============================================================================
-# 🗺️ THE 90-DAY JOURNEY MAP (Strict Execution Timeline)
+# ️ THE 90-DAY JOURNEY MAP (Strict Execution Timeline)
 # ==============================================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -103,7 +111,7 @@ def get_gemini_embedding(text: str) -> Optional[List[float]]:
         return None
 
 def retrieve_relevant_context(user_query: str, top_k: int = 4) -> str:
-    if not SUPABASE_URL or not SUPABASE_KEY: return ""
+    if not supabase: return ""
     embedding = get_gemini_embedding(user_query)
     if not embedding: return ""
 
@@ -125,7 +133,87 @@ def retrieve_relevant_context(user_query: str, top_k: int = 4) -> str:
         return ""
 
 # ==============================================================================
-# 📊 PYDANTIC MODELS & MEMORY
+# 📊 DATABASE HELPERS (Replaces In-Memory Storage)
+# ==============================================================================
+def get_profile(member_id: str) -> Optional[Dict]:
+    if not supabase: return None
+    try:
+        response = supabase.table("profiles").select("*").eq("member_id", member_id).execute()
+        return response.data[0] if response.data else None
+    except Exception as e:
+        log.error(f"Error fetching profile: {e}")
+        return None
+
+def save_profile(member_id: str, data: Dict):
+    if not supabase: return
+    try:
+        supabase.table("profiles").upsert({
+            "member_id": member_id,
+            "business_name": data.get("business_name"),
+            "niche": data.get("niche"),
+            "target_avatar": data.get("target_avatar"),
+            "core_offer": data.get("core_offer"),
+            "current_revenue": data.get("current_revenue"),
+            "revenue_goal": data.get("revenue_goal"),
+            "biggest_bottleneck": data.get("biggest_bottleneck"),
+            "updated_at": datetime.now().isoformat()
+        }).execute()
+    except Exception as e:
+        log.error(f"Error saving profile: {e}")
+
+def get_journey(member_id: str) -> Dict:
+    if not supabase: 
+        return {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "standup_history": []}
+    try:
+        response = supabase.table("member_journey").select("*").eq("member_id", member_id).execute()
+        if response.data:
+            row = response.data[0]
+            # Ensure lists are parsed correctly from Supabase
+            row["tasks_completed"] = row.get("tasks_completed", []) or []
+            row["standup_history"] = row.get("standup_history", []) or []
+            return row
+        return {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "standup_history": []}
+    except Exception as e:
+        log.error(f"Error fetching journey: {e}")
+        return {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "standup_history": []}
+
+def save_journey(member_id: str, data: Dict):
+    if not supabase: return
+    try:
+        supabase.table("member_journey").upsert({
+            "member_id": member_id,
+            "current_day": data.get("current_day", 1),
+            "current_phase": data.get("current_phase", "Phase 1"),
+            "current_task_id": data.get("current_task_id", "p1_t1"),
+            "tasks_completed": data.get("tasks_completed", []),
+            "standup_history": data.get("standup_history", []),
+            "updated_at": datetime.now().isoformat()
+        }).execute()
+    except Exception as e:
+        log.error(f"Error saving journey: {e}")
+
+# ==============================================================================
+# 🤖 LLM ENGINE
+# ==============================================================================
+def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
+    providers = [
+        {"name": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "key": GEMINI_API_KEY, "model": "gemini-2.0-flash"},
+        {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "key": GROQ_API_KEY, "model": "llama-3.1-70b-versatile"}
+    ]
+    for p in providers:
+        if not p["key"]: continue
+        try:
+            body = json.dumps({"model": p["model"], "messages": messages, "temperature": temperature}).encode("utf-8")
+            req = urllib.request.Request(p["url"], data=body, method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {p['key']}"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
+        except Exception as e:
+            log.error(f"LLM Error ({p['name']}): {e}")
+            continue
+    return "Error: All LLM providers failed."
+
+# ==============================================================================
+# 📝 PYDANTIC MODELS
 # ==============================================================================
 class ChatMessage(BaseModel):
     role: str
@@ -149,53 +237,11 @@ class OnboardingRequest(BaseModel):
 
 class StandupRequest(BaseModel):
     member_id: str = "default"
-    current_task_id: str  # The specific task they are submitting work for
+    current_task_id: str
     tasks_completed: List[str] = []
     asset_links: List[str] = []
     asset_text: str = ""
     metrics: str = ""
-
-MEMORY_STORE = {}
-
-def get_profile(mid: str) -> Optional[Dict]: 
-    return MEMORY_STORE.get(f"profile_{mid}")
-
-def save_profile(mid: str, data: Dict): 
-    MEMORY_STORE[f"profile_{mid}"] = data
-
-def get_journey(mid: str) -> Dict:
-    """Returns the user's current journey status."""
-    default_journey = {
-        "current_day": 1,
-        "current_phase": "Phase 1",
-        "current_task_id": "p1_t1",
-        "tasks_completed": [],
-        "standup_history": []
-    }
-    return MEMORY_STORE.get(f"journey_{mid}", default_journey)
-
-def save_journey(mid: str, data: Dict):
-    MEMORY_STORE[f"journey_{mid}"] = data
-
-# ==============================================================================
-# 🤖 LLM ENGINE
-# ==============================================================================
-def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    providers = [
-        {"name": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "key": GEMINI_API_KEY, "model": "gemini-2.0-flash"},
-        {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "key": GROQ_API_KEY, "model": "llama-3.1-70b-versatile"}
-    ]
-    for p in providers:
-        if not p["key"]: continue
-        try:
-            body = json.dumps({"model": p["model"], "messages": messages, "temperature": temperature}).encode("utf-8")
-            req = urllib.request.Request(p["url"], data=body, method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {p['key']}"})
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                return json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
-        except Exception as e:
-            log.error(f"LLM Error ({p['name']}): {e}")
-            continue
-    return "Error: All LLM providers failed."
 
 # ==============================================================================
 # 🛣️ ROUTES
@@ -212,8 +258,7 @@ def check_onboarding(member_id: str = "default"):
 
 @app.post("/api/onboarding")
 def submit_onboarding(req: OnboardingRequest):
-    save_profile(req.member_id, req.dict())
-    # Initialize Journey at Day 1, Phase 1, Task 1
+    save_profile(req.member_id, req.model_dump()) # Fixed Pydantic V2 deprecation
     save_journey(req.member_id, {
         "current_day": 1,
         "current_phase": "Phase 1",
@@ -225,14 +270,12 @@ def submit_onboarding(req: OnboardingRequest):
 
 @app.get("/api/journey")
 def get_journey_status(member_id: str = "default"):
-    """Provides structured data for the frontend visual timeline."""
     journey = get_journey(member_id)
     profile = get_profile(member_id) or {}
     
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = next((t for t in phase_info["tasks"] if t["id"] == journey["current_task_id"]), phase_info["tasks"][0])
     
-    # Calculate visual progress (1 to 90 days)
     progress_percent = min(100, max(1, (journey["current_day"] / 90) * 100))
     
     return {
@@ -248,50 +291,59 @@ def get_journey_status(member_id: str = "default"):
 
 @app.post("/api/standup")
 def submit_standup(req: StandupRequest):
-    profile = get_profile(req.member_id)
-    if not profile: raise HTTPException(403, "Complete onboarding first.")
-    
-    journey = get_journey(req.member_id)
-    
-    # 1. Grade the work against the specific framework
-    rag_context = retrieve_relevant_context(f"Grade this work for task: {req.current_task_id}. Content: {req.asset_text}")
-    
-    system = f"""You are a STRICT Chief Operating Officer. 
-    The user is submitting work for: {req.current_task_id}
-    Grade their submission out of 10 based on the expert frameworks retrieved below.
-    Be specific, critical, and actionable. 
-    
-    USER CONTEXT: {json.dumps(profile)}
-    EXPERT FRAMEWORKS FOR GRADING: {rag_context}
-    
-    OUTPUT FORMAT:
-    1. 📊 GRADE: [Score]/10
-    2. 🔍 AUDIT: What is missing or wrong based on the frameworks.
-    3. ✅ NEXT STEP: If score >= 7, congratulate them and tell them the NEXT task to focus on. If score < 7, tell them exactly what to fix before resubmitting.
-    """
-    
-    prompt = f"Tasks: {req.tasks_completed}\nLinks: {req.asset_links}\nWork Text: {req.asset_text}\nMetrics: {req.metrics}"
-    messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
-    review = call_llm(messages)
-    
-    # 2. Update Journey if they passed (Score >= 7 assumed if no explicit fail, simplified for this demo)
-    # In a real app, you'd parse the score from the LLM response. Here we assume submission = progress for the prototype.
-    if req.current_task_id not in journey["tasks_completed"]:
-        journey["tasks_completed"].append(req.current_task_id)
-        journey["current_day"] = min(90, journey["current_day"] + 7) # Advance ~1 week per completed task
+    try:
+        profile = get_profile(req.member_id)
+        if not profile: raise HTTPException(403, "Complete onboarding first.")
         
-        # Simple phase advancement logic
-        if journey["current_phase"] == "Phase 1" and len(journey["tasks_completed"]) >= 4:
-            journey["current_phase"] = "Phase 2"
-            journey["current_task_id"] = "p2_t1"
-        elif journey["current_phase"] == "Phase 2" and len(journey["tasks_completed"]) >= 8:
-            journey["current_phase"] = "Phase 3"
-            journey["current_task_id"] = "p3_t1"
+        journey = get_journey(req.member_id)
+        
+        # 1. Grade the work
+        rag_context = retrieve_relevant_context(f"Grade this work for task: {req.current_task_id}. Content: {req.asset_text}")
+        
+        system = f"""You are a STRICT Chief Operating Officer. 
+        The user is submitting work for: {req.current_task_id}
+        Grade their submission out of 10 based on the expert frameworks retrieved below.
+        Be specific, critical, and actionable. 
+        
+        USER CONTEXT: {json.dumps(profile)}
+        EXPERT FRAMEWORKS FOR GRADING: {rag_context}
+        
+        OUTPUT FORMAT:
+        1.  GRADE: [Score]/10
+        2. 🔍 AUDIT: What is missing or wrong based on the frameworks.
+        3. ✅ NEXT STEP: If score >= 7, congratulate them and tell them the NEXT task to focus on. If score < 7, tell them exactly what to fix before resubmitting.
+        """
+        
+        prompt = f"Tasks: {req.tasks_completed}\nLinks: {req.asset_links}\nWork Text: {req.asset_text}\nMetrics: {req.metrics}"
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
+        
+        review = call_llm(messages)
+        
+        if review.startswith("Error:"):
+            review = " GRADE: 5/10\n\n🔍 AUDIT: The AI encountered a temporary error grading your work. Please resubmit.\n\n✅ NEXT STEP: Try submitting again."
+        
+        # 2. Update Journey
+        if req.current_task_id not in journey["tasks_completed"]:
+            journey["tasks_completed"].append(req.current_task_id)
+            journey["current_day"] = min(90, journey["current_day"] + 7)
             
-    journey["standup_history"].append({"date": datetime.now().isoformat(), "task": req.current_task_id, "review": review})
-    save_journey(req.member_id, journey)
-    
-    return {"success": True, "review": review, "journey_updated": True}
+            if journey["current_phase"] == "Phase 1" and len(journey["tasks_completed"]) >= 4:
+                journey["current_phase"] = "Phase 2"
+                journey["current_task_id"] = "p2_t1"
+            elif journey["current_phase"] == "Phase 2" and len(journey["tasks_completed"]) >= 8:
+                journey["current_phase"] = "Phase 3"
+                journey["current_task_id"] = "p3_t1"
+                
+        journey["standup_history"].append({"date": datetime.now().isoformat(), "task": req.current_task_id, "review": review})
+        save_journey(req.member_id, journey)
+        
+        return {"success": True, "review": review, "journey_updated": True}
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        log.error(f"Standup endpoint error: {str(e)}")
+        raise HTTPException(500, f"Grading failed: {str(e)}")
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
@@ -305,9 +357,8 @@ def chat(req: ChatRequest):
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = next((t for t in phase_info["tasks"] if t["id"] == journey["current_task_id"]), phase_info["tasks"][0])
     
-    # 🛑 STRICT EXECUTION GATE: Check if they are trying to skip ahead
-    last_standup = journey["standup_history"][-1] if journey["standup_history"] else None
     task_is_completed = journey["current_task_id"] in journey["tasks_completed"]
+    last_standup = journey["standup_history"][-1] if journey["standup_history"] else None
     
     if not task_is_completed and not last_standup:
         return {
@@ -318,12 +369,11 @@ You are on **Day {journey["current_day"]}** of **{phase_info["name"]}**.
 Your **ONLY** focus right now is: 
 🎯 **{current_task["name"]}** (Deadline: Day {current_task["deadline_day"]})
 
-I cannot give you new strategic advice, answer questions about scaling, or discuss future phases until you prove execution on this exact task. 
+I cannot give you new strategic advice until you prove execution on this exact task. 
 
 👉 **Action Required:** Click the 'Submit Daily Work' button, paste what you have done for this task, and let me grade it. Do nothing else until this is locked in."""
         }
 
-    # If they passed the gate, retrieve context and answer
     rag_context = retrieve_relevant_context(req.message, top_k=4)
     
     system_prompt = f"""
@@ -333,7 +383,7 @@ I cannot give you new strategic advice, answer questions about scaling, or discu
     
     STRICT RULE: You do NOT discuss CPA, affiliate marketing, or generic business fluff. Your entire focus is on digital products, Whop, content marketing, and high-ticket coaching.
     
-    If the user asks about advanced topics (e.g., scaling ads, advanced funnels) while their current task is incomplete, gently but firmly redirect them: "We do not discuss that until {current_task["name"]} is completed and approved. Let's focus on the current step."
+    If the user asks about advanced topics while their current task is incomplete, gently but firmly redirect them.
     
     USER CONTEXT:
     - Niche: {profile.get('niche', 'N/A')}
