@@ -1,6 +1,6 @@
 """
-E5 AI COACH OS - main.py (FINAL PRODUCTION BUILD)
-RAG-Powered Dynamic Framework Router + Strict Accountability + Stateful Memory
+E5 AI COACH OS - main.py (FINAL WHOP EDITION)
+RAG-Powered Dynamic Framework Router + Strict Accountability + Whop Identity
 """
 import os
 import time
@@ -8,14 +8,12 @@ import logging
 import threading
 import urllib.request
 import urllib.error
-import urllib.parse
 import json
 from typing import List, Optional, Dict, Any
-from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 # --- LOGGING ---
@@ -24,6 +22,7 @@ log = logging.getLogger("e5-coach")
 
 # --- ENV VARS ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
 
@@ -45,58 +44,42 @@ class RateLimiter:
 
 CHAT_LIMIT = RateLimiter(50, 3600)
 
-app = FastAPI(title="E5 AI Coach OS", version="Googol-Plex-Final")
+app = FastAPI(title="E5 AI Coach OS | Whop Edition", version="Final")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ==============================================================================
 # 🧠 GOOGOL-PLEX RAG RETRIEVAL ENGINE
 # ==============================================================================
 def get_gemini_embedding(text: str) -> Optional[List[float]]:
-    """Generates vector embedding using Gemini's text-embedding-004 model."""
-    if not GEMINI_API_KEY:
-        return None
+    if not GEMINI_API_KEY: return None
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={GEMINI_API_KEY}"
         payload = json.dumps({"model": "models/text-embedding-004", "content": {"parts": [{"text": text}]}}).encode("utf-8")
         req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["embedding"]["values"]
+            return json.loads(resp.read().decode("utf-8"))["embedding"]["values"]
     except Exception as e:
         log.error(f"Embedding Error: {e}")
         return None
 
 def retrieve_relevant_context(user_query: str, top_k: int = 4) -> str:
-    """Searches the Supabase vector database for the most relevant framework chunks."""
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        return ""
-    
+    if not SUPABASE_URL or not SUPABASE_KEY: return ""
     embedding = get_gemini_embedding(user_query)
-    if not embedding:
-        return ""
+    if not embedding: return ""
 
     try:
-        # Call the match_chunks RPC function we created in Supabase
         url = f"{SUPABASE_URL.rstrip('/')}/rest/v1/rpc/match_chunks"
-        payload = json.dumps({
-            "query_embedding": embedding,
-            "match_count": top_k
-        }).encode("utf-8")
-        
+        payload = json.dumps({"query_embedding": embedding, "match_count": top_k}).encode("utf-8")
         req = urllib.request.Request(url, data=payload, method="POST", headers={
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}"
+            "Content-Type": "application/json", "apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"
         })
-        
         with urllib.request.urlopen(req, timeout=10) as resp:
             results = json.loads(resp.read().decode("utf-8"))
             
         context = "\n\n--- RETRIEVED EXPERT FRAMEWORKS ---\n"
         for row in results:
-            context += f"\n[Source: {row.get('framework_name', 'Unknown')} | File: {row.get('source_file', 'Unknown')}]\n{row.get('content', '')}\n"
-        context += "--- END RETRIEVED CONTEXT ---\n"
-        return context
+            context += f"\n[Source: {row.get('framework_name', 'Unknown')}]\n{row.get('content', '')}\n"
+        return context + "--- END RETRIEVED CONTEXT ---\n"
     except Exception as e:
         log.error(f"RAG Retrieval Error: {e}")
         return ""
@@ -132,51 +115,38 @@ class StandupRequest(BaseModel):
     metrics: str = ""
 
 MEMORY_STORE = {}
-
-def get_profile(member_id: str) -> Optional[Dict]:
-    return MEMORY_STORE.get(f"profile_{member_id}")
-
-def save_profile(member_id: str, data: Dict):
-    MEMORY_STORE[f"profile_{member_id}"] = data
-
-def get_standup(member_id: str) -> Optional[Dict]:
-    return MEMORY_STORE.get(f"standup_{member_id}")
-
-def save_standup(member_id: str, data: Dict):
-    MEMORY_STORE[f"standup_{member_id}"] = data
+def get_profile(mid: str) -> Optional[Dict]: return MEMORY_STORE.get(f"profile_{mid}")
+def save_profile(mid: str, data: Dict): MEMORY_STORE[f"profile_{mid}"] = data
+def get_standup(mid: str) -> Optional[Dict]: return MEMORY_STORE.get(f"standup_{mid}")
+def save_standup(mid: str, data: Dict): MEMORY_STORE[f"standup_{mid}"] = data
 
 # ==============================================================================
-# 🤖 LLM ENGINE (Gemini / Groq Fallback)
+# 🤖 LLM ENGINE
 # ==============================================================================
 def call_llm(messages: List[Dict], temperature: float = 0.4) -> str:
     providers = [
         {"name": "gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "key": GEMINI_API_KEY, "model": "gemini-2.0-flash"},
-        {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "key": os.environ.get("GROQ_API_KEY", ""), "model": "llama-3.1-70b-versatile"}
+        {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "key": GROQ_API_KEY, "model": "llama-3.1-70b-versatile"}
     ]
-    
     for p in providers:
         if not p["key"]: continue
         try:
             body = json.dumps({"model": p["model"], "messages": messages, "temperature": temperature}).encode("utf-8")
-            req = urllib.request.Request(p["url"], data=body, method="POST", headers={
-                "Content-Type": "application/json", "Authorization": f"Bearer {p['key']}"
-            })
+            req = urllib.request.Request(p["url"], data=body, method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {p['key']}"})
             with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return data["choices"][0]["message"]["content"]
+                return json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
         except Exception as e:
             log.error(f"LLM Error ({p['name']}): {e}")
             continue
-    return "Error: All LLM providers failed. Please check API keys."
+    return "Error: All LLM providers failed."
 
 # ==============================================================================
 # 🛣️ ROUTES
 # ==============================================================================
 @app.get("/")
 def root():
-    if os.path.exists("chat_test.html"):
-        return FileResponse("chat_test.html")
-    return {"status": "ok", "app": "E5 AI Coach Googol-Plex"}
+    if os.path.exists("chat_test.html"): return FileResponse("chat_test.html")
+    return {"status": "ok"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -186,65 +156,54 @@ def check_onboarding(member_id: str = "default"):
 @app.post("/api/onboarding")
 def submit_onboarding(req: OnboardingRequest):
     save_profile(req.member_id, req.dict())
-    return {"success": True, "message": "Onboarding complete. AI Coach activated."}
+    return {"success": True}
 
 @app.post("/api/standup")
 def submit_standup(req: StandupRequest):
     profile = get_profile(req.member_id)
-    if not profile:
-        raise HTTPException(403, "Complete onboarding first.")
-    
+    if not profile: raise HTTPException(403, "Complete onboarding first.")
     save_standup(req.member_id, req.dict())
     
-    # RAG Context for Grading
     rag_context = retrieve_relevant_context(f"Grade this standup: {req.asset_text} {req.metrics}")
     
-    system = f"""You are a STRICT Chief Operating Officer. 
-    Your job is to grade the user's daily work against the expert frameworks retrieved below.
-    Do not give generic praise. Be specific, critical, and actionable.
+    system = f"""You are a STRICT Chief Operating Officer for a Whop Digital Product Creator.
+    Grade the user's daily work against the expert frameworks retrieved below.
+    Be specific, critical, and actionable. No generic praise.
     
     USER CONTEXT: {json.dumps(profile)}
-    
-    EXPERT FRAMEWORKS FOR GRADING:
-    {rag_context}
+    EXPERT FRAMEWORKS FOR GRADING: {rag_context}
     
     OUTPUT FORMAT:
-    1. 📊 **GRADE**: Score out of 10.
-    2. 🔍 **AUDIT**: Point out EXACTLY what is missing or wrong based on the frameworks.
-    3. ✅ **NEXT STEP**: Give ONE specific, actionable task for tomorrow.
-    """
+    1. 📊 GRADE (Out of 10)
+    2. 🔍 AUDIT (What is missing/wrong based on frameworks)
+    3. ✅ NEXT STEP (One specific task for tomorrow)"""
     
     prompt = f"Tasks: {req.tasks_completed}\nLinks: {req.asset_links}\nWork Text: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
-    
-    review = call_llm(messages)
-    return {"success": True, "review": review}
+    return {"success": True, "review": call_llm(messages)}
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    if not req.message:
-        raise HTTPException(400, "empty message")
-    if not CHAT_LIMIT.allow(req.member_id or "default"):
-        raise HTTPException(429, "Rate limit reached")
+    if not req.message: raise HTTPException(400, "empty message")
+    if not CHAT_LIMIT.allow(req.member_id or "default"): raise HTTPException(429, "Rate limit reached")
     
     profile = get_profile(req.member_id or "default")
-    if not profile:
-        raise HTTPException(403, "GATEKEEPER: Please complete the onboarding quiz first.")
+    if not profile: raise HTTPException(403, "GATEKEEPER: Please complete onboarding first.")
     
     standup = get_standup(req.member_id or "default")
-    
-    # Accountability Check
     if not standup and "standup" not in req.message.lower():
         return {"reply": "🛑 **ACCOUNTABILITY GATE TRIGGERED**\n\nYou have not submitted your Daily Standup. As your COO, I cannot give you new strategic advice until you prove execution.\n\nPlease click the 'Submit Daily Work' button, log what you did today, and I will grade it before we proceed."}
 
-    # 1. RETRIEVE CONTEXT (The RAG Magic)
     rag_context = retrieve_relevant_context(req.message, top_k=4)
     
-    # 2. Build the Dynamic System Prompt
     system_prompt = f"""
-    You are the E5 AI Coach, an elite, proactive Chief Operating Officer.
-    Your tone is calm, deeply insightful, slightly detached, and authoritative. Short punchy sentences for actions.
-    ZERO AI FLUFF. Banned words: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy.
+    You are the E5 AI Coach, an elite, proactive Chief Operating Officer designed EXCLUSIVELY to help creators, coaches, and business owners launch, sell, and scale digital products, courses, and communities on Whop.
+    
+    STRICT RULE: You do NOT discuss CPA marketing, affiliate marketing, email infrastructure, domain burns, or SMTP. Your entire focus is on digital products, course creation, Whop community building, content marketing, and high-ticket coaching.
+    
+    TRANSLATION RULE: The knowledge base contains raw expert frameworks. You MUST translate the core mechanics of these frameworks to apply strictly to Whop digital products. If a retrieved framework mentions irrelevant examples, ignore them and apply the underlying psychological or structural principle to Whop product launches, course sales, or community growth.
+    
+    YOUR TONE: Calm, deeply insightful, slightly detached, authoritative. Short punchy sentences. ZERO AI FLUFF. Banned words: delve, tapestry, unleash, unlock, game-changing, robust, seamless, synergy.
     
     USER CONTEXT:
     - Niche: {profile.get('niche', 'N/A')}
@@ -256,29 +215,19 @@ def chat(req: ChatRequest):
     
     INSTRUCTIONS:
     You MUST base your advice strictly on the [EXPERT KNOWLEDGE RETRIEVED] above. 
-    If the retrieved context contains the exact framework (e.g., S.L.P.C., Socratic Six, ASK Method), use it explicitly. 
-    Do not hallucinate generic advice. If no context is retrieved, rely on your core directives.
+    If the retrieved context contains the exact framework (e.g., S.L.P.C., Socratic Six, ASK Method, Value Equation), use it explicitly. 
+    Do not hallucinate generic advice.
     """
     
     messages = [{"role": "system", "content": system_prompt}]
-    for m in req.history[-10:]:
-        messages.append({"role": m.role, "content": m.content})
+    for m in req.history[-10:]: messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": req.message})
     
     try:
-        reply = call_llm(messages)
-        return {"reply": reply}
+        return {"reply": call_llm(messages)}
     except Exception as e:
-        log.error(f"CHAT 500: {e}")
         raise HTTPException(500, f"LLM error: {str(e)}")
-
-@app.get("/test")
-def test_page():
-    if os.path.exists("chat_test.html"): 
-        return FileResponse("chat_test.html")
-    return HTMLResponse("<h3>chat_test.html not found</h3>")
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", "8000"))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
