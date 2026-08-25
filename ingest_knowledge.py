@@ -47,7 +47,7 @@ def chunk_text(text, source_file, framework_name, category):
         chunks.append({
             "source_file": source_file,
             "framework_name": framework_name,
-            "category": category, # NEW: Tags the data with the subfolder name
+            "category": category, # This will be 'e5' or 'foundation'
             "content": chunk.strip()
         })
         start = end - CHUNK_OVERLAP
@@ -70,8 +70,18 @@ def ingest_file(filepath):
     """Reads a file, chunks it, and uploads to Supabase."""
     path = Path(filepath)
     filename = path.name
-    category = path.parent.name # Gets the subfolder name (e.g., 'sales_and_closing')
     
+    # Determine category based on folder structure
+    # If path is knowledge/e5/file.txt -> category is 'e5'
+    # If path is knowledge/foundation/01_sales/file.md -> category is 'foundation'
+    parts = path.parts
+    if 'e5' in parts:
+        category = 'e5'
+    elif 'foundation' in parts:
+        category = 'foundation'
+    else:
+        category = 'unknown'
+
     # Extract framework name from filename
     framework_name = filename.replace('.md', '').replace('.txt', '').replace('_', ' ').title()
     
@@ -97,16 +107,18 @@ def ingest_file(filepath):
                 print(f"Error inserting chunk into Supabase: {e}")
 
 def main():
-    # Recursively find all .md and .txt files in all subfolders inside 'knowledge/'
-    files = glob.glob("knowledge/**/*.md", recursive=True) + glob.glob("knowledge/**/*.txt", recursive=True)
+    # Recursively find all .md and .txt files in the 'knowledge' directory
+    # This will automatically look inside 'e5' and 'foundation' and all their subfolders
+    base_path = Path("knowledge")
+    files = list(base_path.rglob("*.md")) + list(base_path.rglob("*.txt"))
     
     if not files:
         print("No .md or .txt files found in 'knowledge/' subfolders. Please add your framework files.")
         return
 
-    print(f"Starting Gemini ingestion of {len(files)} files across subfolders... This may take a few minutes.")
+    print(f"Starting Gemini ingestion of {len(files)} files across e5 and foundation folders... This may take a few minutes.")
     for file in files:
-        ingest_file(file)
+        ingest_file(str(file))
     print("✅ Ingestion complete! Your AI Coach now has a categorized vector memory.")
 
 if __name__ == "__main__":
