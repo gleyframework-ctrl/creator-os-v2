@@ -1,20 +1,19 @@
 import os
-import glob
 import google.generativeai as genai
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load environment variables
+# Load environment variables (works locally and in GitHub Actions)
 load_dotenv()
 
 # Initialize API Keys
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+GEMINI_API_KEY = os.getenv("AQ.Ab8RN6LWU9S8X5qOEqtMcNHblYU4SfmpHn7Su7XzwgJQAV7mMA")
+SUPABASE_URL = os.getenv("https://abcdefgh.supabase.co")
+SUPABASE_KEY = os.getenv("sb_secret_oyrzdG6BI_KPfB4Za-D_UQ_V6e_TR8f")
 
 if not GEMINI_API_KEY or not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Missing API keys in .env file. Check GEMINI_API_KEY, SUPABASE_URL, and SUPABASE_SERVICE_KEY.")
+    raise ValueError("Missing API keys. Check your environment variables or GitHub Secrets.")
 
 # Configure Gemini
 genai.configure(api_key=GEMINI_API_KEY)
@@ -23,8 +22,8 @@ genai.configure(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # --- CONFIGURATION ---
-CHUNK_SIZE = 1000  # Characters per chunk
-CHUNK_OVERLAP = 200 # Overlap to maintain context
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
 EMBEDDING_DIMENSIONS = 1536 
 
 def chunk_text(text, source_file, framework_name, category):
@@ -37,7 +36,6 @@ def chunk_text(text, source_file, framework_name, category):
         end = start + CHUNK_SIZE
         chunk = text[start:end]
         
-        # Try to break at a newline to avoid cutting sentences in half
         if end < text_length:
             newline_pos = chunk.rfind('\n')
             if newline_pos > CHUNK_SIZE * 0.5:
@@ -47,7 +45,7 @@ def chunk_text(text, source_file, framework_name, category):
         chunks.append({
             "source_file": source_file,
             "framework_name": framework_name,
-            "category": category, # This will be 'e5' or 'foundation'
+            "category": category,
             "content": chunk.strip()
         })
         start = end - CHUNK_OVERLAP
@@ -63,33 +61,26 @@ def get_gemini_embedding(text):
         )
         return result['embedding']
     except Exception as e:
-        print(f"Error generating embedding for chunk: {e}")
+        print(f"Error generating embedding: {e}")
         return None
 
 def ingest_file(filepath):
-    """Reads a file, chunks it, and uploads to Supabase."""
+    """Reads a file, clears old chunks, and uploads new ones to Supabase."""
     path = Path(filepath)
     filename = path.name
+    category = path.parent.name 
     
-    # Determine category based on folder structure
-    # If path is knowledge/e5/file.txt -> category is 'e5'
-    # If path is knowledge/foundation/01_sales/file.md -> category is 'foundation'
-    parts = path.parts
-    if 'e5' in parts:
-        category = 'e5'
-    elif 'foundation' in parts:
-        category = 'foundation'
-    else:
-        category = 'unknown'
-
-    # Extract framework name from filename
     framework_name = filename.replace('.md', '').replace('.txt', '').replace('_', ' ').title()
     
     with open(filepath, 'r', encoding='utf-8') as f:
         text = f.read()
     
+    # CI/CD UPGRADE: Delete existing chunks for this file to prevent duplicates on update
+    print(f"Clearing old chunks for {filename}...")
+    supabase.table("knowledge_chunks").delete().eq("source_file", filename).execute()
+    
     chunks = chunk_text(text, filename, framework_name, category)
-    print(f"Processing [{category}] -> {filename}: {len(chunks)} chunks created.")
+    print(f"Processing [{category}] -> {filename}: {len(chunks)} new chunks created.")
     
     for chunk in chunks:
         embedding = get_gemini_embedding(chunk["content"])
@@ -107,19 +98,17 @@ def ingest_file(filepath):
                 print(f"Error inserting chunk into Supabase: {e}")
 
 def main():
-    # Recursively find all .md and .txt files in the 'knowledge' directory
-    # This will automatically look inside 'e5' and 'foundation' and all their subfolders
     base_path = Path("knowledge")
     files = list(base_path.rglob("*.md")) + list(base_path.rglob("*.txt"))
     
     if not files:
-        print("No .md or .txt files found in 'knowledge/' subfolders. Please add your framework files.")
+        print("No .md or .txt files found in 'knowledge/' subfolders.")
         return
 
-    print(f"Starting Gemini ingestion of {len(files)} files across e5 and foundation folders... This may take a few minutes.")
+    print(f"Starting cloud ingestion of {len(files)} files...")
     for file in files:
         ingest_file(str(file))
-    print("✅ Ingestion complete! Your AI Coach now has a categorized vector memory.")
+    print("✅ Cloud ingestion complete! AI Brain updated successfully.")
 
 if __name__ == "__main__":
     main()
