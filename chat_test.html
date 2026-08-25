@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E5 AI Coach OS | Googol-Plex</title>
+    <title>E5 AI Coach OS | Whop Creator Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,23 +19,24 @@
 
     <!-- GATEKEEPER OVERLAY -->
     <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-amber-500/30">
-            <h2 class="text-2xl font-bold text-amber-500 mb-2">🔒 Initialize Business OS</h2>
+        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30">
+            <h2 class="text-2xl font-bold text-purple-400 mb-2">🔒 Initialize Whop Business OS</h2>
             <p class="text-slate-400 mb-6">The AI needs context to act as your COO. Answer these 4 questions.</p>
             <div class="space-y-4">
-                <input type="text" id="q-biz" placeholder="Business Name & Niche (e.g., Income Engine / CPA)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-amber-500 outline-none">
-                <input type="text" id="q-avatar" placeholder="Target Avatar (e.g., Arabic CPA operators burning domains)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-amber-500 outline-none">
+                <input type="text" id="q-biz" placeholder="Business Name & Niche (e.g., Fitness Course / Whop)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
+                <input type="text" id="q-avatar" placeholder="Target Avatar (e.g., Busy dads wanting to lose weight)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="q-rev" placeholder="Current Monthly Revenue ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-amber-500 outline-none">
-                    <input type="number" id="q-goal" placeholder="Revenue Goal ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-amber-500 outline-none">
+                    <input type="number" id="q-rev" placeholder="Current Monthly Revenue ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
+                    <input type="number" id="q-goal" placeholder="Revenue Goal ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
                 </div>
-                <select id="q-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-amber-500 outline-none">
-                    <option value="Domain Burns">Biggest Bottleneck: Domain Burns</option>
-                    <option value="Manual Work">Biggest Bottleneck: Manual Extraction (3+ hrs/day)</option>
-                    <option value="Scaling">Biggest Bottleneck: Stuck at 50k emails/month</option>
+                <select id="q-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
+                    <option value="Low Whop Sales">Biggest Bottleneck: Low Whop Product Sales</option>
+                    <option value="No Traffic">Biggest Bottleneck: No Traffic to Whop Page</option>
+                    <option value="Low Engagement">Biggest Bottleneck: Low Community Engagement</option>
+                    <option value="Offer Creation">Biggest Bottleneck: Don't Know What to Sell</option>
                 </select>
             </div>
-            <button onclick="submitOnboarding()" class="mt-6 w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg transition">🚀 Unlock AI Coach</button>
+            <button onclick="submitOnboarding()" class="mt-6 w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Unlock AI Coach</button>
         </div>
     </div>
 
@@ -43,24 +44,23 @@
     <div id="app" class="flex-1 flex flex-col hidden">
         <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-amber-600 flex items-center justify-center font-bold">E5</div>
+                <div class="w-8 h-8 rounded bg-purple-600 flex items-center justify-center font-bold">E5</div>
                 <div>
-                    <h1 class="font-semibold">AI Coach OS</h1>
+                    <h1 class="font-semibold">Whop Creator OS</h1>
                     <p id="user-context" class="text-xs text-slate-400">Loading context...</p>
                 </div>
             </div>
-            <button onclick="openStandup()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+            <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
                 <i class="fas fa-clipboard-check"></i> Submit Daily Work
             </button>
         </header>
 
         <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-            <!-- Welcome Message -->
             <div class="flex gap-3">
-                <div class="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center font-bold flex-shrink-0">AI</div>
+                <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold flex-shrink-0">AI</div>
                 <div class="glass p-4 rounded-r-xl rounded-bl-xl text-sm text-slate-300 max-w-3xl leading-relaxed">
                     <p class="mb-2 font-semibold text-white">System Initialized. I am your proactive COO.</p>
-                    <p>Based on your profile, your current focus is fixing <span id="chat-bottleneck" class="text-amber-500 font-bold">Domain Burns</span>. <br><br>
+                    <p>Based on your profile, your current focus is fixing <span id="chat-bottleneck" class="text-purple-400 font-bold">Low Whop Sales</span>. <br><br>
                     Before we discuss new strategies, I need to review your execution. Have you submitted your Daily Standup for today? If not, click the button at the top right. If yes, tell me what you need help with.</p>
                 </div>
             </div>
@@ -68,19 +68,19 @@
 
         <div id="typing" class="hidden px-6 pb-2">
             <div class="flex gap-2 items-center text-slate-500 text-sm ml-10">
-                <div class="w-2 h-2 bg-amber-500 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-amber-500 rounded-full typing-dot"></div>
-                <div class="w-2 h-2 bg-amber-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
             </div>
         </div>
 
         <div class="p-4 border-t border-slate-800 bg-slate-900">
             <div class="max-w-4xl mx-auto relative">
-                <textarea id="user-input" rows="1" placeholder="Ask your AI Coach..." 
-                    class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none px-4 py-3 pr-12 resize-none"
+                <textarea id="user-input" rows="1" placeholder="Ask your Whop AI Coach..." 
+                    class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none px-4 py-3 pr-12 resize-none"
                     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                     oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                <button onclick="sendMessage()" class="absolute right-2 top-2 p-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg">
+                <button onclick="sendMessage()" class="absolute right-2 top-2 p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -89,17 +89,17 @@
 
     <!-- STANDUP MODAL -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-amber-500/30">
+        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-white">📋 Daily Standup & Audit</h3>
                 <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-4">
-                <input type="text" id="s-tasks" placeholder="Tasks completed (e.g., Wrote email, posted video)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <input type="text" id="s-links" placeholder="Links to work (e.g., Telegram post, landing page)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
+                <input type="text" id="s-tasks" placeholder="Tasks completed (e.g., Wrote Whop description, posted TikTok)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
+                <input type="text" id="s-links" placeholder="Links to work (e.g., Whop page, TikTok video)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
                 <textarea id="s-text" rows="3" placeholder="Paste the actual content (email copy, ad script, etc.) for me to grade." class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none"></textarea>
-                <input type="text" id="s-metrics" placeholder="Metrics (e.g., 500 views, 12 leads, 0 burns)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <button onclick="submitStandup()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-lg">🚀 Submit for COO Review</button>
+                <input type="text" id="s-metrics" placeholder="Metrics (e.g., 500 views, 12 Whop clicks, 2 sales)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
+                <button onclick="submitStandup()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg"> Submit for COO Review</button>
             </div>
         </div>
     </div>
@@ -130,7 +130,7 @@
                 business_name: document.getElementById('q-biz').value,
                 niche: document.getElementById('q-biz').value,
                 target_avatar: document.getElementById('q-avatar').value,
-                core_offer: "Infrastructure Private Deployment",
+                core_offer: "Whop Digital Product",
                 current_revenue: parseFloat(document.getElementById('q-rev').value) || 0,
                 revenue_goal: parseFloat(document.getElementById('q-goal').value) || 10000,
                 biggest_bottleneck: document.getElementById('q-bottleneck').value
@@ -167,7 +167,7 @@
                 const data = await res.json();
                 if (res.ok) {
                     closeStandup();
-                    appendMessage('ai', `📋 **COO REVIEW:**\n\n${data.review}`);
+                    appendMessage('ai', ` **COO REVIEW:**\n\n${data.review}`);
                     document.getElementById('s-tasks').value = '';
                     document.getElementById('s-links').value = '';
                     document.getElementById('s-text').value = '';
@@ -212,7 +212,7 @@
             div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
             const isAi = role === 'ai';
             div.innerHTML = `
-                <div class="w-10 h-10 rounded-full ${isAi ? 'bg-amber-600' : 'bg-slate-700'} flex items-center justify-center font-bold flex-shrink-0 text-xs">${isAi ? 'COO' : 'U'}</div>
+                <div class="w-10 h-10 rounded-full ${isAi ? 'bg-purple-600' : 'bg-slate-700'} flex items-center justify-center font-bold flex-shrink-0 text-xs">${isAi ? 'COO' : 'U'}</div>
                 <div class="glass p-4 ${isAi ? 'rounded-r-xl rounded-bl-xl' : 'rounded-l-xl rounded-br-xl'} text-sm text-slate-300 max-w-3xl leading-relaxed whitespace-pre-wrap">${text.replace(/\n/g, '<br>')}</div>
             `;
             container.appendChild(div);
