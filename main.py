@@ -11,7 +11,6 @@ import urllib.error
 import json
 from typing import List, Optional, Dict, Any
 from datetime import datetime
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -42,12 +41,15 @@ class RateLimiter:
         self.window = window_s
         self.hits = {}
         self.lock = threading.Lock()
+    
     def allow(self, key):
         now = time.time()
         with self.lock:
             b = self.hits.setdefault(key, [])
-            while b and now - b[0] > self.window: b.pop(0)
-            if len(b) >= self.max_hits: return False
+            while b and now - b[0] > self.window:
+                b.pop(0)
+            if len(b) >= self.max_hits:
+                return False
             b.append(now)
             return True
 
@@ -57,7 +59,7 @@ app = FastAPI(title="E5 AI Coach OS | Strict Execution", version="3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ==============================================================================
-# ️ THE 90-DAY JOURNEY MAP (Strict Execution Timeline)
+# THE 90-DAY JOURNEY MAP (Strict Execution Timeline)
 # ==============================================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -96,10 +98,11 @@ JOURNEY_MAP = {
 }
 
 # ==============================================================================
-# 🧠 GOOGOL-PLEX RAG RETRIEVAL ENGINE
+# GOOGOL-PLEX RAG RETRIEVAL ENGINE
 # ==============================================================================
 def get_gemini_embedding(text: str) -> Optional[List[float]]:
-    if not GEMINI_API_KEY: return None
+    if not GEMINI_API_KEY:
+        return None
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={GEMINI_API_KEY}"
         payload = json.dumps({"model": "models/text-embedding-004", "content": {"parts": [{"text": text}]}}).encode("utf-8")
@@ -111,19 +114,22 @@ def get_gemini_embedding(text: str) -> Optional[List[float]]:
         return None
 
 def retrieve_relevant_context(user_query: str, top_k: int = 4) -> str:
-    if not supabase: return ""
+    if not supabase:
+        return ""
     embedding = get_gemini_embedding(user_query)
-    if not embedding: return ""
-
+    if not embedding:
+        return ""
     try:
         url = f"{SUPABASE_URL.rstrip('/')}/rest/v1/rpc/match_chunks"
         payload = json.dumps({"query_embedding": embedding, "match_count": top_k}).encode("utf-8")
         req = urllib.request.Request(url, data=payload, method="POST", headers={
-            "Content-Type": "application/json", "apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}"
         })
         with urllib.request.urlopen(req, timeout=10) as resp:
             results = json.loads(resp.read().decode("utf-8"))
-            
+        
         context = "\n\n--- RETRIEVED EXPERT FRAMEWORKS ---\n"
         for row in results:
             context += f"\n[Source: {row.get('framework_name', 'Unknown')}]\n{row.get('content', '')}\n"
@@ -133,10 +139,11 @@ def retrieve_relevant_context(user_query: str, top_k: int = 4) -> str:
         return ""
 
 # ==============================================================================
-# 📊 DATABASE HELPERS (Replaces In-Memory Storage)
+# DATABASE HELPERS (Replaces In-Memory Storage)
 # ==============================================================================
 def get_profile(member_id: str) -> Optional[Dict]:
-    if not supabase: return None
+    if not supabase:
+        return None
     try:
         response = supabase.table("profiles").select("*").eq("member_id", member_id).execute()
         return response.data[0] if response.data else None
@@ -145,7 +152,8 @@ def get_profile(member_id: str) -> Optional[Dict]:
         return None
 
 def save_profile(member_id: str, data: Dict):
-    if not supabase: return
+    if not supabase:
+        return
     try:
         supabase.table("profiles").upsert({
             "member_id": member_id,
@@ -162,13 +170,12 @@ def save_profile(member_id: str, data: Dict):
         log.error(f"Error saving profile: {e}")
 
 def get_journey(member_id: str) -> Dict:
-    if not supabase: 
+    if not supabase:
         return {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "standup_history": []}
     try:
         response = supabase.table("member_journey").select("*").eq("member_id", member_id).execute()
         if response.data:
             row = response.data[0]
-            # Ensure lists are parsed correctly from Supabase
             row["tasks_completed"] = row.get("tasks_completed", []) or []
             row["standup_history"] = row.get("standup_history", []) or []
             return row
@@ -178,7 +185,8 @@ def get_journey(member_id: str) -> Dict:
         return {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "standup_history": []}
 
 def save_journey(member_id: str, data: Dict):
-    if not supabase: return
+    if not supabase:
+        return
     try:
         supabase.table("member_journey").upsert({
             "member_id": member_id,
@@ -193,7 +201,7 @@ def save_journey(member_id: str, data: Dict):
         log.error(f"Error saving journey: {e}")
 
 # ==============================================================================
-# 🤖 LLM ENGINE
+# LLM ENGINE
 # ==============================================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
     providers = [
@@ -201,7 +209,8 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
         {"name": "groq", "url": "https://api.groq.com/openai/v1/chat/completions", "key": GROQ_API_KEY, "model": "llama-3.1-70b-versatile"}
     ]
     for p in providers:
-        if not p["key"]: continue
+        if not p["key"]:
+            continue
         try:
             body = json.dumps({"model": p["model"], "messages": messages, "temperature": temperature}).encode("utf-8")
             req = urllib.request.Request(p["url"], data=body, method="POST", headers={"Content-Type": "application/json", "Authorization": f"Bearer {p['key']}"})
@@ -213,7 +222,7 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
     return "Error: All LLM providers failed."
 
 # ==============================================================================
-# 📝 PYDANTIC MODELS
+# PYDANTIC MODELS
 # ==============================================================================
 class ChatMessage(BaseModel):
     role: str
@@ -244,11 +253,12 @@ class StandupRequest(BaseModel):
     metrics: str = ""
 
 # ==============================================================================
-# 🛣️ ROUTES
+# ROUTES
 # ==============================================================================
 @app.get("/")
 def root():
-    if os.path.exists("chat_test.html"): return FileResponse("chat_test.html")
+    if os.path.exists("chat_test.html"):
+        return FileResponse("chat_test.html")
     return {"status": "ok"}
 
 @app.get("/api/check-onboarding")
@@ -258,7 +268,7 @@ def check_onboarding(member_id: str = "default"):
 
 @app.post("/api/onboarding")
 def submit_onboarding(req: OnboardingRequest):
-    save_profile(req.member_id, req.model_dump()) # Fixed Pydantic V2 deprecation
+    save_profile(req.member_id, req.model_dump())
     save_journey(req.member_id, {
         "current_day": 1,
         "current_phase": "Phase 1",
@@ -272,12 +282,9 @@ def submit_onboarding(req: OnboardingRequest):
 def get_journey_status(member_id: str = "default"):
     journey = get_journey(member_id)
     profile = get_profile(member_id) or {}
-    
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = next((t for t in phase_info["tasks"] if t["id"] == journey["current_task_id"]), phase_info["tasks"][0])
-    
     progress_percent = min(100, max(1, (journey["current_day"] / 90) * 100))
-    
     return {
         "current_day": journey["current_day"],
         "current_phase": phase_info["name"],
@@ -293,52 +300,48 @@ def get_journey_status(member_id: str = "default"):
 def submit_standup(req: StandupRequest):
     try:
         profile = get_profile(req.member_id)
-        if not profile: raise HTTPException(403, "Complete onboarding first.")
+        if not profile:
+            raise HTTPException(403, "Complete onboarding first.")
         
         journey = get_journey(req.member_id)
         
-        # 1. Grade the work
         rag_context = retrieve_relevant_context(f"Grade this work for task: {req.current_task_id}. Content: {req.asset_text}")
         
         system = f"""You are a STRICT Chief Operating Officer. 
-        The user is submitting work for: {req.current_task_id}
-        Grade their submission out of 10 based on the expert frameworks retrieved below.
-        Be specific, critical, and actionable. 
-        
-        USER CONTEXT: {json.dumps(profile)}
-        EXPERT FRAMEWORKS FOR GRADING: {rag_context}
-        
-        OUTPUT FORMAT:
-        1.  GRADE: [Score]/10
-        2. 🔍 AUDIT: What is missing or wrong based on the frameworks.
-        3. ✅ NEXT STEP: If score >= 7, congratulate them and tell them the NEXT task to focus on. If score < 7, tell them exactly what to fix before resubmitting.
-        """
+The user is submitting work for: {req.current_task_id}
+Grade their submission out of 10 based on the expert frameworks retrieved below.
+Be specific, critical, and actionable. 
+
+USER CONTEXT: {json.dumps(profile)}
+EXPERT FRAMEWORKS FOR GRADING: {rag_context}
+
+OUTPUT FORMAT:
+1. GRADE: [Score]/10
+2. AUDIT: What is missing or wrong based on the frameworks.
+3. NEXT STEP: If score >= 7, congratulate them and tell them the NEXT task to focus on. If score < 7, tell them exactly what to fix before resubmitting.
+"""
         
         prompt = f"Tasks: {req.tasks_completed}\nLinks: {req.asset_links}\nWork Text: {req.asset_text}\nMetrics: {req.metrics}"
         messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
-        
         review = call_llm(messages)
         
         if review.startswith("Error:"):
-            review = " GRADE: 5/10\n\n🔍 AUDIT: The AI encountered a temporary error grading your work. Please resubmit.\n\n✅ NEXT STEP: Try submitting again."
+            review = "GRADE: 5/10\n\nAUDIT: The AI encountered a temporary error grading your work. Please resubmit.\n\nNEXT STEP: Try submitting again."
         
-        # 2. Update Journey
         if req.current_task_id not in journey["tasks_completed"]:
             journey["tasks_completed"].append(req.current_task_id)
             journey["current_day"] = min(90, journey["current_day"] + 7)
-            
             if journey["current_phase"] == "Phase 1" and len(journey["tasks_completed"]) >= 4:
                 journey["current_phase"] = "Phase 2"
                 journey["current_task_id"] = "p2_t1"
             elif journey["current_phase"] == "Phase 2" and len(journey["tasks_completed"]) >= 8:
                 journey["current_phase"] = "Phase 3"
                 journey["current_task_id"] = "p3_t1"
-                
+        
         journey["standup_history"].append({"date": datetime.now().isoformat(), "task": req.current_task_id, "review": review})
         save_journey(req.member_id, journey)
         
         return {"success": True, "review": review, "journey_updated": True}
-        
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -347,11 +350,14 @@ def submit_standup(req: StandupRequest):
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    if not req.message: raise HTTPException(400, "empty message")
-    if not CHAT_LIMIT.allow(req.member_id or "default"): raise HTTPException(429, "Rate limit reached")
+    if not req.message:
+        raise HTTPException(400, "empty message")
+    if not CHAT_LIMIT.allow(req.member_id or "default"):
+        raise HTTPException(429, "Rate limit reached")
     
     profile = get_profile(req.member_id or "default")
-    if not profile: raise HTTPException(403, "GATEKEEPER: Please complete onboarding first.")
+    if not profile:
+        raise HTTPException(403, "GATEKEEPER: Please complete onboarding first.")
     
     journey = get_journey(req.member_id or "default")
     phase_info = JOURNEY_MAP[journey["current_phase"]]
@@ -364,41 +370,42 @@ def chat(req: ChatRequest):
         return {
             "reply": f"""🛑 **STRICT ACCOUNTABILITY GATE TRIGGERED**
 
-You are on **Day {journey["current_day"]}** of **{phase_info["name"]}**. 
+You are on **Day {journey['current_day']}** of **{phase_info['name']}**. 
 
 Your **ONLY** focus right now is: 
-🎯 **{current_task["name"]}** (Deadline: Day {current_task["deadline_day"]})
+🎯 **{current_task['name']}** (Deadline: Day {current_task['deadline_day']})
 
 I cannot give you new strategic advice until you prove execution on this exact task. 
 
 👉 **Action Required:** Click the 'Submit Daily Work' button, paste what you have done for this task, and let me grade it. Do nothing else until this is locked in."""
         }
-
+    
     rag_context = retrieve_relevant_context(req.message, top_k=4)
     
     system_prompt = f"""
-    You are the E5 AI Coach, an elite, proactive Chief Operating Officer.
-    The user is currently on **Day {journey["current_day"]}** of **{phase_info["name"]}**.
-    Their current mandatory focus is: **{current_task["name"]}**.
-    
-    STRICT RULE: You do NOT discuss CPA, affiliate marketing, or generic business fluff. Your entire focus is on digital products, Whop, content marketing, and high-ticket coaching.
-    
-    If the user asks about advanced topics while their current task is incomplete, gently but firmly redirect them.
-    
-    USER CONTEXT:
-    - Niche: {profile.get('niche', 'N/A')}
-    - Avatar: {profile.get('target_avatar', 'N/A')}
-    - Bottleneck: {profile.get('biggest_bottleneck', 'N/A')}
-    
-    EXPERT KNOWLEDGE RETRIEVED:
-    {rag_context}
-    
-    INSTRUCTIONS:
-    Base your advice strictly on the [EXPERT KNOWLEDGE RETRIEVED]. Be calm, deeply insightful, slightly detached, and authoritative. Short punchy sentences. ZERO AI FLUFF.
-    """
+You are the E5 AI Coach, an elite, proactive Chief Operating Officer.
+The user is currently on **Day {journey['current_day']}** of **{phase_info['name']}**.
+Their current mandatory focus is: **{current_task['name']}**.
+
+STRICT RULE: You do NOT discuss CPA, affiliate marketing, or generic business fluff. Your entire focus is on digital products, Whop, content marketing, and high-ticket coaching.
+
+If the user asks about advanced topics while their current task is incomplete, gently but firmly redirect them.
+
+USER CONTEXT:
+- Niche: {profile.get('niche', 'N/A')}
+- Avatar: {profile.get('target_avatar', 'N/A')}
+- Bottleneck: {profile.get('biggest_bottleneck', 'N/A')}
+
+EXPERT KNOWLEDGE RETRIEVED:
+{rag_context}
+
+INSTRUCTIONS:
+Base your advice strictly on the [EXPERT KNOWLEDGE RETRIEVED]. Be calm, deeply insightful, slightly detached, and authoritative. Short punchy sentences. ZERO AI FLUFF.
+"""
     
     messages = [{"role": "system", "content": system_prompt}]
-    for m in req.history[-10:]: messages.append({"role": m.role, "content": m.content})
+    for m in req.history[-10:]:
+        messages.append({"role": m.role, "content": m.content})
     messages.append({"role": "user", "content": req.message})
     
     try:
