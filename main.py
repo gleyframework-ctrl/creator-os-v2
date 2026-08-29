@@ -30,11 +30,11 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    log.warning("Supabase credentials missing. Using in-memory fallback.")
+    log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
     supabase = None
 else:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    log.info("Supabase connected.")
+    log.info("✅ Supabase connected.")
 
 # ============================================================
 # IN-MEMORY FALLBACK (If Supabase not available)
@@ -157,7 +157,8 @@ def db_get_profile(member_id):
         try:
             result = supabase.table("profiles").select("*").eq("member_id", member_id).execute()
             return result.data[0] if result.data else None
-        except:
+        except Exception as e:
+            log.error(f"Supabase get profile error: {e}")
             return PROFILES_DB.get(member_id)
     return PROFILES_DB.get(member_id)
 
@@ -166,7 +167,8 @@ def db_upsert_profile(member_id, data):
         try:
             supabase.table("profiles").upsert({**data, "member_id": member_id}).execute()
             return True
-        except:
+        except Exception as e:
+            log.error(f"Supabase upsert profile error: {e}")
             PROFILES_DB[member_id] = data
             return True
     PROFILES_DB[member_id] = data
@@ -178,8 +180,8 @@ def db_get_journey(member_id):
             result = supabase.table("journeys").select("*").eq("member_id", member_id).execute()
             if result.data:
                 return result.data[0]
-        except:
-            pass
+        except Exception as e:
+            log.error(f"Supabase get journey error: {e}")
     return JOURNEY_DB.get(member_id, {
         "current_day": 1, "current_phase": "Phase 1",
         "current_task_id": "p1_t1", "tasks_completed": [],
@@ -191,7 +193,8 @@ def db_upsert_journey(member_id, data):
         try:
             supabase.table("journeys").upsert({**data, "member_id": member_id}).execute()
             return True
-        except:
+        except Exception as e:
+            log.error(f"Supabase upsert journey error: {e}")
             JOURNEY_DB[member_id] = data
             return True
     JOURNEY_DB[member_id] = data
@@ -215,8 +218,8 @@ def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text,
                 "evidence_score": evidence.get("evidence_score", 0)
             }).execute()
             return True
-        except:
-            pass
+        except Exception as e:
+            log.error(f"Supabase add standup error: {e}")
     return True
 
 def db_add_win(member_id, win_text, revenue):
@@ -228,7 +231,8 @@ def db_add_win(member_id, win_text, revenue):
                 "revenue_amount": revenue
             }).execute()
             return True
-        except:
+        except Exception as e:
+            log.error(f"Supabase add win error: {e}")
             WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
             return True
     WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
@@ -239,7 +243,8 @@ def db_get_wins(member_id):
         try:
             result = supabase.table("wins").select("*").eq("member_id", member_id).order("created_at", desc=True).execute()
             return result.data if result.data else []
-        except:
+        except Exception as e:
+            log.error(f"Supabase get wins error: {e}")
             return WINS_DB.get(member_id, [])
     return WINS_DB.get(member_id, [])
 
@@ -248,7 +253,8 @@ def db_add_score(member_id, score):
         try:
             supabase.table("scores").insert({"member_id": member_id, "score": score}).execute()
             return True
-        except:
+        except Exception as e:
+            log.error(f"Supabase add score error: {e}")
             SCORES_DB.setdefault(member_id, []).append(score)
             return True
     SCORES_DB.setdefault(member_id, []).append(score)
@@ -259,7 +265,8 @@ def db_get_scores(member_id):
         try:
             result = supabase.table("scores").select("score").eq("member_id", member_id).execute()
             return [row["score"] for row in result.data] if result.data else []
-        except:
+        except Exception as e:
+            log.error(f"Supabase get scores error: {e}")
             return SCORES_DB.get(member_id, [])
     return SCORES_DB.get(member_id, [])
 
@@ -336,7 +343,7 @@ def get_current_task(journey):
 def advance_journey(journey, member_id):
     phase = journey["current_phase"]
     phase_tasks = JOURNEY_MAP[phase]["tasks"]
-    completed = journey["tasks_completed"]
+    completed = journey.get("tasks_completed", [])
     completed_in_phase = [t for t in phase_tasks if t["id"] in completed]
     if phase == "Phase 1" and len(completed_in_phase) >= 4:
         journey["current_phase"] = "Phase 2"
@@ -508,7 +515,8 @@ Metrics reported: {req.metrics}"""
     try:
         m = re.search(r'GRADE:\s*(\d+)', review)
         if m: score = int(m.group(1))
-    except: pass
+    except:
+        pass
     score = min(10, max(0, score))
     
     # Calculate evidence
@@ -524,7 +532,10 @@ Metrics reported: {req.metrics}"""
     last_date = journey.get("last_standup_date")
     if last_date != today:
         if last_date:
-            days_since = (date.today() - date.fromisoformat(last_date)).days
+            try:
+                days_since = (date.today() - date.fromisoformat(last_date)).days
+            except:
+                days_since = 1
             journey["streak"] = journey.get("streak", 0) + 1 if days_since <= 1 else 1
         else:
             journey["streak"] = 1
@@ -586,7 +597,6 @@ def chat(req: ChatRequest):
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = get_current_task(journey)
     task_completed = current_task["id"] in journey.get("tasks_completed", [])
-    last_standup = None  # Could fetch from standups table if needed
     streak = journey.get("streak", 0)
     frameworks_str = ", ".join(current_task.get("frameworks", []))
     wins = db_get_wins(req.member_id or "default")
