@@ -19,63 +19,158 @@
         .nav-item.active { background: rgba(147, 51, 234, 0.2); border-left: 3px solid #9333ea; }
         .sidebar-stats { font-size: 12px; }
         .stat-badge { background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 2px 10px; border-radius: 20px; }
+        .onboarding-step { display: none; }
+        .onboarding-step.active { display: block; }
+        .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
+        .step-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: all 0.3s; }
+        .step-dot.active { background: #9333ea; width: 24px; border-radius: 10px; }
+        .step-dot.done { background: #22c55e; }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden">
 
-    <!-- GATEKEEPER OVERLAY -->
-    <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4">
-        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-bold text-purple-400 mb-2">🔒 Initialize Whop Business OS</h2>
-            <p class="text-slate-400 mb-4">The AI needs context to act as your COO. Answer these questions and upload proof.</p>
-            
-            <div class="space-y-3">
-                <input type="text" id="q-biz" placeholder="Business Name & Niche" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                <input type="text" id="q-avatar" placeholder="Target Avatar (e.g., Busy dads wanting to lose weight)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                <input type="text" id="q-offer" placeholder="Core Offer (e.g., 12-week coaching program)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="q-rev" placeholder="Current Revenue ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                    <input type="number" id="q-goal" placeholder="Revenue Goal ($)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                </div>
-                
-                <select id="q-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                    <option value="Low Whop Sales">Biggest Bottleneck: Low Whop Product Sales</option>
-                    <option value="No Traffic">Biggest Bottleneck: No Traffic to Whop Page</option>
-                    <option value="Low Engagement">Biggest Bottleneck: Low Community Engagement</option>
-                    <option value="Offer Creation">Biggest Bottleneck: Don't Know What to Sell</option>
-                    <option value="No Consistency">Biggest Bottleneck: Not Posting Consistently</option>
-                </select>
-                
-                <!-- NEW: Adaptive Questions -->
-                <div class="grid grid-cols-2 gap-4">
-                    <select id="q-level" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                        <option value="beginner">Beginner (no business yet)</option>
-                        <option value="intermediate">Intermediate (some revenue)</option>
-                        <option value="advanced">Advanced (scaling)</option>
-                    </select>
-                    <select id="q-hours" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white focus:border-purple-500 outline-none">
-                        <option value="1-3">1-3 hours/week</option>
-                        <option value="4-7">4-7 hours/week</option>
-                        <option value="8+">8+ hours/week</option>
-                    </select>
-                </div>
-                
-                <!-- NEW: Already Done Checkboxes -->
-                <div class="text-sm text-slate-400 mb-1">What have you already done?</div>
-                <div class="grid grid-cols-2 gap-2">
-                    <label class="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" id="q-offer-done"> Clear offer</label>
-                    <label class="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" id="q-audience-done"> Audience</label>
-                    <label class="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" id="q-sales-done"> Made sales</label>
-                    <label class="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" id="q-launch-done"> Launched before</label>
+    <!-- ============================================================
+    ONBOARDING OVERLAY
+    ============================================================ -->
+    <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step-dot active" id="step-dot-1"></div>
+                <div class="step-dot" id="step-dot-2"></div>
+                <div class="step-dot" id="step-dot-3"></div>
+                <div class="step-dot" id="step-dot-4"></div>
+            </div>
+
+            <!-- ==========================================================
+            STEP 1: QUIZ
+            ========================================================== -->
+            <div id="onboarding-step-1" class="onboarding-step active">
+                <div class="ob-logo text-3xl mb-2">🚀</div>
+                <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
+                <p class="text-slate-400 mb-6">3 quick questions to personalize your journey.</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
+                        <select id="onboarding-stage" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="idea">💡 Just an idea (I haven't launched anything yet)</option>
+                            <option value="product" selected>📦 I have a product/offer (but no sales yet)</option>
+                            <option value="selling">💰 I'm already selling (I have customers/revenue)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge right now?</label>
+                        <select id="onboarding-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="traffic">📢 Getting traffic / leads</option>
+                            <option value="conversion">🔄 Converting leads to sales</option>
+                            <option value="content">✍️ Creating consistent content</option>
+                            <option value="community">👥 Growing my community</option>
+                            <option value="offer">📦 Building my offer</option>
+                            <option value="time">⏰ Not enough time</option>
+                            <option value="other">❓ Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
+                        <select id="onboarding-hours" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="1-3">🕐 1-3 hours (Reflective pace)</option>
+                            <option value="4-7" selected>🕒 4-7 hours (Steady pace)</option>
+                            <option value="8+">⚡ 8+ hours (Accelerator pace)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateStrategy()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition mt-2">
+                        🚀 Generate My Strategy Document
+                    </button>
                 </div>
             </div>
-            
-            <button onclick="submitOnboarding()" class="mt-6 w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Start My 90-Day Journey</button>
+
+            <!-- ==========================================================
+            STEP 2: AI-GENERATED DOCUMENT
+            ========================================================== -->
+            <div id="onboarding-step-2" class="onboarding-step">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl">📄</span>
+                    <h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2>
+                </div>
+                <p class="text-slate-400 mb-4">Review your AI-generated strategy document. Edit if needed.</p>
+
+                <div id="strategy-document-container" class="bg-slate-900 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">
+                    Loading...
+                </div>
+
+                <div class="mt-4 flex gap-3">
+                    <button onclick="regenerateStrategy()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">
+                        🔄 Regenerate
+                    </button>
+                    <button onclick="goToStep(3)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
+                        ✅ Looks Good → Next
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            STEP 3: PROOF UPLOAD (Optional)
+            ========================================================== -->
+            <div id="onboarding-step-3" class="onboarding-step">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl">📸</span>
+                    <h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2>
+                </div>
+                <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
+
+                <div class="space-y-3">
+                    <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition">
+                        <input type="file" id="proof-upload" multiple accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="handleProofUpload(event)">
+                        <button onclick="document.getElementById('proof-upload').click()" class="text-slate-400 hover:text-white">
+                            <i class="fas fa-cloud-upload-alt text-3xl block mb-2"></i>
+                            Click to upload screenshots
+                        </button>
+                        <p class="text-xs text-slate-500 mt-2">PNG, JPG, PDF • Multiple files allowed</p>
+                    </div>
+                    <div id="proof-list" class="flex flex-wrap gap-2"></div>
+
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="goToStep(4)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
+                            ⏭️ Skip & Continue
+                        </button>
+                        <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">
+                            🚀 Start My 90-Day Journey
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+            STEP 4: CONFIRMATION
+            ========================================================== -->
+            <div id="onboarding-step-4" class="onboarding-step">
+                <div class="text-center py-8">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-2xl font-bold text-green-400 mb-2">You're All Set!</h2>
+                    <p class="text-slate-400 mb-6">Your AI Coach is now personalized for your business.</p>
+                    <div class="bg-slate-800 rounded-lg p-4 text-left text-sm text-slate-300 max-w-md mx-auto">
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Stage:</span> <span id="confirm-stage">—</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Bottleneck:</span> <span id="confirm-bottleneck">—</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Speed:</span> <span id="confirm-speed">—</span></div>
+                        <div class="flex justify-between py-1"><span class="text-slate-500">Starting Day:</span> <span id="confirm-day">—</span></div>
+                    </div>
+                    <button onclick="completeOnboarding()" class="mt-6 w-full max-w-xs bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">
+                        🚀 Enter Your AI Coach
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- MAIN APP UI -->
+    <!-- ============================================================
+    MAIN APP UI (Hidden until onboarding complete)
+    ============================================================ -->
     <div id="app" class="flex-1 flex flex-col hidden">
         <!-- HEADER -->
         <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50">
@@ -96,7 +191,7 @@
         </header>
 
         <div class="flex-1 flex">
-            <!-- SIDEBAR NAVIGATION -->
+            <!-- SIDEBAR -->
             <nav class="w-64 border-r border-slate-800 bg-slate-900/30 p-4 hidden md:block">
                 <div class="space-y-2">
                     <button onclick="switchTab('chat')" id="nav-chat" class="nav-item active w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
@@ -109,8 +204,6 @@
                         <i class="fas fa-cog"></i> Settings
                     </button>
                 </div>
-                
-                <!-- SIDEBAR STATS -->
                 <div class="sidebar-stats mt-8 p-4 border-t border-slate-700">
                     <div class="flex justify-between mb-1"><span class="text-slate-500">Streak</span><span id="side-streak" class="text-yellow-400">0 days 🔥</span></div>
                     <div class="flex justify-between mb-1"><span class="text-slate-500">Avg Score</span><span id="side-avg" class="text-purple-400">—</span></div>
@@ -122,7 +215,6 @@
 
             <!-- MAIN CONTENT -->
             <div class="flex-1 flex flex-col">
-                
                 <!-- CHAT TAB -->
                 <div id="tab-chat" class="tab-content active flex-1 flex flex-col">
                     <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
@@ -135,7 +227,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="typing" class="hidden px-6 pb-2">
                         <div class="flex gap-2 items-center text-slate-500 text-sm ml-10">
                             <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
@@ -143,7 +234,6 @@
                             <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
                         </div>
                     </div>
-
                     <div class="p-4 border-t border-slate-800 bg-slate-900">
                         <div class="max-w-4xl mx-auto relative">
                             <textarea id="user-input" rows="1" placeholder="Ask your Whop AI Coach..." 
@@ -160,24 +250,16 @@
                 <!-- JOURNEY TAB -->
                 <div id="tab-journey" class="tab-content flex-1 overflow-y-auto p-6">
                     <h2 class="text-2xl font-bold mb-6">Your 90-Day Journey</h2>
-                    
                     <div class="glass rounded-xl p-6 mb-6">
                         <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <p class="text-sm text-slate-400">Current Phase</p>
-                                <p class="text-xl font-bold text-purple-400" id="journey-phase">Loading...</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm text-slate-400">Day</p>
-                                <p class="text-3xl font-bold" id="journey-day">--<span class="text-lg text-slate-500">/90</span></p>
-                            </div>
+                            <div><p class="text-sm text-slate-400">Current Phase</p><p class="text-xl font-bold text-purple-400" id="journey-phase">Loading...</p></div>
+                            <div class="text-right"><p class="text-sm text-slate-400">Day</p><p class="text-3xl font-bold" id="journey-day">--<span class="text-lg text-slate-500">/90</span></p></div>
                         </div>
                         <div class="w-full bg-slate-700 rounded-full h-3 mb-2">
-                            <div id="journey-progress" class="progress-bar bg-purple-600 h-3 rounded-full" style="width: 0%"></div>
+                            <div id="journey-progress" class="progress-bar bg-purple-600 h-3 rounded-full" style="width:0%"></div>
                         </div>
                         <p class="text-xs text-slate-400 text-right" id="journey-focus">Focus: Loading...</p>
                     </div>
-
                     <div class="glass rounded-xl p-6 mb-6 border-l-4 border-purple-500">
                         <h3 class="font-semibold text-lg mb-2">🎯 Current Mandatory Task</h3>
                         <p class="text-xl font-bold text-white mb-1" id="current-task-name">Loading...</p>
@@ -187,7 +269,6 @@
                         <div class="mt-2" id="task-deliverables"></div>
                         <p class="text-xs text-yellow-400 mt-3">⚠️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
                     </div>
-
                     <div class="space-y-4" id="all-phases-container"></div>
                 </div>
 
@@ -198,18 +279,9 @@
                         <div class="glass rounded-xl p-6">
                             <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-user"></i> Business Profile</h3>
                             <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Business Name</label>
-                                    <input type="text" id="profile-business" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Niche</label>
-                                    <input type="text" id="profile-niche" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Target Avatar</label>
-                                    <input type="text" id="profile-avatar" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white">
-                                </div>
+                                <div><label class="block text-sm text-slate-400 mb-1">Business Name</label><input type="text" id="profile-business" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
+                                <div><label class="block text-sm text-slate-400 mb-1">Niche</label><input type="text" id="profile-niche" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
+                                <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label><input type="text" id="profile-avatar" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
                                 <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg">Save Profile</button>
                             </div>
                         </div>
@@ -224,7 +296,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -267,19 +338,167 @@
         </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
     <script>
         // ============================================================
         // ⚠️ IMPORTANT: CHANGE THIS TO YOUR RAILWAY URL
         // ============================================================
         const API = 'https://e5-ai-coach-production.up.railway.app';
-        // For local testing: const API = 'http://localhost:8000';
-        
+        // const API = 'http://localhost:8000';  // For local testing
+
         const MEMBER_ID = localStorage.getItem('e5_member_id') || 'default';
         if (!localStorage.getItem('e5_member_id')) localStorage.setItem('e5_member_id', MEMBER_ID);
-        
+
         let chatHistory = [];
         let journeyData = null;
-        let currentTab = 'chat';
+        let strategyDocument = '';
+        let uploadedFiles = [];
+        let currentStep = 1;
+
+        // ============================================================
+        // ONBOARDING NAVIGATION
+        // ============================================================
+        function showStep(step) {
+            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`onboarding-step-${step}`).classList.add('active');
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'done');
+                if (i + 1 === step) dot.classList.add('active');
+                else if (i + 1 < step) dot.classList.add('done');
+            });
+            currentStep = step;
+        }
+
+        function goToStep(step) {
+            showStep(step);
+        }
+
+        // ============================================================
+        // STEP 1: GENERATE STRATEGY DOCUMENT
+        // ============================================================
+        async function generateStrategy() {
+            const stage = document.getElementById('onboarding-stage').value;
+            const bottleneck = document.getElementById('onboarding-bottleneck').value;
+            const hours = document.getElementById('onboarding-hours').value;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+
+            try {
+                const response = await fetch(`${API}/api/generate-strategy`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours })
+                });
+
+                const data = await response.json();
+                strategyDocument = data.document;
+
+                document.getElementById('strategy-document-container').textContent = data.document;
+
+                // Store for later
+                localStorage.setItem('strategy_document', data.document);
+                localStorage.setItem('starting_day', data.starting_day);
+                localStorage.setItem('speed_profile', data.speed_profile);
+
+                showStep(2);
+
+            } catch (error) {
+                alert('Error generating strategy: ' + error.message);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🚀 Generate My Strategy Document';
+        }
+
+        async function regenerateStrategy() {
+            await generateStrategy();
+        }
+
+        // ============================================================
+        // STEP 3: PROOF UPLOAD
+        // ============================================================
+        function handleProofUpload(event) {
+            const files = event.target.files;
+            const list = document.getElementById('proof-list');
+
+            for (let file of files) {
+                uploadedFiles.push(file);
+                const div = document.createElement('div');
+                div.className = 'bg-slate-800 text-xs text-slate-300 px-3 py-1 rounded-full flex items-center gap-2';
+                div.innerHTML = `📎 ${file.name} <span class="text-green-400">✅</span>`;
+                list.appendChild(div);
+            }
+        }
+
+        // ============================================================
+        // STEP 4: SUBMIT ONBOARDING
+        // ============================================================
+        async function submitOnboarding() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+
+            try {
+                // 1. Save strategy document
+                const stage = document.getElementById('onboarding-stage').value;
+                const bottleneck = document.getElementById('onboarding-bottleneck').value;
+                const hours = document.getElementById('onboarding-hours').value;
+
+                const response = await fetch(`${API}/api/complete-onboarding`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        member_id: MEMBER_ID,
+                        stage,
+                        bottleneck,
+                        hours,
+                        strategy_document: strategyDocument,
+                        starting_day: parseInt(localStorage.getItem('starting_day')) || 1,
+                        speed_profile: localStorage.getItem('speed_profile') || 'steady'
+                    })
+                });
+
+                const data = await response.json();
+
+                // Update confirmation
+                document.getElementById('confirm-stage').textContent = stage;
+                document.getElementById('confirm-bottleneck').textContent = bottleneck;
+                document.getElementById('confirm-speed').textContent = localStorage.getItem('speed_profile') || 'steady';
+                document.getElementById('confirm-day').textContent = localStorage.getItem('starting_day') || 1;
+
+                showStep(4);
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+
+            btn.disabled = false;
+            btn.textContent = '🚀 Start My 90-Day Journey';
+        }
+
+        async function completeOnboarding() {
+            document.getElementById('gatekeeper').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
+            await loadJourney();
+            await loadWins();
+
+            // Add welcome message with context
+            const stage = localStorage.getItem('stage') || 'beginner';
+            const day = localStorage.getItem('starting_day') || 1;
+            const speed = localStorage.getItem('speed_profile') || 'steady';
+
+            let welcomeMessage = `**System Initialized. I am your proactive COO.**\n\n`;
+            welcomeMessage += `Based on your profile, you are a **${stage}** level business.\n`;
+            welcomeMessage += `Your starting point: Day **${day}** of the 90-day journey.\n`;
+            welcomeMessage += `Your speed profile: **${speed}** (${speed === 'accelerator' ? 'Fast-paced' : speed === 'steady' ? 'Consistent' : 'Reflective'}).\n\n`;
+            welcomeMessage += `Check the **"My Journey"** tab to see your first task. Submit work in the Daily Standup to get graded and unlock the next step.`;
+
+            appendMessage('ai', welcomeMessage);
+        }
 
         // ============================================================
         // TAB SWITCHING
@@ -289,51 +508,8 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.getElementById(`nav-${tab}`).classList.add('active');
-            currentTab = tab;
             if (tab === 'journey') loadJourney();
             if (tab === 'settings') loadWins();
-        }
-
-        // ============================================================
-        // ONBOARDING
-        // ============================================================
-        async function submitOnboarding() {
-            const payload = {
-                member_id: MEMBER_ID,
-                business_name: document.getElementById('q-biz').value,
-                niche: document.getElementById('q-biz').value,
-                target_avatar: document.getElementById('q-avatar').value,
-                core_offer: document.getElementById('q-offer').value || "Digital Product",
-                current_revenue: parseFloat(document.getElementById('q-rev').value) || 0,
-                revenue_goal: parseFloat(document.getElementById('q-goal').value) || 10000,
-                biggest_bottleneck: document.getElementById('q-bottleneck').value,
-                current_level: document.getElementById('q-level').value,
-                weekly_hours: document.getElementById('q-hours').value,
-                offer_done: document.getElementById('q-offer-done').checked,
-                audience_done: document.getElementById('q-audience-done').checked,
-                sales_done: document.getElementById('q-sales-done').checked,
-                launch_done: document.getElementById('q-launch-done').checked
-            };
-            
-            try {
-                const res = await fetch(`${API}/api/onboarding`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    document.getElementById('gatekeeper').classList.add('hidden');
-                    document.getElementById('app').classList.remove('hidden');
-                    document.getElementById('user-context').textContent = `${payload.target_avatar} | Bottleneck: ${payload.biggest_bottleneck}`;
-                    document.getElementById('chat-bottleneck').textContent = payload.biggest_bottleneck;
-                    loadJourney();
-                } else {
-                    const err = await res.json();
-                    alert("Error: " + JSON.stringify(err));
-                }
-            } catch (e) {
-                alert("Error saving profile: " + e.message);
-            }
         }
 
         // ============================================================
@@ -343,7 +519,7 @@
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
                 journeyData = await res.json();
-                
+
                 document.getElementById('journey-phase').textContent = journeyData.current_phase;
                 document.getElementById('journey-day').innerHTML = `${journeyData.current_day}<span class="text-lg text-slate-500">/90</span>`;
                 document.getElementById('journey-progress').style.width = `${journeyData.progress_percent}%`;
@@ -352,20 +528,17 @@
                 document.getElementById('task-deadline').textContent = `Deadline: Day ${journeyData.current_task.deadline_day}`;
                 document.getElementById('task-why').textContent = journeyData.current_task.why || '';
                 document.getElementById('standup-task-name').textContent = journeyData.current_task.name;
-                
-                // Frameworks
+
                 const fwDiv = document.getElementById('task-frameworks');
-                fwDiv.innerHTML = (journeyData.current_task.frameworks || []).map(f => 
+                fwDiv.innerHTML = (journeyData.current_task.frameworks || []).map(f =>
                     `<span class="inline-block bg-purple-900/30 text-purple-300 text-xs px-2 py-1 rounded mr-1">${f}</span>`
                 ).join('');
-                
-                // Deliverables
+
                 const delDiv = document.getElementById('task-deliverables');
-                delDiv.innerHTML = (journeyData.current_task.deliverables || []).map(d => 
+                delDiv.innerHTML = (journeyData.current_task.deliverables || []).map(d =>
                     `<div class="text-sm text-slate-400">▸ ${d}</div>`
                 ).join('');
-                
-                // All phases
+
                 const container = document.getElementById('all-phases-container');
                 container.innerHTML = '';
                 Object.entries(journeyData.all_phases || {}).forEach(([key, phase]) => {
@@ -387,16 +560,11 @@
                         </div>
                     `;
                 });
-                
+
                 updateSidebarStats();
-            } catch (e) {
-                console.error("Failed to load journey", e);
-            }
+            } catch (e) { console.error("Failed to load journey", e); }
         }
 
-        // ============================================================
-        // SIDEBAR STATS
-        // ============================================================
         function updateSidebarStats() {
             if (!journeyData) return;
             document.getElementById('side-streak').textContent = `${journeyData.streak || 0} days 🔥`;
@@ -429,9 +597,7 @@
                         </div>
                     `).join('');
                 }
-            } catch (e) {
-                console.error("Failed to load wins", e);
-            }
+            } catch (e) { console.error("Failed to load wins", e); }
         }
 
         function openWinModal() {
@@ -460,9 +626,7 @@
                 loadWins();
                 loadJourney();
                 showToast('🏆 Win recorded!');
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            } catch (e) { alert('Error: ' + e.message); }
         }
 
         // ============================================================
@@ -481,7 +645,7 @@
 
         async function submitStandup() {
             if (!journeyData) { alert("Loading journey data, please try again."); return; }
-            
+
             const payload = {
                 member_id: MEMBER_ID,
                 current_task_id: journeyData.current_task.id,
@@ -490,11 +654,11 @@
                 asset_text: document.getElementById('s-text').value,
                 metrics: document.getElementById('s-metrics').value
             };
-            
+
             const btn = event.target;
             btn.innerText = "⏳ Grading...";
             btn.disabled = true;
-            
+
             try {
                 const res = await fetch(`${API}/api/standup`, {
                     method: 'POST',
@@ -502,7 +666,7 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
-                
+
                 document.getElementById('review-result').style.display = 'block';
                 const scoreEl = document.getElementById('review-score');
                 scoreEl.textContent = `${data.score}/10`;
@@ -510,12 +674,12 @@
                 document.getElementById('review-xp').textContent = `+${data.xp_gained || 25} XP • 🔥 ${data.streak || 0} day streak`;
                 document.getElementById('review-text').textContent = data.review || 'No review provided.';
                 btn.style.display = 'none';
-                
+
                 document.getElementById('s-tasks').value = '';
                 document.getElementById('s-links').value = '';
                 document.getElementById('s-text').value = '';
                 document.getElementById('s-metrics').value = '';
-                
+
                 await loadJourney();
                 showToast(data.score >= 7 ? '✅ Task approved! Journey updated.' : '📝 Review received. Keep pushing.');
             } catch (e) {
@@ -595,9 +759,7 @@
                 });
                 await loadJourney();
                 showToast('Profile saved.');
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            } catch (e) { alert('Error: ' + e.message); }
         }
 
         // ============================================================
@@ -619,10 +781,11 @@
                 const res = await fetch(`${API}/api/check-onboarding?member_id=${MEMBER_ID}`);
                 const data = await res.json();
                 if (!data.onboarded) {
-                    document.getElementById('gatekeeper').classList.remove('hidden');
+                    showStep(1);
+                    document.getElementById('gatekeeper').style.display = 'flex';
                     document.getElementById('app').classList.add('hidden');
                 } else {
-                    document.getElementById('gatekeeper').classList.add('hidden');
+                    document.getElementById('gatekeeper').style.display = 'none';
                     document.getElementById('app').classList.remove('hidden');
                     document.getElementById('user-context').textContent = `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
                     document.getElementById('chat-bottleneck').textContent = data.profile?.biggest_bottleneck || '';
