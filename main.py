@@ -23,10 +23,16 @@ NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
+# Gemini fallback configuration (optional)
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
+log.info(f"🔍 Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
 
 # ============================================================
-# RAILWAY POSTGRESQL (FIXED CONNECTION)
+# RAILWAY POSTGRESQL CONNECTION
 # ============================================================
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -43,9 +49,8 @@ DATABASE_CONNECTED = False
 def get_db_connection():
     """Create PostgreSQL connection using Railway environment variables."""
     try:
-        # Validate all required variables are present
         if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
-            log.warning("⚠️ Missing PostgreSQL environment variables! Check Railway variables.")
+            log.warning("⚠️ Missing PostgreSQL environment variables!")
             return None
         
         log.info(f"🔍 Connecting to PostgreSQL: host={PGHOST}, db={PGDATABASE}, user={PGUSER}, port={PGPORT}")
@@ -180,7 +185,7 @@ app = FastAPI(title="E5 AI Coach OS", version="5.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
-# JOURNEY MAP (12 Tasks — UNCHANGED)
+# JOURNEY MAP (12 Tasks)
 # ============================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -213,7 +218,7 @@ JOURNEY_MAP = {
 }
 
 # ============================================================
-# DATABASE HELPERS (PostgreSQL — Drop-in Replacement)
+# DATABASE HELPERS (PostgreSQL)
 # ============================================================
 def db_get_profile(member_id):
     try:
@@ -376,44 +381,81 @@ def db_get_scores(member_id):
         return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# NVIDIA LLM ENGINE
+# LLM ENGINE (NVIDIA + Gemini Fallback)
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    if not NVIDIA_API_KEY:
-        log.error("❌ NVIDIA_API_KEY is not set!")
-        return "Error: NVIDIA API key not configured."
+    """Call NVIDIA NIM with automatic fallback to Gemini."""
     
-    payload = json.dumps({
-        "model": NVIDIA_MODEL,
-        "messages": messages,
-        "temperature": temperature,
-        "max_tokens": 1024
-    }).encode("utf-8")
+    # ============================================================
+    # LAYER 1: NVIDIA NIM
+    # ============================================================
+    if NVIDIA_API_KEY:
+        try:
+            log.info("🚀 Calling NVIDIA NIM...")
+            payload = json.dumps({
+                "model": NVIDIA_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": 1024
+            }).encode("utf-8")
+            
+            req = urllib.request.Request(
+                NVIDIA_URL,
+                data=payload,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {NVIDIA_API_KEY}"
+                }
+            )
+            
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                log.info("✅ NVIDIA NIM Success!")
+                return result["choices"][0]["message"]["content"]
+                
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode('utf-8', errors='ignore')[:100]
+            log.warning(f"⚠️ NVIDIA HTTP {e.code}: {error_body}")
+        except Exception as e:
+            log.warning(f"⚠️ NVIDIA failed: {e}")
     
-    req = urllib.request.Request(
-        NVIDIA_URL,
-        data=payload,
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {NVIDIA_API_KEY}"
-        }
-    )
+    # ============================================================
+    # LAYER 2: Google Gemini (Fallback)
+    # ============================================================
+    if GEMINI_API_KEY:
+        try:
+            log.info("🚀 Calling Gemini (fallback)...")
+            payload = json.dumps({
+                "model": GEMINI_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": 1024
+            }).encode("utf-8")
+            
+            req = urllib.request.Request(
+                GEMINI_URL,
+                data=payload,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {GEMINI_API_KEY}"
+                }
+            )
+            
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                log.info("✅ Gemini Success!")
+                return result["choices"][0]["message"]["content"]
+                
+        except Exception as e:
+            log.warning(f"⚠️ Gemini failed: {e}")
     
-    log.info(f"🚀 Calling NVIDIA NIM: {NVIDIA_MODEL}")
-    
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            result = json.loads(resp.read().decode("utf-8"))
-            log.info("✅ NVIDIA NIM Success!")
-            return result["choices"][0]["message"]["content"]
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode('utf-8', errors='ignore')[:300]
-        log.error(f"❌ NVIDIA HTTP {e.code}: {error_body}")
-        return f"Error: NVIDIA API failed ({e.code}). Check logs."
-    except Exception as e:
-        log.error(f"❌ NVIDIA Request Failed: {str(e)}")
-        return f"Error: Connection failed - {str(e)}"
+    # ============================================================
+    # ALL FAILED
+    # ============================================================
+    log.error("❌ All AI providers failed.")
+    return "Error: All AI providers unavailable. Please try again later."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -509,7 +551,7 @@ def calculate_trajectory(journey):
         return {"status": "on_track", "message": "✅ You're exactly where you should be. Steady progress wins the race.", "color": "blue"}
 
 # ============================================================
-# ROUTES (ALL PRESERVED)
+# ROUTES
 # ============================================================
 @app.get("/")
 @app.get("/onboarding.html")
