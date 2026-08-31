@@ -18,39 +18,120 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA NIM Configuration (Proven Working)
+# NVIDIA NIM Configuration
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
-log.info(f"🔍 NVIDIA Model: {NVIDIA_MODEL}")
 
 # ============================================================
-# SUPABASE CLIENT WITH RETRY
+# RAILWAY POSTGRESQL (Replaces Supabase)
 # ============================================================
-from supabase import create_client
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
-supabase = None
-if SUPABASE_URL and SUPABASE_KEY:
-    for attempt in range(3):
-        try:
-            supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-            supabase.table("profiles").select("count").limit(1).execute()
-            log.info("✅ Supabase connected and verified.")
-            break
-        except Exception as e:
-            if attempt == 2:
-                log.error(f"⚠️ Supabase connection failed after 3 attempts: {e}")
-                log.warning("⚠️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
-                supabase = None
-            else:
-                log.warning(f"⚠️ Supabase attempt {attempt + 1} failed, retrying...")
-                time.sleep(2)
-else:
-    log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
+# Get Railway PostgreSQL connection details
+PGHOST = os.environ.get("PGHOST", "").strip()
+PGDATABASE = os.environ.get("PGDATABASE", "").strip()
+PGUSER = os.environ.get("PGUSER", "").strip()
+PGPASSWORD = os.environ.get("PGPASSWORD", "").strip()
+PGPORT = os.environ.get("PGPORT", "5432").strip()
+
+DATABASE_CONNECTED = False
+
+def get_db_connection():
+    """Create PostgreSQL connection."""
+    try:
+        return psycopg2.connect(
+            host=PGHOST,
+            database=PGDATABASE,
+            user=PGUSER,
+            password=PGPASSWORD,
+            port=PGPORT,
+            cursor_factory=RealDictCursor
+        )
+    except Exception as e:
+        log.error(f"❌ Database connection failed: {e}")
+        return None
+
+def init_db():
+    """Create tables if they don't exist."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            log.warning("⚠️ Could not connect to database. Using in-memory fallback.")
+            return
+        
+        cur = conn.cursor()
+        
+        # Create all tables
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS profiles (
+                member_id TEXT PRIMARY KEY,
+                data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS journeys (
+                member_id TEXT PRIMARY KEY,
+                data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS standups (
+                id SERIAL PRIMARY KEY,
+                member_id TEXT,
+                data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS wins (
+                id SERIAL PRIMARY KEY,
+                member_id TEXT,
+                data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS scores (
+                id SERIAL PRIMARY KEY,
+                member_id TEXT,
+                score INT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS strategy_docs (
+                member_id TEXT PRIMARY KEY,
+                data JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        log.info("✅ PostgreSQL tables initialized.")
+        global DATABASE_CONNECTED
+        DATABASE_CONNECTED = True
+    except Exception as e:
+        log.error(f"⚠️ Database initialization failed: {e}")
+        log.warning("⚠️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
+
+# Initialize on startup
+init_db()
 
 # ============================================================
 # IN-MEMORY FALLBACK
@@ -86,11 +167,11 @@ CHAT_LIMIT = RateLimiter(50, 3600)
 # ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="4.2")
+app = FastAPI(title="E5 AI Coach OS", version="5.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
-# JOURNEY MAP (12 Tasks)
+# JOURNEY MAP (12 Tasks — UNCHANGED)
 # ============================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -123,178 +204,175 @@ JOURNEY_MAP = {
 }
 
 # ============================================================
-# SUPABASE HELPERS WITH RETRY
+# DATABASE HELPERS (PostgreSQL — Drop-in Replacement)
 # ============================================================
-def db_operation_with_retry(operation, max_retries=3):
-    """Wrapper for database operations with automatic retry."""
-    for attempt in range(max_retries):
-        try:
-            return operation()
-        except Exception as e:
-            if attempt == max_retries - 1:
-                log.error(f"DB operation failed after {max_retries} attempts: {e}")
-                raise
-            time.sleep(1)
-
 def db_get_profile(member_id):
-    if not supabase:
-        return PROFILES_DB.get(member_id)
-    
-    def op():
-        result = supabase.table("profiles").select("*").eq("member_id", member_id).execute()
-        return result.data[0] if result.data else None
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            return PROFILES_DB.get(member_id)
+        cur = conn.cursor()
+        cur.execute("SELECT data FROM profiles WHERE member_id = %s", (member_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result['data'] if result else PROFILES_DB.get(member_id)
+    except Exception as e:
+        log.error(f"DB get profile error: {e}")
         return PROFILES_DB.get(member_id)
 
 def db_upsert_profile(member_id, data):
-    if not supabase:
-        PROFILES_DB[member_id] = data
-        return True
-    
-    def op():
-        supabase.table("profiles").upsert({**data, "member_id": member_id}).execute()
-        return True
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            PROFILES_DB[member_id] = data
+            return True
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO profiles (member_id, data) VALUES (%s, %s)
+            ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
+        """, (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        log.error(f"DB upsert profile error: {e}")
         PROFILES_DB[member_id] = data
         return True
 
 def db_get_journey(member_id):
-    if not supabase:
-        return JOURNEY_DB.get(member_id, {
-            "current_day": 1, "current_phase": "Phase 1",
-            "current_task_id": "p1_t1", "tasks_completed": [],
-            "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
-        })
-    
-    def op():
-        result = supabase.table("journeys").select("*").eq("member_id", member_id).execute()
-        return result.data[0] if result.data else None
-    
+    default_journey = {
+        "current_day": 1, "current_phase": "Phase 1",
+        "current_task_id": "p1_t1", "tasks_completed": [],
+        "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
+    }
     try:
-        result = db_operation_with_retry(op)
-        return result if result else JOURNEY_DB.get(member_id, {
-            "current_day": 1, "current_phase": "Phase 1",
-            "current_task_id": "p1_t1", "tasks_completed": [],
-            "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
-        })
-    except:
-        return JOURNEY_DB.get(member_id, {
-            "current_day": 1, "current_phase": "Phase 1",
-            "current_task_id": "p1_t1", "tasks_completed": [],
-            "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
-        })
+        conn = get_db_connection()
+        if not conn:
+            return JOURNEY_DB.get(member_id, default_journey)
+        cur = conn.cursor()
+        cur.execute("SELECT data FROM journeys WHERE member_id = %s", (member_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result['data'] if result else JOURNEY_DB.get(member_id, default_journey)
+    except Exception as e:
+        log.error(f"DB get journey error: {e}")
+        return JOURNEY_DB.get(member_id, default_journey)
 
 def db_upsert_journey(member_id, data):
-    if not supabase:
-        JOURNEY_DB[member_id] = data
-        return True
-    
-    def op():
-        supabase.table("journeys").upsert({**data, "member_id": member_id}).execute()
-        return True
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            JOURNEY_DB[member_id] = data
+            return True
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO journeys (member_id, data) VALUES (%s, %s)
+            ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
+        """, (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        log.error(f"DB upsert journey error: {e}")
         JOURNEY_DB[member_id] = data
         return True
 
 def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text, metrics, score, review, evidence):
-    if not supabase:
-        return True
-    
-    def op():
-        supabase.table("standups").insert({
-            "member_id": member_id, "task_id": task_id,
-            "tasks_completed": tasks_completed, "asset_links": asset_links,
-            "asset_text": asset_text, "metrics": metrics,
-            "score": score, "review_text": review,
-            "link_present": evidence.get("link_present", False),
-            "metrics_present": evidence.get("metrics_present", False),
-            "deliverables_mentioned": evidence.get("deliverables_mentioned", False),
-            "evidence_score": evidence.get("evidence_score", 0)
-        }).execute()
-        return True
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            return True
+        cur = conn.cursor()
+        data = {
+            "task_id": task_id, "tasks_completed": tasks_completed,
+            "asset_links": asset_links, "asset_text": asset_text,
+            "metrics": metrics, "score": score, "review": review, "evidence": evidence
+        }
+        cur.execute("INSERT INTO standups (member_id, data) VALUES (%s, %s)", (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        log.error(f"DB add standup error: {e}")
         return True
 
 def db_add_win(member_id, win_text, revenue):
-    if not supabase:
-        WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
-        return True
-    
-    def op():
-        supabase.table("wins").insert({
-            "member_id": member_id,
-            "win_text": win_text,
-            "revenue_amount": revenue
-        }).execute()
-        return True
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
+            return True
+        cur = conn.cursor()
+        data = {"win_text": win_text, "revenue_amount": revenue}
+        cur.execute("INSERT INTO wins (member_id, data) VALUES (%s, %s)", (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        log.error(f"DB add win error: {e}")
         WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
         return True
 
 def db_get_wins(member_id):
-    if not supabase:
-        return WINS_DB.get(member_id, [])
-    
-    def op():
-        result = supabase.table("wins").select("*").eq("member_id", member_id).order("created_at", desc=True).execute()
-        return result.data if result.data else []
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            return WINS_DB.get(member_id, [])
+        cur = conn.cursor()
+        cur.execute("SELECT data FROM wins WHERE member_id = %s ORDER BY created_at DESC", (member_id,))
+        results = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [r['data'] for r in results] if results else WINS_DB.get(member_id, [])
+    except Exception as e:
+        log.error(f"DB get wins error: {e}")
         return WINS_DB.get(member_id, [])
 
 def db_add_score(member_id, score):
-    if not supabase:
-        SCORES_DB.setdefault(member_id, []).append(score)
-        return True
-    
-    def op():
-        supabase.table("scores").insert({"member_id": member_id, "score": score}).execute()
-        return True
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            SCORES_DB.setdefault(member_id, []).append(score)
+            return True
+        cur = conn.cursor()
+        cur.execute("INSERT INTO scores (member_id, score) VALUES (%s, %s)", (member_id, score))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        log.error(f"DB add score error: {e}")
         SCORES_DB.setdefault(member_id, []).append(score)
         return True
 
 def db_get_scores(member_id):
-    if not supabase:
-        return SCORES_DB.get(member_id, [])
-    
-    def op():
-        result = supabase.table("scores").select("score").eq("member_id", member_id).execute()
-        return [row["score"] for row in result.data] if result.data else []
-    
     try:
-        return db_operation_with_retry(op)
-    except:
+        conn = get_db_connection()
+        if not conn:
+            return SCORES_DB.get(member_id, [])
+        cur = conn.cursor()
+        cur.execute("SELECT score FROM scores WHERE member_id = %s", (member_id,))
+        results = cur.fetchall()
+        cur.close()
+        conn.close()
+        return [r['score'] for r in results] if results else SCORES_DB.get(member_id, [])
+    except Exception as e:
+        log.error(f"DB get scores error: {e}")
         return SCORES_DB.get(member_id, [])
 
 # ============================================================
 # NVIDIA LLM ENGINE
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call NVIDIA NIM API."""
     if not NVIDIA_API_KEY:
         log.error("❌ NVIDIA_API_KEY is not set!")
-        return "Error: NVIDIA API key not configured in Railway."
+        return "Error: NVIDIA API key not configured."
     
     payload = json.dumps({
         "model": NVIDIA_MODEL,
@@ -410,20 +488,19 @@ def advance_journey(journey, member_id):
             journey["current_task_id"] = remaining[0]["id"]
 
 def calculate_trajectory(journey):
-    """Calculates if the member is ahead, behind, or on track."""
     current_day = journey.get("current_day", 1)
     tasks_completed = len(journey.get("tasks_completed", []))
     expected_tasks = max(1, current_day // 7)
     
     if tasks_completed > expected_tasks:
-        return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead of schedule! Keep this momentum.", "color": "green"}
+        return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead of schedule!", "color": "green"}
     elif tasks_completed < expected_tasks:
-        return {"status": "behind", "message": f"⚠️ You're {expected_tasks - tasks_completed} task(s) behind. Focus on your current task to get back on track.", "color": "yellow"}
+        return {"status": "behind", "message": f"⚠️ You're {expected_tasks - tasks_completed} task(s) behind. Focus on your current task.", "color": "yellow"}
     else:
         return {"status": "on_track", "message": "✅ You're exactly where you should be. Steady progress wins the race.", "color": "blue"}
 
 # ============================================================
-# ROUTES
+# ROUTES (ALL PRESERVED)
 # ============================================================
 @app.get("/")
 @app.get("/onboarding.html")
@@ -434,7 +511,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "supabase": supabase is not None, "version": "4.2"}
+    return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.0"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -478,14 +555,22 @@ def generate_strategy(req: StrategyRequest):
     messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
     document = call_llm(messages)
     
-    if supabase:
-        try:
-            supabase.table("strategy_docs").insert({
-                "member_id": req.member_id, "document": document, "starting_day": starting_day,
+    try:
+        conn = get_db_connection()
+        if conn:
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s)
+                ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
+            """, (req.member_id, json.dumps({
+                "document": document, "starting_day": starting_day,
                 "speed_profile": speed_profile, "bottleneck": req.bottleneck
-            }).execute()
-        except Exception as e:
-            log.error(f"Error saving strategy doc: {e}")
+            })))
+            conn.commit()
+            cur.close()
+            conn.close()
+    except Exception as e:
+        log.error(f"Error saving strategy doc: {e}")
     
     return {"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "focus": focus}
 
@@ -501,11 +586,22 @@ def complete_onboarding(req: CompleteOnboardingRequest):
     journey["current_day"] = req.starting_day
     db_upsert_journey(req.member_id, journey)
     
-    if supabase:
-        try:
-            supabase.table("strategy_docs").upsert({"member_id": req.member_id, "document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck}).execute()
-        except Exception as e:
-            log.error(f"Error saving strategy doc: {e}")
+    try:
+        conn = get_db_connection()
+        if conn:
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s)
+                ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
+            """, (req.member_id, json.dumps({
+                "document": req.strategy_document, "starting_day": req.starting_day,
+                "speed_profile": req.speed_profile, "bottleneck": req.bottleneck
+            })))
+            conn.commit()
+            cur.close()
+            conn.close()
+    except Exception as e:
+        log.error(f"Error saving strategy doc: {e}")
     
     return {"success": True, "message": "Onboarding complete", "starting_day": req.starting_day, "speed_profile": req.speed_profile}
 
