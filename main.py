@@ -23,7 +23,8 @@ log = logging.getLogger("e5-coach")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "google/gemini-2.0-flash-001").strip()
 OPENROUTER_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
 
 # ============================================================
@@ -38,8 +39,12 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
     supabase = None
 else:
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    log.info("✅ Supabase connected.")
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        log.info("✅ Supabase connected.")
+    except Exception as e:
+        log.error(f"⚠️ Supabase connection failed: {e}")
+        supabase = None
 
 # ============================================================
 # IN-MEMORY FALLBACK (If Supabase not available)
@@ -276,17 +281,19 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# LLM ENGINE — NOW USING OPENROUTER
+# LLM ENGINE — OPENROUTER + GEMINI FALLBACK
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    # Read API key and model from environment (OpenRouter)
-    api_key = GROQ_API_KEY  # We reuse the same env var name
+    """Call LLM with OpenRouter primary + Gemini fallback."""
+    
+    # Step 1: Try OpenRouter
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip() or os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
-        return "Error: No API key configured. Please set GROQ_API_KEY in Railway."
+        return "Error: No API key configured. Please set OPENROUTER_API_KEY in Railway."
 
-    # Use OpenRouter base URL
-    url = f"{OPENROUTER_BASE_URL}/chat/completions"
-    model = GROQ_MODEL  # e.g., "meta-llama/llama-3.3-70b-instruct:free"
+    # Use a known free model
+    model = os.environ.get("GROQ_MODEL", "google/gemini-2.0-flash-001").strip()
+    url = f"{os.environ.get('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1').strip()}/chat/completions"
 
     try:
         payload = json.dumps({
@@ -302,17 +309,62 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
             method="POST",
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}"
-                # Optional: add "HTTP-Referer" and "X-Title" for OpenRouter analytics
-                # "HTTP-Referer": "https://your-app-url.com",
-                # "X-Title": "E5 AI Coach"
+                "Authorization": f"Bearer {api_key}",
+                "HTTP-Referer": "https://e5-ai-coach-production.up.railway.app",
+                "X-Title": "E5 AI Coach OS"
             }
         )
         with urllib.request.urlopen(req, timeout=90) as resp:
-            return json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
+            result = json.loads(resp.read().decode("utf-8"))
+            log.info("✅ OpenRouter call succeeded")
+            return result["choices"][0]["message"]["content"]
+
+    except urllib.error.HTTPError as e:
+        log.error(f"OpenRouter HTTP Error: {e.code} - {e.reason}")
+        error_body = ""
+        try:
+            error_body = e.read().decode("utf-8")[:200]
+            log.error(f"OpenRouter error body: {error_body}")
+        except:
+            pass
+
     except Exception as e:
-        log.error(f"LLM Error: {e}")
-        return f"Error: LLM failed. {str(e)}"
+        log.error(f"OpenRouter failed: {e}")
+
+    # Step 2: Try Gemini as fallback
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if gemini_key:
+        try:
+            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
+            gemini_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+
+            payload2 = json.dumps({
+                "model": gemini_model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": 1500
+            }).encode("utf-8")
+
+            req2 = urllib.request.Request(
+                gemini_url,
+                data=payload2,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {gemini_key}"
+                }
+            )
+            with urllib.request.urlopen(req2, timeout=90) as resp2:
+                result2 = json.loads(resp2.read().decode("utf-8"))
+                log.info("✅ Gemini fallback succeeded")
+                return result2["choices"][0]["message"]["content"]
+
+        except urllib.error.HTTPError as e2:
+            log.error(f"Gemini HTTP Error: {e2.code} - {e2.reason}")
+        except Exception as e2:
+            log.error(f"Gemini fallback failed: {e2}")
+
+    return "Error: Both OpenRouter and Gemini failed. Please check API keys and try again."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -506,16 +558,19 @@ Generate a strategy document."""
     
     document = call_llm(messages)
     
-    try:
-        supabase.table("strategy_docs").insert({
-            "member_id": req.member_id,
-            "document": document,
-            "starting_day": starting_day,
-            "speed_profile": speed_profile,
-            "bottleneck": req.bottleneck
-        }).execute()
-    except Exception as e:
-        log.error(f"Error saving strategy doc: {e}")
+    if supabase:
+        try:
+            supabase.table("strategy_docs").insert({
+                "member_id": req.member_id,
+                "document": document,
+                "starting_day": starting_day,
+                "speed_profile": speed_profile,
+                "bottleneck": req.bottleneck
+            }).execute()
+        except Exception as e:
+            log.error(f"Error saving strategy doc: {e}")
+    else:
+        log.warning("Supabase not available, skipping strategy doc save")
     
     return {
         "document": document,
@@ -566,16 +621,19 @@ def complete_onboarding(req: CompleteOnboardingRequest):
     
     db_upsert_journey(req.member_id, journey)
     
-    try:
-        supabase.table("strategy_docs").upsert({
-            "member_id": req.member_id,
-            "document": req.strategy_document,
-            "starting_day": req.starting_day,
-            "speed_profile": req.speed_profile,
-            "bottleneck": req.bottleneck
-        }).execute()
-    except Exception as e:
-        log.error(f"Error saving strategy doc: {e}")
+    if supabase:
+        try:
+            supabase.table("strategy_docs").upsert({
+                "member_id": req.member_id,
+                "document": req.strategy_document,
+                "starting_day": req.starting_day,
+                "speed_profile": req.speed_profile,
+                "bottleneck": req.bottleneck
+            }).execute()
+        except Exception as e:
+            log.error(f"Error saving strategy doc: {e}")
+    else:
+        log.warning("Supabase not available, skipping strategy doc upsert")
     
     return {
         "success": True,
