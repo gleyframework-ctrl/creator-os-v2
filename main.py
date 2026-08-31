@@ -18,13 +18,13 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA NIM Configuration
+# NVIDIA NIM Configuration (Proven Working)
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
-log.info(f" NVIDIA Model: {NVIDIA_MODEL}")
+log.info(f"🔍 NVIDIA Model: {NVIDIA_MODEL}")
 
 # ============================================================
 # SUPABASE CLIENT
@@ -41,7 +41,7 @@ else:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"️ Supabase connection failed: {e}")
+        log.error(f"⚠️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -78,7 +78,7 @@ CHAT_LIMIT = RateLimiter(50, 3600)
 # ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="4.0")
+app = FastAPI(title="E5 AI Coach OS", version="4.1")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
@@ -343,10 +343,24 @@ def advance_journey(journey, member_id):
         if remaining:
             journey["current_task_id"] = remaining[0]["id"]
 
+def calculate_trajectory(journey):
+    """Calculates if the member is ahead, behind, or on track."""
+    current_day = journey.get("current_day", 1)
+    tasks_completed = len(journey.get("tasks_completed", []))
+    expected_tasks = max(1, current_day // 7)
+    
+    if tasks_completed > expected_tasks:
+        return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead of schedule! Keep this momentum.", "color": "green"}
+    elif tasks_completed < expected_tasks:
+        return {"status": "behind", "message": f"⚠️ You're {expected_tasks - tasks_completed} task(s) behind. Focus on your current task to get back on track.", "color": "yellow"}
+    else:
+        return {"status": "on_track", "message": "✅ You're exactly where you should be. Steady progress wins the race.", "color": "blue"}
+
 # ============================================================
 # ROUTES
 # ============================================================
 @app.get("/")
+@app.get("/onboarding.html")  # Fixes the redirect issue
 def root():
     if os.path.exists("chat_test.html"):
         return FileResponse("chat_test.html")
@@ -354,7 +368,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "supabase": supabase is not None, "version": "4.0"}
+    return {"ok": True, "supabase": supabase is not None, "version": "4.1"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -370,21 +384,13 @@ def submit_onboarding(req: OnboardingRequest):
         starting_day = 31
     
     speed_profile = "accelerator" if req.weekly_hours == "8+" else "steady" if req.weekly_hours == "4-7" else "reflective"
-    
     profile_data = req.dict()
     profile_data["speed_profile"] = speed_profile
     db_upsert_profile(req.member_id, profile_data)
     db_upsert_journey(req.member_id, {
-        "current_day": starting_day,
-        "current_phase": "Phase 1",
-        "current_task_id": "p1_t1",
-        "tasks_completed": [],
-        "streak": 0,
-        "last_standup_date": None,
-        "xp_total": 0,
-        "badges": []
+        "current_day": starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1",
+        "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
     })
-    
     return {"success": True, "starting_day": starting_day, "speed_profile": speed_profile}
 
 @app.post("/api/generate-strategy")
@@ -393,13 +399,8 @@ def generate_strategy(req: StrategyRequest):
     speed_profile = "accelerator" if req.hours == "8+" else "steady" if req.hours == "4-7" else "reflective"
     
     bottleneck_map = {
-        "traffic": "Module 3 — Attract",
-        "conversion": "Module 4 — Convert",
-        "content": "Module 3 — Attract",
-        "community": "Module 5 — Automate",
-        "offer": "Module 2 — Package",
-        "time": "Module 5 — Automate",
-        "other": "Module 1 — Position"
+        "traffic": "Module 3 — Attract", "conversion": "Module 4 — Convert", "content": "Module 3 — Attract",
+        "community": "Module 5 — Automate", "offer": "Module 2 — Package", "time": "Module 5 — Automate", "other": "Module 1 — Position"
     }
     focus = bottleneck_map.get(req.bottleneck, "Module 1 — Position")
     
@@ -412,82 +413,33 @@ def generate_strategy(req: StrategyRequest):
     if supabase:
         try:
             supabase.table("strategy_docs").insert({
-                "member_id": req.member_id,
-                "document": document,
-                "starting_day": starting_day,
-                "speed_profile": speed_profile,
-                "bottleneck": req.bottleneck
+                "member_id": req.member_id, "document": document, "starting_day": starting_day,
+                "speed_profile": speed_profile, "bottleneck": req.bottleneck
             }).execute()
         except Exception as e:
             log.error(f"Error saving strategy doc: {e}")
     
-    return {
-        "document": document,
-        "starting_day": starting_day,
-        "speed_profile": speed_profile,
-        "focus": focus
-    }
+    return {"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "focus": focus}
 
 @app.post("/api/complete-onboarding")
 def complete_onboarding(req: CompleteOnboardingRequest):
     profile = db_get_profile(req.member_id)
     if not profile:
-        db_upsert_profile(req.member_id, {
-            "business_name": "New Member",
-            "niche": "",
-            "target_avatar": "",
-            "biggest_bottleneck": req.bottleneck,
-            "current_level": req.stage,
-            "weekly_hours": req.hours,
-            "speed_profile": req.speed_profile,
-            "onboarding_complete": True
-        })
+        db_upsert_profile(req.member_id, {"business_name": "New Member", "niche": "", "target_avatar": "", "biggest_bottleneck": req.bottleneck, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True})
     else:
-        db_upsert_profile(req.member_id, {
-            **profile,
-            "current_level": req.stage,
-            "weekly_hours": req.hours,
-            "speed_profile": req.speed_profile,
-            "onboarding_complete": True,
-            "biggest_bottleneck": req.bottleneck
-        })
+        db_upsert_profile(req.member_id, {**profile, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True, "biggest_bottleneck": req.bottleneck})
     
-    journey = db_get_journey(req.member_id)
-    if not journey:
-        journey = {
-            "member_id": req.member_id,
-            "current_day": req.starting_day,
-            "current_phase": "Phase 1",
-            "current_task_id": "p1_t1",
-            "tasks_completed": [],
-            "streak": 0,
-            "last_standup_date": None,
-            "xp_total": 0,
-            "badges": []
-        }
-    else:
-        journey["current_day"] = req.starting_day
-    
+    journey = db_get_journey(req.member_id) or {"member_id": req.member_id, "current_day": req.starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
+    journey["current_day"] = req.starting_day
     db_upsert_journey(req.member_id, journey)
     
     if supabase:
         try:
-            supabase.table("strategy_docs").upsert({
-                "member_id": req.member_id,
-                "document": req.strategy_document,
-                "starting_day": req.starting_day,
-                "speed_profile": req.speed_profile,
-                "bottleneck": req.bottleneck
-            }).execute()
+            supabase.table("strategy_docs").upsert({"member_id": req.member_id, "document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck}).execute()
         except Exception as e:
             log.error(f"Error saving strategy doc: {e}")
     
-    return {
-        "success": True,
-        "message": "Onboarding complete",
-        "starting_day": req.starting_day,
-        "speed_profile": req.speed_profile
-    }
+    return {"success": True, "message": "Onboarding complete", "starting_day": req.starting_day, "speed_profile": req.speed_profile}
 
 @app.get("/api/journey")
 def get_journey_status(member_id: str = "default"):
@@ -501,48 +453,20 @@ def get_journey_status(member_id: str = "default"):
     wins = db_get_wins(member_id)
     
     return {
-        "current_day": journey.get("current_day", 1),
-        "current_phase": phase_info["name"],
-        "phase_days": phase_info["days"],
-        "sub_coach": phase_info.get("sub_coach", "Strategist"),
-        "focus": phase_info["focus"],
-        "current_task": current_task,
-        "tasks_completed": journey.get("tasks_completed", []),
-        "tasks_completed_count": len(journey.get("tasks_completed", [])),
-        "progress_percent": round(progress_percent, 1),
-        "streak": journey.get("streak", 0),
-        "xp": journey.get("xp_total", 0),
-        "avg_score": avg_score,
-        "standup_count": len(scores),
-        "wins": wins,
-        "profile": {
-            "business_name": profile.get("business_name", ""),
-            "niche": profile.get("niche", ""),
-            "bottleneck": profile.get("biggest_bottleneck", ""),
-            "speed_profile": profile.get("speed_profile", "steady")
-        },
-        "all_phases": {
-            k: {
-                "name": v["name"],
-                "sub_coach": v.get("sub_coach", "Strategist"),
-                "tasks": [{
-                    "id": t["id"],
-                    "name": t["name"],
-                    "deadline_day": t["deadline_day"],
-                    "completed": t["id"] in journey.get("tasks_completed", []),
-                    "why": t.get("why", ""),
-                    "frameworks": t.get("frameworks", []),
-                    "deliverables": t.get("deliverables", [])
-                } for t in v["tasks"]]
-            } for k, v in JOURNEY_MAP.items()
-        }
+        "current_day": journey.get("current_day", 1), "current_phase": phase_info["name"], "phase_days": phase_info["days"],
+        "sub_coach": phase_info.get("sub_coach", "Strategist"), "focus": phase_info["focus"], "current_task": current_task,
+        "tasks_completed": journey.get("tasks_completed", []), "tasks_completed_count": len(journey.get("tasks_completed", [])),
+        "progress_percent": round(progress_percent, 1), "streak": journey.get("streak", 0), "xp": journey.get("xp_total", 0),
+        "avg_score": avg_score, "standup_count": len(scores), "wins": wins,
+        "trajectory": calculate_trajectory(journey),  # <-- NEW TRAJECTORY FEATURE
+        "profile": {"business_name": profile.get("business_name", ""), "niche": profile.get("niche", ""), "bottleneck": profile.get("biggest_bottleneck", ""), "speed_profile": profile.get("speed_profile", "steady")},
+        "all_phases": {k: {"name": v["name"], "sub_coach": v.get("sub_coach", "Strategist"), "tasks": [{"id": t["id"], "name": t["name"], "deadline_day": t["deadline_day"], "completed": t["id"] in journey.get("tasks_completed", []), "why": t.get("why", ""), "frameworks": t.get("frameworks", []), "deliverables": t.get("deliverables", [])} for t in v["tasks"]]} for k, v in JOURNEY_MAP.items()}
     }
 
 @app.post("/api/standup")
 def submit_standup(req: StandupRequest):
     profile = db_get_profile(req.member_id)
-    if not profile:
-        raise HTTPException(403, "Complete onboarding first.")
+    if not profile: raise HTTPException(403, "Complete onboarding first.")
     
     journey = db_get_journey(req.member_id)
     phase_info = JOURNEY_MAP[journey["current_phase"]]
@@ -554,15 +478,10 @@ def submit_standup(req: StandupRequest):
     system = f"""You are a STRICT Chief Operating Officer grading execution.
 TASK BEING GRADED: {task['name']}
 REQUIRED FRAMEWORKS: {frameworks_str}
-REQUIRED DELIVERABLES:
-{deliverables_str}
+REQUIRED DELIVERABLES:\n{deliverables_str}
 MEMBER CONTEXT: Niche: {profile.get('niche', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')}
 EVIDENCE-BASED GRADING RUBRIC: Link present? (+2), Specific metrics? (+2), Deliverables mentioned? (+2), Quality? (0-4). Grade STRICTLY.
-OUTPUT FORMAT: GRADE: [X]/10
-AUDIT: [2-3 specific things missing]
-WHAT TO FIX: [Exact fix if < 7]
-NEXT STEP: [Exact next task if >= 7]
-FRAMEWORK TIP: [One insight]"""
+OUTPUT FORMAT: GRADE: [X]/10\nAUDIT: [2-3 specific things missing]\nWHAT TO FIX: [Exact fix if < 7]\nNEXT STEP: [Exact next task if >= 7]\nFRAMEWORK TIP: [One insight]"""
     
     prompt = f"Tasks completed: {req.tasks_completed}\nLinks: {req.asset_links}\nWork content: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
@@ -571,30 +490,20 @@ FRAMEWORK TIP: [One insight]"""
     score = 5
     try:
         m = re.search(r'GRADE:\s*(\d+)', review)
-        if m:
-            score = int(m.group(1))
-    except:
-        pass
+        if m: score = int(m.group(1))
+    except: pass
     score = min(10, max(0, score))
     
-    evidence = {
-        "link_present": len(req.asset_links) > 0 and req.asset_links[0].strip(),
-        "metrics_present": req.metrics.strip() != "",
-        "deliverables_mentioned": len(req.tasks_completed) > 0,
-        "evidence_score": score
-    }
+    evidence = {"link_present": len(req.asset_links) > 0 and req.asset_links[0].strip(), "metrics_present": req.metrics.strip() != "", "deliverables_mentioned": len(req.tasks_completed) > 0, "evidence_score": score}
     today = date.today().isoformat()
     last_date = journey.get("last_standup_date")
     
     if last_date != today:
         if last_date:
-            try:
-                days_since = (date.today() - date.fromisoformat(last_date)).days
-            except:
-                days_since = 1
+            try: days_since = (date.today() - date.fromisoformat(last_date)).days
+            except: days_since = 1
             journey["streak"] = journey.get("streak", 0) + 1 if days_since <= 1 else 1
-        else:
-            journey["streak"] = 1
+        else: journey["streak"] = 1
         journey["last_standup_date"] = today
     
     if score >= 7 and req.current_task_id not in journey.get("tasks_completed", []):
@@ -610,34 +519,21 @@ FRAMEWORK TIP: [One insight]"""
     db_add_score(req.member_id, score)
     db_upsert_journey(req.member_id, journey)
     
-    return {
-        "success": True,
-        "review": review,
-        "score": score,
-        "task_unlocked": score >= 7,
-        "streak": journey.get("streak", 0),
-        "xp_gained": xp_gained,
-        "xp_total": journey.get("xp_total", 0),
-        "journey_updated": True
-    }
+    return {"success": True, "review": review, "score": score, "task_unlocked": score >= 7, "streak": journey.get("streak", 0), "xp_gained": xp_gained, "xp_total": journey.get("xp_total", 0), "journey_updated": True}
 
 @app.post("/api/win")
 def submit_win(req: WinRequest):
-    if not db_get_profile(req.member_id):
-        raise HTTPException(403, "Complete onboarding first.")
+    if not db_get_profile(req.member_id): raise HTTPException(403, "Complete onboarding first.")
     db_add_win(req.member_id, req.win_text, req.revenue_amount)
     return {"success": True, "total_wins": len(db_get_wins(req.member_id))}
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    if not req.message:
-        raise HTTPException(400, "empty message")
-    if not CHAT_LIMIT.allow(req.member_id or "default"):
-        raise HTTPException(429, "Rate limit reached")
+    if not req.message: raise HTTPException(400, "empty message")
+    if not CHAT_LIMIT.allow(req.member_id or "default"): raise HTTPException(429, "Rate limit reached")
     
     profile = db_get_profile(req.member_id or "default")
-    if not profile:
-        raise HTTPException(403, "GATEKEEPER: Complete onboarding first.")
+    if not profile: raise HTTPException(403, "GATEKEEPER: Complete onboarding first.")
     
     journey = db_get_journey(req.member_id or "default")
     phase_info = JOURNEY_MAP[journey["current_phase"]]
@@ -650,22 +546,10 @@ def chat(req: ChatRequest):
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0
     
     if not task_completed:
-        return {
-            "reply": f"""**ACCOUNTABILITY GATE**
-You are Day {journey.get('current_day', 1)} — {phase_info['name']} phase.
-Current task: {current_task['name']}
-Deadline: Day {current_task['deadline_day']}
-Why: {current_task.get('why', 'Complete this task to move forward.')}
-Required frameworks: {frameworks_str}
-Deliverables needed:
-{chr(10).join(['— ' + d for d in current_task.get('deliverables', [])])}
-
-Submit your work using the 'Submit Daily Work' button. I will grade it and unlock the next step."""
-        }
+        return {"reply": f"""**ACCOUNTABILITY GATE**\nYou are Day {journey.get('current_day', 1)} — {phase_info['name']} phase.\nCurrent task: {current_task['name']}\nDeadline: Day {current_task['deadline_day']}\nWhy: {current_task.get('why', 'Complete this task to move forward.')}\nRequired frameworks: {frameworks_str}\nDeliverables needed:\n{chr(10).join(['— ' + d for d in current_task.get('deliverables', [])])}\n\nSubmit your work using the 'Submit Daily Work' button. I will grade it and unlock the next step."""}
     
     wins_text = "No wins recorded yet."
-    if wins:
-        wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
+    if wins: wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
     
     system_prompt = f"""You are the E5 AI Coach — an elite, proactive Chief Operating Officer.
 CURRENT MEMBER CONTEXT: Business: {profile.get('business_name', 'N/A')} | Niche: {profile.get('niche', 'N/A')} | Avatar: {profile.get('target_avatar', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')} | Day: {journey.get('current_day', 1)}/90 | Phase: {phase_info['name']} | Task: {current_task['name']} | Completed: {task_completed} | Streak: {streak} | Avg score: {avg_score}/10 | Wins: {wins_text} | Frameworks: {frameworks_str}
