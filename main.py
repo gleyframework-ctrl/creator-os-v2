@@ -21,7 +21,7 @@ log = logging.getLogger("e5-coach")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash").strip()
 
-log.info(f"🔍 Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
+log.info(f" Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
 log.info(f"🔍 Gemini Model: {GEMINI_MODEL}")
 
 # ============================================================
@@ -32,14 +32,14 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
+    log.warning("️ Supabase credentials missing. Using in-memory fallback.")
     supabase = None
 else:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"️ Supabase connection failed: {e}")
+        log.error(f"⚠️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -223,7 +223,7 @@ def db_get_scores(member_id):
 # GEMINI LLM ENGINE - CORRECTED API ENDPOINT
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call Gemini API with correct endpoint."""
+    """Call Gemini API with correct endpoint - API key in URL."""
     
     if not GEMINI_API_KEY:
         log.error("❌ GEMINI_API_KEY is not set!")
@@ -243,7 +243,7 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
         }
     }).encode("utf-8")
     
-    # CORRECT ENDPOINT: Native Gemini API
+    # CORRECT ENDPOINT: API key MUST be in URL as query parameter
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     
     log.info(f" Calling Gemini: {url[:80]}...")
