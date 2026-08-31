@@ -3,7 +3,6 @@ import time
 import logging
 import threading
 import urllib.request
-import urllib.error
 import json
 import re
 from typing import List, Optional, Dict
@@ -19,11 +18,11 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# Environment variables (NO TRAILING SPACES)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash").strip()
+
+log.info(f"🔍 Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
+log.info(f"🔍 Gemini Model: {GEMINI_MODEL}")
 
 # ============================================================
 # SUPABASE CLIENT
@@ -40,7 +39,7 @@ else:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"️ Supabase connection failed: {e}")
+        log.error(f"⚠️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -221,72 +220,49 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# LLM ENGINE - GEMINI PRIMARY + GROQ FALLBACK (PROVEN FREE APIs)
+# GEMINI LLM ENGINE - SIMPLE & WORKING
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call LLM with Gemini primary + Groq fallback."""
+    """Call Gemini API directly."""
     
-    # Try Gemini first (Google's free API)
-    if GEMINI_API_KEY:
-        try:
-            log.info(f"🔍 Calling Gemini: Model='{GEMINI_MODEL}'")
-            
-            # Convert OpenAI format to Gemini format
-            gemini_contents = []
-            for msg in messages:
-                role = "model" if msg["role"] == "assistant" else "user"
-                gemini_contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-            
-            payload = json.dumps({
-                "contents": gemini_contents,
-                "generationConfig": {
-                    "temperature": temperature,
-                    "maxOutputTokens": 1500
-                }
-            }).encode("utf-8")
-            
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-            
-            req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
-            
-            with urllib.request.urlopen(req, timeout=90) as resp:
-                result = json.loads(resp.read().decode("utf-8"))
-                log.info("✅ Gemini succeeded!")
-                return result["candidates"][0]["content"]["parts"][0]["text"]
-                
-        except Exception as e:
-            log.error(f"❌ Gemini failed: {str(e)}")
+    if not GEMINI_API_KEY:
+        log.error("❌ GEMINI_API_KEY is not set!")
+        return "Error: Gemini API key not configured."
     
-    # Fallback to Groq (ultra-fast, free tier)
-    if GROQ_API_KEY:
-        try:
-            log.info(f"🔄 Gemini failed, trying Groq fallback: Model='{GROQ_MODEL}'")
-            
-            payload = json.dumps({
-                "model": GROQ_MODEL,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": 1500
-            }).encode("utf-8")
-            
-            req = urllib.request.Request(
-                "https://api.groq.com/openai/v1/chat/completions",
-                data=payload, method="POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {GROQ_API_KEY}"
-                }
-            )
-            
-            with urllib.request.urlopen(req, timeout=90) as resp:
-                result = json.loads(resp.read().decode("utf-8"))
-                log.info("✅ Groq fallback succeeded!")
-                return result["choices"][0]["message"]["content"]
-                
-        except Exception as e:
-            log.error(f"❌ Groq fallback failed: {str(e)}")
+    # Convert OpenAI format to Gemini format
+    gemini_contents = []
+    for msg in messages:
+        role = "model" if msg["role"] == "assistant" else "user"
+        gemini_contents.append({"role": role, "parts": [{"text": msg["content"]}]})
     
-    return "Error: Both Gemini and Groq failed. Please check API keys in Railway."
+    payload = json.dumps({
+        "contents": gemini_contents,
+        "generationConfig": {
+            "temperature": temperature,
+            "maxOutputTokens": 1500
+        }
+    }).encode("utf-8")
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    
+    log.info(f"🔍 Calling Gemini: {url[:80]}...")
+    
+    try:
+        req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
+        
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+            log.info("✅ Gemini succeeded!")
+            return result["candidates"][0]["content"]["parts"][0]["text"]
+            
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8', errors='ignore')[:500]
+        log.error(f"❌ Gemini HTTP {e.code}: {e.reason}")
+        log.error(f"Response: {error_body}")
+        return f"Error: Gemini API failed with {e.code}: {error_body}"
+    except Exception as e:
+        log.error(f"❌ Gemini failed: {str(e)}")
+        return f"Error: Gemini failed - {str(e)}"
 
 # ============================================================
 # PYDANTIC MODELS
