@@ -6,7 +6,6 @@ import urllib.request
 import urllib.error
 import json
 import re
-import subprocess
 from typing import List, Optional, Dict
 from datetime import datetime, date
 from pydantic import BaseModel
@@ -15,28 +14,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 # ============================================================
-# DNS FIX FOR RAILWAY (CRITICAL)
-# ============================================================
-try:
-    with open('/etc/resolv.conf', 'w') as f:
-        f.write('nameserver 8.8.8.8\n')
-        f.write('nameserver 1.1.1.1\n')
-        f.write('nameserver 127.0.0.11\n')
-    print("✅ DNS servers updated to 8.8.8.8, 1.1.1.1, 127.0.0.11")
-except Exception as e:
-    print(f"⚠️ Could not update DNS servers: {e}")
-
-# ============================================================
-# LOGGING & ENV (NO TRAILING SPACES)
+# LOGGING & ENV
 # ============================================================
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
+# Environment variables (NO TRAILING SPACES)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
-OPENROUTER_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.1-70b-versatile").strip()
 
 # ============================================================
 # SUPABASE CLIENT
@@ -46,14 +33,14 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    log.warning("️ Supabase credentials missing. Using in-memory fallback.")
+    log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
     supabase = None
 else:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"⚠️ Supabase connection failed: {e}")
+        log.error(f"️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -90,7 +77,7 @@ CHAT_LIMIT = RateLimiter(50, 3600)
 # ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="2.2")
+app = FastAPI(title="E5 AI Coach OS", version="3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
@@ -234,115 +221,72 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# LLM ENGINE — WITH DNS FIX & RETRIES
+# LLM ENGINE - GEMINI PRIMARY + GROQ FALLBACK (PROVEN FREE APIs)
 # ============================================================
-def call_llm_with_retry(messages: List[Dict], temperature: float = 0.3, max_retries: int = 3) -> str:
-    """Call LLM with retries to handle transient DNS errors."""
-    last_error = ""
-    
-    for attempt in range(max_retries):
-        try:
-            return call_llm(messages, temperature)
-        except Exception as e:
-            last_error = str(e)
-            log.warning(f"⚠️ LLM call failed (attempt {attempt + 1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)  # Exponential backoff
-    
-    log.error(f"❌ All LLM retries failed. Last error: {last_error}")
-    return f"Error: LLM failed after {max_retries} retries. {last_error}"
-
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call LLM with OpenRouter primary + Gemini fallback."""
+    """Call LLM with Gemini primary + Groq fallback."""
     
-    # 1. Get API Key
-    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip() or os.environ.get("GROQ_API_KEY", "").strip()
-    if not api_key:
-        log.error("❌ CRITICAL: No API key found.")
-        return "Error: No API key configured."
-
-    # 2. Get Model and URL
-    model = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
-    base_url = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
-    url = f"{base_url}/chat/completions"
-    
-    masked_key = api_key[:10] + "..." + api_key[-4:] if len(api_key) > 14 else "***"
-    log.info(f" Calling LLM: Model='{model}', Key='{masked_key}'")
-
-    # 3. Try OpenRouter
-    try:
-        payload = json.dumps({
-            "model": model,
-            "messages": messages,
-            "temperature": temperature,
-            "max_tokens": 1500
-        }).encode("utf-8")
-        
-        req = urllib.request.Request(
-            url, data=payload, method="POST",
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}",
-                "HTTP-Referer": "https://e5-ai-coach-production.up.railway.app",
-                "X-Title": "E5 AI Coach OS"
-            }
-        )
-        with urllib.request.urlopen(req, timeout=90) as resp:
-            result = json.loads(resp.read().decode("utf-8"))
-            log.info("✅ OpenRouter succeeded!")
-            return result["choices"][0]["message"]["content"]
-            
-    except urllib.error.HTTPError as e:
-        error_body = ""
+    # Try Gemini first (Google's free API)
+    if GEMINI_API_KEY:
         try:
-            error_body = e.read().decode('utf-8', errors='ignore')[:300]
-        except:
-            pass
-        log.error(f"❌ OpenRouter HTTP {e.code}: {e.reason} - {error_body}")
-        raise  # Re-raise to trigger retry
-    except Exception as e:
-        log.error(f"❌ OpenRouter failed: {str(e)}")
-        raise  # Re-raise to trigger retry
-    
-    # 4. Fallback to Gemini (only if OpenRouter raises an exception)
-    # This code is unreachable if OpenRouter raises, but kept for structure
-    return "Error: OpenRouter failed."
-
-def call_llm_with_fallback(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Wrapper that tries OpenRouter, then Gemini."""
-    try:
-        return call_llm(messages, temperature)
-    except Exception as e:
-        log.warning(f"⚠️ OpenRouter failed, trying Gemini fallback...")
-        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-        if not gemini_key:
-            return "Error: Both OpenRouter and Gemini failed."
-        
-        try:
-            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
-            gemini_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+            log.info(f"🔍 Calling Gemini: Model='{GEMINI_MODEL}'")
             
-            payload2 = json.dumps({
-                "model": gemini_model,
+            # Convert OpenAI format to Gemini format
+            gemini_contents = []
+            for msg in messages:
+                role = "model" if msg["role"] == "assistant" else "user"
+                gemini_contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+            
+            payload = json.dumps({
+                "contents": gemini_contents,
+                "generationConfig": {
+                    "temperature": temperature,
+                    "maxOutputTokens": 1500
+                }
+            }).encode("utf-8")
+            
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+            
+            req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
+            
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                log.info("✅ Gemini succeeded!")
+                return result["candidates"][0]["content"]["parts"][0]["text"]
+                
+        except Exception as e:
+            log.error(f"❌ Gemini failed: {str(e)}")
+    
+    # Fallback to Groq (ultra-fast, free tier)
+    if GROQ_API_KEY:
+        try:
+            log.info(f"🔄 Gemini failed, trying Groq fallback: Model='{GROQ_MODEL}'")
+            
+            payload = json.dumps({
+                "model": GROQ_MODEL,
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": 1500
             }).encode("utf-8")
             
-            req2 = urllib.request.Request(
-                gemini_url, data=payload2, method="POST",
+            req = urllib.request.Request(
+                "https://api.groq.com/openai/v1/chat/completions",
+                data=payload, method="POST",
                 headers={
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {gemini_key}"
+                    "Authorization": f"Bearer {GROQ_API_KEY}"
                 }
             )
-            with urllib.request.urlopen(req2, timeout=90) as resp2:
-                result2 = json.loads(resp2.read().decode("utf-8"))
-                log.info("✅ Gemini fallback succeeded!")
-                return result2["choices"][0]["message"]["content"]
-        except Exception as e2:
-            log.error(f" Gemini fallback failed: {str(e2)}")
-            return "Error: Both OpenRouter and Gemini failed."
+            
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+                log.info("✅ Groq fallback succeeded!")
+                return result["choices"][0]["message"]["content"]
+                
+        except Exception as e:
+            log.error(f"❌ Groq fallback failed: {str(e)}")
+    
+    return "Error: Both Gemini and Groq failed. Please check API keys in Railway."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -436,7 +380,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "supabase": supabase is not None, "version": "2.2"}
+    return {"ok": True, "supabase": supabase is not None, "version": "3.0"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -489,11 +433,7 @@ def generate_strategy(req: StrategyRequest):
     user_prompt = f"Member answers:\n- Stage: {req.stage}\n- Biggest Challenge: {req.bottleneck}\n- Hours Available: {req.hours}/week\n\nCalculated:\n- Starting Day: {starting_day}\n- Speed Profile: {speed_profile}\n- Focus Area: {focus}\n\nGenerate a strategy document."
     
     messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
-    
-    # Use the retry + fallback wrapper
-    document = call_llm_with_retry(messages)
-    if document.startswith("Error:"):
-        document = call_llm_with_fallback(messages)
+    document = call_llm(messages)
     
     if supabase:
         try:
@@ -654,9 +594,7 @@ FRAMEWORK TIP: [One insight]"""
     
     prompt = f"Tasks completed: {req.tasks_completed}\nLinks: {req.asset_links}\nWork content: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
-    review = call_llm_with_retry(messages)
-    if review.startswith("Error:"):
-        review = call_llm_with_fallback(messages)
+    review = call_llm(messages)
     
     score = 5
     try:
@@ -763,14 +701,9 @@ COACHING RULES: 1. Diagnose Before Prescribing. 2. Personalize with Memory. 3. O
 TONE: Calm. Authoritative. Short punchy sentences. Think McKinsey Partner meets Alex Hormozi."""
     
     messages = [{"role": "system", "content": system_prompt}] + [{"role": m.role, "content": m.content} for m in req.history[-10:]] + [{"role": "user", "content": req.message}]
-    reply = call_llm_with_retry(messages)
-    if reply.startswith("Error:"):
-        reply = call_llm_with_fallback(messages)
+    reply = call_llm(messages)
     return {"reply": reply}
 
-# ============================================================
-# MAIN ENTRY POINT
-# ============================================================
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
