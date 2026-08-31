@@ -3,35 +3,33 @@ import time
 import logging
 import threading
 import urllib.request
+import urllib.error
 import json
 import re
 from typing import List, Optional, Dict
 from datetime import datetime, date
-
-# ⚠️ IMPORTANT: BaseModel must be imported
 from pydantic import BaseModel
-
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 # ============================================================
-# LOGGING & ENV
+# LOGGING & ENV (FIXED: NO TRAILING SPACES IN KEY NAMES)
 # ============================================================
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
+# Clean environment variable reading (NO SPACES!)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "google/gemini-2.0-flash-001").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
 OPENROUTER_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
 
 # ============================================================
 # SUPABASE CLIENT
 # ============================================================
 from supabase import create_client
-
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 
@@ -47,7 +45,7 @@ else:
         supabase = None
 
 # ============================================================
-# IN-MEMORY FALLBACK (If Supabase not available)
+# IN-MEMORY FALLBACK
 # ============================================================
 PROFILES_DB = {}
 JOURNEY_DB = {}
@@ -63,6 +61,7 @@ class RateLimiter:
         self.window = window_s
         self.hits = {}
         self.lock = threading.Lock()
+    
     def allow(self, key):
         now = time.time()
         with self.lock:
@@ -73,94 +72,50 @@ class RateLimiter:
                 return False
             b.append(now)
             return True
+
 CHAT_LIMIT = RateLimiter(50, 3600)
 
 # ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="2.0")
+app = FastAPI(title="E5 AI Coach OS", version="2.1")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
-# JOURNEY MAP (12 Tasks with Frameworks & Deliverables)
+# JOURNEY MAP (FIXED: NO TRAILING SPACES IN KEYS)
 # ============================================================
 JOURNEY_MAP = {
     "Phase 1": {
-        "name": "Foundation",
-        "days": "1-30",
-        "focus": "Offer, Avatar, and First Content",
-        "sub_coach": "Foundation Strategist",
+        "name": "Foundation", "days": "1-30", "focus": "Offer, Avatar, and First Content", "sub_coach": "Foundation Strategist",
         "tasks": [
-            {"id": "p1_t1", "name": "Define Core Offer & Value Stack", "deadline_day": 3,
-             "why": "Without a clear offer, all traffic is wasted.",
-             "frameworks": ["AVOCADO Opening Offers", "Value Equation (Hormozi)"],
-             "deliverables": ["Written offer in one sentence", "3 core outcomes you deliver", "Price and guarantee defined"]},
-            {"id": "p1_t2", "name": "Identify Target Avatar & Pain Points", "deadline_day": 7,
-             "why": "Speaking to everyone means converting no one.",
-             "frameworks": ["Dream Customer/Follower (TTB)", "Pain Stack Analysis"],
-             "deliverables": ["Avatar name, age, situation", "3 biggest fears", "3 biggest desires", "Where they hang out online"]},
-            {"id": "p1_t3", "name": "Create & Publish First Content Piece", "deadline_day": 14,
-             "why": "The first piece proves you can execute.",
-             "frameworks": ["Hook Mastery (Kallaway)", "Anti-viral content strategy"],
-             "deliverables": ["Published TikTok or YouTube Short", "Link to the video", "View count after 48 hours"]},
-            {"id": "p1_t4", "name": "Write & Test DM Outreach Template", "deadline_day": 21,
-             "why": "DMs are your fastest path to revenue.",
-             "frameworks": ["SIPE DM Framework", "Ladder of Tiny Yeses"],
-             "deliverables": ["3-message DM sequence written", "Sent to 10 people", "Reply rate reported"]}
+            {"id": "p1_t1", "name": "Define Core Offer & Value Stack", "deadline_day": 3, "why": "Without a clear offer, all traffic is wasted.", "frameworks": ["AVOCADO Opening Offers", "Value Equation (Hormozi)"], "deliverables": ["Written offer in one sentence", "3 core outcomes you deliver", "Price and guarantee defined"]},
+            {"id": "p1_t2", "name": "Identify Target Avatar & Pain Points", "deadline_day": 7, "why": "Speaking to everyone means converting no one.", "frameworks": ["Dream Customer/Follower (TTB)", "Pain Stack Analysis"], "deliverables": ["Avatar name, age, situation", "3 biggest fears", "3 biggest desires", "Where they hang out online"]},
+            {"id": "p1_t3", "name": "Create & Publish First Content Piece", "deadline_day": 14, "why": "The first piece proves you can execute.", "frameworks": ["Hook Mastery (Kallaway)", "Anti-viral content strategy"], "deliverables": ["Published TikTok or YouTube Short", "Link to the video", "View count after 48 hours"]},
+            {"id": "p1_t4", "name": "Write & Test DM Outreach Template", "deadline_day": 21, "why": "DMs are your fastest path to revenue.", "frameworks": ["SIPE DM Framework", "Ladder of Tiny Yeses"], "deliverables": ["3-message DM sequence written", "Sent to 10 people", "Reply rate reported"]}
         ]
     },
     "Phase 2": {
-        "name": "Traffic",
-        "days": "31-60",
-        "focus": "Content volume, Inbound system, Outbound system",
-        "sub_coach": "Traffic & Growth Specialist",
+        "name": "Traffic", "days": "31-60", "focus": "Content volume, Inbound system, Outbound system", "sub_coach": "Traffic & Growth Specialist",
         "tasks": [
-            {"id": "p2_t1", "name": "Double Content Volume & Consistency", "deadline_day": 37,
-             "why": "Traffic is the fuel. Without consistent volume you cannot test what works.",
-             "frameworks": ["Content Engine (E5)", "VAGEL weekly rotation"],
-             "deliverables": ["7 pieces published this week", "Links to all 7", "Best performing piece identified"]},
-            {"id": "p2_t2", "name": "Build Inbound System (Comment to DM)", "deadline_day": 45,
-             "why": "Inbound leads are warm leads. A system that turns comments into DMs runs while you sleep.",
-             "frameworks": ["Community OS", "Comment-to-DM trigger flow"],
-             "deliverables": ["CTA in every video", "Keyword trigger set up", "First inbound DM documented"]},
-            {"id": "p2_t3", "name": "Launch Outbound DM System", "deadline_day": 52,
-             "why": "Outbound is your tap. You control when revenue comes in.",
-             "frameworks": ["DM Doctor", "Rohan 7-step follow-up"],
-             "deliverables": ["50 DMs sent this week", "Positive reply rate", "3 calls booked"]},
-            {"id": "p2_t4", "name": "Fill Weekly Traffic Tracker", "deadline_day": 60,
-             "why": "What you do not measure you cannot improve.",
-             "frameworks": ["Traffic tracking matrix"],
-             "deliverables": ["Weekly tracker with: views, clicks, DMs sent, replies, calls, closes"]}
+            {"id": "p2_t1", "name": "Double Content Volume & Consistency", "deadline_day": 37, "why": "Traffic is the fuel.", "frameworks": ["Content Engine (E5)", "VAGEL weekly rotation"], "deliverables": ["7 pieces published this week", "Links to all 7", "Best performing piece identified"]},
+            {"id": "p2_t2", "name": "Build Inbound System (Comment to DM)", "deadline_day": 45, "why": "Inbound leads are warm leads.", "frameworks": ["Community OS", "Comment-to-DM trigger flow"], "deliverables": ["CTA in every video", "Keyword trigger set up", "First inbound DM documented"]},
+            {"id": "p2_t3", "name": "Launch Outbound DM System", "deadline_day": 52, "why": "Outbound is your tap.", "frameworks": ["DM Doctor", "Rohan 7-step follow-up"], "deliverables": ["50 DMs sent this week", "Positive reply rate", "3 calls booked"]},
+            {"id": "p2_t4", "name": "Fill Weekly Traffic Tracker", "deadline_day": 60, "why": "What you do not measure you cannot improve.", "frameworks": ["Traffic tracking matrix"], "deliverables": ["Weekly tracker with: views, clicks, DMs sent, replies, calls, closes"]}
         ]
     },
     "Phase 3": {
-        "name": "Conversion",
-        "days": "61-90",
-        "focus": "Funnel hacking, Offer rebuild, Landing page, Full launch",
-        "sub_coach": "Revenue & Conversion Specialist",
+        "name": "Conversion", "days": "61-90", "focus": "Funnel hacking, Offer rebuild, Landing page, Full launch", "sub_coach": "Revenue & Conversion Specialist",
         "tasks": [
-            {"id": "p3_t1", "name": "Funnel Hack 3 Competitors", "deadline_day": 67,
-             "why": "Your competitors have already spent money testing what works.",
-             "frameworks": ["Funnel Hacker mode", "Competitor analysis matrix"],
-             "deliverables": ["3 competitor funnels documented", "Best hook from each", "One element to steal and improve"]},
-            {"id": "p3_t2", "name": "Rebuild Offer Doc with Real Data", "deadline_day": 75,
-             "why": "Your offer should be built on what the market proved it wants.",
-             "frameworks": ["Offer Architect (10 pillars)", "F.I.B.S. (Belcher)"],
-             "deliverables": ["New offer doc with real testimonials", "Price anchoring updated", "Risk reversal added"]},
-            {"id": "p3_t3", "name": "Optimize Landing Page Conversion", "deadline_day": 82,
-             "why": "A 1% improvement in conversion rate doubles revenue without more traffic.",
-             "frameworks": ["STORM copywriting (Cattoni)", "19-section sales page (Tutton)"],
-             "deliverables": ["Heatmap or session recording reviewed", "Headline A/B tested", "Conversion rate before and after"]},
-            {"id": "p3_t4", "name": "Execute Full Launch Plan", "deadline_day": 90,
-             "why": "A launch is a concentrated burst of revenue that validates the entire system.",
-             "frameworks": ["Launch Planner", "21-day launch map"],
-             "deliverables": ["Launch executed", "Revenue generated", "Full case study written"]}
+            {"id": "p3_t1", "name": "Funnel Hack 3 Competitors", "deadline_day": 67, "why": "Your competitors have already spent money testing what works.", "frameworks": ["Funnel Hacker mode", "Competitor analysis matrix"], "deliverables": ["3 competitor funnels documented", "Best hook from each", "One element to steal and improve"]},
+            {"id": "p3_t2", "name": "Rebuild Offer Doc with Real Data", "deadline_day": 75, "why": "Your offer should be built on what the market proved it wants.", "frameworks": ["Offer Architect (10 pillars)", "F.I.B.S. (Belcher)"], "deliverables": ["New offer doc with real testimonials", "Price anchoring updated", "Risk reversal added"]},
+            {"id": "p3_t3", "name": "Optimize Landing Page Conversion", "deadline_day": 82, "why": "A 1% improvement in conversion rate doubles revenue.", "frameworks": ["STORM copywriting (Cattoni)", "19-section sales page (Tutton)"], "deliverables": ["Heatmap or session recording reviewed", "Headline A/B tested", "Conversion rate before and after"]},
+            {"id": "p3_t4", "name": "Execute Full Launch Plan", "deadline_day": 90, "why": "A launch is a concentrated burst of revenue.", "frameworks": ["Launch Planner", "21-day launch map"], "deliverables": ["Launch executed", "Revenue generated", "Full case study written"]}
         ]
     }
 }
 
 # ============================================================
-# SUPABASE HELPERS
+# SUPABASE HELPERS (FIXED: NO TRAILING SPACES, NO DUPLICATES)
 # ============================================================
 def db_get_profile(member_id):
     if supabase:
@@ -179,8 +134,6 @@ def db_upsert_profile(member_id, data):
             return True
         except Exception as e:
             log.error(f"Supabase upsert profile error: {e}")
-            PROFILES_DB[member_id] = data
-            return True
     PROFILES_DB[member_id] = data
     return True
 
@@ -205,8 +158,6 @@ def db_upsert_journey(member_id, data):
             return True
         except Exception as e:
             log.error(f"Supabase upsert journey error: {e}")
-            JOURNEY_DB[member_id] = data
-            return True
     JOURNEY_DB[member_id] = data
     return True
 
@@ -214,14 +165,10 @@ def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text,
     if supabase:
         try:
             supabase.table("standups").insert({
-                "member_id": member_id,
-                "task_id": task_id,
-                "tasks_completed": tasks_completed,
-                "asset_links": asset_links,
-                "asset_text": asset_text,
-                "metrics": metrics,
-                "score": score,
-                "review_text": review,
+                "member_id": member_id, "task_id": task_id,
+                "tasks_completed": tasks_completed, "asset_links": asset_links,
+                "asset_text": asset_text, "metrics": metrics,
+                "score": score, "review_text": review,
                 "link_present": evidence.get("link_present", False),
                 "metrics_present": evidence.get("metrics_present", False),
                 "deliverables_mentioned": evidence.get("deliverables_mentioned", False),
@@ -243,8 +190,6 @@ def db_add_win(member_id, win_text, revenue):
             return True
         except Exception as e:
             log.error(f"Supabase add win error: {e}")
-            WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
-            return True
     WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
     return True
 
@@ -255,7 +200,6 @@ def db_get_wins(member_id):
             return result.data if result.data else []
         except Exception as e:
             log.error(f"Supabase get wins error: {e}")
-            return WINS_DB.get(member_id, [])
     return WINS_DB.get(member_id, [])
 
 def db_add_score(member_id, score):
@@ -265,8 +209,6 @@ def db_add_score(member_id, score):
             return True
         except Exception as e:
             log.error(f"Supabase add score error: {e}")
-            SCORES_DB.setdefault(member_id, []).append(score)
-            return True
     SCORES_DB.setdefault(member_id, []).append(score)
     return True
 
@@ -277,24 +219,30 @@ def db_get_scores(member_id):
             return [row["score"] for row in result.data] if result.data else []
         except Exception as e:
             log.error(f"Supabase get scores error: {e}")
-            return SCORES_DB.get(member_id, [])
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# LLM ENGINE — OPENROUTER + GEMINI FALLBACK
+# LLM ENGINE — BULLETPROOF WITH DIAGNOSTICS & FALLBACK
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
     """Call LLM with OpenRouter primary + Gemini fallback."""
     
-    # Step 1: Try OpenRouter
+    # 1. Get API Key (clean, no trailing space issues)
     api_key = os.environ.get("OPENROUTER_API_KEY", "").strip() or os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
-        return "Error: No API key configured. Please set OPENROUTER_API_KEY in Railway."
+        log.error("❌ CRITICAL: No API key found. Check OPENROUTER_API_KEY or GROQ_API_KEY in Railway.")
+        return "Error: No API key configured. Please check your environment variables."
 
-    # Use a known free model
-    model = os.environ.get("GROQ_MODEL", "google/gemini-2.0-flash-001").strip()
-    url = f"{os.environ.get('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1').strip()}/chat/completions"
+    # 2. Get Model and URL
+    model = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
+    base_url = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
+    url = f"{base_url}/chat/completions"
+    
+    # Log exactly what we are using (masking the key for security)
+    masked_key = api_key[:10] + "..." + api_key[-4:] if len(api_key) > 14 else "***"
+    log.info(f"🔍 Attempting LLM call: Model='{model}', URL='{url}', Key='{masked_key}'")
 
+    # 3. Try OpenRouter
     try:
         payload = json.dumps({
             "model": model,
@@ -302,11 +250,9 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
             "temperature": temperature,
             "max_tokens": 1500
         }).encode("utf-8")
-
+        
         req = urllib.request.Request(
-            url,
-            data=payload,
-            method="POST",
+            url, data=payload, method="POST",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}",
@@ -316,55 +262,62 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
         )
         with urllib.request.urlopen(req, timeout=90) as resp:
             result = json.loads(resp.read().decode("utf-8"))
-            log.info("✅ OpenRouter call succeeded")
+            log.info("✅ OpenRouter succeeded!")
             return result["choices"][0]["message"]["content"]
-
+            
     except urllib.error.HTTPError as e:
-        log.error(f"OpenRouter HTTP Error: {e.code} - {e.reason}")
         error_body = ""
         try:
-            error_body = e.read().decode("utf-8")[:200]
-            log.error(f"OpenRouter error body: {error_body}")
+            error_body = e.read().decode('utf-8', errors='ignore')[:300]
         except:
             pass
-
+        log.error(f"❌ OpenRouter HTTP {e.code}: {e.reason}")
+        log.error(f"Response: {error_body}")
     except Exception as e:
-        log.error(f"OpenRouter failed: {e}")
-
-    # Step 2: Try Gemini as fallback
+        log.error(f"❌ OpenRouter failed: {str(e)}")
+    
+    # 4. Fallback to Gemini
+    log.info("🔄 Trying Gemini fallback...")
     gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if gemini_key:
+    if not gemini_key:
+        log.error("❌ No Gemini key available for fallback")
+        return "Error: Both OpenRouter and Gemini failed."
+    
+    try:
+        gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
+        gemini_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        
+        payload2 = json.dumps({
+            "model": gemini_model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": 1500
+        }).encode("utf-8")
+        
+        req2 = urllib.request.Request(
+            gemini_url, data=payload2, method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {gemini_key}"
+            }
+        )
+        with urllib.request.urlopen(req2, timeout=90) as resp2:
+            result2 = json.loads(resp2.read().decode("utf-8"))
+            log.info("✅ Gemini fallback succeeded!")
+            return result2["choices"][0]["message"]["content"]
+            
+    except urllib.error.HTTPError as e2:
+        error_body2 = ""
         try:
-            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
-            gemini_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-
-            payload2 = json.dumps({
-                "model": gemini_model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": 1500
-            }).encode("utf-8")
-
-            req2 = urllib.request.Request(
-                gemini_url,
-                data=payload2,
-                method="POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {gemini_key}"
-                }
-            )
-            with urllib.request.urlopen(req2, timeout=90) as resp2:
-                result2 = json.loads(resp2.read().decode("utf-8"))
-                log.info("✅ Gemini fallback succeeded")
-                return result2["choices"][0]["message"]["content"]
-
-        except urllib.error.HTTPError as e2:
-            log.error(f"Gemini HTTP Error: {e2.code} - {e2.reason}")
-        except Exception as e2:
-            log.error(f"Gemini fallback failed: {e2}")
-
-    return "Error: Both OpenRouter and Gemini failed. Please check API keys and try again."
+            error_body2 = e2.read().decode('utf-8', errors='ignore')[:300]
+        except:
+            pass
+        log.error(f"❌ Gemini HTTP {e2.code}: {e2.reason}")
+        log.error(f"Response: {error_body2}")
+    except Exception as e2:
+        log.error(f"❌ Gemini fallback failed: {str(e2)}")
+    
+    return "Error: Both OpenRouter and Gemini failed. Check Railway logs for details."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -408,7 +361,6 @@ class WinRequest(BaseModel):
     win_text: str
     revenue_amount: Optional[float] = None
 
-# NEW ONBOARDING MODELS
 class StrategyRequest(BaseModel):
     member_id: str
     stage: str
@@ -436,6 +388,7 @@ def advance_journey(journey, member_id):
     phase_tasks = JOURNEY_MAP[phase]["tasks"]
     completed = journey.get("tasks_completed", [])
     completed_in_phase = [t for t in phase_tasks if t["id"] in completed]
+    
     if phase == "Phase 1" and len(completed_in_phase) >= 4:
         journey["current_phase"] = "Phase 2"
         journey["current_task_id"] = "p2_t1"
@@ -458,7 +411,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "supabase": supabase is not None, "version": "2.0"}
+    return {"ok": True, "supabase": supabase is not None, "version": "2.1"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -473,17 +426,11 @@ def submit_onboarding(req: OnboardingRequest):
     elif req.current_level == "advanced" and (req.offer_done and req.audience_done and req.sales_done):
         starting_day = 31
     
-    if req.weekly_hours == "8+":
-        speed_profile = "accelerator"
-    elif req.weekly_hours == "4-7":
-        speed_profile = "steady"
-    else:
-        speed_profile = "reflective"
+    speed_profile = "accelerator" if req.weekly_hours == "8+" else "steady" if req.weekly_hours == "4-7" else "reflective"
     
     profile_data = req.dict()
     profile_data["speed_profile"] = speed_profile
     db_upsert_profile(req.member_id, profile_data)
-    
     db_upsert_journey(req.member_id, {
         "current_day": starting_day,
         "current_phase": "Phase 1",
@@ -497,23 +444,10 @@ def submit_onboarding(req: OnboardingRequest):
     
     return {"success": True, "starting_day": starting_day, "speed_profile": speed_profile}
 
-# ============================================================
-# NEW ONBOARDING ENDPOINTS (Quiz + Strategy Document)
-# ============================================================
 @app.post("/api/generate-strategy")
 def generate_strategy(req: StrategyRequest):
-    starting_day = 1
-    if req.stage == "product":
-        starting_day = 15
-    elif req.stage == "selling":
-        starting_day = 31
-    
-    if req.hours == "8+":
-        speed_profile = "accelerator"
-    elif req.hours == "4-7":
-        speed_profile = "steady"
-    else:
-        speed_profile = "reflective"
+    starting_day = 15 if req.stage == "product" else 31 if req.stage == "selling" else 1
+    speed_profile = "accelerator" if req.hours == "8+" else "steady" if req.hours == "4-7" else "reflective"
     
     bottleneck_map = {
         "traffic": "Module 3 — Attract (Content Engine)",
@@ -526,36 +460,10 @@ def generate_strategy(req: StrategyRequest):
     }
     focus = bottleneck_map.get(req.bottleneck, "Module 1 — Position")
     
-    system_prompt = """You are a strategic business coach. Generate a personalized strategy document based on the member's answers.
-
-The document must include:
-1. Current Stage (based on their answer)
-2. Biggest Challenge (based on their answer)
-3. Recommended Focus Area (based on their bottleneck)
-4. Starting Day (calculated)
-5. Speed Profile (based on hours)
-6. Recommended First Task
-7. Next Steps for the member
-
-Use a clear, professional, and encouraging tone. The document should help the member understand their starting point and what to do next."""
-
-    user_prompt = f"""Member answers:
-- Stage: {req.stage}
-- Biggest Challenge: {req.bottleneck}
-- Hours Available: {req.hours}/week
-
-Calculated:
-- Starting Day: {starting_day}
-- Speed Profile: {speed_profile}
-- Focus Area: {focus}
-
-Generate a strategy document."""
-
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt}
-    ]
+    system_prompt = "You are a strategic business coach. Generate a personalized strategy document based on the member's answers. Include: Current Stage, Biggest Challenge, Recommended Focus Area, Starting Day, Speed Profile, Recommended First Task, and Next Steps. Use a clear, professional, and encouraging tone."
+    user_prompt = f"Member answers:\n- Stage: {req.stage}\n- Biggest Challenge: {req.bottleneck}\n- Hours Available: {req.hours}/week\n\nCalculated:\n- Starting Day: {starting_day}\n- Speed Profile: {speed_profile}\n- Focus Area: {focus}\n\nGenerate a strategy document."
     
+    messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
     document = call_llm(messages)
     
     if supabase:
@@ -569,8 +477,6 @@ Generate a strategy document."""
             }).execute()
         except Exception as e:
             log.error(f"Error saving strategy doc: {e}")
-    else:
-        log.warning("Supabase not available, skipping strategy doc save")
     
     return {
         "document": document,
@@ -632,8 +538,6 @@ def complete_onboarding(req: CompleteOnboardingRequest):
             }).execute()
         except Exception as e:
             log.error(f"Error saving strategy doc: {e}")
-    else:
-        log.warning("Supabase not available, skipping strategy doc upsert")
     
     return {
         "success": True,
@@ -707,44 +611,27 @@ def submit_standup(req: StandupRequest):
     deliverables_str = "\n".join([f"- {d}" for d in task.get("deliverables", [])])
     
     system = f"""You are a STRICT Chief Operating Officer grading execution.
-
 TASK BEING GRADED: {task['name']}
 REQUIRED FRAMEWORKS: {frameworks_str}
 REQUIRED DELIVERABLES:
 {deliverables_str}
-
-MEMBER CONTEXT:
-- Niche: {profile.get('niche', 'N/A')}
-- Bottleneck: {profile.get('biggest_bottleneck', 'N/A')}
-- Speed Profile: {profile.get('speed_profile', 'steady')}
-
-EVIDENCE-BASED GRADING RUBRIC (apply strictly):
-- Link to work present? → +2 points
-- Specific metrics reported? → +2 points
-- Deliverables mentioned? → +2 points
-- Quality of content? → 0-4 points
-
-Grade their submission STRICTLY. Missing deliverables = low score.
-
-OUTPUT FORMAT (use exactly):
-GRADE: [X]/10
-AUDIT: [2-3 specific things missing or weak]
-WHAT TO FIX: [If score < 7: exact fix needed before moving on]
-NEXT STEP: [If score >= 7: the exact next task and first action]
-FRAMEWORK TIP: [One framework insight that applies to their specific situation]"""
+MEMBER CONTEXT: Niche: {profile.get('niche', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')}
+EVIDENCE-BASED GRADING RUBRIC: Link present? (+2), Specific metrics? (+2), Deliverables mentioned? (+2), Quality? (0-4). Grade STRICTLY.
+OUTPUT FORMAT: GRADE: [X]/10
+AUDIT: [2-3 specific things missing]
+WHAT TO FIX: [Exact fix if < 7]
+NEXT STEP: [Exact next task if >= 7]
+FRAMEWORK TIP: [One insight]"""
     
-    prompt = f"""Tasks completed: {req.tasks_completed}
-Links submitted: {req.asset_links}
-Work content: {req.asset_text}
-Metrics reported: {req.metrics}"""
-    
+    prompt = f"Tasks completed: {req.tasks_completed}\nLinks: {req.asset_links}\nWork content: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
     review = call_llm(messages)
     
     score = 5
     try:
         m = re.search(r'GRADE:\s*(\d+)', review)
-        if m: score = int(m.group(1))
+        if m:
+            score = int(m.group(1))
     except:
         pass
     score = min(10, max(0, score))
@@ -755,9 +642,9 @@ Metrics reported: {req.metrics}"""
         "deliverables_mentioned": len(req.tasks_completed) > 0,
         "evidence_score": score
     }
-    
     today = date.today().isoformat()
     last_date = journey.get("last_standup_date")
+    
     if last_date != today:
         if last_date:
             try:
@@ -778,12 +665,7 @@ Metrics reported: {req.metrics}"""
     else:
         xp_gained = 25
     
-    db_add_standup(
-        req.member_id, req.current_task_id,
-        ",".join(req.tasks_completed), ",".join(req.asset_links),
-        req.asset_text, req.metrics, score, review, evidence
-    )
-    
+    db_add_standup(req.member_id, req.current_task_id, ",".join(req.tasks_completed), ",".join(req.asset_links), req.asset_text, req.metrics, score, review, evidence)
     db_add_score(req.member_id, score)
     db_upsert_journey(req.member_id, journey)
     
@@ -829,17 +711,12 @@ def chat(req: ChatRequest):
     if not task_completed:
         return {
             "reply": f"""**ACCOUNTABILITY GATE**
-
 You are Day {journey.get('current_day', 1)} — {phase_info['name']} phase.
-
-Current task: **{current_task['name']}**
+Current task: {current_task['name']}
 Deadline: Day {current_task['deadline_day']}
-
-**Why this task:** {current_task.get('why', 'Complete this task to move forward.')}
-
-**Required frameworks:** {frameworks_str}
-
-**Deliverables needed:**
+Why: {current_task.get('why', 'Complete this task to move forward.')}
+Required frameworks: {frameworks_str}
+Deliverables needed:
 {chr(10).join(['— ' + d for d in current_task.get('deliverables', [])])}
 
 Submit your work using the 'Submit Daily Work' button. I will grade it and unlock the next step."""
@@ -849,41 +726,18 @@ Submit your work using the 'Submit Daily Work' button. I will grade it and unloc
     if wins:
         wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
     
-    system_prompt = f"""You are the E5 AI Coach — an elite, proactive Chief Operating Officer trained on proven business frameworks.
-
-CURRENT MEMBER CONTEXT:
-— Business: {profile.get('business_name', 'N/A')} | Niche: {profile.get('niche', 'N/A')}
-— Avatar: {profile.get('target_avatar', 'N/A')}
-— Bottleneck: {profile.get('biggest_bottleneck', 'N/A')}
-— Speed Profile: {profile.get('speed_profile', 'steady')}
-— Day: {journey.get('current_day', 1)}/90 | Phase: {phase_info['name']}
-— Current Task: {current_task['name']}
-— Task completed: {task_completed}
-— Streak: {streak} days | Avg score: {avg_score}/10
-— Wins: {wins_text}
-— Frameworks available: {frameworks_str}
-
-COACHING RULES:
-1. Diagnose Before Prescribing — Ask to see the work first.
-2. Personalize with Memory — Use their niche and wins in every example.
-3. One Insight Per Response — Depth over breadth.
-4. Apply, Don't Recite — Use frameworks invisibly.
-5. 60% Questions / 40% Insight — End with diagnostic questions.
-6. Rewrite Together — Show BEFORE/AFTER of their work.
-7. Short & Human — 150-250 words max.
-8. Never Invent — Only course context.
-9. Language Matching — EN/AR.
-
+    system_prompt = f"""You are the E5 AI Coach — an elite, proactive Chief Operating Officer.
+CURRENT MEMBER CONTEXT: Business: {profile.get('business_name', 'N/A')} | Niche: {profile.get('niche', 'N/A')} | Avatar: {profile.get('target_avatar', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')} | Day: {journey.get('current_day', 1)}/90 | Phase: {phase_info['name']} | Task: {current_task['name']} | Completed: {task_completed} | Streak: {streak} | Avg score: {avg_score}/10 | Wins: {wins_text} | Frameworks: {frameworks_str}
+COACHING RULES: 1. Diagnose Before Prescribing. 2. Personalize with Memory. 3. One Insight Per Response. 4. Apply, Don't Recite. 5. 60% Questions / 40% Insight. 6. Rewrite Together. 7. Short & Human (150-250 words). 8. Never Invent. 9. Language Matching (EN/AR).
 TONE: Calm. Authoritative. Short punchy sentences. Think McKinsey Partner meets Alex Hormozi."""
     
-    messages = [{"role": "system", "content": system_prompt}]
-    for m in req.history[-10:]:
-        messages.append({"role": m.role, "content": m.content})
-    messages.append({"role": "user", "content": req.message})
-    
+    messages = [{"role": "system", "content": system_prompt}] + [{"role": m.role, "content": m.content} for m in req.history[-10:]] + [{"role": "user", "content": req.message}]
     reply = call_llm(messages)
     return {"reply": reply}
 
+# ============================================================
+# MAIN ENTRY POINT (FIXED)
+# ============================================================
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
