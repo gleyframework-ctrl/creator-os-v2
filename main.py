@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 # ============================================================
-# LOGGING & ENV (FIXED: NO TRAILING SPACES IN KEY NAMES)
+# LOGGING & ENV (FIXED: NO TRAILING SPACES)
 # ============================================================
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
@@ -82,7 +82,7 @@ app = FastAPI(title="E5 AI Coach OS", version="2.1")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
-# JOURNEY MAP (FIXED: NO TRAILING SPACES IN KEYS)
+# JOURNEY MAP (FIXED: NO TRAILING SPACES)
 # ============================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -115,7 +115,7 @@ JOURNEY_MAP = {
 }
 
 # ============================================================
-# SUPABASE HELPERS (FIXED: NO TRAILING SPACES, NO DUPLICATES)
+# SUPABASE HELPERS (FIXED: NO DUPLICATES, NO TRAILING SPACES)
 # ============================================================
 def db_get_profile(member_id):
     if supabase:
@@ -736,7 +736,7 @@ TONE: Calm. Authoritative. Short punchy sentences. Think McKinsey Partner meets 
     return {"reply": reply}
 
 # ============================================================
-# MAIN ENTRY POINT (FIXED)
+# MAIN ENTRY POINT
 # ============================================================
 if __name__ == "__main__":
     import uvicorn
