@@ -1,274 +1,141 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E5 AI Coach OS | Strict Execution</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        .progress-bar { transition: width 0.5s ease-in-out; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-item.active { background: rgba(147, 51, 234, 0.2); border-left: 3px solid #9333ea; }
-        .sidebar-stats { font-size: 12px; }
-        .stat-badge { background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 2px 10px; border-radius: 20px; }
-        .onboarding-step { display: none; }
-        .onboarding-step.active { display: block; }
-        .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
-        .step-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: all 0.3s; }
-        .step-dot.active { background: #9333ea; width: 24px; border-radius: 10px; }
-        .step-dot.done { background: #22c55e; }
-        .trajectory-banner-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-        .trajectory-banner-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); color: #eab308; }
-        .trajectory-banner-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* Trajectory Banner Colors */
+        .trajectory-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); }
+        .trajectory-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); }
+        .trajectory-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); }
+        
+        /* Progress Bar */
+        .progress-track { background: rgba(255,255,255,0.1); border-radius: 20px; height: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 20px; transition: width 0.8s ease-in-out; background: linear-gradient(90deg, #667eea, #764ba2); }
+        
+        /* Task Status */
+        .task-done { opacity: 0.5; text-decoration: line-through; }
+        .task-current { border-left: 3px solid #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+        .task-pending { opacity: 0.6; }
+        
+        /* Stats Cards */
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
+        .stat-card:hover { background: rgba(255,255,255,0.06); }
+        .stat-value { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
-
-    <!-- ============================================================
-    ONBOARDING OVERLAY
-    ============================================================ -->
-    <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
-
-            <!-- Step Indicator -->
-            <div class="step-indicator">
-                <div class="step-dot active" id="step-dot-1"></div>
-                <div class="step-dot" id="step-dot-2"></div>
-                <div class="step-dot" id="step-dot-3"></div>
-                <div class="step-dot" id="step-dot-4"></div>
-            </div>
-
-            <!-- STEP 1: QUIZ -->
-            <div id="onboarding-step-1" class="onboarding-step active">
-                <div class="ob-logo text-3xl mb-2">🚀</div>
-                <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
-                <p class="text-slate-400 mb-6">3 quick questions to personalize your journey.</p>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
-                        <select id="onboarding-stage" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
-                            <option value="idea">💡 Just an idea (I haven't launched anything yet)</option>
-                            <option value="product" selected>📦 I have a product/offer (but no sales yet)</option>
-                            <option value="selling">💰 I'm already selling (I have customers/revenue)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge right now?</label>
-                        <select id="onboarding-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
-                            <option value="traffic">📢 Getting traffic / leads</option>
-                            <option value="conversion">🔄 Converting leads to sales</option>
-                            <option value="content">✍️ Creating consistent content</option>
-                            <option value="community">👥 Growing my community</option>
-                            <option value="offer">📦 Building my offer</option>
-                            <option value="time">⏰ Not enough time</option>
-                            <option value="other">❓ Other</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
-                        <select id="onboarding-hours" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
-                            <option value="1-3">🕐 1-3 hours (Reflective pace)</option>
-                            <option value="4-7" selected>🕒 4-7 hours (Steady pace)</option>
-                            <option value="8+">⚡ 8+ hours (Accelerator pace)</option>
-                        </select>
-                    </div>
-
-                    <button onclick="generateStrategy()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition mt-2">
-                        🚀 Generate My Strategy Document
-                    </button>
-                </div>
-            </div>
-
-            <!-- STEP 2: AI-GENERATED DOCUMENT -->
-            <div id="onboarding-step-2" class="onboarding-step">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-2xl">📄</span>
-                    <h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2>
-                </div>
-                <p class="text-slate-400 mb-4">Review your AI-generated strategy document. Edit if needed.</p>
-
-                <div id="strategy-document-container" class="bg-slate-900 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">
-                    Loading...
-                </div>
-
-                <div class="mt-4 flex gap-3">
-                    <button onclick="regenerateStrategy()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">
-                        🔄 Regenerate
-                    </button>
-                    <button onclick="goToStep(3)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                        ✅ Looks Good → Next
-                    </button>
-                </div>
-            </div>
-
-            <!-- STEP 3: PROOF UPLOAD (Optional) -->
-            <div id="onboarding-step-3" class="onboarding-step">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-2xl">📸</span>
-                    <h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2>
-                </div>
-                <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
-
-                <div class="space-y-3">
-                    <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition">
-                        <input type="file" id="proof-upload" multiple accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="handleProofUpload(event)">
-                        <button onclick="document.getElementById('proof-upload').click()" class="text-slate-400 hover:text-white">
-                            <i class="fas fa-cloud-upload-alt text-3xl block mb-2"></i>
-                            Click to upload screenshots
-                        </button>
-                        <p class="text-xs text-slate-500 mt-2">PNG, JPG, PDF • Multiple files allowed</p>
-                    </div>
-                    <div id="proof-list" class="flex flex-wrap gap-2"></div>
-
-                    <div class="flex gap-3 mt-4">
-                        <button onclick="goToStep(4)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                            ⏭️ Skip & Continue
-                        </button>
-                        <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                            🚀 Start My 90-Day Journey
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 4: CONFIRMATION -->
-            <div id="onboarding-step-4" class="onboarding-step">
-                <div class="text-center py-8">
-                    <div class="text-6xl mb-4">🎉</div>
-                    <h2 class="text-2xl font-bold text-green-400 mb-2">You're All Set!</h2>
-                    <p class="text-slate-400 mb-6">Your AI Coach is now personalized for your business.</p>
-                    <div class="bg-slate-800 rounded-lg p-4 text-left text-sm text-slate-300 max-w-md mx-auto">
-                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Stage:</span> <span id="confirm-stage">—</span></div>
-                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Bottleneck:</span> <span id="confirm-bottleneck">—</span></div>
-                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Speed:</span> <span id="confirm-speed">—</span></div>
-                        <div class="flex justify-between py-1"><span class="text-slate-500">Starting Day:</span> <span id="confirm-day">—</span></div>
-                    </div>
-                    <button onclick="completeOnboarding()" class="mt-6 w-full max-w-xs bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">
-                        🚀 Enter Your AI Coach
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ============================================================
-    MAIN APP UI (Hidden until onboarding complete)
-    ============================================================ -->
-    <div id="app" class="flex-1 flex flex-col hidden">
-        <!-- HEADER -->
-        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50">
+<body class="bg-gray-900 text-white min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-purple-600 flex items-center justify-center font-bold">E5</div>
+                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center font-bold text-xl">E5</div>
                 <div>
-                    <h1 class="font-semibold">Whop Creator OS</h1>
-                    <p id="user-context" class="text-xs text-slate-400">Loading context...</p>
+                    <h1 class="text-2xl font-bold">Whop Creator OS</h1>
+                    <p id="header-context" class="text-gray-400 text-sm">Loading context...</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="sidebar-streak-header" class="text-xs text-yellow-400 hidden md:inline">🔥 0 days</span>
-                <span id="sidebar-xp-header" class="text-xs text-purple-400 hidden md:inline">⭐ 0 XP</span>
-                <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                    <i class="fas fa-clipboard-check"></i> Submit Daily Work
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-orange-500">🔥</span>
+                    <span id="streak-display" class="text-sm font-medium">0 days</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-yellow-500">⭐</span>
+                    <span id="xp-display" class="text-sm font-medium">0 XP</span>
+                </div>
+                <button onclick="showSubmitDailyWork()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    📋 Submit Daily Work
                 </button>
             </div>
-        </header>
+        </div>
 
-        <div class="flex-1 flex">
-            <!-- SIDEBAR -->
-            <nav class="w-64 border-r border-slate-800 bg-slate-900/30 p-4 hidden md:block">
-                <div class="space-y-2">
-                    <button onclick="switchTab('chat')" id="nav-chat" class="nav-item active w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-comments"></i> AI Coach
-                    </button>
-                    <button onclick="switchTab('journey')" id="nav-journey" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-road"></i> My Journey
-                    </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-cog"></i> Settings
-                    </button>
-                </div>
-                <div class="sidebar-stats mt-8 p-4 border-t border-slate-700">
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Streak</span><span id="side-streak" class="text-yellow-400">0 days 🔥</span></div>
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Avg Score</span><span id="side-avg" class="text-purple-400">—</span></div>
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Standups</span><span id="side-standups" class="text-slate-300">0</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">XP</span><span id="side-xp" class="text-purple-400">0</span></div>
-                    <div class="mt-2 h-1 w-full bg-slate-700 rounded"><div id="side-xp-bar" class="h-1 bg-purple-600 rounded" style="width:0%"></div></div>
-                </div>
-            </nav>
-
-            <!-- MAIN CONTENT -->
-            <div class="flex-1 flex flex-col">
-                <!-- CHAT TAB -->
-                <div id="tab-chat" class="tab-content active flex-1 flex flex-col">
-                    <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-                        <div class="flex gap-3">
-                            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold flex-shrink-0">AI</div>
-                            <div class="glass p-4 rounded-r-xl rounded-bl-xl text-sm text-slate-300 max-w-3xl leading-relaxed">
-                                <p class="mb-2 font-semibold text-white">System Initialized. I am your proactive COO.</p>
-                                <p>Based on your profile, your current focus is fixing <span id="chat-bottleneck" class="text-purple-400 font-bold">Low Whop Sales</span>.</p>
-                                <p class="mt-2 text-slate-400">Check <b>"My Journey"</b> to see your task. Submit work in Daily Standup before asking strategic questions.</p>
-                            </div>
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Sidebar -->
+            <div class="col-span-3 space-y-2">
+                <button onclick="showAICoach()" id="nav-chat" class="w-full text-left px-4 py-3 rounded-lg bg-purple-900/50 border border-purple-700 hover:bg-purple-800/50 transition-colors flex items-center gap-3">
+                    <span>💬</span>
+                    <span>AI Coach</span>
+                </button>
+                <button onclick="showJourney()" id="nav-journey" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
+                    <span>🏔️</span>
+                    <span>My Journey</span>
+                </button>
+                <button onclick="showSettings()" id="nav-settings" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </button>
+                
+                <!-- Stats Sidebar -->
+                <div class="mt-8 p-4 glass rounded-lg">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-400">Streak</span><span id="sidebar-streak" class="text-orange-500 font-medium">0 days 🔥</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Avg Score</span><span id="sidebar-score" class="text-purple-400 font-medium">—</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Standups</span><span id="sidebar-standups" class="text-gray-300 font-medium">0</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">XP</span><span id="sidebar-xp" class="text-yellow-400 font-medium">0</span></div>
+                        <div class="mt-2 pt-2 border-t border-gray-700">
+                            <div class="text-gray-500 text-xs mb-1">Journey Progress</div>
+                            <div class="progress-track"><div id="sidebar-progress" class="progress-fill" style="width:0%"></div></div>
                         </div>
                     </div>
-                    <div id="typing" class="hidden px-6 pb-2">
-                        <div class="flex gap-2 items-center text-slate-500 text-sm ml-10">
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
-                        </div>
-                    </div>
-                    <div class="p-4 border-t border-slate-800 bg-slate-900">
-                        <div class="max-w-4xl mx-auto relative">
-                            <textarea id="user-input" rows="1" placeholder="Ask your Whop AI Coach..." 
-                                class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none px-4 py-3 pr-12 resize-none"
-                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
-                                oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                            <button onclick="sendMessage()" class="absolute right-2 top-2 p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                </div>
+            </div>
+
+            <!-- Main Panel -->
+            <div class="col-span-9">
+                <!-- AI Coach Chat -->
+                <div id="ai-coach-panel" class="space-y-4">
+                    <!-- Rendered by JavaScript -->
+                </div>
+
+                <!-- Journey Panel -->
+                <div id="journey-panel" class="hidden space-y-6">
+                    <div class="glass rounded-lg p-6">
+                        <h2 class="text-2xl font-bold mb-4">🏔️ Your 90-Day Journey</h2>
+                        <div id="journey-content" class="space-y-4">
+                            <div class="animate-pulse-slow text-gray-400">Loading your journey...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- JOURNEY TAB -->
-                <div id="tab-journey" class="tab-content flex-1 overflow-y-auto p-6">
-                    <h2 class="text-2xl font-bold mb-6">Your 90-Day Journey</h2>
-                    <div id="journey-content" class="space-y-4"></div>
-                </div>
-
-                <!-- SETTINGS TAB -->
-                <div id="tab-settings" class="tab-content flex-1 overflow-y-auto p-6">
-                    <h2 class="text-2xl font-bold mb-6">Settings & Profile</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass rounded-xl p-6">
-                            <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-user"></i> Business Profile</h3>
-                            <div class="space-y-4">
-                                <div><label class="block text-sm text-slate-400 mb-1">Business Name</label><input type="text" id="profile-business" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <div><label class="block text-sm text-slate-400 mb-1">Niche</label><input type="text" id="profile-niche" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label><input type="text" id="profile-avatar" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg">Save Profile</button>
+                <!-- Settings Panel -->
+                <div id="settings-panel" class="hidden space-y-6">
+                    <div class="glass rounded-lg p-6">
+                        <h2 class="text-2xl font-bold mb-4">⚙️ Settings & Profile</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Business Name</label>
+                                <input type="text" id="business-name" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Niche</label>
+                                <input type="text" id="niche" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Target Avatar</label>
+                                <textarea id="target-avatar" rows="3" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"></textarea>
+                            </div>
+                            <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">💾 Save Profile</button>
                         </div>
-                        <div class="glass rounded-xl p-6">
-                            <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-trophy"></i> Wins & Proof</h3>
-                            <div class="space-y-4">
-                                <button onclick="openWinModal()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2">
-                                    <i class="fas fa-plus"></i> Record a Win
-                                </button>
-                                <div id="wins-list" class="space-y-2"></div>
-                            </div>
+                    </div>
+                    
+                    <!-- Wins Section -->
+                    <div class="glass rounded-lg p-6">
+                        <h3 class="text-lg font-bold mb-4">🏆 Wins & Proof</h3>
+                        <button onclick="showWinModal()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors mb-4">
+                            ➕ Record a Win
+                        </button>
+                        <div id="wins-list" class="space-y-2 text-sm">
+                            <div class="text-gray-400">No wins recorded yet. Start building your proof!</div>
                         </div>
                     </div>
                 </div>
@@ -276,30 +143,9 @@
         </div>
     </div>
 
-    <!-- STANDUP MODAL -->
-    <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">📋 Daily Standup & Audit</h3>
-                <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
-            <div class="space-y-3">
-                <input type="text" id="s-tasks" placeholder="Tasks completed (e.g., Wrote Whop description)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <input type="text" id="s-links" placeholder="Links to work (e.g., Whop page, TikTok video)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <textarea id="s-text" rows="3" placeholder="Paste the actual content (email copy, ad script, etc.) for me to grade." class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none"></textarea>
-                <input type="text" id="s-metrics" placeholder="Metrics (e.g., 500 views, 12 clicks, 2 sales)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <button onclick="submitStandup()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg">🚀 Submit for COO Review</button>
-                <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-700">
-                    <div id="review-score" class="text-2xl font-bold text-center"></div>
-                    <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
-                    <div id="review-text" class="text-sm text-slate-300 mt-3 whitespace-pre-wrap"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- ============================================================ -->
     <!-- WIN MODAL -->
+    <!-- ============================================================ -->
     <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
             <div class="flex justify-between items-center mb-4">
@@ -307,267 +153,365 @@
                 <button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-3">
-                <textarea id="win-text" rows="3" placeholder="Describe your win (e.g., Closed my first $497 client from a TikTok comment)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none"></textarea>
-                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <button onclick="submitWin()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg">💾 Save Win</button>
+                <textarea id="win-text" rows="3" placeholder="Describe your win (e.g., Closed my first $497 client from a TikTok comment)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500"></textarea>
+                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
+                <button onclick="submitWin()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors">💾 Save Win</button>
             </div>
         </div>
     </div>
 
     <!-- ============================================================ -->
+    <!-- STANDUP MODAL -->
+    <!-- ============================================================ -->
+    <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
+                <button onclick="closeStandupModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="text-sm text-purple-300 mb-4">Submit your work for review.</p>
+            <div class="space-y-3">
+                <input type="text" id="s-tasks" placeholder="Tasks completed today" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
+                <input type="text" id="s-links" placeholder="Links to your work" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
+                <textarea id="s-text" rows="3" placeholder="Paste your work content" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500"></textarea>
+                <input type="text" id="s-metrics" placeholder="Metrics (views, clicks, sales...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
+                <button onclick="submitStandup()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition-colors">🚀 Submit for Review</button>
+                <div id="review-result" style="display:none" class="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <div id="review-score" class="text-2xl font-bold text-center"></div>
+                    <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
+                    <div id="review-text" class="text-sm text-gray-300 mt-3 whitespace-pre-wrap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TOAST NOTIFICATIONS -->
+    <!-- ============================================================ -->
+    <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+    <!-- ============================================================ -->
     <!-- JAVASCRIPT -->
     <!-- ============================================================ -->
     <script>
-        // ============================================================
-        // ⚠️ IMPORTANT: CHANGE THIS TO YOUR RAILWAY URL
-        // ============================================================
-        const API = window.location.origin;  // Uses current domain (Railway URL)
-        // For local testing: const API = 'http://localhost:8000';
-
-        const MEMBER_ID = localStorage.getItem('e5_member_id') || 'default';
-        if (!localStorage.getItem('e5_member_id')) localStorage.setItem('e5_member_id', MEMBER_ID);
-
-        let chatHistory = [];
+        const API = window.location.origin;
+        let memberId = localStorage.getItem('member_id') || 'default';
+        if (!localStorage.getItem('member_id')) localStorage.setItem('member_id', memberId);
+        
         let journeyData = null;
-        let strategyDocument = '';
-        let uploadedFiles = [];
-        let currentStep = 1;
+        let chatHistory = [];
 
         // ============================================================
-        // ONBOARDING NAVIGATION
+        // INIT
         // ============================================================
-        function showStep(step) {
-            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
-            document.getElementById(`onboarding-step-${step}`).classList.add('active');
-            document.querySelectorAll('.step-dot').forEach((dot, i) => {
-                dot.classList.remove('active', 'done');
-                if (i + 1 === step) dot.classList.add('active');
-                else if (i + 1 < step) dot.classList.add('done');
-            });
-            currentStep = step;
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkOnboarding();
+            showAICoach();
+            loadStats();
+            setInterval(loadStats, 30000);
+        });
+
+        // ============================================================
+        // ONBOARDING CHECK
+        // ============================================================
+        async function checkOnboarding() {
+            try {
+                const res = await fetch(`${API}/api/check-onboarding?member_id=${memberId}`);
+                const data = await res.json();
+                if (!data.onboarded) {
+                    window.location.href = '/onboarding.html';
+                } else {
+                    document.getElementById('header-context').textContent = 
+                        `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
+                }
+            } catch (e) {
+                console.error('Onboarding check error:', e);
+            }
         }
 
-        function goToStep(step) {
-            showStep(step);
+        // ============================================================
+        // TAB NAVIGATION
+        // ============================================================
+        function showAICoach() {
+            document.getElementById('ai-coach-panel').classList.remove('hidden');
+            document.getElementById('journey-panel').classList.add('hidden');
+            document.getElementById('settings-panel').classList.add('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
+            document.getElementById('nav-chat').classList.add('bg-purple-900/50', 'border-purple-700');
+            loadChatHistory();
+        }
+
+        function showJourney() {
+            document.getElementById('ai-coach-panel').classList.add('hidden');
+            document.getElementById('journey-panel').classList.remove('hidden');
+            document.getElementById('settings-panel').classList.add('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
+            document.getElementById('nav-journey').classList.add('bg-purple-900/50', 'border-purple-700');
+            loadJourney();
+        }
+
+        function showSettings() {
+            document.getElementById('ai-coach-panel').classList.add('hidden');
+            document.getElementById('journey-panel').classList.add('hidden');
+            document.getElementById('settings-panel').classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
+            document.getElementById('nav-settings').classList.add('bg-purple-900/50', 'border-purple-700');
+            loadProfile();
+            loadWins();
         }
 
         // ============================================================
-        // STEP 1: GENERATE STRATEGY DOCUMENT
+        // CHAT
         // ============================================================
-        async function generateStrategy() {
-            const stage = document.getElementById('onboarding-stage').value;
-            const bottleneck = document.getElementById('onboarding-bottleneck').value;
-            const hours = document.getElementById('onboarding-hours').value;
+        function loadChatHistory() {
+            const panel = document.getElementById('ai-coach-panel');
+            panel.innerHTML = `
+                <div class="space-y-4">
+                    <div class="glass rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">AI</div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-white">System Initialized</p>
+                                <p class="text-sm text-gray-400 mt-1">I am your proactive COO. Check "My Journey" to see your current task.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Ask your AI Coach..." 
+                            class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"
+                            onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-4 py-3 rounded-lg transition-colors">
+                            <span>➤</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
 
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Generating...';
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const panel = document.getElementById('ai-coach-panel');
+            panel.innerHTML += `
+                <div class="glass rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">You</div>
+                        <div class="flex-1"><p class="text-sm">${message}</p></div>
+                    </div>
+                </div>
+            `;
+            input.value = '';
 
             try {
-                const response = await fetch(`${API}/api/generate-strategy`, {
+                const res = await fetch(`${API}/api/chat`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours })
+                    body: JSON.stringify({ member_id: memberId, message, history: chatHistory })
                 });
-
-                const data = await response.json();
-                strategyDocument = data.document;
-
-                document.getElementById('strategy-document-container').textContent = data.document;
-
-                // Store for later
-                localStorage.setItem('strategy_document', data.document);
-                localStorage.setItem('starting_day', data.starting_day);
-                localStorage.setItem('speed_profile', data.speed_profile);
-
-                showStep(2);
-
-            } catch (error) {
-                alert('Error generating strategy: ' + error.message);
-            }
-
-            btn.disabled = false;
-            btn.textContent = '🚀 Generate My Strategy Document';
-        }
-
-        async function regenerateStrategy() {
-            await generateStrategy();
-        }
-
-        // ============================================================
-        // STEP 3: PROOF UPLOAD
-        // ============================================================
-        function handleProofUpload(event) {
-            const files = event.target.files;
-            const list = document.getElementById('proof-list');
-
-            for (let file of files) {
-                uploadedFiles.push(file);
-                const div = document.createElement('div');
-                div.className = 'bg-slate-800 text-xs text-slate-300 px-3 py-1 rounded-full flex items-center gap-2';
-                div.innerHTML = `📎 ${file.name} <span class="text-green-400">✅</span>`;
-                list.appendChild(div);
+                const data = await res.json();
+                
+                panel.innerHTML += `
+                    <div class="glass rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">AI</div>
+                            <div class="flex-1">
+                                <p class="text-sm whitespace-pre-wrap">${data.reply}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                panel.scrollTop = panel.scrollHeight;
+                chatHistory.push({role: 'user', content: message});
+                chatHistory.push({role: 'assistant', content: data.reply});
+            } catch (e) {
+                showToast('⚠️ Error sending message', 'error');
             }
         }
 
         // ============================================================
-        // STEP 4: SUBMIT ONBOARDING
-        // ============================================================
-        async function submitOnboarding() {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Submitting...';
-
-            try {
-                const stage = document.getElementById('onboarding-stage').value;
-                const bottleneck = document.getElementById('onboarding-bottleneck').value;
-                const hours = document.getElementById('onboarding-hours').value;
-
-                const response = await fetch(`${API}/api/complete-onboarding`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        member_id: MEMBER_ID,
-                        stage,
-                        bottleneck,
-                        hours,
-                        strategy_document: strategyDocument,
-                        starting_day: parseInt(localStorage.getItem('starting_day')) || 1,
-                        speed_profile: localStorage.getItem('speed_profile') || 'steady'
-                    })
-                });
-
-                const data = await response.json();
-
-                // Update confirmation
-                document.getElementById('confirm-stage').textContent = stage;
-                document.getElementById('confirm-bottleneck').textContent = bottleneck;
-                document.getElementById('confirm-speed').textContent = localStorage.getItem('speed_profile') || 'steady';
-                document.getElementById('confirm-day').textContent = localStorage.getItem('starting_day') || 1;
-
-                showStep(4);
-
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-
-            btn.disabled = false;
-            btn.textContent = '🚀 Start My 90-Day Journey';
-        }
-
-        async function completeOnboarding() {
-            document.getElementById('gatekeeper').style.display = 'none';
-            document.getElementById('app').classList.remove('hidden');
-            await loadJourney();
-            await loadWins();
-
-            // Add welcome message with context
-            const stage = localStorage.getItem('stage') || 'beginner';
-            const day = localStorage.getItem('starting_day') || 1;
-            const speed = localStorage.getItem('speed_profile') || 'steady';
-
-            let welcomeMessage = `**System Initialized. I am your proactive COO.**\n\n`;
-            welcomeMessage += `Based on your profile, you are a **${stage}** level business.\n`;
-            welcomeMessage += `Your starting point: Day **${day}** of the 90-day journey.\n`;
-            welcomeMessage += `Your speed profile: **${speed}** (${speed === 'accelerator' ? 'Fast-paced' : speed === 'steady' ? 'Consistent' : 'Reflective'}).\n\n`;
-            welcomeMessage += `Check the **"My Journey"** tab to see your first task. Submit work in the Daily Standup to get graded and unlock the next step.`;
-
-            appendMessage('ai', welcomeMessage);
-        }
-
-        // ============================================================
-        // TAB SWITCHING
-        // ============================================================
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab}`).classList.add('active');
-            if (tab === 'journey') loadJourney();
-            if (tab === 'settings') loadWins();
-        }
-
-        // ============================================================
-        // JOURNEY (WITH TRAJECTORY)
+        // JOURNEY — POLISHED VERSION
         // ============================================================
         async function loadJourney() {
             const content = document.getElementById('journey-content');
-            content.innerHTML = '<div class="animate-pulse-slow text-slate-400">Loading...</div>';
+            content.innerHTML = '<div class="animate-pulse-slow text-gray-400">Loading your journey...</div>';
 
             try {
-                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
                 journeyData = await res.json();
 
-                // Trajectory banner styling
-                const trajectory = journeyData.trajectory || { status: 'on_track', message: 'Loading trajectory...', color: 'blue' };
-                const bannerClass = `trajectory-banner-${trajectory.color}`;
+                // Trajectory banner
+                const traj = journeyData.trajectory || { status: 'on_track', message: 'Loading...', color: 'blue' };
+                const trajClass = {
+                    'green': 'trajectory-green text-green-300',
+                    'yellow': 'trajectory-yellow text-yellow-300',
+                    'blue': 'trajectory-blue text-blue-300'
+                }[traj.color] || 'trajectory-blue text-blue-300';
+
+                const tasksCompleted = journeyData.tasks_completed_count || 0;
+                const totalTasks = 12;
+                const progressPercent = Math.min(100, Math.round((tasksCompleted / totalTasks) * 100));
 
                 content.innerHTML = `
                     <!-- Trajectory Banner -->
-                    <div class="${bannerClass} rounded-lg p-4 mb-4">
-                        <p class="text-sm font-medium">${trajectory.message}</p>
+                    <div class="${trajClass} rounded-lg p-4 mb-4 border-l-4">
+                        <p class="text-sm font-medium">${traj.message}</p>
                     </div>
 
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Current Phase</div>
-                            <div class="text-xl font-bold text-purple-400">${journeyData.current_phase}</div>
+                    <div class="grid grid-cols-4 gap-3 mb-6">
+                        <div class="stat-card text-center">
+                            <div class="stat-value text-purple-400">${journeyData.current_day}/90</div>
+                            <div class="stat-label">Day</div>
                         </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Day</div>
-                            <div class="text-xl font-bold">${journeyData.current_day}/90</div>
+                        <div class="stat-card text-center">
+                            <div class="stat-value text-green-400">${tasksCompleted}/${totalTasks}</div>
+                            <div class="stat-label">Tasks Done</div>
                         </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Focus</div>
-                            <div class="text-sm">${journeyData.focus}</div>
+                        <div class="stat-card text-center">
+                            <div class="stat-value text-yellow-400">${journeyData.xp || 0}</div>
+                            <div class="stat-label">XP</div>
+                        </div>
+                        <div class="stat-card text-center">
+                            <div class="stat-value text-orange-400">${journeyData.streak || 0}</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-gray-400 mb-1">
+                            <span>Journey Progress</span>
+                            <span>${progressPercent}%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div id="journey-progress-bar" class="progress-fill" style="width:${progressPercent}%"></div>
                         </div>
                     </div>
 
                     <!-- Current Task -->
-                    <div class="glass p-6 rounded-lg border-l-4 border-purple-600">
-                        <h3 class="text-lg font-bold mb-2">🎯 Current Mandatory Task</h3>
-                        <h4 class="text-xl font-bold text-purple-400 mb-2">${journeyData.current_task.name}</h4>
-                        <p class="text-sm text-slate-400 mb-4">Deadline: Day ${journeyData.current_task.deadline_day}</p>
-                        <p class="text-sm mb-4">${journeyData.current_task.why}</p>
-                        
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Frameworks:</div>
-                            <div class="flex flex-wrap gap-2">
-                                ${journeyData.current_task.frameworks.map(f => `<span class="px-3 py-1 bg-purple-900/50 rounded-full text-xs">${f}</span>`).join('')}
-                            </div>
+                    <div class="glass p-5 rounded-lg border-l-4 border-purple-600 mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-medium text-purple-400">🎯 CURRENT TASK</h3>
+                            <span class="text-xs text-gray-400">Deadline: Day ${journeyData.current_task.deadline_day}</span>
                         </div>
-
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Deliverables:</div>
-                            <ul class="list-disc list-inside text-sm space-y-1">
+                        <h4 class="text-lg font-bold text-white">${journeyData.current_task.name}</h4>
+                        <p class="text-sm text-gray-400 mt-1">${journeyData.current_task.why}</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            ${journeyData.current_task.frameworks.map(f => 
+                                `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="mt-3">
+                            <p class="text-xs text-gray-400">Deliverables:</p>
+                            <ul class="text-xs text-gray-300 list-disc list-inside">
                                 ${journeyData.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
                             </ul>
                         </div>
+                    </div>
 
-                        <p class="text-xs text-slate-500">⚠️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
+                    <!-- All Phases -->
+                    <div class="space-y-3">
+                        ${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
+                            const done = phase.tasks.filter(t => t.completed).length;
+                            const total = phase.tasks.length;
+                            const isCurrent = key === journeyData.current_phase.replace(' ', '_');
+                            return `
+                                <div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : 'opacity-70'}">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-sm">${phase.name}</h4>
+                                        <span class="text-xs text-gray-400">${done}/${total}</span>
+                                    </div>
+                                    <div class="space-y-1">
+                                        ${phase.tasks.map(task => `
+                                            <div class="flex items-center gap-2 text-sm ${task.completed ? 'task-done text-gray-500' : isCurrent && !task.completed ? 'task-current pl-2' : 'task-pending'}">
+                                                <span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span>
+                                                <span>${task.name}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
 
-                // Update sidebar stats
+                // Update sidebar progress
+                document.getElementById('sidebar-progress').style.width = `${progressPercent}%`;
                 updateSidebarStats();
 
             } catch (e) {
-                console.error("Failed to load journey", e);
-                content.innerHTML = '<div class="text-red-400">Error loading journey data</div>';
+                console.error('Journey load error:', e);
+                content.innerHTML = '<div class="text-red-400">Error loading journey data. Please refresh.</div>';
             }
         }
 
+        // ============================================================
+        // STATS
+        // ============================================================
         function updateSidebarStats() {
             if (!journeyData) return;
-            document.getElementById('side-streak').textContent = `${journeyData.streak || 0} days 🔥`;
-            document.getElementById('side-avg').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
-            document.getElementById('side-standups').textContent = journeyData.standup_count || 0;
-            document.getElementById('side-xp').textContent = journeyData.xp || 0;
-            const xp = journeyData.xp || 0;
-            document.getElementById('side-xp-bar').style.width = Math.min(100, (xp % 500) / 5) + '%';
-            document.getElementById('sidebar-streak-header').textContent = `🔥 ${journeyData.streak || 0} days`;
-            document.getElementById('sidebar-xp-header').textContent = `⭐ ${journeyData.xp || 0} XP`;
+            document.getElementById('sidebar-streak').textContent = `${journeyData.streak || 0} days 🔥`;
+            document.getElementById('sidebar-score').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
+            document.getElementById('sidebar-standups').textContent = journeyData.standup_count || 0;
+            document.getElementById('sidebar-xp').textContent = journeyData.xp || 0;
+            document.getElementById('streak-display').textContent = `${journeyData.streak || 0} days`;
+            document.getElementById('xp-display').textContent = `${journeyData.xp || 0} XP`;
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
+                journeyData = await res.json();
+                updateSidebarStats();
+            } catch (e) {
+                console.error('Stats load error:', e);
+            }
+        }
+
+        // ============================================================
+        // PROFILE
+        // ============================================================
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API}/api/check-onboarding?member_id=${memberId}`);
+                const data = await res.json();
+                if (data.profile) {
+                    document.getElementById('business-name').value = data.profile.business_name || '';
+                    document.getElementById('niche').value = data.profile.niche || '';
+                    document.getElementById('target-avatar').value = data.profile.target_avatar || '';
+                }
+            } catch (e) { console.error('Profile load error:', e); }
+        }
+
+        async function saveProfile() {
+            const payload = {
+                member_id: memberId,
+                business_name: document.getElementById('business-name').value,
+                niche: document.getElementById('niche').value,
+                target_avatar: document.getElementById('target-avatar').value,
+                core_offer: '',
+                current_revenue: 0,
+                revenue_goal: 10000,
+                biggest_bottleneck: '',
+                current_level: 'beginner',
+                weekly_hours: '4-7',
+                offer_done: false,
+                audience_done: false,
+                sales_done: false,
+                launch_done: false
+            };
+            try {
+                await fetch(`${API}/api/onboarding`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                showToast('✅ Profile saved!');
+            } catch (e) {
+                showToast('⚠️ Error saving profile', 'error');
+            }
         }
 
         // ============================================================
@@ -575,25 +519,25 @@
         // ============================================================
         async function loadWins() {
             try {
-                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
                 const data = await res.json();
                 const wins = data.wins || [];
                 const container = document.getElementById('wins-list');
                 if (wins.length === 0) {
-                    container.innerHTML = '<div class="text-sm text-slate-500">No wins recorded yet. Start building your proof!</div>';
+                    container.innerHTML = '<div class="text-sm text-gray-400">No wins recorded yet. Start building your proof!</div>';
                 } else {
                     container.innerHTML = wins.slice(0, 5).map(w => `
-                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
-                            <div class="text-sm text-slate-300">🏆 ${w.win_text}</div>
+                        <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                            <div class="text-sm text-gray-300">🏆 ${w.win_text}</div>
                             ${w.revenue_amount ? `<div class="text-xs text-green-400">+$${w.revenue_amount}</div>` : ''}
-                            <div class="text-xs text-slate-500 mt-1">${new Date(w.created_at).toLocaleDateString()}</div>
+                            <div class="text-xs text-gray-500 mt-1">${new Date(w.created_at).toLocaleDateString()}</div>
                         </div>
                     `).join('');
                 }
-            } catch (e) { console.error("Failed to load wins", e); }
+            } catch (e) { console.error('Wins load error:', e); }
         }
 
-        function openWinModal() {
+        function showWinModal() {
             document.getElementById('win-modal').classList.remove('hidden');
             document.getElementById('win-modal').classList.add('flex');
         }
@@ -606,12 +550,12 @@
         async function submitWin() {
             const text = document.getElementById('win-text').value.trim();
             const revenue = parseFloat(document.getElementById('win-revenue').value) || null;
-            if (!text) { alert('Describe your win.'); return; }
+            if (!text) { showToast('⚠️ Please describe your win', 'error'); return; }
             try {
                 await fetch(`${API}/api/win`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({member_id: MEMBER_ID, win_text: text, revenue_amount: revenue})
+                    body: JSON.stringify({ member_id: memberId, win_text: text, revenue_amount: revenue })
                 });
                 closeWinModal();
                 document.getElementById('win-text').value = '';
@@ -619,30 +563,29 @@
                 loadWins();
                 loadJourney();
                 showToast('🏆 Win recorded!');
-            } catch (e) { alert('Error: ' + e.message); }
+            } catch (e) { showToast('⚠️ Error recording win', 'error'); }
         }
 
         // ============================================================
         // STANDUP
         // ============================================================
-        function openStandup() {
-            if (!journeyData) { alert("Please wait for journey to load."); return; }
+        function showSubmitDailyWork() {
+            if (!journeyData) { showToast('⏳ Loading journey data...', 'info'); return; }
             document.getElementById('standup-modal').classList.remove('hidden');
             document.getElementById('standup-modal').classList.add('flex');
             document.getElementById('review-result').style.display = 'none';
-            document.getElementById('standup-task-name').textContent = journeyData.current_task.name;
         }
 
-        function closeStandup() {
+        function closeStandupModal() {
             document.getElementById('standup-modal').classList.add('hidden');
             document.getElementById('standup-modal').classList.remove('flex');
         }
 
         async function submitStandup() {
-            if (!journeyData) { alert("Loading journey data, please try again."); return; }
+            if (!journeyData) { showToast('⏳ Please wait for journey to load', 'info'); return; }
 
             const payload = {
-                member_id: MEMBER_ID,
+                member_id: memberId,
                 current_task_id: journeyData.current_task.id,
                 tasks_completed: document.getElementById('s-tasks').value.split(',').filter(s => s.trim()),
                 asset_links: document.getElementById('s-links').value.split(',').filter(s => s.trim()),
@@ -668,7 +611,6 @@
                 scoreEl.className = `text-2xl font-bold text-center ${data.score >= 7 ? 'text-green-400' : data.score >= 5 ? 'text-yellow-400' : 'text-red-400'}`;
                 document.getElementById('review-xp').textContent = `+${data.xp_gained || 25} XP • 🔥 ${data.streak || 0} day streak`;
                 document.getElementById('review-text').textContent = data.review || 'No review provided.';
-                btn.style.display = 'none';
 
                 document.getElementById('s-tasks').value = '';
                 document.getElementById('s-links').value = '';
@@ -676,141 +618,45 @@
                 document.getElementById('s-metrics').value = '';
 
                 await loadJourney();
-                showToast(data.score >= 7 ? '✅ Task approved! Journey updated.' : '📝 Review received. Keep pushing.');
+                showToast(data.score >= 7 ? '✅ Task approved! +125 XP' : '📝 Review received. Keep pushing!');
             } catch (e) {
-                alert('Error: ' + e.message);
+                showToast('⚠️ Error submitting standup', 'error');
             }
-            btn.innerText = "🚀 Submit for COO Review";
+            btn.innerText = "🚀 Submit for Review";
             btn.disabled = false;
         }
 
         // ============================================================
-        // CHAT
+        // TOAST NOTIFICATIONS
         // ============================================================
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            appendMessage('user', text);
-            chatHistory.push({role: 'user', content: text});
-            input.value = '';
-            input.style.height = 'auto';
-            document.getElementById('typing').classList.remove('hidden');
-
-            try {
-                const res = await fetch(`${API}/api/chat`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        message: text,
-                        mode: 'coach',
-                        member_id: MEMBER_ID,
-                        history: chatHistory.slice(-10)
-                    })
-                });
-                const data = await res.json();
-                document.getElementById('typing').classList.add('hidden');
-                if (res.ok) {
-                    appendMessage('ai', data.reply);
-                    chatHistory.push({role: 'assistant', content: data.reply});
-                } else {
-                    appendMessage('ai', `⚠️ ${data.detail || 'Unknown error'}`);
-                }
-            } catch (e) {
-                document.getElementById('typing').classList.add('hidden');
-                appendMessage('ai', `⚠️ Network error: ${e.message}`);
-            }
-        }
-
-        function appendMessage(role, text) {
-            const container = document.getElementById('chat-container');
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                success: 'bg-green-600 border-green-500',
+                error: 'bg-red-600 border-red-500',
+                info: 'bg-blue-600 border-blue-500'
+            };
             const div = document.createElement('div');
-            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
-            const isAi = role === 'ai';
-            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            div.innerHTML = `
-                <div class="w-10 h-10 rounded-full ${isAi ? 'bg-purple-600' : 'bg-slate-700'} flex items-center justify-center font-bold flex-shrink-0 text-xs">${isAi ? 'COO' : 'U'}</div>
-                <div class="glass p-4 ${isAi ? 'rounded-r-xl rounded-bl-xl' : 'rounded-l-xl rounded-br-xl'} text-sm text-slate-300 max-w-3xl leading-relaxed">
-                    ${formatted}
-                </div>
-            `;
+            div.className = `${colors[type] || colors.success} text-white px-4 py-3 rounded-lg border text-sm shadow-lg transition-all opacity-0 transform translate-y-2`;
+            div.textContent = message;
             container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 10);
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(2)';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
         }
 
         // ============================================================
-        // PROFILE
+        // KEYBOARD SHORTCUTS
         // ============================================================
-        async function saveProfile() {
-            const biz = document.getElementById('profile-business').value.trim();
-            const niche = document.getElementById('profile-niche').value.trim();
-            const avatar = document.getElementById('profile-avatar').value.trim();
-            try {
-                await fetch(`${API}/api/onboarding`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        member_id: MEMBER_ID,
-                        business_name: biz,
-                        niche: niche,
-                        target_avatar: avatar,
-                        core_offer: '',
-                        current_revenue: 0,
-                        revenue_goal: 10000,
-                        biggest_bottleneck: '',
-                        current_level: 'beginner',
-                        weekly_hours: '4-7',
-                        offer_done: false,
-                        audience_done: false,
-                        sales_done: false,
-                        launch_done: false
-                    })
-                });
-                await loadJourney();
-                showToast('Profile saved.');
-            } catch (e) { alert('Error: ' + e.message); }
-        }
-
-        // ============================================================
-        // TOAST
-        // ============================================================
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg border border-slate-700 text-sm z-50';
-            t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        // ============================================================
-        // INIT
-        // ============================================================
-        async function init() {
-            try {
-                const res = await fetch(`${API}/api/check-onboarding?member_id=${MEMBER_ID}`);
-                const data = await res.json();
-                if (!data.onboarded) {
-                    showStep(1);
-                    document.getElementById('gatekeeper').style.display = 'flex';
-                    document.getElementById('app').classList.add('hidden');
-                } else {
-                    document.getElementById('gatekeeper').style.display = 'none';
-                    document.getElementById('app').classList.remove('hidden');
-                    document.getElementById('user-context').textContent = `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
-                    document.getElementById('chat-bottleneck').textContent = data.profile?.biggest_bottleneck || '';
-                    document.getElementById('profile-business').value = data.profile?.business_name || '';
-                    document.getElementById('profile-niche').value = data.profile?.niche || '';
-                    document.getElementById('profile-avatar').value = data.profile?.target_avatar || '';
-                    await loadJourney();
-                    await loadWins();
-                }
-            } catch (e) {
-                console.error("Init error:", e);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeStandupModal();
+                closeWinModal();
             }
-        }
-
-        init();
+        });
     </script>
 </body>
 </html>
