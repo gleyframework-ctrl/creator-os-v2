@@ -23,6 +23,8 @@ log = logging.getLogger("e5-coach")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
+OPENROUTER_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
 
 # ============================================================
 # SUPABASE CLIENT
@@ -274,20 +276,38 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# LLM ENGINE
+# LLM ENGINE — NOW USING OPENROUTER
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    api_key = GROQ_API_KEY if GROQ_API_KEY else GEMINI_API_KEY
+    # Read API key and model from environment (OpenRouter)
+    api_key = GROQ_API_KEY  # We reuse the same env var name
     if not api_key:
-        return "Error: No API keys configured."
-    
-    url = "https://api.groq.com/openai/v1/chat/completions" if GROQ_API_KEY else "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-    model = "llama-3.1-70b-versatile" if GROQ_API_KEY else "gemini-2.0-flash"
-    
+        return "Error: No API key configured. Please set GROQ_API_KEY in Railway."
+
+    # Use OpenRouter base URL
+    url = f"{OPENROUTER_BASE_URL}/chat/completions"
+    model = GROQ_MODEL  # e.g., "meta-llama/llama-3.3-70b-instruct:free"
+
     try:
-        payload = json.dumps({"model": model, "messages": messages, "temperature": temperature, "max_tokens": 1500}).encode("utf-8")
-        req = urllib.request.Request(url, data=payload, method="POST",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"})
+        payload = json.dumps({
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": 1500
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+                # Optional: add "HTTP-Referer" and "X-Title" for OpenRouter analytics
+                # "HTTP-Referer": "https://your-app-url.com",
+                # "X-Title": "E5 AI Coach"
+            }
+        )
         with urllib.request.urlopen(req, timeout=90) as resp:
             return json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
     except Exception as e:
@@ -336,9 +356,7 @@ class WinRequest(BaseModel):
     win_text: str
     revenue_amount: Optional[float] = None
 
-# ============================================================
-# NEW ONBOARDING MODELS (Added for Quiz + Strategy Document)
-# ============================================================
+# NEW ONBOARDING MODELS
 class StrategyRequest(BaseModel):
     member_id: str
     stage: str
