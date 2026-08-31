@@ -7,48 +7,148 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        .progress-bar { transition: width 0.5s ease-in-out; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-item.active { background: rgba(147, 51, 234, 0.2); border-left: 3px solid #9333ea; }
-        .sidebar-stats { font-size: 12px; }
-        .stat-badge { background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 2px 10px; border-radius: 20px; }
+        /* ============================================================
+           BASE
+           ============================================================ */
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+        
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.4); border-radius: 20px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
+        
+        /* ============================================================
+           GLASS
+           ============================================================ */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+        .glass-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+        
+        /* ============================================================
+           SIDEBAR
+           ============================================================ */
+        .sidebar-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
+            border-radius: 12px; cursor: pointer; transition: all 0.2s; 
+            color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500;
+        }
+        .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
+        .sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+        .sidebar-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-item .badge { margin-left: auto; background: rgba(139, 92, 246, 0.2); color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+        
+        /* ============================================================
+           STAT CARDS
+           ============================================================ */
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.2s; }
+        .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+        .stat-value { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
+        
+        /* ============================================================
+           TRAJECTORY BANNER
+           ============================================================ */
+        .trajectory { border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
+        .trajectory-green { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .trajectory-yellow { background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.2); color: #facc15; }
+        .trajectory-blue { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .trajectory-icon { font-size: 20px; }
+        
+        /* ============================================================
+           TASK CARD
+           ============================================================ */
+        .task-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+        .task-card .title { font-size: 18px; font-weight: 600; color: #f1f5f9; }
+        .task-card .deadline { font-size: 12px; color: #94a3b8; }
+        .task-card .why { font-size: 14px; color: #94a3b8; margin: 8px 0 12px 0; line-height: 1.5; }
+        .task-framework { display: inline-block; background: rgba(139, 92, 246, 0.15); color: #a78bfa; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; margin: 2px; }
+        .task-deliverable { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; color: #cbd5e1; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .task-deliverable .check { color: #4ade80; font-size: 14px; }
+        .task-deliverable .pending { color: #94a3b8; font-size: 14px; }
+        
+        /* ============================================================
+           PHASE CARD
+           ============================================================ */
+        .phase-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 14px 16px; transition: all 0.2s; }
+        .phase-card:hover { background: rgba(255,255,255,0.04); }
+        .phase-card .phase-title { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+        .phase-card .phase-progress { font-size: 12px; color: #94a3b8; }
+        .phase-task { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; color: #94a3b8; }
+        .phase-task.done { color: #4ade80; text-decoration: line-through; opacity: 0.6; }
+        .phase-task.current { color: #a78bfa; }
+        .phase-task .icon { font-size: 14px; width: 20px; text-align: center; }
+        
+        /* ============================================================
+           CHAT
+           ============================================================ */
+        .chat-message { display: flex; gap: 12px; padding: 12px 16px; border-radius: 12px; }
+        .chat-message.user { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.1); }
+        .chat-message.ai { background: rgba(139, 92, 246, 0.06); border: 1px solid rgba(139, 92, 246, 0.08); }
+        .chat-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .chat-avatar.ai { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        .chat-avatar.user { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .chat-content { flex: 1; font-size: 14px; line-height: 1.6; color: #e2e8f0; }
+        .chat-content strong { color: #f1f5f9; }
+        
+        /* ============================================================
+           ONBOARDING (Preserved)
+           ============================================================ */
         .onboarding-step { display: none; }
         .onboarding-step.active { display: block; }
         .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
         .step-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: all 0.3s; }
-        .step-dot.active { background: #9333ea; width: 24px; border-radius: 10px; }
-        .step-dot.done { background: #22c55e; }
-        .trajectory-banner-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-        .trajectory-banner-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); color: #eab308; }
-        .trajectory-banner-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 16px 20px; border-radius: 12px; color: white; font-size: 14px; max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; }
-        .toast-success { background: rgba(34, 197, 94, 0.9); border: 1px solid #22c55e; }
-        .toast-warning { background: rgba(234, 179, 8, 0.9); border: 1px solid #eab308; }
-        .toast-error { background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; }
-        .toast-info { background: rgba(59, 130, 246, 0.9); border: 1px solid #3b82f6; }
-        .toast-close { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; margin-left: auto; font-size: 18px; }
+        .step-dot.active { background: #8b5cf6; width: 24px; border-radius: 10px; }
+        .step-dot.done { background: #4ade80; }
+        
+        .input-field { width: 100%; padding: 12px 16px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: #f1f5f9; font-size: 14px; transition: all 0.2s; outline: none; }
+        .input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
+        .input-field::placeholder { color: #475569; }
+        
+        .btn-primary { background: #8b5cf6; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-primary:hover { background: #7c3aed; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .btn-secondary { background: rgba(255,255,255,0.05); color: #e2e8f0; padding: 10px 20px; border-radius: 10px; font-weight: 500; font-size: 13px; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.06); cursor: pointer; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+        
+        .btn-success { background: #22c55e; color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-success:hover { background: #16a34a; transform: translateY(-1px); }
+        
+        .typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 20px; border-radius: 12px; color: white; font-size: 14px; max-width: 420px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .toast-success { background: rgba(34, 197, 94, 0.9); }
+        .toast-warning { background: rgba(234, 179, 8, 0.9); }
+        .toast-error { background: rgba(239, 68, 68, 0.9); }
+        .toast-info { background: rgba(59, 130, 246, 0.9); }
+        .toast-close { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; margin-left: auto; font-size: 18px; }
         .toast-close:hover { opacity: 1; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { width: 100%; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body>
 
     <!-- ============================================================
-    ONBOARDING OVERLAY
+    ONBOARDING OVERLAY (PRESERVED)
     ============================================================ -->
-    <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div id="gatekeeper" class="fixed inset-0 bg-[#0a0e1a]/98 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
-
-            <!-- Step Indicator -->
             <div class="step-indicator">
                 <div class="step-dot active" id="step-dot-1"></div>
                 <div class="step-dot" id="step-dot-2"></div>
@@ -58,23 +158,21 @@
 
             <!-- STEP 1: QUIZ -->
             <div id="onboarding-step-1" class="onboarding-step active">
-                <div class="ob-logo text-3xl mb-2">🚀</div>
+                <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
                 <p class="text-slate-400 mb-6">3 quick questions to personalize your journey.</p>
-
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
-                        <select id="onboarding-stage" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
-                            <option value="idea">💡 Just an idea (I haven't launched anything yet)</option>
-                            <option value="product" selected>📦 I have a product/offer (but no sales yet)</option>
-                            <option value="selling">💰 I'm already selling (I have customers/revenue)</option>
+                        <select id="onboarding-stage" class="input-field">
+                            <option value="idea">💡 Just an idea</option>
+                            <option value="product" selected>📦 I have a product/offer</option>
+                            <option value="selling">💰 I'm already selling</option>
                         </select>
                     </div>
-
                     <div>
-                        <label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge right now?</label>
-                        <select id="onboarding-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge?</label>
+                        <select id="onboarding-bottleneck" class="input-field">
                             <option value="traffic">📢 Getting traffic / leads</option>
                             <option value="conversion">🔄 Converting leads to sales</option>
                             <option value="content">✍️ Creating consistent content</option>
@@ -84,71 +182,51 @@
                             <option value="other">❓ Other</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
-                        <select id="onboarding-hours" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
-                            <option value="1-3">🕐 1-3 hours (Reflective pace)</option>
-                            <option value="4-7" selected>🕒 4-7 hours (Steady pace)</option>
-                            <option value="8+">⚡ 8+ hours (Accelerator pace)</option>
+                        <select id="onboarding-hours" class="input-field">
+                            <option value="1-3">🕐 1-3 hours (Reflective)</option>
+                            <option value="4-7" selected>🕒 4-7 hours (Steady)</option>
+                            <option value="8+">⚡ 8+ hours (Accelerator)</option>
                         </select>
                     </div>
-
-                    <button onclick="generateStrategy()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition mt-2">
-                        🚀 Generate My Strategy Document
-                    </button>
+                    <button onclick="generateStrategy()" class="btn-primary w-full">🚀 Generate My Strategy Document</button>
                 </div>
             </div>
 
-            <!-- STEP 2: AI-GENERATED DOCUMENT -->
+            <!-- STEP 2: DOCUMENT -->
             <div id="onboarding-step-2" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="text-2xl">📄</span>
                     <h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2>
                 </div>
-                <p class="text-slate-400 mb-4">Review your AI-generated strategy document. Edit if needed.</p>
-
-                <div id="strategy-document-container" class="bg-slate-900 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">
-                    Loading...
-                </div>
-
+                <p class="text-slate-400 mb-4">Review your AI-generated strategy document.</p>
+                <div id="strategy-document-container" class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">Loading...</div>
                 <div class="mt-4 flex gap-3">
-                    <button onclick="regenerateStrategy()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">
-                        🔄 Regenerate
-                    </button>
-                    <button onclick="goToStep(3)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                        ✅ Looks Good → Next
-                    </button>
+                    <button onclick="regenerateStrategy()" class="btn-secondary">🔄 Regenerate</button>
+                    <button onclick="goToStep(3)" class="btn-primary">✅ Looks Good → Next</button>
                 </div>
             </div>
 
-            <!-- STEP 3: PROOF UPLOAD (Optional) -->
+            <!-- STEP 3: PROOF UPLOAD -->
             <div id="onboarding-step-3" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2">
                     <span class="text-2xl">📸</span>
                     <h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2>
                 </div>
                 <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
-
-                <div class="space-y-3">
-                    <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition">
-                        <input type="file" id="proof-upload" multiple accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="handleProofUpload(event)">
-                        <button onclick="document.getElementById('proof-upload').click()" class="text-slate-400 hover:text-white">
-                            <i class="fas fa-cloud-upload-alt text-3xl block mb-2"></i>
-                            Click to upload screenshots
-                        </button>
-                        <p class="text-xs text-slate-500 mt-2">PNG, JPG, PDF • Multiple files allowed</p>
-                    </div>
-                    <div id="proof-list" class="flex flex-wrap gap-2"></div>
-
-                    <div class="flex gap-3 mt-4">
-                        <button onclick="goToStep(4)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                            ⏭️ Skip & Continue
-                        </button>
-                        <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">
-                            🚀 Start My 90-Day Journey
-                        </button>
-                    </div>
+                <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition">
+                    <input type="file" id="proof-upload" multiple accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="handleProofUpload(event)">
+                    <button onclick="document.getElementById('proof-upload').click()" class="text-slate-400 hover:text-white">
+                        <i class="fas fa-cloud-upload-alt text-3xl block mb-2"></i>
+                        Click to upload screenshots
+                    </button>
+                    <p class="text-xs text-slate-500 mt-2">PNG, JPG, PDF • Multiple files allowed</p>
+                </div>
+                <div id="proof-list" class="flex flex-wrap gap-2 mt-3"></div>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="goToStep(4)" class="btn-secondary">⏭️ Skip & Continue</button>
+                    <button onclick="submitOnboarding()" class="btn-success">🚀 Start My 90-Day Journey</button>
                 </div>
             </div>
 
@@ -158,149 +236,175 @@
                     <div class="text-6xl mb-4">🎉</div>
                     <h2 class="text-2xl font-bold text-green-400 mb-2">You're All Set!</h2>
                     <p class="text-slate-400 mb-6">Your AI Coach is now personalized for your business.</p>
-                    <div class="bg-slate-800 rounded-lg p-4 text-left text-sm text-slate-300 max-w-md mx-auto">
+                    <div class="bg-slate-800/50 rounded-lg p-4 text-left text-sm text-slate-300 max-w-md mx-auto border border-slate-700">
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Stage:</span> <span id="confirm-stage">—</span></div>
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Bottleneck:</span> <span id="confirm-bottleneck">—</span></div>
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Speed:</span> <span id="confirm-speed">—</span></div>
                         <div class="flex justify-between py-1"><span class="text-slate-500">Starting Day:</span> <span id="confirm-day">—</span></div>
                     </div>
-                    <button onclick="completeOnboarding()" class="mt-6 w-full max-w-xs bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">
-                        🚀 Enter Your AI Coach
-                    </button>
+                    <button onclick="completeOnboarding()" class="btn-primary mt-6 w-full max-w-xs">🚀 Enter Your AI Coach</button>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- ============================================================
-    MAIN APP UI (Hidden until onboarding complete)
+    MAIN APP
     ============================================================ -->
-    <div id="app" class="flex-1 flex flex-col hidden">
+    <div id="app" class="flex flex-col h-screen hidden">
+
         <!-- HEADER -->
-        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50">
+        <header class="border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-purple-600 flex items-center justify-center font-bold">E5</div>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm">E5</div>
                 <div>
-                    <h1 class="font-semibold">Whop Creator OS</h1>
-                    <p id="user-context" class="text-xs text-slate-400">Loading context...</p>
+                    <h1 class="font-semibold text-white text-lg">Whop Creator OS</h1>
+                    <p id="header-context" class="text-xs text-slate-500">Loading context...</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="sidebar-streak-header" class="text-xs text-yellow-400 hidden md:inline">🔥 0 days</span>
-                <span id="sidebar-xp-header" class="text-xs text-purple-400 hidden md:inline">⭐ 0 XP</span>
-                <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                    <i class="fas fa-clipboard-check"></i> Submit Daily Work
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="text-orange-500">🔥</span>
+                    <span id="streak-display" class="font-medium text-slate-300">0 days</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="text-yellow-500">⭐</span>
+                    <span id="xp-display" class="font-medium text-slate-300">0 XP</span>
+                </div>
+                <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                    <i class="fas fa-clipboard-check"></i> Submit Work
                 </button>
             </div>
         </header>
 
-        <div class="flex-1 flex">
+        <div class="flex flex-1 overflow-hidden">
+
             <!-- SIDEBAR -->
-            <nav class="w-64 border-r border-slate-800 bg-slate-900/30 p-4 hidden md:block">
-                <div class="space-y-2">
-                    <button onclick="switchTab('chat')" id="nav-chat" class="nav-item active w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-comments"></i> AI Coach
-                    </button>
-                    <button onclick="switchTab('journey')" id="nav-journey" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-road"></i> My Journey
-                    </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                        <i class="fas fa-cog"></i> Settings
-                    </button>
+            <nav class="sidebar w-56 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
+                <div class="space-y-1">
+                    <div onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
+                        <span class="icon">📊</span> Dashboard
+                    </div>
+                    <div onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
+                        <span class="icon">💬</span> AI Coach
+                    </div>
+                    <div onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
+                        <span class="icon">🏔️</span> My Journey
+                        <span class="badge" id="journey-badge">0%</span>
+                    </div>
+                    <div onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
+                        <span class="icon">⚙️</span> Settings
+                    </div>
                 </div>
-                <div class="sidebar-stats mt-8 p-4 border-t border-slate-700">
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Streak</span><span id="side-streak" class="text-yellow-400">0 days 🔥</span></div>
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Avg Score</span><span id="side-avg" class="text-purple-400">—</span></div>
-                    <div class="flex justify-between mb-1"><span class="text-slate-500">Standups</span><span id="side-standups" class="text-slate-300">0</span></div>
-                    <div class="flex justify-between"><span class="text-slate-500">XP</span><span id="side-xp" class="text-purple-400">0</span></div>
-                    <div class="mt-2 h-1 w-full bg-slate-700 rounded"><div id="side-xp-bar" class="h-1 bg-purple-600 rounded" style="width:0%"></div></div>
+
+                <!-- Stats Sidebar -->
+                <div class="mt-auto pt-4 border-t border-slate-800/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Progress</div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-400">Streak</span><span id="side-streak" class="text-orange-400 font-medium">0 days</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Avg Score</span><span id="side-score" class="text-purple-400 font-medium">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Standups</span><span id="side-standups" class="text-slate-300 font-medium">0</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">XP</span><span id="side-xp" class="text-yellow-400 font-medium">0</span></div>
+                    </div>
+                    <div class="mt-3 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div id="side-progress" class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:0%"></div>
+                    </div>
                 </div>
             </nav>
 
             <!-- MAIN CONTENT -->
-            <div class="flex-1 flex flex-col">
+            <main class="flex-1 overflow-y-auto p-6 bg-[#0a0e1a]/30">
+
+                <!-- DASHBOARD TAB -->
+                <div id="tab-dashboard" class="tab-content">
+                    <div id="dashboard-content" class="space-y-6">
+                        <div class="text-slate-400 animate-pulse">Loading dashboard...</div>
+                    </div>
+                </div>
+
                 <!-- CHAT TAB -->
-                <div id="tab-chat" class="tab-content active flex-1 flex flex-col">
-                    <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-                        <div class="flex gap-3">
-                            <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold flex-shrink-0">AI</div>
-                            <div class="glass p-4 rounded-r-xl rounded-bl-xl text-sm text-slate-300 max-w-3xl leading-relaxed">
-                                <p class="mb-2 font-semibold text-white">System Initialized. I am your proactive COO.</p>
-                                <p>Based on your profile, your current focus is fixing <span id="chat-bottleneck" class="text-purple-400 font-bold">Low Whop Sales</span>.</p>
-                                <p class="mt-2 text-slate-400">Check <b>"My Journey"</b> to see your task. Submit work in Daily Standup before asking strategic questions.</p>
-                            </div>
+                <div id="tab-chat" class="tab-content hidden">
+                    <div class="flex flex-col h-full">
+                        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4">
+                            <!-- Chat messages rendered here -->
                         </div>
-                    </div>
-                    <div id="typing" class="hidden px-6 pb-2">
-                        <div class="flex gap-2 items-center text-slate-500 text-sm ml-10">
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
-                            <div class="w-2 h-2 bg-purple-500 rounded-full typing-dot"></div>
+                        <div class="flex gap-3 pt-4 border-t border-slate-800/50">
+                            <input type="text" id="chat-input" placeholder="Ask your AI Coach..." 
+                                class="input-field flex-1"
+                                onkeydown="if(event.key==='Enter') sendMessage()">
+                            <button onclick="sendMessage()" class="btn-primary px-5 py-3">Send</button>
                         </div>
-                    </div>
-                    <div class="p-4 border-t border-slate-800 bg-slate-900">
-                        <div class="max-w-4xl mx-auto relative">
-                            <textarea id="user-input" rows="1" placeholder="Ask your Whop AI Coach..." 
-                                class="w-full bg-slate-800 text-white placeholder-slate-500 rounded-xl border border-slate-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none px-4 py-3 pr-12 resize-none"
-                                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
-                                oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                            <button onclick="sendMessage()" class="absolute right-2 top-2 p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                        <div id="typing-indicator" class="hidden py-2">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="text-slate-400 text-sm ml-2">AI is thinking...</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- JOURNEY TAB -->
-                <div id="tab-journey" class="tab-content flex-1 overflow-y-auto p-6">
-                    <h2 class="text-2xl font-bold mb-6">Your 90-Day Journey</h2>
-                    <div id="journey-content" class="space-y-4"></div>
+                <div id="tab-journey" class="tab-content hidden">
+                    <div id="journey-content" class="space-y-6">
+                        <div class="text-slate-400 animate-pulse">Loading journey...</div>
+                    </div>
                 </div>
 
                 <!-- SETTINGS TAB -->
-                <div id="tab-settings" class="tab-content flex-1 overflow-y-auto p-6">
-                    <h2 class="text-2xl font-bold mb-6">Settings & Profile</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass rounded-xl p-6">
-                            <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-user"></i> Business Profile</h3>
-                            <div class="space-y-4">
-                                <div><label class="block text-sm text-slate-400 mb-1">Business Name</label><input type="text" id="profile-business" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <div><label class="block text-sm text-slate-400 mb-1">Niche</label><input type="text" id="profile-niche" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label><input type="text" id="profile-avatar" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></div>
-                                <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 rounded-lg">Save Profile</button>
+                <div id="tab-settings" class="tab-content hidden">
+                    <div class="max-w-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
+                        <div class="space-y-6">
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">Business Profile</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm text-slate-400 mb-1">Business Name</label>
+                                        <input type="text" id="profile-business" class="input-field">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-slate-400 mb-1">Niche</label>
+                                        <input type="text" id="profile-niche" class="input-field">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-slate-400 mb-1">Target Avatar</label>
+                                        <input type="text" id="profile-avatar" class="input-field">
+                                    </div>
+                                    <button onclick="saveProfile()" class="btn-primary">💾 Save Profile</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="glass rounded-xl p-6">
-                            <h3 class="font-semibold mb-4 flex items-center gap-2"><i class="fas fa-trophy"></i> Wins & Proof</h3>
-                            <div class="space-y-4">
-                                <button onclick="openWinModal()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded-lg flex items-center justify-center gap-2">
-                                    <i class="fas fa-plus"></i> Record a Win
-                                </button>
-                                <div id="wins-list" class="space-y-2"></div>
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
+                                <button onclick="openWinModal()" class="btn-success text-sm px-4 py-2 mb-4">➕ Record a Win</button>
+                                <div id="wins-list" class="space-y-2 text-sm text-slate-400">No wins recorded yet.</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+            </main>
         </div>
     </div>
+
+    <!-- ============================================================
+    MODALS
+    ============================================================ -->
 
     <!-- STANDUP MODAL -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">📋 Daily Standup & Audit</h3>
+                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
                 <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
             <div class="space-y-3">
-                <input type="text" id="s-tasks" placeholder="Tasks completed (e.g., Wrote Whop description)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <input type="text" id="s-links" placeholder="Links to work (e.g., Whop page, TikTok video)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <textarea id="s-text" rows="3" placeholder="Paste the actual content (email copy, ad script, etc.) for me to grade." class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none"></textarea>
-                <input type="text" id="s-metrics" placeholder="Metrics (e.g., 500 views, 12 clicks, 2 sales)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <button onclick="submitStandup()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg">🚀 Submit for COO Review</button>
-                <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-700">
+                <input type="text" id="s-tasks" placeholder="Tasks completed today" class="input-field">
+                <input type="text" id="s-links" placeholder="Links to your work" class="input-field">
+                <textarea id="s-text" rows="3" placeholder="Paste your work content" class="input-field"></textarea>
+                <input type="text" id="s-metrics" placeholder="Metrics (views, clicks, sales...)" class="input-field">
+                <button onclick="submitStandup()" class="btn-primary w-full">🚀 Submit for Review</button>
+                <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                     <div id="review-score" class="text-2xl font-bold text-center"></div>
                     <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
                     <div id="review-text" class="text-sm text-slate-300 mt-3 whitespace-pre-wrap"></div>
@@ -317,9 +421,9 @@
                 <button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-3">
-                <textarea id="win-text" rows="3" placeholder="Describe your win (e.g., Closed my first $497 client from a TikTok comment)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none"></textarea>
-                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white outline-none">
-                <button onclick="submitWin()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg">💾 Save Win</button>
+                <textarea id="win-text" rows="3" placeholder="Describe your win..." class="input-field"></textarea>
+                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="input-field">
+                <button onclick="submitWin()" class="btn-success w-full">💾 Save Win</button>
             </div>
         </div>
     </div>
@@ -327,16 +431,11 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- ============================================================ -->
-    <!-- JAVASCRIPT -->
-    <!-- ============================================================ -->
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
     <script>
-        // ============================================================
-        // ⚠️ IMPORTANT: CHANGE THIS TO YOUR RAILWAY URL
-        // ============================================================
-        const API = window.location.origin;  // Uses current domain (Railway URL)
-        // For local testing: const API = 'http://localhost:8000';
-
+        const API = window.location.origin;
         const MEMBER_ID = localStorage.getItem('e5_member_id') || 'default';
         if (!localStorage.getItem('e5_member_id')) localStorage.setItem('e5_member_id', MEMBER_ID);
 
@@ -345,6 +444,7 @@
         let strategyDocument = '';
         let uploadedFiles = [];
         let currentStep = 1;
+        let currentTab = 'dashboard';
 
         // ============================================================
         // ONBOARDING NAVIGATION
@@ -360,33 +460,18 @@
             currentStep = step;
         }
 
-        function goToStep(step) {
-            showStep(step);
-        }
+        function goToStep(step) { showStep(step); }
 
         // ============================================================
         // TOAST NOTIFICATIONS
         // ============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
-            const icons = {
-                success: '✅',
-                warning: '⚠️',
-                error: '❌',
-                info: 'ℹ️'
-            };
-            
+            const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerHTML = `
-                <span>${icons[type] || ''}</span>
-                <span>${message}</span>
-                <span class="toast-close" onclick="this.parentElement.remove()">×</span>
-            `;
-            
+            toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span><span class="toast-close" onclick="this.parentElement.remove()">×</span>`;
             container.appendChild(toast);
-            
-            // Auto-dismiss after 4 seconds
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
@@ -394,47 +479,51 @@
         }
 
         // ============================================================
-        // STEP 1: GENERATE STRATEGY DOCUMENT
+        // TAB SWITCHING
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            currentTab = tab;
+            if (tab === 'dashboard') loadDashboard();
+            if (tab === 'journey') loadJourney();
+            if (tab === 'settings') loadWins();
+        }
+
+        // ============================================================
+        // STEP 1: GENERATE STRATEGY
         // ============================================================
         async function generateStrategy() {
             const stage = document.getElementById('onboarding-stage').value;
             const bottleneck = document.getElementById('onboarding-bottleneck').value;
             const hours = document.getElementById('onboarding-hours').value;
-
             const btn = event.target;
             btn.disabled = true;
             btn.textContent = '⏳ Generating...';
 
             try {
-                const response = await fetch(`${API}/api/generate-strategy`, {
+                const res = await fetch(`${API}/api/generate-strategy`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours })
                 });
-
-                const data = await response.json();
+                const data = await res.json();
                 strategyDocument = data.document;
-
                 document.getElementById('strategy-document-container').textContent = data.document;
-
-                // Store for later
                 localStorage.setItem('strategy_document', data.document);
                 localStorage.setItem('starting_day', data.starting_day);
                 localStorage.setItem('speed_profile', data.speed_profile);
-
                 showStep(2);
-
             } catch (error) {
                 showToast('Error generating strategy: ' + error.message, 'error');
             }
-
             btn.disabled = false;
             btn.textContent = '🚀 Generate My Strategy Document';
         }
 
-        async function regenerateStrategy() {
-            await generateStrategy();
-        }
+        async function regenerateStrategy() { await generateStrategy(); }
 
         // ============================================================
         // STEP 3: PROOF UPLOAD
@@ -442,7 +531,6 @@
         function handleProofUpload(event) {
             const files = event.target.files;
             const list = document.getElementById('proof-list');
-
             for (let file of files) {
                 uploadedFiles.push(file);
                 const div = document.createElement('div');
@@ -465,35 +553,28 @@
                 const bottleneck = document.getElementById('onboarding-bottleneck').value;
                 const hours = document.getElementById('onboarding-hours').value;
 
-                const response = await fetch(`${API}/api/complete-onboarding`, {
+                const res = await fetch(`${API}/api/complete-onboarding`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         member_id: MEMBER_ID,
-                        stage,
-                        bottleneck,
-                        hours,
+                        stage, bottleneck, hours,
                         strategy_document: strategyDocument,
                         starting_day: parseInt(localStorage.getItem('starting_day')) || 1,
                         speed_profile: localStorage.getItem('speed_profile') || 'steady'
                     })
                 });
+                const data = await res.json();
 
-                const data = await response.json();
-
-                // Update confirmation
                 document.getElementById('confirm-stage').textContent = stage;
                 document.getElementById('confirm-bottleneck').textContent = bottleneck;
                 document.getElementById('confirm-speed').textContent = localStorage.getItem('speed_profile') || 'steady';
                 document.getElementById('confirm-day').textContent = localStorage.getItem('starting_day') || 1;
-
                 showStep(4);
                 showToast('🎉 Onboarding complete!', 'success');
-
             } catch (error) {
                 showToast('Error: ' + error.message, 'error');
             }
-
             btn.disabled = false;
             btn.textContent = '🚀 Start My 90-Day Journey';
         }
@@ -501,131 +582,283 @@
         async function completeOnboarding() {
             document.getElementById('gatekeeper').style.display = 'none';
             document.getElementById('app').classList.remove('hidden');
+            await loadDashboard();
             await loadJourney();
             await loadWins();
-
-            // Add welcome message with context
-            const stage = localStorage.getItem('stage') || 'beginner';
-            const day = localStorage.getItem('starting_day') || 1;
-            const speed = localStorage.getItem('speed_profile') || 'steady';
-
-            let welcomeMessage = `**System Initialized. I am your proactive COO.**\n\n`;
-            welcomeMessage += `Based on your profile, you are a **${stage}** level business.\n`;
-            welcomeMessage += `Your starting point: Day **${day}** of the 90-day journey.\n`;
-            welcomeMessage += `Your speed profile: **${speed}** (${speed === 'accelerator' ? 'Fast-paced' : speed === 'steady' ? 'Consistent' : 'Reflective'}).\n\n`;
-            welcomeMessage += `Check the **"My Journey"** tab to see your first task. Submit work in the Daily Standup to get graded and unlock the next step.`;
-
-            appendMessage('ai', welcomeMessage);
+            switchTab('dashboard');
             showToast('🚀 Welcome to your AI Coach!', 'success');
         }
 
         // ============================================================
-        // TAB SWITCHING
+        // DASHBOARD
         // ============================================================
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab}`).classList.add('active');
-            if (tab === 'journey') loadJourney();
-            if (tab === 'settings') loadWins();
-        }
-
-        // ============================================================
-        // JOURNEY (WITH TRAJECTORY)
-        // ============================================================
-        async function loadJourney() {
-            const content = document.getElementById('journey-content');
-            content.innerHTML = '<div class="animate-pulse-slow text-slate-400">Loading...</div>';
-
+        async function loadDashboard() {
+            const container = document.getElementById('dashboard-content');
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
                 journeyData = await res.json();
 
-                const trajectory = journeyData.trajectory || { status: 'on_track', message: 'Loading trajectory...', color: 'blue' };
-                const bannerClass = `trajectory-banner-${trajectory.color}`;
+                const traj = journeyData.trajectory || { status: 'on_track', message: 'Loading...', color: 'blue' };
+                const trajClass = {
+                    'green': 'trajectory-green',
+                    'yellow': 'trajectory-yellow',
+                    'blue': 'trajectory-blue'
+                }[traj.color] || 'trajectory-blue';
+                const trajIcon = {
+                    'green': '🚀',
+                    'yellow': '⚠️',
+                    'blue': '✅'
+                }[traj.color] || '✅';
 
-                content.innerHTML = `
+                const tasksDone = journeyData.tasks_completed_count || 0;
+                const totalTasks = 12;
+                const progress = Math.round((tasksDone / totalTasks) * 100);
+
+                container.innerHTML = `
                     <!-- Trajectory Banner -->
-                    <div class="${bannerClass} rounded-lg p-4 mb-4">
-                        <p class="text-sm font-medium">${trajectory.message}</p>
+                    <div class="${trajClass} trajectory">
+                        <span class="trajectory-icon">${trajIcon}</span>
+                        <span>${traj.message}</span>
                     </div>
 
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Current Phase</div>
-                            <div class="text-xl font-bold text-purple-400">${journeyData.current_phase}</div>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="stat-card">
+                            <div class="stat-value text-purple-400">${journeyData.current_day}/90</div>
+                            <div class="stat-label">Day</div>
                         </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Day</div>
-                            <div class="text-xl font-bold">${journeyData.current_day}/90</div>
+                        <div class="stat-card">
+                            <div class="stat-value text-green-400">${tasksDone}/${totalTasks}</div>
+                            <div class="stat-label">Tasks Done</div>
                         </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-slate-400 text-sm">Focus</div>
-                            <div class="text-sm">${journeyData.focus}</div>
+                        <div class="stat-card">
+                            <div class="stat-value text-yellow-400">${journeyData.xp || 0}</div>
+                            <div class="stat-label">XP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-orange-400">${journeyData.streak || 0}</div>
+                            <div class="stat-label">Day Streak</div>
                         </div>
                     </div>
 
                     <!-- Progress Bar -->
-                    <div class="mb-4">
+                    <div>
                         <div class="flex justify-between text-sm text-slate-400 mb-1">
                             <span>Journey Progress</span>
-                            <span>${journeyData.progress_percent}%</span>
+                            <span>${progress}%</span>
                         </div>
-                        <div class="w-full bg-slate-700 rounded-full h-2">
-                            <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width:${journeyData.progress_percent}%"></div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div>
                         </div>
                     </div>
 
                     <!-- Current Task -->
-                    <div class="glass p-6 rounded-lg border-l-4 border-purple-600">
-                        <h3 class="text-lg font-bold mb-2">🎯 Current Mandatory Task</h3>
-                        <h4 class="text-xl font-bold text-purple-400 mb-2">${journeyData.current_task.name}</h4>
-                        <p class="text-sm text-slate-400 mb-4">Deadline: Day ${journeyData.current_task.deadline_day}</p>
-                        <p class="text-sm mb-4">${journeyData.current_task.why}</p>
-                        
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Frameworks:</div>
-                            <div class="flex flex-wrap gap-2">
-                                ${journeyData.current_task.frameworks.map(f => `<span class="px-3 py-1 bg-purple-900/50 rounded-full text-xs">${f}</span>`).join('')}
+                    <div class="task-card border-l-4 border-l-purple-500">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Task</div>
+                                <div class="title">${journeyData.current_task.name}</div>
+                                <div class="deadline">📅 Deadline: Day ${journeyData.current_task.deadline_day}</div>
                             </div>
+                            <span class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">${journeyData.current_phase}</span>
                         </div>
-
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Deliverables:</div>
-                            <ul class="list-disc list-inside text-sm space-y-1">
-                                ${journeyData.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
-                            </ul>
+                        <div class="why">${journeyData.current_task.why}</div>
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            ${journeyData.current_task.frameworks.map(f => `<span class="task-framework">${f}</span>`).join('')}
                         </div>
+                        <div class="mt-3 space-y-1">
+                            ${journeyData.current_task.deliverables.map(d => `
+                                <div class="task-deliverable"><span class="pending">⬜</span> ${d}</div>
+                            `).join('')}
+                        </div>
+                        <div class="mt-3 text-xs text-slate-500">⚠️ Submit work in Daily Standup to unlock next step</div>
+                    </div>
 
-                        <p class="text-xs text-slate-500">⚠️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
+                    <!-- All Phases -->
+                    <div>
+                        <h3 class="text-sm font-medium text-slate-400 mb-3">All Phases</h3>
+                        <div class="space-y-2">
+                            ${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
+                                const done = phase.tasks.filter(t => t.completed).length;
+                                const total = phase.tasks.length;
+                                const isCurrent = key === journeyData.current_phase.replace(' ', '_');
+                                return `
+                                    <div class="phase-card ${isCurrent ? 'border-purple-500/30' : ''}">
+                                        <div class="flex justify-between items-center">
+                                            <span class="phase-title">${isCurrent ? '🔄' : '✅'} ${phase.name}</span>
+                                            <span class="phase-progress">${done}/${total}</span>
+                                        </div>
+                                        <div class="mt-1 space-y-0.5">
+                                            ${phase.tasks.map(task => `
+                                                <div class="phase-task ${task.completed ? 'done' : isCurrent && !task.completed ? 'current' : ''}">
+                                                    <span class="icon">${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span>
+                                                    ${task.name}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                 `;
-
                 updateSidebarStats();
-
             } catch (e) {
-                console.error("Failed to load journey", e);
-                content.innerHTML = '<div class="text-red-400">Error loading journey data</div>';
+                container.innerHTML = `<div class="text-red-400">Error loading dashboard</div>`;
+                console.error(e);
             }
         }
 
-        function updateSidebarStats() {
-            if (!journeyData) return;
-            document.getElementById('side-streak').textContent = `${journeyData.streak || 0} days 🔥`;
-            document.getElementById('side-avg').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
-            document.getElementById('side-standups').textContent = journeyData.standup_count || 0;
-            document.getElementById('side-xp').textContent = journeyData.xp || 0;
-            const xp = journeyData.xp || 0;
-            document.getElementById('side-xp-bar').style.width = Math.min(100, (xp % 500) / 5) + '%';
-            document.getElementById('sidebar-streak-header').textContent = `🔥 ${journeyData.streak || 0} days`;
-            document.getElementById('sidebar-xp-header').textContent = `⭐ ${journeyData.xp || 0} XP`;
+        // ============================================================
+        // CHAT
+        // ============================================================
+        function getChatContainer() {
+            return document.getElementById('chat-messages');
+        }
+
+        function appendMessage(role, text) {
+            const container = getChatContainer();
+            const div = document.createElement('div');
+            div.className = `chat-message ${role}`;
+            const avatar = role === 'ai' ? 'AI' : 'You';
+            const avatarClass = role === 'ai' ? 'ai' : 'user';
+            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            div.innerHTML = `
+                <div class="chat-avatar ${avatarClass}">${avatar}</div>
+                <div class="chat-content">${formatted}</div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+            input.value = '';
+
+            const typing = document.getElementById('typing-indicator');
+            typing.classList.remove('hidden');
+
+            try {
+                const res = await fetch(`${API}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        member_id: MEMBER_ID,
+                        history: chatHistory.slice(-10)
+                    })
+                });
+                const data = await res.json();
+                typing.classList.add('hidden');
+                if (res.ok) {
+                    appendMessage('ai', data.reply);
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    appendMessage('ai', `⚠️ ${data.detail || 'Unknown error'}`);
+                    showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
+                }
+            } catch (e) {
+                typing.classList.add('hidden');
+                appendMessage('ai', `⚠️ Network error: ${e.message}`);
+                showToast('Network error', 'error');
+            }
         }
 
         // ============================================================
-        // WINS
+        // JOURNEY
         // ============================================================
+        async function loadJourney() {
+            const container = document.getElementById('journey-content');
+            try {
+                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                journeyData = await res.json();
+                // Reuse dashboard rendering but simplify
+                const tasksDone = journeyData.tasks_completed_count || 0;
+                const totalTasks = 12;
+                const progress = Math.round((tasksDone / totalTasks) * 100);
+
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="text-sm text-slate-400">All the details of your 90-day journey.</div>
+                        <!-- Reuse dashboard stats but cleaner -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="stat-card"><div class="stat-value text-purple-400">${journeyData.current_day}/90</div><div class="stat-label">Day</div></div>
+                            <div class="stat-card"><div class="stat-value text-green-400">${tasksDone}/${totalTasks}</div><div class="stat-label">Tasks</div></div>
+                            <div class="stat-card"><div class="stat-value text-yellow-400">${journeyData.xp || 0}</div><div class="stat-label">XP</div></div>
+                            <div class="stat-card"><div class="stat-value text-orange-400">${journeyData.streak || 0}</div><div class="stat-label">Streak</div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm text-slate-400 mb-1"><span>Progress</span><span>${progress}%</span></div>
+                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div>
+                        </div>
+                        <div class="task-card border-l-4 border-l-purple-500">
+                            <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Task</div>
+                            <div class="title">${journeyData.current_task.name}</div>
+                            <div class="deadline">📅 Day ${journeyData.current_task.deadline_day}</div>
+                            <div class="why">${journeyData.current_task.why}</div>
+                            <div class="flex flex-wrap gap-1 mt-2">${journeyData.current_task.frameworks.map(f => `<span class="task-framework">${f}</span>`).join('')}</div>
+                            <div class="mt-3 space-y-1">${journeyData.current_task.deliverables.map(d => `<div class="task-deliverable"><span class="pending">⬜</span> ${d}</div>`).join('')}</div>
+                        </div>
+                        <div class="space-y-2">
+                            ${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
+                                const done = phase.tasks.filter(t => t.completed).length;
+                                const total = phase.tasks.length;
+                                const isCurrent = key === journeyData.current_phase.replace(' ', '_');
+                                return `
+                                    <div class="phase-card ${isCurrent ? 'border-purple-500/30' : ''}">
+                                        <div class="flex justify-between items-center"><span class="phase-title">${isCurrent ? '🔄' : '✅'} ${phase.name}</span><span class="phase-progress">${done}/${total}</span></div>
+                                        <div class="mt-1 space-y-0.5">${phase.tasks.map(task => `<div class="phase-task ${task.completed ? 'done' : isCurrent && !task.completed ? 'current' : ''}"><span class="icon">${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span>${task.name}</div>`).join('')}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                container.innerHTML = `<div class="text-red-400">Error loading journey</div>`;
+            }
+        }
+
+        // ============================================================
+        // SETTINGS / PROFILE / WINS
+        // ============================================================
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API}/api/check-onboarding?member_id=${MEMBER_ID}`);
+                const data = await res.json();
+                if (data.profile) {
+                    document.getElementById('profile-business').value = data.profile.business_name || '';
+                    document.getElementById('profile-niche').value = data.profile.niche || '';
+                    document.getElementById('profile-avatar').value = data.profile.target_avatar || '';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function saveProfile() {
+            const payload = {
+                member_id: MEMBER_ID,
+                business_name: document.getElementById('profile-business').value,
+                niche: document.getElementById('profile-niche').value,
+                target_avatar: document.getElementById('profile-avatar').value,
+                core_offer: '', current_revenue: 0, revenue_goal: 10000,
+                biggest_bottleneck: '', current_level: 'beginner', weekly_hours: '4-7',
+                offer_done: false, audience_done: false, sales_done: false, launch_done: false
+            };
+            try {
+                await fetch(`${API}/api/onboarding`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast('✅ Profile saved!', 'success');
+            } catch (e) { showToast('Error saving profile', 'error'); }
+        }
+
         async function loadWins() {
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
@@ -633,17 +866,17 @@
                 const wins = data.wins || [];
                 const container = document.getElementById('wins-list');
                 if (wins.length === 0) {
-                    container.innerHTML = '<div class="text-sm text-slate-500">No wins recorded yet. Start building your proof!</div>';
+                    container.innerHTML = '<div class="text-sm text-slate-400">No wins recorded yet.</div>';
                 } else {
                     container.innerHTML = wins.slice(0, 5).map(w => `
-                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
                             <div class="text-sm text-slate-300">🏆 ${w.win_text}</div>
                             ${w.revenue_amount ? `<div class="text-xs text-green-400">+$${w.revenue_amount}</div>` : ''}
                             <div class="text-xs text-slate-500 mt-1">${new Date(w.created_at).toLocaleDateString()}</div>
                         </div>
                     `).join('');
                 }
-            } catch (e) { console.error("Failed to load wins", e); }
+            } catch (e) { console.error(e); }
         }
 
         function openWinModal() {
@@ -663,23 +896,23 @@
             try {
                 await fetch(`${API}/api/win`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({member_id: MEMBER_ID, win_text: text, revenue_amount: revenue})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID, win_text: text, revenue_amount: revenue })
                 });
                 closeWinModal();
                 document.getElementById('win-text').value = '';
                 document.getElementById('win-revenue').value = '';
                 loadWins();
-                loadJourney();
+                loadDashboard();
                 showToast('🏆 Win recorded!', 'success');
-            } catch (e) { showToast('Error recording win: ' + e.message, 'error'); }
+            } catch (e) { showToast('Error recording win', 'error'); }
         }
 
         // ============================================================
         // STANDUP
         // ============================================================
         function openStandup() {
-            if (!journeyData) { showToast("Please wait for journey to load.", 'info'); return; }
+            if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
             document.getElementById('standup-modal').classList.remove('hidden');
             document.getElementById('standup-modal').classList.add('flex');
             document.getElementById('review-result').style.display = 'none';
@@ -692,7 +925,7 @@
         }
 
         async function submitStandup() {
-            if (!journeyData) { showToast("Loading journey data, please try again.", 'info'); return; }
+            if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
 
             const payload = {
                 member_id: MEMBER_ID,
@@ -710,7 +943,7 @@
             try {
                 const res = await fetch(`${API}/api/standup`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -721,118 +954,42 @@
                 scoreEl.className = `text-2xl font-bold text-center ${data.score >= 7 ? 'text-green-400' : data.score >= 5 ? 'text-yellow-400' : 'text-red-400'}`;
                 document.getElementById('review-xp').textContent = `+${data.xp_gained || 25} XP • 🔥 ${data.streak || 0} day streak`;
                 document.getElementById('review-text').textContent = data.review || 'No review provided.';
-                btn.style.display = 'none';
 
                 document.getElementById('s-tasks').value = '';
                 document.getElementById('s-links').value = '';
                 document.getElementById('s-text').value = '';
                 document.getElementById('s-metrics').value = '';
 
+                await loadDashboard();
                 await loadJourney();
-
-                // Show toast notification based on score
                 if (data.score >= 7) {
                     showToast(`✅ Score: ${data.score}/10! +${data.xp_gained} XP`, 'success');
-                } else if (data.score >= 5) {
-                    showToast(`📝 Score: ${data.score}/10. Keep pushing!`, 'warning');
                 } else {
-                    showToast(`📝 Score: ${data.score}/10. Review the feedback and try again.`, 'info');
+                    showToast(`📝 Score: ${data.score}/10. Review the feedback.`, 'warning');
                 }
             } catch (e) {
-                showToast('Error submitting standup: ' + e.message, 'error');
+                showToast('Error submitting standup', 'error');
             }
-            btn.innerText = "🚀 Submit for COO Review";
+            btn.innerText = "🚀 Submit for Review";
             btn.disabled = false;
         }
 
         // ============================================================
-        // CHAT
+        // SIDEBAR STATS
         // ============================================================
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+        function updateSidebarStats() {
+            if (!journeyData) return;
+            document.getElementById('side-streak').textContent = `${journeyData.streak || 0} days`;
+            document.getElementById('side-score').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
+            document.getElementById('side-standups').textContent = journeyData.standup_count || 0;
+            document.getElementById('side-xp').textContent = journeyData.xp || 0;
+            document.getElementById('streak-display').textContent = `${journeyData.streak || 0} days`;
+            document.getElementById('xp-display').textContent = `${journeyData.xp || 0} XP`;
 
-            appendMessage('user', text);
-            chatHistory.push({role: 'user', content: text});
-            input.value = '';
-            input.style.height = 'auto';
-            document.getElementById('typing').classList.remove('hidden');
-
-            try {
-                const res = await fetch(`${API}/api/chat`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        message: text,
-                        mode: 'coach',
-                        member_id: MEMBER_ID,
-                        history: chatHistory.slice(-10)
-                    })
-                });
-                const data = await res.json();
-                document.getElementById('typing').classList.add('hidden');
-                if (res.ok) {
-                    appendMessage('ai', data.reply);
-                    chatHistory.push({role: 'assistant', content: data.reply});
-                } else {
-                    appendMessage('ai', `⚠️ ${data.detail || 'Unknown error'}`);
-                    showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
-                }
-            } catch (e) {
-                document.getElementById('typing').classList.add('hidden');
-                appendMessage('ai', `⚠️ Network error: ${e.message}`);
-                showToast('Network error: ' + e.message, 'error');
-            }
-        }
-
-        function appendMessage(role, text) {
-            const container = document.getElementById('chat-container');
-            const div = document.createElement('div');
-            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
-            const isAi = role === 'ai';
-            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            div.innerHTML = `
-                <div class="w-10 h-10 rounded-full ${isAi ? 'bg-purple-600' : 'bg-slate-700'} flex items-center justify-center font-bold flex-shrink-0 text-xs">${isAi ? 'COO' : 'U'}</div>
-                <div class="glass p-4 ${isAi ? 'rounded-r-xl rounded-bl-xl' : 'rounded-l-xl rounded-br-xl'} text-sm text-slate-300 max-w-3xl leading-relaxed">
-                    ${formatted}
-                </div>
-            `;
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // ============================================================
-        // PROFILE
-        // ============================================================
-        async function saveProfile() {
-            const biz = document.getElementById('profile-business').value.trim();
-            const niche = document.getElementById('profile-niche').value.trim();
-            const avatar = document.getElementById('profile-avatar').value.trim();
-            try {
-                await fetch(`${API}/api/onboarding`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        member_id: MEMBER_ID,
-                        business_name: biz,
-                        niche: niche,
-                        target_avatar: avatar,
-                        core_offer: '',
-                        current_revenue: 0,
-                        revenue_goal: 10000,
-                        biggest_bottleneck: '',
-                        current_level: 'beginner',
-                        weekly_hours: '4-7',
-                        offer_done: false,
-                        audience_done: false,
-                        sales_done: false,
-                        launch_done: false
-                    })
-                });
-                await loadJourney();
-                showToast('✅ Profile saved!', 'success');
-            } catch (e) { showToast('Error saving profile: ' + e.message, 'error'); }
+            const tasksDone = journeyData.tasks_completed_count || 0;
+            const progress = Math.round((tasksDone / 12) * 100);
+            document.getElementById('side-progress').style.width = `${progress}%`;
+            document.getElementById('journey-badge').textContent = `${progress}%`;
         }
 
         // ============================================================
@@ -849,16 +1006,25 @@
                 } else {
                     document.getElementById('gatekeeper').style.display = 'none';
                     document.getElementById('app').classList.remove('hidden');
-                    document.getElementById('user-context').textContent = `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
-                    document.getElementById('chat-bottleneck').textContent = data.profile?.biggest_bottleneck || '';
+                    document.getElementById('header-context').textContent =
+                        `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
                     document.getElementById('profile-business').value = data.profile?.business_name || '';
                     document.getElementById('profile-niche').value = data.profile?.niche || '';
                     document.getElementById('profile-avatar').value = data.profile?.target_avatar || '';
+                    await loadDashboard();
                     await loadJourney();
                     await loadWins();
+                    await loadProfile();
+                    switchTab('dashboard');
+
+                    // Add welcome message to chat
+                    setTimeout(() => {
+                        const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
+                        appendMessage('ai', welcome);
+                    }, 500);
                 }
             } catch (e) {
-                console.error("Init error:", e);
+                console.error('Init error:', e);
             }
         }
 
