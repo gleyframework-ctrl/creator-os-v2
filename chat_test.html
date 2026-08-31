@@ -1,353 +1,168 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E5 AI Coach OS | Strict Execution</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <div id="app" class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center font-bold text-xl">E5</div>
-                <div>
-                    <h1 class="text-2xl font-bold">Whop Creator OS</h1>
-                    <p class="text-gray-400 text-sm">Loading context...</p>
+# 🎯 THE PROBLEM — Trajectory Not Displaying on Frontend
+
+You've added the **Trajectory Prediction** to the backend (`main.py` has `calculate_trajectory()` and it's included in `/api/journey` response), but **the frontend (`chat_test.html`) doesn't display it yet**.
+
+---
+
+## 📊 What's Happening
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| **Backend (`main.py`)** | ✅ Working | `calculate_trajectory()` added, included in `/api/journey` response |
+| **API Response** | ✅ Has trajectory | `"trajectory": {"status": "on_track", "message": "✅ You're exactly where you should be...", "color": "blue"}` |
+| **Frontend (`chat_test.html`)** | ❌ NOT displaying | The `loadJourney()` function doesn't render the trajectory data |
+
+---
+
+## 🔍 The Proof — What's Actually in the API Response
+
+When you call `/api/journey`, the response includes:
+```json
+{
+  "current_day": 1,
+  "current_phase": "Foundation",
+  "...": "...",
+  "trajectory": {
+    "status": "on_track",
+    "message": "✅ You're exactly where you should be. Steady progress wins the race.",
+    "color": "blue"
+  }
+}
+```
+
+But in your HTML, the `loadJourney()` function only renders:
+- Current Phase
+- Day
+- Focus
+- Current Task (name, deadline, why, frameworks, deliverables)
+
+**It does NOT render `trajectory` anywhere.**
+
+---
+
+## ✅ THE FIX — Update `chat_test.html`
+
+Add the trajectory display to the Journey panel. Replace your `loadJourney()` function with this updated version:
+
+```javascript
+async function loadJourney() {
+    const content = document.getElementById('journey-content');
+    content.innerHTML = '<div class="animate-pulse-slow text-gray-400">Loading...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE}/api/journey?member_id=${memberId}`);
+        const data = await response.json();
+
+        // Determine color class for trajectory
+        const trajectoryColors = {
+            'green': 'border-green-500 bg-green-900/20',
+            'yellow': 'border-yellow-500 bg-yellow-900/20',
+            'blue': 'border-blue-500 bg-blue-900/20'
+        };
+        const trajectoryColor = trajectoryColors[data.trajectory.color] || 'border-gray-500 bg-gray-800';
+
+        content.innerHTML = `
+            <!-- Trajectory Banner -->
+            <div class="${trajectoryColor} border-l-4 rounded-lg p-4 mb-4">
+                <p class="text-sm font-medium">${data.trajectory.message}</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-gray-400 text-sm">Current Phase</div>
+                    <div class="text-xl font-bold text-purple-400">${data.current_phase}</div>
+                </div>
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-gray-400 text-sm">Day</div>
+                    <div class="text-xl font-bold">${data.current_day}/90</div>
+                </div>
+                <div class="glass p-4 rounded-lg">
+                    <div class="text-gray-400 text-sm">Focus</div>
+                    <div class="text-sm">${data.focus}</div>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-orange-500">🔥</span>
-                    <span id="streak-display" class="text-sm">0 days</span>
+
+            <!-- Current Task -->
+            <div class="glass p-6 rounded-lg border-l-4 border-purple-600">
+                <h3 class="text-lg font-bold mb-2">🎯 Current Mandatory Task</h3>
+                <h4 class="text-xl font-bold text-purple-400 mb-2">${data.current_task.name}</h4>
+                <p class="text-sm text-gray-400 mb-4">Deadline: Day ${data.current_task.deadline_day}</p>
+                <p class="text-sm mb-4">${data.current_task.why}</p>
+                
+                <div class="mb-4">
+                    <div class="text-sm font-medium mb-2">Required Frameworks:</div>
+                    <div class="flex flex-wrap gap-2">
+                        ${data.current_task.frameworks.map(f => `<span class="px-3 py-1 bg-purple-900/50 rounded-full text-xs">${f}</span>`).join('')}
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-yellow-500">⭐</span>
-                    <span id="xp-display" class="text-sm">0 XP</span>
+
+                <div class="mb-4">
+                    <div class="text-sm font-medium mb-2">Required Deliverables:</div>
+                    <ul class="list-disc list-inside text-sm space-y-1">
+                        ${data.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
+                    </ul>
                 </div>
-                <button onclick="showSubmitDailyWork()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Submit Daily Work
-                </button>
+
+                <p class="text-xs text-gray-500">⚠️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
             </div>
-        </div>
+        `;
+    } catch (error) {
+        console.error('Error loading journey:', error);
+        content.innerHTML = '<div class="text-red-400">Error loading journey data</div>';
+    }
+}
+```
 
-        <!-- Main Content Area -->
-        <div class="grid grid-cols-12 gap-6">
-            <!-- Sidebar -->
-            <div class="col-span-3 space-y-2">
-                <button onclick="showAICoach()" class="w-full text-left px-4 py-3 rounded-lg bg-purple-900/50 border border-purple-700 hover:bg-purple-800/50 transition-colors flex items-center gap-3">
-                    <span>💬</span>
-                    <span>AI Coach</span>
-                </button>
-                <button onclick="showJourney()" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
-                    <span>🏔️</span>
-                    <span>My Journey</span>
-                </button>
-                <button onclick="showSettings()" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
-                    <span>️</span>
-                    <span>Settings</span>
-                </button>
-                
-                <!-- Stats -->
-                <div class="mt-8 p-4 glass rounded-lg">
-                    <div class="space-y-2 text-sm">
-                        <div><span class="text-gray-400">Streak:</span> <span id="sidebar-streak" class="text-orange-500">0 days </span></div>
-                        <div><span class="text-gray-400">Avg Score:</span> <span id="sidebar-score">—</span></div>
-                        <div><span class="text-gray-400">Standups:</span> <span id="sidebar-standups">0</span></div>
-                        <div><span class="text-gray-400">XP:</span> <span id="sidebar-xp">0</span></div>
-                    </div>
-                </div>
-            </div>
+---
 
-            <!-- Main Panel -->
-            <div class="col-span-9">
-                <!-- AI Coach Chat -->
-                <div id="ai-coach-panel" class="space-y-4">
-                    <!-- Chat messages will be rendered here -->
-                </div>
+## 📋 What This Fix Does
 
-                <!-- Journey Panel -->
-                <div id="journey-panel" class="hidden space-y-6">
-                    <div class="glass rounded-lg p-6">
-                        <h2 class="text-2xl font-bold mb-4">Your 90-Day Journey</h2>
-                        <div id="journey-content" class="space-y-4">
-                            <div class="animate-pulse-slow text-gray-400">Loading...</div>
-                        </div>
-                    </div>
-                </div>
+| Before | After |
+|--------|-------|
+| No trajectory visible | **Colored banner** appears at top of Journey panel |
+| Members don't know their pace | Shows: "🚀 You're ahead!" / "✅ On track" / "⚠️ You're behind" |
+| No visual feedback | Banner color matches status (green/yellow/blue) |
 
-                <!-- Settings Panel -->
-                <div id="settings-panel" class="hidden space-y-6">
-                    <div class="glass rounded-lg p-6">
-                        <h2 class="text-2xl font-bold mb-4">Settings & Profile</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Business Name</label>
-                                <input type="text" id="business-name" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Niche</label>
-                                <input type="text" id="niche" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2">Target Avatar</label>
-                                <textarea id="target-avatar" rows="3" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"></textarea>
-                            </div>
-                            <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">Save Profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+---
 
-    <script>
-        const API_BASE = window.location.origin;
-        let memberId = localStorage.getItem('member_id') || 'default';
-        let currentTask = null;
+## 🚀 What You'll See
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await checkOnboarding();
-            showAICoach();
-        });
+After updating the frontend, your Journey page will show:
 
-        async function checkOnboarding() {
-            try {
-                const response = await fetch(`${API_BASE}/api/check-onboarding?member_id=${memberId}`);
-                const data = await response.json();
-                if (!data.onboarded) {
-                    window.location.href = '/onboarding.html';
-                }
-            } catch (error) {
-                console.error('Error checking onboarding:', error);
-            }
-        }
+```
+┌──────────────────────────────────────────────────────────┐
+│  ✅ You're exactly where you should be. Steady progress  │  ← NEW BANNER
+│  wins the race.                                         │
+├──────────────────────────────────────────────────────────┤
+│  Current Phase          Day           Focus             │
+│  Foundation             1/90          Offer, Avatar...  │
+├──────────────────────────────────────────────────────────┤
+│  🎯 Current Mandatory Task                              │
+│  Define Core Offer & Value Stack                        │
+│  ...                                                   │
+└──────────────────────────────────────────────────────────┘
+```
 
-        function showAICoach() {
-            document.getElementById('ai-coach-panel').classList.remove('hidden');
-            document.getElementById('journey-panel').classList.add('hidden');
-            document.getElementById('settings-panel').classList.add('hidden');
-            loadChatHistory();
-        }
+---
 
-        function showJourney() {
-            document.getElementById('ai-coach-panel').classList.add('hidden');
-            document.getElementById('journey-panel').classList.remove('hidden');
-            document.getElementById('settings-panel').classList.add('hidden');
-            loadJourney();
-        }
+## ✅ Your Next Step
 
-        function showSettings() {
-            document.getElementById('ai-coach-panel').classList.add('hidden');
-            document.getElementById('journey-panel').classList.add('hidden');
-            document.getElementById('settings-panel').classList.remove('hidden');
-            loadProfile();
-        }
+1. **Open** `chat_test.html` on GitHub (edit mode)
+2. **Find** the `loadJourney()` function
+3. **Replace** it with the code above
+4. **Commit** → message: "Add Trajectory display to Journey panel"
+5. **Wait** for Railway redeploy (~2 min)
+6. **Refresh** your app → go to "My Journey" → see the trajectory banner
 
-        async function loadChatHistory() {
-            const panel = document.getElementById('ai-coach-panel');
-            panel.innerHTML = `
-                <div class="space-y-4">
-                    <div class="glass rounded-lg p-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">AI</div>
-                            <div class="flex-1">
-                                <p class="text-sm">System Initialized. I am your proactive COO.</p>
-                                <p class="text-sm text-gray-400 mt-2">Based on your profile, your current focus is fixing Low Whop Sales.</p>
-                                <p class="text-sm text-gray-400">Check "My Journey" to see your task. Submit work in Daily Standup before asking strategic questions.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="chat-input" placeholder="Ask your Whop AI Coach..." 
-                            class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"
-                            onkeypress="if(event.key==='Enter')sendMessage()">
-                        <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-4 py-3 rounded-lg transition-colors">
-                            <span></span>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
+---
 
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
+## 💬 Tell Me What Happens
 
-            const panel = document.getElementById('ai-coach-panel');
-            panel.innerHTML += `
-                <div class="glass rounded-lg p-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">You</div>
-                        <div class="flex-1">
-                            <p class="text-sm">${message}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            input.value = '';
+- **"I see the trajectory banner!"** → ✅ Great! Next feature: Supabase retry wrapper.
+- **"Still not showing"** → Share the new Railway logs.
+- **"I need help finding the function"** → I'll guide you.
 
-            try {
-                const response = await fetch(`${API_BASE}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        member_id: memberId,
-                        message: message,
-                        history: []
-                    })
-                });
-                const data = await response.json();
-                
-                panel.innerHTML += `
-                    <div class="glass rounded-lg p-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">AI</div>
-                            <div class="flex-1">
-                                <p class="text-sm whitespace-pre-wrap">${data.reply}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                panel.scrollTop = panel.scrollHeight;
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        }
+---
 
-        async function loadJourney() {
-            const content = document.getElementById('journey-content');
-            content.innerHTML = '<div class="animate-pulse-slow text-gray-400">Loading...</div>';
-
-            try {
-                const response = await fetch(`${API_BASE}/api/journey?member_id=${memberId}`);
-                const data = await response.json();
-
-                content.innerHTML = `
-                    <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-gray-400 text-sm">Current Phase</div>
-                            <div class="text-xl font-bold text-purple-400">${data.current_phase}</div>
-                        </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-gray-400 text-sm">Day</div>
-                            <div class="text-xl font-bold">${data.current_day}/90</div>
-                        </div>
-                        <div class="glass p-4 rounded-lg">
-                            <div class="text-gray-400 text-sm">Focus</div>
-                            <div class="text-sm">${data.focus}</div>
-                        </div>
-                    </div>
-
-                    <div class="glass p-6 rounded-lg border-l-4 border-purple-600">
-                        <h3 class="text-lg font-bold mb-2">🎯 Current Mandatory Task</h3>
-                        <h4 class="text-xl font-bold text-purple-400 mb-2">${data.current_task.name}</h4>
-                        <p class="text-sm text-gray-400 mb-4">Deadline: Day ${data.current_task.deadline_day}</p>
-                        <p class="text-sm mb-4">${data.current_task.why}</p>
-                        
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Frameworks:</div>
-                            <div class="flex flex-wrap gap-2">
-                                ${data.current_task.frameworks.map(f => `<span class="px-3 py-1 bg-purple-900/50 rounded-full text-xs">${f}</span>`).join('')}
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="text-sm font-medium mb-2">Required Deliverables:</div>
-                            <ul class="list-disc list-inside text-sm space-y-1">
-                                ${data.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
-                            </ul>
-                        </div>
-
-                        <p class="text-xs text-gray-500">⚠️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error loading journey:', error);
-                content.innerHTML = '<div class="text-red-400">Error loading journey data</div>';
-            }
-        }
-
-        async function loadProfile() {
-            try {
-                const response = await fetch(`${API_BASE}/api/check-onboarding?member_id=${memberId}`);
-                const data = await response.json();
-                
-                if (data.profile) {
-                    document.getElementById('business-name').value = data.profile.business_name || '';
-                    document.getElementById('niche').value = data.profile.niche || '';
-                    document.getElementById('target-avatar').value = data.profile.target_avatar || '';
-                }
-            } catch (error) {
-                console.error('Error loading profile:', error);
-            }
-        }
-
-        async function saveProfile() {
-            const profile = {
-                business_name: document.getElementById('business-name').value,
-                niche: document.getElementById('niche').value,
-                target_avatar: document.getElementById('target-avatar').value
-            };
-
-            try {
-                await fetch(`${API_BASE}/api/onboarding`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        member_id: memberId,
-                        ...profile,
-                        core_offer: '',
-                        current_revenue: 0,
-                        revenue_goal: 10000,
-                        biggest_bottleneck: '',
-                        current_level: 'beginner',
-                        weekly_hours: '4-7',
-                        offer_done: false,
-                        audience_done: false,
-                        sales_done: false,
-                        launch_done: false
-                    })
-                });
-                alert('Profile saved!');
-            } catch (error) {
-                console.error('Error saving profile:', error);
-                alert('Error saving profile');
-            }
-        }
-
-        function showSubmitDailyWork() {
-            alert('Daily Standup feature coming soon! For now, use the chat to submit your work.');
-        }
-
-        async function loadStats() {
-            try {
-                const response = await fetch(`${API_BASE}/api/journey?member_id=${memberId}`);
-                const data = await response.json();
-                
-                document.getElementById('streak-display').textContent = `${data.streak} days`;
-                document.getElementById('xp-display').textContent = `${data.xp} XP`;
-                document.getElementById('sidebar-streak').textContent = `${data.streak} days 🔥`;
-                document.getElementById('sidebar-xp').textContent = data.xp;
-                document.getElementById('sidebar-standups').textContent = data.standup_count;
-                document.getElementById('sidebar-score').textContent = data.avg_score > 0 ? `${data.avg_score}/10` : '—';
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        // Load stats every 30 seconds
-        setInterval(loadStats, 30000);
-        loadStats();
-    </script>
-</body>
-</html>
+**This is a 5-minute fix. Update the HTML, commit, and you'll see the trajectory banner.** 🚀
