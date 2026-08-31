@@ -39,7 +39,7 @@ else:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"⚠️ Supabase connection failed: {e}")
+        log.error(f"️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -220,10 +220,10 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# GEMINI LLM ENGINE - SIMPLE & WORKING
+# GEMINI LLM ENGINE - CORRECTED API ENDPOINT
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call Gemini API directly."""
+    """Call Gemini API with correct endpoint."""
     
     if not GEMINI_API_KEY:
         log.error("❌ GEMINI_API_KEY is not set!")
@@ -243,9 +243,10 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
         }
     }).encode("utf-8")
     
+    # CORRECT ENDPOINT: Native Gemini API
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     
-    log.info(f"🔍 Calling Gemini: {url[:80]}...")
+    log.info(f" Calling Gemini: {url[:80]}...")
     
     try:
         req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
@@ -257,7 +258,7 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
             
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8', errors='ignore')[:500]
-        log.error(f"❌ Gemini HTTP {e.code}: {e.reason}")
+        log.error(f" Gemini HTTP {e.code}: {e.reason}")
         log.error(f"Response: {error_body}")
         return f"Error: Gemini API failed with {e.code}: {error_body}"
     except Exception as e:
