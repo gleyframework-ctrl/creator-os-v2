@@ -26,12 +26,12 @@ NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
 
 # ============================================================
-# RAILWAY POSTGRESQL (Replaces Supabase)
+# RAILWAY POSTGRESQL (FIXED CONNECTION)
 # ============================================================
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-# Get Railway PostgreSQL connection details
+# Database connection details from Railway environment
 PGHOST = os.environ.get("PGHOST", "").strip()
 PGDATABASE = os.environ.get("PGDATABASE", "").strip()
 PGUSER = os.environ.get("PGUSER", "").strip()
@@ -41,9 +41,16 @@ PGPORT = os.environ.get("PGPORT", "5432").strip()
 DATABASE_CONNECTED = False
 
 def get_db_connection():
-    """Create PostgreSQL connection."""
+    """Create PostgreSQL connection using Railway environment variables."""
     try:
-        return psycopg2.connect(
+        # Validate all required variables are present
+        if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
+            log.warning("⚠️ Missing PostgreSQL environment variables! Check Railway variables.")
+            return None
+        
+        log.info(f"🔍 Connecting to PostgreSQL: host={PGHOST}, db={PGDATABASE}, user={PGUSER}, port={PGPORT}")
+        
+        conn = psycopg2.connect(
             host=PGHOST,
             database=PGDATABASE,
             user=PGUSER,
@@ -51,6 +58,8 @@ def get_db_connection():
             port=PGPORT,
             cursor_factory=RealDictCursor
         )
+        log.info("✅ PostgreSQL connection established.")
+        return conn
     except Exception as e:
         log.error(f"❌ Database connection failed: {e}")
         return None
