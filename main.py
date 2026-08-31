@@ -18,11 +18,12 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
+# FIXED: Default is now gemini-2.0-flash
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash").strip()
 
-log.info(f" Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
-log.info(f"🔍 Gemini Model: {GEMINI_MODEL}")
+log.info(f"🔍 Gemini API Key: {'Set' if GEMINI_API_KEY else 'MISSING'}")
+log.info(f" Gemini Model: {GEMINI_MODEL}")
 
 # ============================================================
 # SUPABASE CLIENT
@@ -32,14 +33,14 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    log.warning("️ Supabase credentials missing. Using in-memory fallback.")
+    log.warning("⚠️ Supabase credentials missing. Using in-memory fallback.")
     supabase = None
 else:
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
         log.info("✅ Supabase connected.")
     except Exception as e:
-        log.error(f"⚠️ Supabase connection failed: {e}")
+        log.error(f"️ Supabase connection failed: {e}")
         supabase = None
 
 # ============================================================
@@ -76,7 +77,7 @@ CHAT_LIMIT = RateLimiter(50, 3600)
 # ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="3.0")
+app = FastAPI(title="E5 AI Coach OS", version="3.2")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
@@ -220,11 +221,9 @@ def db_get_scores(member_id):
     return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# GEMINI LLM ENGINE - CORRECTED API ENDPOINT
+# GEMINI LLM ENGINE - FIXED MODEL NAME
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
-    """Call Gemini API with correct endpoint - API key in URL."""
-    
     if not GEMINI_API_KEY:
         log.error("❌ GEMINI_API_KEY is not set!")
         return "Error: Gemini API key not configured."
@@ -243,24 +242,22 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
         }
     }).encode("utf-8")
     
-    # CORRECT ENDPOINT: API key MUST be in URL as query parameter
+    # FIXED: Using gemini-2.0-flash
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
     
-    log.info(f" Calling Gemini: {url[:80]}...")
+    log.info(f" Calling Gemini: {GEMINI_MODEL}")
     
     try:
         req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
-        
         with urllib.request.urlopen(req, timeout=90) as resp:
             result = json.loads(resp.read().decode("utf-8"))
             log.info("✅ Gemini succeeded!")
             return result["candidates"][0]["content"]["parts"][0]["text"]
-            
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8', errors='ignore')[:500]
-        log.error(f" Gemini HTTP {e.code}: {e.reason}")
+        log.error(f"❌ Gemini HTTP {e.code}: {e.reason}")
         log.error(f"Response: {error_body}")
-        return f"Error: Gemini API failed with {e.code}: {error_body}"
+        return f"Error: Gemini API failed with {e.code}. Check model name and API key."
     except Exception as e:
         log.error(f"❌ Gemini failed: {str(e)}")
         return f"Error: Gemini failed - {str(e)}"
@@ -357,7 +354,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "supabase": supabase is not None, "version": "3.0"}
+    return {"ok": True, "supabase": supabase is not None, "version": "3.2"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
