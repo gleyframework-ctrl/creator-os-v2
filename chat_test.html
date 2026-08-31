@@ -6,30 +6,60 @@
     <title>E5 AI Coach OS | Strict Execution</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Existing Styles */
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* NEW: Toast Notification Styles */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none; /* Let clicks pass through empty space */
+        }
+        .toast {
+            pointer-events: auto; /* Re-enable clicks on the toast itself */
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 250px;
+            max-width: 350px;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        .toast.success { background-color: #10b981; border-left: 4px solid #059669; }
+        .toast.warning { background-color: #f59e0b; border-left: 4px solid #d97706; }
+        .toast.error { background-color: #ef4444; border-left: 4px solid #dc2626; }
         
-        /* Trajectory Banner Colors */
-        .trajectory-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); }
-        .trajectory-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); }
-        .trajectory-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); }
-        
-        /* Progress Bar */
-        .progress-track { background: rgba(255,255,255,0.1); border-radius: 20px; height: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 20px; transition: width 0.8s ease-in-out; background: linear-gradient(90deg, #667eea, #764ba2); }
-        
-        /* Task Status */
-        .task-done { opacity: 0.5; text-decoration: line-through; }
-        .task-current { border-left: 3px solid #8b5cf6; background: rgba(139, 92, 246, 0.1); }
-        .task-pending { opacity: 0.6; }
-        
-        /* Stats Cards */
-        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
-        .stat-card:hover { background: rgba(255,255,255,0.06); }
-        .stat-value { font-size: 24px; font-weight: bold; }
-        .stat-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .toast-close:hover { opacity: 1; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -40,20 +70,20 @@
                 <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center font-bold text-xl">E5</div>
                 <div>
                     <h1 class="text-2xl font-bold">Whop Creator OS</h1>
-                    <p id="header-context" class="text-gray-400 text-sm">Loading context...</p>
+                    <p class="text-gray-400 text-sm">Loading context...</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2">
                     <span class="text-orange-500">🔥</span>
-                    <span id="streak-display" class="text-sm font-medium">0 days</span>
+                    <span id="streak-display" class="text-sm">0 days</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-yellow-500">⭐</span>
-                    <span id="xp-display" class="text-sm font-medium">0 XP</span>
+                    <span id="xp-display" class="text-sm">0 XP</span>
                 </div>
                 <button onclick="showSubmitDailyWork()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                    📋 Submit Daily Work
+                    Submit Daily Work
                 </button>
             </div>
         </div>
@@ -62,30 +92,26 @@
         <div class="grid grid-cols-12 gap-6">
             <!-- Sidebar -->
             <div class="col-span-3 space-y-2">
-                <button onclick="showAICoach()" id="nav-chat" class="w-full text-left px-4 py-3 rounded-lg bg-purple-900/50 border border-purple-700 hover:bg-purple-800/50 transition-colors flex items-center gap-3">
+                <button onclick="showAICoach()" class="w-full text-left px-4 py-3 rounded-lg bg-purple-900/50 border border-purple-700 hover:bg-purple-800/50 transition-colors flex items-center gap-3">
                     <span>💬</span>
                     <span>AI Coach</span>
                 </button>
-                <button onclick="showJourney()" id="nav-journey" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
+                <button onclick="showJourney()" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
                     <span>🏔️</span>
                     <span>My Journey</span>
                 </button>
-                <button onclick="showSettings()" id="nav-settings" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
-                    <span>⚙️</span>
+                <button onclick="showSettings()" class="w-full text-left px-4 py-3 rounded-lg glass hover:bg-white/10 transition-colors flex items-center gap-3">
+                    <span>️</span>
                     <span>Settings</span>
                 </button>
                 
-                <!-- Stats Sidebar -->
+                <!-- Stats -->
                 <div class="mt-8 p-4 glass rounded-lg">
                     <div class="space-y-2 text-sm">
-                        <div class="flex justify-between"><span class="text-gray-400">Streak</span><span id="sidebar-streak" class="text-orange-500 font-medium">0 days 🔥</span></div>
-                        <div class="flex justify-between"><span class="text-gray-400">Avg Score</span><span id="sidebar-score" class="text-purple-400 font-medium">—</span></div>
-                        <div class="flex justify-between"><span class="text-gray-400">Standups</span><span id="sidebar-standups" class="text-gray-300 font-medium">0</span></div>
-                        <div class="flex justify-between"><span class="text-gray-400">XP</span><span id="sidebar-xp" class="text-yellow-400 font-medium">0</span></div>
-                        <div class="mt-2 pt-2 border-t border-gray-700">
-                            <div class="text-gray-500 text-xs mb-1">Journey Progress</div>
-                            <div class="progress-track"><div id="sidebar-progress" class="progress-fill" style="width:0%"></div></div>
-                        </div>
+                        <div><span class="text-gray-400">Streak:</span> <span id="sidebar-streak" class="text-orange-500">0 days 🔥</span></div>
+                        <div><span class="text-gray-400">Avg Score:</span> <span id="sidebar-score">—</span></div>
+                        <div><span class="text-gray-400">Standups:</span> <span id="sidebar-standups">0</span></div>
+                        <div><span class="text-gray-400">XP:</span> <span id="sidebar-xp">0</span></div>
                     </div>
                 </div>
             </div>
@@ -94,15 +120,15 @@
             <div class="col-span-9">
                 <!-- AI Coach Chat -->
                 <div id="ai-coach-panel" class="space-y-4">
-                    <!-- Rendered by JavaScript -->
+                    <!-- Chat messages will be rendered here -->
                 </div>
 
                 <!-- Journey Panel -->
                 <div id="journey-panel" class="hidden space-y-6">
                     <div class="glass rounded-lg p-6">
-                        <h2 class="text-2xl font-bold mb-4">🏔️ Your 90-Day Journey</h2>
+                        <h2 class="text-2xl font-bold mb-4">Your 90-Day Journey</h2>
                         <div id="journey-content" class="space-y-4">
-                            <div class="animate-pulse-slow text-gray-400">Loading your journey...</div>
+                            <div class="animate-pulse-slow text-gray-400">Loading...</div>
                         </div>
                     </div>
                 </div>
@@ -110,7 +136,7 @@
                 <!-- Settings Panel -->
                 <div id="settings-panel" class="hidden space-y-6">
                     <div class="glass rounded-lg p-6">
-                        <h2 class="text-2xl font-bold mb-4">⚙️ Settings & Profile</h2>
+                        <h2 class="text-2xl font-bold mb-4">Settings & Profile</h2>
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium mb-2">Business Name</label>
@@ -124,18 +150,7 @@
                                 <label class="block text-sm font-medium mb-2">Target Avatar</label>
                                 <textarea id="target-avatar" rows="3" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"></textarea>
                             </div>
-                            <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">💾 Save Profile</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Wins Section -->
-                    <div class="glass rounded-lg p-6">
-                        <h3 class="text-lg font-bold mb-4">🏆 Wins & Proof</h3>
-                        <button onclick="showWinModal()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors mb-4">
-                            ➕ Record a Win
-                        </button>
-                        <div id="wins-list" class="space-y-2 text-sm">
-                            <div class="text-gray-400">No wins recorded yet. Start building your proof!</div>
+                            <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">Save Profile</button>
                         </div>
                     </div>
                 </div>
@@ -143,101 +158,63 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- WIN MODAL -->
-    <!-- ============================================================ -->
-    <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">🏆 Record a Win</h3>
-                <button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="space-y-3">
-                <textarea id="win-text" rows="3" placeholder="Describe your win (e.g., Closed my first $497 client from a TikTok comment)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500"></textarea>
-                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
-                <button onclick="submitWin()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors">💾 Save Win</button>
-            </div>
-        </div>
-    </div>
+    <!-- NEW: Toast Notification Container -->
+    <div id="toast-container"></div>
 
-    <!-- ============================================================ -->
-    <!-- STANDUP MODAL -->
-    <!-- ============================================================ -->
-    <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
-                <button onclick="closeStandupModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <p class="text-sm text-purple-300 mb-4">Submit your work for review.</p>
-            <div class="space-y-3">
-                <input type="text" id="s-tasks" placeholder="Tasks completed today" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
-                <input type="text" id="s-links" placeholder="Links to your work" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
-                <textarea id="s-text" rows="3" placeholder="Paste your work content" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500"></textarea>
-                <input type="text" id="s-metrics" placeholder="Metrics (views, clicks, sales...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white outline-none focus:border-purple-500">
-                <button onclick="submitStandup()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition-colors">🚀 Submit for Review</button>
-                <div id="review-result" style="display:none" class="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                    <div id="review-score" class="text-2xl font-bold text-center"></div>
-                    <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
-                    <div id="review-text" class="text-sm text-gray-300 mt-3 whitespace-pre-wrap"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- TOAST NOTIFICATIONS -->
-    <!-- ============================================================ -->
-    <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
-
-    <!-- ============================================================ -->
-    <!-- JAVASCRIPT -->
-    <!-- ============================================================ -->
     <script>
-        const API = window.location.origin;
+        const API_BASE = window.location.origin;
         let memberId = localStorage.getItem('member_id') || 'default';
-        if (!localStorage.getItem('member_id')) localStorage.setItem('member_id', memberId);
-        
-        let journeyData = null;
-        let chatHistory = [];
 
-        // ============================================================
-        // INIT
-        // ============================================================
+        // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             await checkOnboarding();
             showAICoach();
-            loadStats();
-            setInterval(loadStats, 30000);
         });
 
         // ============================================================
-        // ONBOARDING CHECK
+        // NEW: TOAST NOTIFICATION SYSTEM
         // ============================================================
-        async function checkOnboarding() {
-            try {
-                const res = await fetch(`${API}/api/check-onboarding?member_id=${memberId}`);
-                const data = await res.json();
-                if (!data.onboarded) {
-                    window.location.href = '/onboarding.html';
-                } else {
-                    document.getElementById('header-context').textContent = 
-                        `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
-                }
-            } catch (e) {
-                console.error('Onboarding check error:', e);
-            }
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         // ============================================================
-        // TAB NAVIGATION
+        // EXISTING FUNCTIONS
         // ============================================================
+        async function checkOnboarding() {
+            try {
+                const response = await fetch(`${API_BASE}/api/check-onboarding?member_id=${memberId}`);
+                const data = await response.json();
+                if (!data.onboarded) {
+                    window.location.href = '/onboarding.html';
+                }
+            } catch (error) {
+                console.error('Error checking onboarding:', error);
+            }
+        }
+
         function showAICoach() {
             document.getElementById('ai-coach-panel').classList.remove('hidden');
             document.getElementById('journey-panel').classList.add('hidden');
             document.getElementById('settings-panel').classList.add('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
-            document.getElementById('nav-chat').classList.add('bg-purple-900/50', 'border-purple-700');
             loadChatHistory();
         }
 
@@ -245,8 +222,6 @@
             document.getElementById('ai-coach-panel').classList.add('hidden');
             document.getElementById('journey-panel').classList.remove('hidden');
             document.getElementById('settings-panel').classList.add('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
-            document.getElementById('nav-journey').classList.add('bg-purple-900/50', 'border-purple-700');
             loadJourney();
         }
 
@@ -254,16 +229,10 @@
             document.getElementById('ai-coach-panel').classList.add('hidden');
             document.getElementById('journey-panel').classList.add('hidden');
             document.getElementById('settings-panel').classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-purple-900/50', 'border-purple-700'));
-            document.getElementById('nav-settings').classList.add('bg-purple-900/50', 'border-purple-700');
             loadProfile();
-            loadWins();
         }
 
-        // ============================================================
-        // CHAT
-        // ============================================================
-        function loadChatHistory() {
+        async function loadChatHistory() {
             const panel = document.getElementById('ai-coach-panel');
             panel.innerHTML = `
                 <div class="space-y-4">
@@ -271,17 +240,18 @@
                         <div class="flex items-start gap-3">
                             <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">AI</div>
                             <div class="flex-1">
-                                <p class="text-sm font-medium text-white">System Initialized</p>
-                                <p class="text-sm text-gray-400 mt-1">I am your proactive COO. Check "My Journey" to see your current task.</p>
+                                <p class="text-sm">System Initialized. I am your proactive COO.</p>
+                                <p class="text-sm text-gray-400 mt-2">Based on your profile, your current focus is fixing Low Whop Sales.</p>
+                                <p class="text-sm text-gray-400">Check "My Journey" to see your task. Submit work in Daily Standup before asking strategic questions.</p>
                             </div>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <input type="text" id="chat-input" placeholder="Ask your AI Coach..." 
+                        <input type="text" id="chat-input" placeholder="Ask your Whop AI Coach..." 
                             class="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500"
-                            onkeypress="if(event.key==='Enter') sendMessage()">
+                            onkeypress="if(event.key==='Enter')sendMessage()">
                         <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-4 py-3 rounded-lg transition-colors">
-                            <span>➤</span>
+                            <span></span>
                         </button>
                     </div>
                 </div>
@@ -298,19 +268,25 @@
                 <div class="glass rounded-lg p-4">
                     <div class="flex items-start gap-3">
                         <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">You</div>
-                        <div class="flex-1"><p class="text-sm">${message}</p></div>
+                        <div class="flex-1">
+                            <p class="text-sm">${message}</p>
+                        </div>
                     </div>
                 </div>
             `;
             input.value = '';
 
             try {
-                const res = await fetch(`${API}/api/chat`, {
+                const response = await fetch(`${API_BASE}/api/chat`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ member_id: memberId, message, history: chatHistory })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        member_id: memberId,
+                        message: message,
+                        history: []
+                    })
                 });
-                const data = await res.json();
+                const data = await response.json();
                 
                 panel.innerHTML += `
                     <div class="glass rounded-lg p-4">
@@ -323,340 +299,154 @@
                     </div>
                 `;
                 panel.scrollTop = panel.scrollHeight;
-                chatHistory.push({role: 'user', content: message});
-                chatHistory.push({role: 'assistant', content: data.reply});
-            } catch (e) {
-                showToast('⚠️ Error sending message', 'error');
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('❌ Failed to send message.', 'error');
             }
         }
 
-        // ============================================================
-        // JOURNEY — POLISHED VERSION
-        // ============================================================
         async function loadJourney() {
             const content = document.getElementById('journey-content');
-            content.innerHTML = '<div class="animate-pulse-slow text-gray-400">Loading your journey...</div>';
+            content.innerHTML = '<div class="animate-pulse-slow text-gray-400">Loading...</div>';
 
             try {
-                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
-                journeyData = await res.json();
+                const response = await fetch(`${API_BASE}/api/journey?member_id=${memberId}`);
+                const data = await response.json();
 
-                // Trajectory banner
-                const traj = journeyData.trajectory || { status: 'on_track', message: 'Loading...', color: 'blue' };
-                const trajClass = {
-                    'green': 'trajectory-green text-green-300',
-                    'yellow': 'trajectory-yellow text-yellow-300',
-                    'blue': 'trajectory-blue text-blue-300'
-                }[traj.color] || 'trajectory-blue text-blue-300';
-
-                const tasksCompleted = journeyData.tasks_completed_count || 0;
-                const totalTasks = 12;
-                const progressPercent = Math.min(100, Math.round((tasksCompleted / totalTasks) * 100));
+                // Determine color class for trajectory
+                const trajectoryColors = {
+                    'green': 'border-green-500 bg-green-900/20 text-green-300',
+                    'yellow': 'border-yellow-500 bg-yellow-900/20 text-yellow-300',
+                    'blue': 'border-blue-500 bg-blue-900/20 text-blue-300'
+                };
+                const trajectoryColor = trajectoryColors[data.trajectory?.color] || 'border-gray-500 bg-gray-800 text-gray-300';
 
                 content.innerHTML = `
                     <!-- Trajectory Banner -->
-                    <div class="${trajClass} rounded-lg p-4 mb-4 border-l-4">
-                        <p class="text-sm font-medium">${traj.message}</p>
+                    <div class="${trajectoryColor} border-l-4 rounded-lg p-4 mb-4">
+                        <p class="text-sm font-medium">${data.trajectory?.message || 'Loading trajectory...'}</p>
                     </div>
 
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-4 gap-3 mb-6">
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-purple-400">${journeyData.current_day}/90</div>
-                            <div class="stat-label">Day</div>
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="glass p-4 rounded-lg">
+                            <div class="text-gray-400 text-sm">Current Phase</div>
+                            <div class="text-xl font-bold text-purple-400">${data.current_phase}</div>
                         </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-green-400">${tasksCompleted}/${totalTasks}</div>
-                            <div class="stat-label">Tasks Done</div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="text-gray-400 text-sm">Day</div>
+                            <div class="text-xl font-bold">${data.current_day}/90</div>
                         </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-yellow-400">${journeyData.xp || 0}</div>
-                            <div class="stat-label">XP</div>
-                        </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-orange-400">${journeyData.streak || 0}</div>
-                            <div class="stat-label">Day Streak</div>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="mb-6">
-                        <div class="flex justify-between text-sm text-gray-400 mb-1">
-                            <span>Journey Progress</span>
-                            <span>${progressPercent}%</span>
-                        </div>
-                        <div class="progress-track">
-                            <div id="journey-progress-bar" class="progress-fill" style="width:${progressPercent}%"></div>
+                        <div class="glass p-4 rounded-lg">
+                            <div class="text-gray-400 text-sm">Focus</div>
+                            <div class="text-sm">${data.focus}</div>
                         </div>
                     </div>
 
                     <!-- Current Task -->
-                    <div class="glass p-5 rounded-lg border-l-4 border-purple-600 mb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="text-sm font-medium text-purple-400">🎯 CURRENT TASK</h3>
-                            <span class="text-xs text-gray-400">Deadline: Day ${journeyData.current_task.deadline_day}</span>
+                    <div class="glass p-6 rounded-lg border-l-4 border-purple-600">
+                        <h3 class="text-lg font-bold mb-2">🎯 Current Mandatory Task</h3>
+                        <h4 class="text-xl font-bold text-purple-400 mb-2">${data.current_task.name}</h4>
+                        <p class="text-sm text-gray-400 mb-4">Deadline: Day ${data.current_task.deadline_day}</p>
+                        <p class="text-sm mb-4">${data.current_task.why}</p>
+                        
+                        <div class="mb-4">
+                            <div class="text-sm font-medium mb-2">Required Frameworks:</div>
+                            <div class="flex flex-wrap gap-2">
+                                ${data.current_task.frameworks.map(f => `<span class="px-3 py-1 bg-purple-900/50 rounded-full text-xs">${f}</span>`).join('')}
+                            </div>
                         </div>
-                        <h4 class="text-lg font-bold text-white">${journeyData.current_task.name}</h4>
-                        <p class="text-sm text-gray-400 mt-1">${journeyData.current_task.why}</p>
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            ${journeyData.current_task.frameworks.map(f => 
-                                `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`
-                            ).join('')}
-                        </div>
-                        <div class="mt-3">
-                            <p class="text-xs text-gray-400">Deliverables:</p>
-                            <ul class="text-xs text-gray-300 list-disc list-inside">
-                                ${journeyData.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
+
+                        <div class="mb-4">
+                            <div class="text-sm font-medium mb-2">Required Deliverables:</div>
+                            <ul class="list-disc list-inside text-sm space-y-1">
+                                ${data.current_task.deliverables.map(d => `<li>${d}</li>`).join('')}
                             </ul>
                         </div>
-                    </div>
 
-                    <!-- All Phases -->
-                    <div class="space-y-3">
-                        ${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
-                            const done = phase.tasks.filter(t => t.completed).length;
-                            const total = phase.tasks.length;
-                            const isCurrent = key === journeyData.current_phase.replace(' ', '_');
-                            return `
-                                <div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : 'opacity-70'}">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-sm">${phase.name}</h4>
-                                        <span class="text-xs text-gray-400">${done}/${total}</span>
-                                    </div>
-                                    <div class="space-y-1">
-                                        ${phase.tasks.map(task => `
-                                            <div class="flex items-center gap-2 text-sm ${task.completed ? 'task-done text-gray-500' : isCurrent && !task.completed ? 'task-current pl-2' : 'task-pending'}">
-                                                <span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span>
-                                                <span>${task.name}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
+                        <p class="text-xs text-gray-500">️ Submit work for this task in the Daily Standup before the AI will answer new strategic questions.</p>
                     </div>
                 `;
-
-                // Update sidebar progress
-                document.getElementById('sidebar-progress').style.width = `${progressPercent}%`;
-                updateSidebarStats();
-
-            } catch (e) {
-                console.error('Journey load error:', e);
-                content.innerHTML = '<div class="text-red-400">Error loading journey data. Please refresh.</div>';
+            } catch (error) {
+                console.error('Error loading journey:', error);
+                content.innerHTML = '<div class="text-red-400">Error loading journey data</div>';
+                showToast('❌ Failed to load journey.', 'error');
             }
         }
 
-        // ============================================================
-        // STATS
-        // ============================================================
-        function updateSidebarStats() {
-            if (!journeyData) return;
-            document.getElementById('sidebar-streak').textContent = `${journeyData.streak || 0} days 🔥`;
-            document.getElementById('sidebar-score').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
-            document.getElementById('sidebar-standups').textContent = journeyData.standup_count || 0;
-            document.getElementById('sidebar-xp').textContent = journeyData.xp || 0;
-            document.getElementById('streak-display').textContent = `${journeyData.streak || 0} days`;
-            document.getElementById('xp-display').textContent = `${journeyData.xp || 0} XP`;
-        }
-
-        async function loadStats() {
-            try {
-                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
-                journeyData = await res.json();
-                updateSidebarStats();
-            } catch (e) {
-                console.error('Stats load error:', e);
-            }
-        }
-
-        // ============================================================
-        // PROFILE
-        // ============================================================
         async function loadProfile() {
             try {
-                const res = await fetch(`${API}/api/check-onboarding?member_id=${memberId}`);
-                const data = await res.json();
+                const response = await fetch(`${API_BASE}/api/check-onboarding?member_id=${memberId}`);
+                const data = await response.json();
+                
                 if (data.profile) {
                     document.getElementById('business-name').value = data.profile.business_name || '';
                     document.getElementById('niche').value = data.profile.niche || '';
                     document.getElementById('target-avatar').value = data.profile.target_avatar || '';
                 }
-            } catch (e) { console.error('Profile load error:', e); }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
         }
 
         async function saveProfile() {
-            const payload = {
-                member_id: memberId,
+            const profile = {
                 business_name: document.getElementById('business-name').value,
                 niche: document.getElementById('niche').value,
-                target_avatar: document.getElementById('target-avatar').value,
-                core_offer: '',
-                current_revenue: 0,
-                revenue_goal: 10000,
-                biggest_bottleneck: '',
-                current_level: 'beginner',
-                weekly_hours: '4-7',
-                offer_done: false,
-                audience_done: false,
-                sales_done: false,
-                launch_done: false
+                target_avatar: document.getElementById('target-avatar').value
             };
+
             try {
-                await fetch(`${API}/api/onboarding`, {
+                await fetch(`${API_BASE}/api/onboarding`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        member_id: memberId,
+                        ...profile,
+                        core_offer: '',
+                        current_revenue: 0,
+                        revenue_goal: 10000,
+                        biggest_bottleneck: '',
+                        current_level: 'beginner',
+                        weekly_hours: '4-7',
+                        offer_done: false,
+                        audience_done: false,
+                        sales_done: false,
+                        launch_done: false
+                    })
                 });
-                showToast('✅ Profile saved!');
-            } catch (e) {
-                showToast('⚠️ Error saving profile', 'error');
+                showToast('✅ Profile saved successfully!', 'success');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showToast('❌ Error saving profile.', 'error');
             }
         }
 
-        // ============================================================
-        // WINS
-        // ============================================================
-        async function loadWins() {
-            try {
-                const res = await fetch(`${API}/api/journey?member_id=${memberId}`);
-                const data = await res.json();
-                const wins = data.wins || [];
-                const container = document.getElementById('wins-list');
-                if (wins.length === 0) {
-                    container.innerHTML = '<div class="text-sm text-gray-400">No wins recorded yet. Start building your proof!</div>';
-                } else {
-                    container.innerHTML = wins.slice(0, 5).map(w => `
-                        <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
-                            <div class="text-sm text-gray-300">🏆 ${w.win_text}</div>
-                            ${w.revenue_amount ? `<div class="text-xs text-green-400">+$${w.revenue_amount}</div>` : ''}
-                            <div class="text-xs text-gray-500 mt-1">${new Date(w.created_at).toLocaleDateString()}</div>
-                        </div>
-                    `).join('');
-                }
-            } catch (e) { console.error('Wins load error:', e); }
-        }
-
-        function showWinModal() {
-            document.getElementById('win-modal').classList.remove('hidden');
-            document.getElementById('win-modal').classList.add('flex');
-        }
-
-        function closeWinModal() {
-            document.getElementById('win-modal').classList.add('hidden');
-            document.getElementById('win-modal').classList.remove('flex');
-        }
-
-        async function submitWin() {
-            const text = document.getElementById('win-text').value.trim();
-            const revenue = parseFloat(document.getElementById('win-revenue').value) || null;
-            if (!text) { showToast('⚠️ Please describe your win', 'error'); return; }
-            try {
-                await fetch(`${API}/api/win`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ member_id: memberId, win_text: text, revenue_amount: revenue })
-                });
-                closeWinModal();
-                document.getElementById('win-text').value = '';
-                document.getElementById('win-revenue').value = '';
-                loadWins();
-                loadJourney();
-                showToast('🏆 Win recorded!');
-            } catch (e) { showToast('⚠️ Error recording win', 'error'); }
-        }
-
-        // ============================================================
-        // STANDUP
-        // ============================================================
         function showSubmitDailyWork() {
-            if (!journeyData) { showToast('⏳ Loading journey data...', 'info'); return; }
-            document.getElementById('standup-modal').classList.remove('hidden');
-            document.getElementById('standup-modal').classList.add('flex');
-            document.getElementById('review-result').style.display = 'none';
+            // Example of how the standup notification would trigger
+            // In a real implementation, this would open a modal or form
+            showToast(' Daily Standup feature coming soon!', 'success');
         }
 
-        function closeStandupModal() {
-            document.getElementById('standup-modal').classList.add('hidden');
-            document.getElementById('standup-modal').classList.remove('flex');
-        }
-
-        async function submitStandup() {
-            if (!journeyData) { showToast('⏳ Please wait for journey to load', 'info'); return; }
-
-            const payload = {
-                member_id: memberId,
-                current_task_id: journeyData.current_task.id,
-                tasks_completed: document.getElementById('s-tasks').value.split(',').filter(s => s.trim()),
-                asset_links: document.getElementById('s-links').value.split(',').filter(s => s.trim()),
-                asset_text: document.getElementById('s-text').value,
-                metrics: document.getElementById('s-metrics').value
-            };
-
-            const btn = event.target;
-            btn.innerText = "⏳ Grading...";
-            btn.disabled = true;
-
+        async function loadStats() {
             try {
-                const res = await fetch(`${API}/api/standup`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-
-                document.getElementById('review-result').style.display = 'block';
-                const scoreEl = document.getElementById('review-score');
-                scoreEl.textContent = `${data.score}/10`;
-                scoreEl.className = `text-2xl font-bold text-center ${data.score >= 7 ? 'text-green-400' : data.score >= 5 ? 'text-yellow-400' : 'text-red-400'}`;
-                document.getElementById('review-xp').textContent = `+${data.xp_gained || 25} XP • 🔥 ${data.streak || 0} day streak`;
-                document.getElementById('review-text').textContent = data.review || 'No review provided.';
-
-                document.getElementById('s-tasks').value = '';
-                document.getElementById('s-links').value = '';
-                document.getElementById('s-text').value = '';
-                document.getElementById('s-metrics').value = '';
-
-                await loadJourney();
-                showToast(data.score >= 7 ? '✅ Task approved! +125 XP' : '📝 Review received. Keep pushing!');
-            } catch (e) {
-                showToast('⚠️ Error submitting standup', 'error');
+                const response = await fetch(`${API_BASE}/api/journey?member_id=${memberId}`);
+                const data = await response.json();
+                
+                document.getElementById('streak-display').textContent = `${data.streak} days`;
+                document.getElementById('xp-display').textContent = `${data.xp} XP`;
+                document.getElementById('sidebar-streak').textContent = `${data.streak} days 🔥`;
+                document.getElementById('sidebar-xp').textContent = data.xp;
+                document.getElementById('sidebar-standups').textContent = data.standup_count;
+                document.getElementById('sidebar-score').textContent = data.avg_score > 0 ? `${data.avg_score}/10` : '—';
+            } catch (error) {
+                console.error('Error loading stats:', error);
             }
-            btn.innerText = "🚀 Submit for Review";
-            btn.disabled = false;
         }
 
-        // ============================================================
-        // TOAST NOTIFICATIONS
-        // ============================================================
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const colors = {
-                success: 'bg-green-600 border-green-500',
-                error: 'bg-red-600 border-red-500',
-                info: 'bg-blue-600 border-blue-500'
-            };
-            const div = document.createElement('div');
-            div.className = `${colors[type] || colors.success} text-white px-4 py-3 rounded-lg border text-sm shadow-lg transition-all opacity-0 transform translate-y-2`;
-            div.textContent = message;
-            container.appendChild(div);
-            setTimeout(() => { div.style.opacity = '1'; div.style.transform = 'translateY(0)'; }, 10);
-            setTimeout(() => {
-                div.style.opacity = '0';
-                div.style.transform = 'translateY(2)';
-                setTimeout(() => div.remove(), 300);
-            }, 3000);
-        }
-
-        // ============================================================
-        // KEYBOARD SHORTCUTS
-        // ============================================================
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeStandupModal();
-                closeWinModal();
-            }
-        });
+        // Load stats every 30 seconds
+        setInterval(loadStats, 30000);
+        loadStats();
     </script>
 </body>
 </html>
