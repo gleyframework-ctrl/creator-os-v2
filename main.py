@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA NIM Configuration — use the working model
+# NVIDIA NIM — using the proven working model
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -31,72 +31,132 @@ log.info(f"🔍 NVIDIA Model: {NVIDIA_MODEL}")
 log.info(f"🔍 Telegram Bot: {'Set' if TELEGRAM_BOT_TOKEN else 'MISSING'}")
 
 # ============================================================
-# DATABASE (Railway PostgreSQL)
+# RAILWAY POSTGRESQL
 # ============================================================
-import psycopg2
-from psycopg2.extras import RealDictCursor
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
 
-PGHOST = os.environ.get("PGHOST", "").strip()
-PGDATABASE = os.environ.get("PGDATABASE", "").strip()
-PGUSER = os.environ.get("PGUSER", "").strip()
-PGPASSWORD = os.environ.get("PGPASSWORD", "").strip()
-PGPORT = os.environ.get("PGPORT", "5432").strip()
+    PGHOST = os.environ.get("PGHOST", "").strip()
+    PGDATABASE = os.environ.get("PGDATABASE", "").strip()
+    PGUSER = os.environ.get("PGUSER", "").strip()
+    PGPASSWORD = os.environ.get("PGPASSWORD", "").strip()
+    PGPORT = os.environ.get("PGPORT", "5432").strip()
 
-DATABASE_CONNECTED = False
+    DATABASE_CONNECTED = False
 
-def get_db_connection():
-    try:
-        if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
-            log.warning("⚠️ Missing PostgreSQL env variables")
+    def get_db_connection():
+        try:
+            if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
+                log.warning("⚠️ Missing PostgreSQL environment variables!")
+                return None
+            log.info(f"🔍 Connecting to PostgreSQL: host={PGHOST}, db={PGDATABASE}, user={PGUSER}, port={PGPORT}")
+            conn = psycopg2.connect(
+                host=PGHOST,
+                database=PGDATABASE,
+                user=PGUSER,
+                password=PGPASSWORD,
+                port=PGPORT,
+                cursor_factory=RealDictCursor
+            )
+            log.info("✅ PostgreSQL connection established.")
+            return conn
+        except Exception as e:
+            log.error(f"❌ Database connection failed: {e}")
             return None
-        return psycopg2.connect(
-            host=PGHOST, database=PGDATABASE, user=PGUSER,
-            password=PGPASSWORD, port=PGPORT, cursor_factory=RealDictCursor
-        )
-    except Exception as e:
-        log.error(f"DB Connection Error: {e}")
+
+    def init_db():
+        try:
+            conn = get_db_connection()
+            if not conn:
+                log.warning("⚠️ Could not connect to database. Using in-memory fallback.")
+                return
+            cur = conn.cursor()
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS profiles (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS journeys (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS standups (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS wins (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS scores (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    score INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS strategy_docs (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS member_notifications (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT REFERENCES profiles(member_id) ON DELETE CASCADE,
+                    notification_type TEXT,
+                    message TEXT,
+                    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    read_at TIMESTAMP,
+                    action_taken BOOLEAN DEFAULT FALSE
+                )
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_notifications_member_id ON member_notifications(member_id)
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_notifications_sent_at ON member_notifications(sent_at)
+            """)
+            conn.commit()
+            cur.close()
+            conn.close()
+            log.info("✅ PostgreSQL tables initialized.")
+            global DATABASE_CONNECTED
+            DATABASE_CONNECTED = True
+        except Exception as e:
+            log.error(f"⚠️ Database initialization failed: {e}")
+            log.warning("⚠️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
+
+    init_db()
+except ImportError:
+    log.error("❌ psycopg2 not installed. Install it with: pip install psycopg2-binary")
+    DATABASE_CONNECTED = False
+
+    def get_db_connection():
         return None
 
-def init_db():
-    global DATABASE_CONNECTED
-    conn = get_db_connection()
-    if not conn:
-        log.warning("⚠️ DB not connected. Using in‑memory fallback.")
-        return
-    try:
-        cur = conn.cursor()
-        # Main tables
-        cur.execute("""CREATE TABLE IF NOT EXISTS profiles (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        cur.execute("""CREATE TABLE IF NOT EXISTS journeys (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        cur.execute("""CREATE TABLE IF NOT EXISTS standups (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        cur.execute("""CREATE TABLE IF NOT EXISTS wins (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        cur.execute("""CREATE TABLE IF NOT EXISTS scores (id SERIAL PRIMARY KEY, member_id TEXT, score INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        cur.execute("""CREATE TABLE IF NOT EXISTS strategy_docs (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
-        # Re‑engagement table
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS member_notifications (
-                id SERIAL PRIMARY KEY,
-                member_id TEXT REFERENCES profiles(member_id) ON DELETE CASCADE,
-                notification_type TEXT,
-                message TEXT,
-                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                read_at TIMESTAMP,
-                action_taken BOOLEAN DEFAULT FALSE
-            )
-        """)
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_notifications_member_id ON member_notifications(member_id)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_notifications_sent_at ON member_notifications(sent_at)")
-        conn.commit()
-        cur.close(); conn.close()
-        DATABASE_CONNECTED = True
-        log.info("✅ Database tables initialized.")
-    except Exception as e:
-        log.error(f"Init DB Error: {e}")
-
-init_db()
-
 # ============================================================
-# IN‑MEMORY FALLBACK
+# IN-MEMORY FALLBACK
 # ============================================================
 PROFILES_DB = {}
 JOURNEY_DB = {}
@@ -104,9 +164,32 @@ WINS_DB = {}
 SCORES_DB = {}
 
 # ============================================================
+# RATE LIMITER
+# ============================================================
+class RateLimiter:
+    def __init__(self, max_hits, window_s):
+        self.max_hits = max_hits
+        self.window = window_s
+        self.hits = {}
+        self.lock = threading.Lock()
+
+    def allow(self, key):
+        now = time.time()
+        with self.lock:
+            b = self.hits.setdefault(key, [])
+            while b and now - b[0] > self.window:
+                b.pop(0)
+            if len(b) >= self.max_hits:
+                return False
+            b.append(now)
+            return True
+
+CHAT_LIMIT = RateLimiter(50, 3600)
+
+# ============================================================
 # FASTAPI APP
 # ============================================================
-app = FastAPI(title="E5 AI Coach OS", version="5.2")
+app = FastAPI(title="E5 AI Coach OS", version="5.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
@@ -143,7 +226,7 @@ JOURNEY_MAP = {
 }
 
 # ============================================================
-# DATABASE HELPERS (Core)
+# DATABASE HELPERS (EXISTING)
 # ============================================================
 def db_get_profile(member_id):
     try:
@@ -155,46 +238,52 @@ def db_get_profile(member_id):
         cur.close(); conn.close()
         return result['data'] if result else PROFILES_DB.get(member_id)
     except Exception as e:
-        log.error(f"get_profile error: {e}")
+        log.error(f"DB get profile error: {e}")
         return PROFILES_DB.get(member_id)
 
 def db_upsert_profile(member_id, data):
     try:
         conn = get_db_connection()
-        if not conn: PROFILES_DB[member_id] = data; return True
+        if not conn:
+            PROFILES_DB[member_id] = data
+            return True
         cur = conn.cursor()
-        cur.execute("INSERT INTO profiles (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (member_id, json.dumps(data)))
-        conn.commit(); cur.close(); conn.close()
+        cur.execute("INSERT INTO profiles (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP", (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close(); conn.close()
         return True
     except Exception as e:
-        log.error(f"upsert_profile error: {e}")
+        log.error(f"DB upsert profile error: {e}")
         PROFILES_DB[member_id] = data
         return True
 
 def db_get_journey(member_id):
-    default_j = {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
+    default_journey = {"current_day": 1, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
     try:
         conn = get_db_connection()
-        if not conn: return JOURNEY_DB.get(member_id, default_j)
+        if not conn: return JOURNEY_DB.get(member_id, default_journey)
         cur = conn.cursor()
         cur.execute("SELECT data FROM journeys WHERE member_id = %s", (member_id,))
         result = cur.fetchone()
         cur.close(); conn.close()
-        return result['data'] if result else JOURNEY_DB.get(member_id, default_j)
+        return result['data'] if result else JOURNEY_DB.get(member_id, default_journey)
     except Exception as e:
-        log.error(f"get_journey error: {e}")
-        return JOURNEY_DB.get(member_id, default_j)
+        log.error(f"DB get journey error: {e}")
+        return JOURNEY_DB.get(member_id, default_journey)
 
 def db_upsert_journey(member_id, data):
     try:
         conn = get_db_connection()
-        if not conn: JOURNEY_DB[member_id] = data; return True
+        if not conn:
+            JOURNEY_DB[member_id] = data
+            return True
         cur = conn.cursor()
-        cur.execute("INSERT INTO journeys (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (member_id, json.dumps(data)))
-        conn.commit(); cur.close(); conn.close()
+        cur.execute("INSERT INTO journeys (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP", (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close(); conn.close()
         return True
     except Exception as e:
-        log.error(f"upsert_journey error: {e}")
+        log.error(f"DB upsert journey error: {e}")
         JOURNEY_DB[member_id] = data
         return True
 
@@ -205,10 +294,12 @@ def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text,
         cur = conn.cursor()
         data = {"task_id": task_id, "tasks_completed": tasks_completed, "asset_links": asset_links, "asset_text": asset_text, "metrics": metrics, "score": score, "review": review, "evidence": evidence}
         cur.execute("INSERT INTO standups (member_id, data) VALUES (%s, %s)", (member_id, json.dumps(data)))
-        conn.commit(); cur.close(); conn.close()
+        conn.commit()
+        cur.close(); conn.close()
+        return True
     except Exception as e:
-        log.error(f"add_standup error: {e}")
-    return True
+        log.error(f"DB add standup error: {e}")
+        return True
 
 def db_add_win(member_id, win_text, revenue):
     try:
@@ -217,12 +308,15 @@ def db_add_win(member_id, win_text, revenue):
             WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
             return True
         cur = conn.cursor()
-        cur.execute("INSERT INTO wins (member_id, data) VALUES (%s, %s)", (member_id, json.dumps({"win_text": win_text, "revenue_amount": revenue})))
-        conn.commit(); cur.close(); conn.close()
+        data = {"win_text": win_text, "revenue_amount": revenue}
+        cur.execute("INSERT INTO wins (member_id, data) VALUES (%s, %s)", (member_id, json.dumps(data)))
+        conn.commit()
+        cur.close(); conn.close()
+        return True
     except Exception as e:
-        log.error(f"add_win error: {e}")
+        log.error(f"DB add win error: {e}")
         WINS_DB.setdefault(member_id, []).append({"win_text": win_text, "revenue_amount": revenue})
-    return True
+        return True
 
 def db_get_wins(member_id):
     try:
@@ -234,7 +328,7 @@ def db_get_wins(member_id):
         cur.close(); conn.close()
         return [r['data'] for r in results] if results else WINS_DB.get(member_id, [])
     except Exception as e:
-        log.error(f"get_wins error: {e}")
+        log.error(f"DB get wins error: {e}")
         return WINS_DB.get(member_id, [])
 
 def db_add_score(member_id, score):
@@ -245,11 +339,13 @@ def db_add_score(member_id, score):
             return True
         cur = conn.cursor()
         cur.execute("INSERT INTO scores (member_id, score) VALUES (%s, %s)", (member_id, score))
-        conn.commit(); cur.close(); conn.close()
+        conn.commit()
+        cur.close(); conn.close()
+        return True
     except Exception as e:
-        log.error(f"add_score error: {e}")
+        log.error(f"DB add score error: {e}")
         SCORES_DB.setdefault(member_id, []).append(score)
-    return True
+        return True
 
 def db_get_scores(member_id):
     try:
@@ -261,17 +357,20 @@ def db_get_scores(member_id):
         cur.close(); conn.close()
         return [r['score'] for r in results] if results else SCORES_DB.get(member_id, [])
     except Exception as e:
-        log.error(f"get_scores error: {e}")
+        log.error(f"DB get scores error: {e}")
         return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# RE‑ENGAGEMENT HELPERS
+# NEW: RE-ENGAGEMENT HELPERS
 # ============================================================
+
 def db_get_inactive_members():
     """Get members who haven't submitted a standup in 3+ days."""
     try:
         conn = get_db_connection()
-        if not conn: return []
+        if not conn:
+            return []
+
         cur = conn.cursor()
         cur.execute("""
             SELECT j.member_id, p.data->>'business_name' as business_name,
@@ -280,13 +379,15 @@ def db_get_inactive_members():
                    j.data->>'current_task_id' as current_task
             FROM journeys j
             JOIN profiles p ON j.member_id = p.member_id
-            WHERE (j.data->>'last_standup_date' IS NULL
+            WHERE (j.data->>'last_standup_date' IS NULL 
                    OR j.data->>'last_standup_date' < NOW() - INTERVAL '3 days')
             AND p.data->>'onboarding_complete' = 'true'
             ORDER BY j.data->>'last_standup_date' ASC NULLS FIRST
         """)
         results = cur.fetchall()
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
+
         inactive = []
         for row in results:
             last_date = row.get('last_standup_date')
@@ -298,7 +399,8 @@ def db_get_inactive_members():
                     days_inactive = 3
             else:
                 days_inactive = 14
-            # get task name
+
+            # Get task name
             current_task_id = row.get('current_task', 'p1_t1')
             task_name = "Unknown"
             for phase in JOURNEY_MAP.values():
@@ -306,6 +408,7 @@ def db_get_inactive_members():
                     if t["id"] == current_task_id:
                         task_name = t["name"]
                         break
+
             inactive.append({
                 "member_id": row['member_id'],
                 "business_name": row.get('business_name', 'Member'),
@@ -315,78 +418,129 @@ def db_get_inactive_members():
                 "xp": int(row.get('xp', 0)),
                 "current_task": task_name
             })
+
         return inactive
     except Exception as e:
-        log.error(f"get_inactive error: {e}")
+        log.error(f"Error getting inactive members: {e}")
         return []
 
 def db_get_notifications_sent(member_id, days_back=7):
+    """Get notifications sent to a member in the last X days."""
     try:
         conn = get_db_connection()
-        if not conn: return []
+        if not conn:
+            return []
         cur = conn.cursor()
-        cur.execute("SELECT * FROM member_notifications WHERE member_id = %s AND sent_at > NOW() - INTERVAL '%s days' ORDER BY sent_at DESC", (member_id, days_back))
+        cur.execute("""
+            SELECT * FROM member_notifications 
+            WHERE member_id = %s AND sent_at > NOW() - INTERVAL '%s days'
+            ORDER BY sent_at DESC
+        """, (member_id, days_back))
         results = cur.fetchall()
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         return results
     except Exception as e:
-        log.error(f"get_notifications error: {e}")
+        log.error(f"Error getting notifications: {e}")
         return []
 
 def db_add_notification(member_id, notification_type, message):
+    """Record a notification sent to a member."""
     try:
         conn = get_db_connection()
-        if not conn: return True
+        if not conn:
+            return True
         cur = conn.cursor()
-        cur.execute("INSERT INTO member_notifications (member_id, notification_type, message) VALUES (%s, %s, %s)", (member_id, notification_type, message))
-        conn.commit(); cur.close(); conn.close()
+        cur.execute("""
+            INSERT INTO member_notifications (member_id, notification_type, message)
+            VALUES (%s, %s, %s)
+        """, (member_id, notification_type, message))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
     except Exception as e:
-        log.error(f"add_notification error: {e}")
-    return True
+        log.error(f"Error adding notification: {e}")
+        return True
 
 def db_mark_notification_read(member_id):
+    """Mark all notifications for a member as read."""
     try:
         conn = get_db_connection()
-        if not conn: return True
+        if not conn:
+            return True
         cur = conn.cursor()
-        cur.execute("UPDATE member_notifications SET read_at = CURRENT_TIMESTAMP, action_taken = TRUE WHERE member_id = %s AND read_at IS NULL", (member_id,))
-        conn.commit(); cur.close(); conn.close()
+        cur.execute("""
+            UPDATE member_notifications 
+            SET read_at = CURRENT_TIMESTAMP, action_taken = TRUE
+            WHERE member_id = %s AND read_at IS NULL
+        """, (member_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
     except Exception as e:
-        log.error(f"mark_notification_read error: {e}")
-    return True
+        log.error(f"Error marking notifications read: {e}")
+        return True
 
 def db_get_member_contact(member_id):
+    """Get member contact info for notifications."""
     try:
         conn = get_db_connection()
-        if not conn: return {"telegram_id": None, "email": None, "business_name": "Member"}
+        if not conn:
+            return {"telegram_id": None, "email": None, "business_name": "Member"}
         cur = conn.cursor()
-        cur.execute("SELECT data->>'telegram_id' as telegram_id, data->>'email' as email, data->>'business_name' as business_name FROM profiles WHERE member_id = %s", (member_id,))
+        cur.execute("""
+            SELECT data->>'telegram_id' as telegram_id,
+                   data->>'email' as email,
+                   data->>'business_name' as business_name
+            FROM profiles WHERE member_id = %s
+        """, (member_id,))
         result = cur.fetchone()
-        cur.close(); conn.close()
+        cur.close()
+        conn.close()
         return {
             "telegram_id": result.get('telegram_id') if result else None,
             "email": result.get('email') if result else None,
             "business_name": result.get('business_name', 'Member') if result else 'Member'
         }
     except Exception as e:
-        log.error(f"get_member_contact error: {e}")
+        log.error(f"Error getting member contact: {e}")
         return {"telegram_id": None, "email": None, "business_name": "Member"}
 
-def send_telegram_message(chat_id, message):
+# ============================================================
+# TELEGRAM NOTIFICATIONS
+# ============================================================
+
+def send_telegram_message(chat_id: str, message: str) -> bool:
+    """Send a Telegram message to a member."""
     if not TELEGRAM_BOT_TOKEN or not chat_id:
         return False
+
     try:
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        payload = json.dumps({"chat_id": chat_id, "text": message, "parse_mode": "HTML"}).encode("utf-8")
-        req = urllib.request.Request(url, data=payload, method="POST", headers={"Content-Type": "application/json"})
+        payload = json.dumps({
+            "chat_id": chat_id,
+            "text": message,
+            "parse_mode": "HTML"
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            method="POST",
+            headers={"Content-Type": "application/json"}
+        )
+
         with urllib.request.urlopen(req, timeout=30) as resp:
-            result = json.loads(resp.read().decode())
+            result = json.loads(resp.read().decode("utf-8"))
             return result.get("ok", False)
     except Exception as e:
         log.error(f"Telegram send error: {e}")
         return False
 
 def send_re_engagement_notification(member):
+    """Send appropriate re-engagement message based on days inactive."""
     days = member.get("days_inactive", 0)
     member_id = member.get("member_id")
     business_name = member.get("business_name", "Member")
@@ -394,11 +548,13 @@ def send_re_engagement_notification(member):
     streak = member.get("streak", 0)
     xp = member.get("xp", 0)
     current_task = member.get("current_task", "")
-    # Check if already sent this week
+
+    # Check if we already sent a notification recently
     recent = db_get_notifications_sent(member_id, days_back=7)
     if recent and len(recent) > 0:
         return False
-    # Build message
+
+    # Build message based on days inactive
     if days >= 14:
         message = f"""⚠️ <b>Is Everything Okay?</b>
 
@@ -415,6 +571,7 @@ Your journey is important to us. If you're stuck or need help, just reply to thi
 
 🔗 https://e5-ai-coach-production.up.railway.app"""
         notification_type = "re_engagement_urgent"
+
     elif days >= 7:
         message = f"""📢 <b>We Miss You!</b>
 
@@ -436,6 +593,7 @@ Just spend 15 minutes on it and submit your work.
 
 🔗 https://e5-ai-coach-production.up.railway.app"""
         notification_type = "re_engagement_reminder"
+
     elif days >= 3:
         message = f"""🔥 <b>Your Streak is at Risk!</b>
 
@@ -457,20 +615,26 @@ Don't let your streak die! 💪
         notification_type = "streak_warning"
     else:
         return False
-    # Send
+
+    # Send the message
     contact = db_get_member_contact(member_id)
+
+    # Try Telegram first
     if contact.get("telegram_id"):
         success = send_telegram_message(contact["telegram_id"], message)
         if success:
             db_add_notification(member_id, notification_type, message)
             log.info(f"📨 Sent {notification_type} to {business_name}")
             return True
-    log.info(f"⚠️ No contact for {business_name}, notification not sent")
+
+    log.info(f"⚠️ No contact method for {business_name}, notification not sent")
     return False
 
-def send_re_engagement_reminder(member_id):
+def send_re_engagement_reminder(member_id: str) -> bool:
+    """Send a single re-engagement reminder to a specific member."""
     journey = db_get_journey(member_id)
     profile = db_get_profile(member_id) or {}
+
     member = {
         "member_id": member_id,
         "business_name": profile.get("business_name", "Member"),
@@ -480,22 +644,30 @@ def send_re_engagement_reminder(member_id):
         "current_task": "Your current task",
         "days_inactive": 3
     }
+
     return send_re_engagement_notification(member)
 
 # ============================================================
 # NVIDIA LLM ENGINE
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
+    """Call NVIDIA NIM with simple retry logic."""
+
     if not NVIDIA_API_KEY:
-        return "Error: NVIDIA API key not configured."
+        log.error("❌ NVIDIA_API_KEY is not set!")
+        return "Error: NVIDIA API key not configured in Railway environment variables."
+
     for attempt in range(3):
         try:
+            log.info(f"🚀 Calling NVIDIA NIM (attempt {attempt+1}/3)...")
+
             payload = json.dumps({
                 "model": NVIDIA_MODEL,
                 "messages": messages,
                 "temperature": temperature,
                 "max_tokens": 1024
             }).encode("utf-8")
+
             req = urllib.request.Request(
                 NVIDIA_URL,
                 data=payload,
@@ -505,19 +677,37 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
                     "Authorization": f"Bearer {NVIDIA_API_KEY}"
                 }
             )
+
             with urllib.request.urlopen(req, timeout=60) as resp:
-                result = json.loads(resp.read().decode())
+                result = json.loads(resp.read().decode("utf-8"))
+                log.info("✅ NVIDIA NIM Success!")
                 return result["choices"][0]["message"]["content"]
+
         except urllib.error.HTTPError as e:
-            if e.code in [503, 429, 502, 504]:
+            error_body = e.read().decode('utf-8', errors='ignore')[:200]
+            log.error(f"⚠️ NVIDIA HTTP {e.code}: {e.reason}")
+            log.error(f"Error body: {error_body}")
+
+            if e.code == 410:
+                return f"Error: Model '{NVIDIA_MODEL}' is no longer available (HTTP 410). Please update NVIDIA_MODEL in Railway variables."
+            elif e.code == 401:
+                return "Error: Invalid NVIDIA API key (HTTP 401). Please check your NVIDIA_API_KEY."
+            elif e.code == 404:
+                return f"Error: Model '{NVIDIA_MODEL}' not found (HTTP 404). Please check the model name."
+            elif e.code in [503, 429, 502, 504]:
+                log.warning(f"⚠️ Retrying in 2 seconds...")
                 time.sleep(2)
                 continue
-            return f"Error: NVIDIA API failed ({e.code})."
+            else:
+                return f"Error: NVIDIA API failed ({e.code}). Check logs for details."
+
         except Exception as e:
+            log.warning(f"⚠️ NVIDIA attempt {attempt+1} failed: {e}")
             if attempt < 2:
                 time.sleep(2)
                 continue
-    return "Error: NVIDIA service temporarily unavailable."
+
+    return "Error: NVIDIA service temporarily unavailable after 3 attempts. Please try again later."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -588,6 +778,7 @@ def advance_journey(journey, member_id):
     phase_tasks = JOURNEY_MAP[phase]["tasks"]
     completed = journey.get("tasks_completed", [])
     completed_in_phase = [t for t in phase_tasks if t["id"] in completed]
+
     if phase == "Phase 1" and len(completed_in_phase) >= 4:
         journey["current_phase"] = "Phase 2"
         journey["current_task_id"] = "p2_t1"
@@ -603,15 +794,16 @@ def calculate_trajectory(journey):
     current_day = journey.get("current_day", 1)
     tasks_completed = len(journey.get("tasks_completed", []))
     expected_tasks = max(1, current_day // 7)
+
     if tasks_completed > expected_tasks:
-        return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead!", "color": "green"}
+        return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead of schedule!", "color": "green"}
     elif tasks_completed < expected_tasks:
-        return {"status": "behind", "message": f"⚠️ You're {expected_tasks - tasks_completed} task(s) behind.", "color": "yellow"}
+        return {"status": "behind", "message": f"⚠️ You're {expected_tasks - tasks_completed} task(s) behind. Focus on your current task.", "color": "yellow"}
     else:
-        return {"status": "on_track", "message": "✅ You're exactly on track.", "color": "blue"}
+        return {"status": "on_track", "message": "✅ You're exactly where you should be. Steady progress wins the race.", "color": "blue"}
 
 # ============================================================
-# ROUTES
+# ROUTES (ALL EXISTING + NEW RE-ENGAGEMENT ENDPOINTS)
 # ============================================================
 @app.get("/")
 @app.get("/onboarding.html")
@@ -622,7 +814,7 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.2"}
+    return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.0"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -636,87 +828,70 @@ def submit_onboarding(req: OnboardingRequest):
         starting_day = 15
     elif req.current_level == "advanced" and (req.offer_done and req.audience_done and req.sales_done):
         starting_day = 31
+
     speed_profile = "accelerator" if req.weekly_hours == "8+" else "steady" if req.weekly_hours == "4-7" else "reflective"
+
     profile_data = req.dict()
     profile_data["speed_profile"] = speed_profile
     db_upsert_profile(req.member_id, profile_data)
     db_upsert_journey(req.member_id, {
-        "current_day": starting_day,
-        "current_phase": "Phase 1",
-        "current_task_id": "p1_t1",
-        "tasks_completed": [],
-        "streak": 0,
-        "last_standup_date": None,
-        "xp_total": 0,
-        "badges": []
+        "current_day": starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1",
+        "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
     })
+
     return {"success": True, "starting_day": starting_day, "speed_profile": speed_profile}
 
 @app.post("/api/generate-strategy")
 def generate_strategy(req: StrategyRequest):
     starting_day = 15 if req.stage == "product" else 31 if req.stage == "selling" else 1
     speed_profile = "accelerator" if req.hours == "8+" else "steady" if req.hours == "4-7" else "reflective"
+
     bottleneck_map = {
-        "traffic": "Module 3 — Attract",
-        "conversion": "Module 4 — Convert",
-        "content": "Module 3 — Attract",
-        "community": "Module 5 — Automate",
-        "offer": "Module 2 — Package",
-        "time": "Module 5 — Automate",
-        "other": "Module 1 — Position"
+        "traffic": "Module 3 — Attract", "conversion": "Module 4 — Convert", "content": "Module 3 — Attract",
+        "community": "Module 5 — Automate", "offer": "Module 2 — Package", "time": "Module 5 — Automate", "other": "Module 1 — Position"
     }
     focus = bottleneck_map.get(req.bottleneck, "Module 1 — Position")
+
     system_prompt = "You are a strategic business coach. Generate a personalized strategy document based on the member's answers. Include: Current Stage, Biggest Challenge, Recommended Focus Area, Starting Day, Speed Profile, Recommended First Task, and Next Steps. Use a clear, professional, and encouraging tone."
     user_prompt = f"Member answers:\n- Stage: {req.stage}\n- Biggest Challenge: {req.bottleneck}\n- Hours Available: {req.hours}/week\n\nCalculated:\n- Starting Day: {starting_day}\n- Speed Profile: {speed_profile}\n- Focus Area: {focus}\n\nGenerate a strategy document."
+
     messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
     document = call_llm(messages)
+
     try:
         conn = get_db_connection()
         if conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "bottleneck": req.bottleneck})))
-            conn.commit(); cur.close(); conn.close()
+            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP", (req.member_id, json.dumps({"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "bottleneck": req.bottleneck})))
+            conn.commit()
+            cur.close(); conn.close()
     except Exception as e:
         log.error(f"Error saving strategy doc: {e}")
+
     return {"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "focus": focus}
 
 @app.post("/api/complete-onboarding")
 def complete_onboarding(req: CompleteOnboardingRequest):
     profile = db_get_profile(req.member_id)
     if not profile:
-        db_upsert_profile(req.member_id, {
-            "business_name": "New Member",
-            "niche": "",
-            "target_avatar": "",
-            "biggest_bottleneck": req.bottleneck,
-            "current_level": req.stage,
-            "weekly_hours": req.hours,
-            "speed_profile": req.speed_profile,
-            "onboarding_complete": True
-        })
+        db_upsert_profile(req.member_id, {"business_name": "New Member", "niche": "", "target_avatar": "", "biggest_bottleneck": req.bottleneck, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True})
     else:
         db_upsert_profile(req.member_id, {**profile, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True, "biggest_bottleneck": req.bottleneck})
-    journey = db_get_journey(req.member_id) or {
-        "member_id": req.member_id,
-        "current_day": req.starting_day,
-        "current_phase": "Phase 1",
-        "current_task_id": "p1_t1",
-        "tasks_completed": [],
-        "streak": 0,
-        "last_standup_date": None,
-        "xp_total": 0,
-        "badges": []
-    }
+
+    journey = db_get_journey(req.member_id) or {"member_id": req.member_id, "current_day": req.starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
     journey["current_day"] = req.starting_day
     db_upsert_journey(req.member_id, journey)
+
     try:
         conn = get_db_connection()
         if conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck})))
-            conn.commit(); cur.close(); conn.close()
+            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP", (req.member_id, json.dumps({"document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck})))
+            conn.commit()
+            cur.close(); conn.close()
     except Exception as e:
         log.error(f"Error saving strategy doc: {e}")
+
     return {"success": True, "message": "Onboarding complete", "starting_day": req.starting_day, "speed_profile": req.speed_profile}
 
 @app.get("/api/journey")
@@ -729,55 +904,30 @@ def get_journey_status(member_id: str = "default"):
     scores = db_get_scores(member_id)
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0
     wins = db_get_wins(member_id)
+
     return {
-        "current_day": journey.get("current_day", 1),
-        "current_phase": phase_info["name"],
-        "phase_days": phase_info["days"],
-        "sub_coach": phase_info.get("sub_coach", "Strategist"),
-        "focus": phase_info["focus"],
-        "current_task": current_task,
-        "tasks_completed": journey.get("tasks_completed", []),
-        "tasks_completed_count": len(journey.get("tasks_completed", [])),
-        "progress_percent": round(progress_percent, 1),
-        "streak": journey.get("streak", 0),
-        "xp": journey.get("xp_total", 0),
-        "avg_score": avg_score,
-        "standup_count": len(scores),
-        "wins": wins,
+        "current_day": journey.get("current_day", 1), "current_phase": phase_info["name"], "phase_days": phase_info["days"],
+        "sub_coach": phase_info.get("sub_coach", "Strategist"), "focus": phase_info["focus"], "current_task": current_task,
+        "tasks_completed": journey.get("tasks_completed", []), "tasks_completed_count": len(journey.get("tasks_completed", [])),
+        "progress_percent": round(progress_percent, 1), "streak": journey.get("streak", 0), "xp": journey.get("xp_total", 0),
+        "avg_score": avg_score, "standup_count": len(scores), "wins": wins,
         "trajectory": calculate_trajectory(journey),
-        "profile": {
-            "business_name": profile.get("business_name", ""),
-            "niche": profile.get("niche", ""),
-            "bottleneck": profile.get("biggest_bottleneck", ""),
-            "speed_profile": profile.get("speed_profile", "steady")
-        },
-        "all_phases": {
-            k: {
-                "name": v["name"],
-                "sub_coach": v.get("sub_coach", "Strategist"),
-                "tasks": [{
-                    "id": t["id"],
-                    "name": t["name"],
-                    "deadline_day": t["deadline_day"],
-                    "completed": t["id"] in journey.get("tasks_completed", []),
-                    "why": t.get("why", ""),
-                    "frameworks": t.get("frameworks", []),
-                    "deliverables": t.get("deliverables", [])
-                } for t in v["tasks"]]
-            } for k, v in JOURNEY_MAP.items()
-        }
+        "profile": {"business_name": profile.get("business_name", ""), "niche": profile.get("niche", ""), "bottleneck": profile.get("biggest_bottleneck", ""), "speed_profile": profile.get("speed_profile", "steady")},
+        "all_phases": {k: {"name": v["name"], "sub_coach": v.get("sub_coach", "Strategist"), "tasks": [{"id": t["id"], "name": t["name"], "deadline_day": t["deadline_day"], "completed": t["id"] in journey.get("tasks_completed", []), "why": t.get("why", ""), "frameworks": t.get("frameworks", []), "deliverables": t.get("deliverables", [])} for t in v["tasks"]]} for k, v in JOURNEY_MAP.items()}
     }
 
 @app.post("/api/standup")
 def submit_standup(req: StandupRequest):
     profile = db_get_profile(req.member_id)
-    if not profile:
-        raise HTTPException(403, "Complete onboarding first.")
+    if not profile: raise HTTPException(403, "Complete onboarding first.")
+
     journey = db_get_journey(req.member_id)
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     task = next((t for t in phase_info["tasks"] if t["id"] == req.current_task_id), phase_info["tasks"][0])
+
     frameworks_str = ", ".join(task.get("frameworks", []))
     deliverables_str = "\n".join([f"- {d}" for d in task.get("deliverables", [])])
+
     system = f"""You are a STRICT Chief Operating Officer grading execution.
 TASK BEING GRADED: {task['name']}
 REQUIRED FRAMEWORKS: {frameworks_str}
@@ -790,35 +940,30 @@ AUDIT: [2-3 specific things missing]
 WHAT TO FIX: [Exact fix if < 7]
 NEXT STEP: [Exact next task if >= 7]
 FRAMEWORK TIP: [One insight]"""
+
     prompt = f"Tasks completed: {req.tasks_completed}\nLinks: {req.asset_links}\nWork content: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
     review = call_llm(messages)
+
     score = 5
     try:
         m = re.search(r'GRADE:\s*(\d+)', review)
-        if m:
-            score = int(m.group(1))
-    except:
-        pass
+        if m: score = int(m.group(1))
+    except: pass
     score = min(10, max(0, score))
-    evidence = {
-        "link_present": len(req.asset_links) > 0 and req.asset_links[0].strip(),
-        "metrics_present": req.metrics.strip() != "",
-        "deliverables_mentioned": len(req.tasks_completed) > 0,
-        "evidence_score": score
-    }
+
+    evidence = {"link_present": len(req.asset_links) > 0 and req.asset_links[0].strip(), "metrics_present": req.metrics.strip() != "", "deliverables_mentioned": len(req.tasks_completed) > 0, "evidence_score": score}
     today = date.today().isoformat()
     last_date = journey.get("last_standup_date")
+
     if last_date != today:
         if last_date:
-            try:
-                days_since = (date.today() - date.fromisoformat(last_date)).days
-            except:
-                days_since = 1
+            try: days_since = (date.today() - date.fromisoformat(last_date)).days
+            except: days_since = 1
             journey["streak"] = journey.get("streak", 0) + 1 if days_since <= 1 else 1
-        else:
-            journey["streak"] = 1
+        else: journey["streak"] = 1
         journey["last_standup_date"] = today
+
     if score >= 7 and req.current_task_id not in journey.get("tasks_completed", []):
         journey.setdefault("tasks_completed", []).append(req.current_task_id)
         journey["current_day"] = min(90, journey.get("current_day", 1) + 7)
@@ -827,34 +972,27 @@ FRAMEWORK TIP: [One insight]"""
         journey["xp_total"] = journey.get("xp_total", 0) + xp_gained
     else:
         xp_gained = 25
+
     db_add_standup(req.member_id, req.current_task_id, ",".join(req.tasks_completed), ",".join(req.asset_links), req.asset_text, req.metrics, score, review, evidence)
     db_add_score(req.member_id, score)
     db_upsert_journey(req.member_id, journey)
-    return {
-        "success": True,
-        "review": review,
-        "score": score,
-        "task_unlocked": score >= 7,
-        "streak": journey.get("streak", 0),
-        "xp_gained": xp_gained,
-        "xp_total": journey.get("xp_total", 0),
-        "journey_updated": True
-    }
+
+    return {"success": True, "review": review, "score": score, "task_unlocked": score >= 7, "streak": journey.get("streak", 0), "xp_gained": xp_gained, "xp_total": journey.get("xp_total", 0), "journey_updated": True}
 
 @app.post("/api/win")
 def submit_win(req: WinRequest):
-    if not db_get_profile(req.member_id):
-        raise HTTPException(403, "Complete onboarding first.")
+    if not db_get_profile(req.member_id): raise HTTPException(403, "Complete onboarding first.")
     db_add_win(req.member_id, req.win_text, req.revenue_amount)
     return {"success": True, "total_wins": len(db_get_wins(req.member_id))}
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    if not req.message:
-        raise HTTPException(400, "empty message")
+    if not req.message: raise HTTPException(400, "empty message")
+    if not CHAT_LIMIT.allow(req.member_id or "default"): raise HTTPException(429, "Rate limit reached")
+
     profile = db_get_profile(req.member_id or "default")
-    if not profile:
-        raise HTTPException(403, "GATEKEEPER: Complete onboarding first.")
+    if not profile: raise HTTPException(403, "GATEKEEPER: Complete onboarding first.")
+
     journey = db_get_journey(req.member_id or "default")
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = get_current_task(journey)
@@ -864,6 +1002,7 @@ def chat(req: ChatRequest):
     wins = db_get_wins(req.member_id or "default")
     scores = db_get_scores(req.member_id or "default")
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+
     if not task_completed:
         return {"reply": f"""**ACCOUNTABILITY GATE**
 You are Day {journey.get('current_day', 1)} — {phase_info['name']} phase.
@@ -873,60 +1012,72 @@ Why: {current_task.get('why', 'Complete this task to move forward.')}
 Required frameworks: {frameworks_str}
 Deliverables needed:
 {chr(10).join(['— ' + d for d in current_task.get('deliverables', [])])}
+
 Submit your work using the 'Submit Daily Work' button. I will grade it and unlock the next step."""}
+
     wins_text = "No wins recorded yet."
-    if wins:
-        wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
+    if wins: wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
+
     system_prompt = f"""You are the E5 AI Coach — an elite, proactive Chief Operating Officer.
 CURRENT MEMBER CONTEXT: Business: {profile.get('business_name', 'N/A')} | Niche: {profile.get('niche', 'N/A')} | Avatar: {profile.get('target_avatar', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')} | Day: {journey.get('current_day', 1)}/90 | Phase: {phase_info['name']} | Task: {current_task['name']} | Completed: {task_completed} | Streak: {streak} | Avg score: {avg_score}/10 | Wins: {wins_text} | Frameworks: {frameworks_str}
 COACHING RULES: 1. Diagnose Before Prescribing. 2. Personalize with Memory. 3. One Insight Per Response. 4. Apply, Don't Recite. 5. 60% Questions / 40% Insight. 6. Rewrite Together. 7. Short & Human (150-250 words). 8. Never Invent. 9. Language Matching (EN/AR).
 TONE: Calm. Authoritative. Short punchy sentences. Think McKinsey Partner meets Alex Hormozi."""
+
     messages = [{"role": "system", "content": system_prompt}] + [{"role": m.role, "content": m.content} for m in req.history[-10:]] + [{"role": "user", "content": req.message}]
     reply = call_llm(messages)
     return {"reply": reply}
 
 # ============================================================
-# RE‑ENGAGEMENT ENDPOINTS
+# NEW: RE-ENGAGEMENT ENDPOINTS
 # ============================================================
+
 @app.post("/api/check-inactive")
 def check_inactive_members():
+    """Daily job to check and re-engage inactive members."""
     try:
-        log.info("🔍 Running re‑engagement check...")
+        log.info("🔍 Running re-engagement check...")
         inactive = db_get_inactive_members()
+
         if not inactive:
             log.info("✅ No inactive members found.")
             return {"success": True, "message": "No inactive members found", "count": 0}
+
         sent_count = 0
         for member in inactive:
             if send_re_engagement_notification(member):
                 sent_count += 1
-        log.info(f"📨 Sent {sent_count} re‑engagement notifications")
-        return {"success": True, "inactive_count": len(inactive), "sent_count": sent_count, "members": inactive}
+
+        log.info(f"📨 Sent {sent_count} re-engagement notifications")
+        return {
+            "success": True,
+            "inactive_count": len(inactive),
+            "sent_count": sent_count,
+            "members": inactive
+        }
     except Exception as e:
-        log.error(f"Re‑engagement check failed: {e}")
+        log.error(f"Re-engagement check failed: {e}")
         return {"success": False, "error": str(e)}
 
 @app.post("/api/trigger-re-engagement")
 def trigger_re_engagement(member_id: str):
+    """Manually trigger a re-engagement notification for a member."""
     try:
         success = send_re_engagement_reminder(member_id)
         return {"success": success, "member_id": member_id}
     except Exception as e:
-        log.error(f"Trigger re‑engagement failed: {e}")
+        log.error(f"Trigger re-engagement failed: {e}")
         return {"success": False, "error": str(e)}
 
 @app.post("/api/mark-notifications-read")
 def mark_notifications_read(member_id: str):
+    """Mark all notifications as read for a member."""
     try:
         db_mark_notification_read(member_id)
         return {"success": True}
     except Exception as e:
-        log.error(f"Mark read failed: {e}")
+        log.error(f"Mark notifications read failed: {e}")
         return {"success": False, "error": str(e)}
 
-# ============================================================
-# MAIN
-# ============================================================
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
