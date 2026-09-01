@@ -7,12 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ============================================================
-           BASE STYLES
-           ============================================================ */
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .glass-dark { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
         .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
@@ -22,7 +18,6 @@
         .tab-content.active { display: block; }
         .nav-item.active { background: rgba(147, 51, 234, 0.2); border-left: 3px solid #9333ea; }
         .sidebar-stats { font-size: 12px; }
-        .stat-badge { background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 2px 10px; border-radius: 20px; }
         .onboarding-step { display: none; }
         .onboarding-step.active { display: block; }
         .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
@@ -42,8 +37,6 @@
         .toast-close:hover { opacity: 1; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-
-        /* CELEBRATION MODAL */
         .celebration-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
         .celebration-modal.show { display: flex; }
         .celebration-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(34, 197, 94, 0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -52,12 +45,9 @@
         .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10001; overflow: hidden; }
         .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
         @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
-
-        /* SKELETON LOADER */
         .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-        /* SIDEBAR */
+        
         .sidebar-mobile { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #0f172a; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
         .sidebar-mobile.open { transform: translateX(0); }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
@@ -74,14 +64,12 @@
         .sidebar-mobile .nav-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
         .sidebar-mobile .nav-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
 
-        /* STANDUP */
         .char-counter.under { color: #ef4444; }
         .char-counter.over { color: #22c55e; }
         .char-counter.mid { color: #eab308; }
         .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
 
-        /* EMPTY STATES */
         .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.02); border: 2px dashed rgba(255,255,255,0.06); border-radius: 16px; }
         .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
         .empty-state .title { font-size: 18px; font-weight: 600; color: #f1f5f9; margin-bottom: 8px; }
@@ -91,7 +79,6 @@
         .empty-state .btn-primary { background: #8b5cf6; color: white; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
         .empty-state .btn-primary:hover { background: #7c3aed; transform: translateY(-1px); }
 
-        /* ACTIVITY */
         .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .activity-item:last-child { border-bottom: none; }
         .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
@@ -104,30 +91,29 @@
         .activity-text strong { color: #f1f5f9; }
         .activity-time { font-size: 11px; color: #64748b; }
 
-        /* STAT CARDS */
         .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
         .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
         .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
 
-        /* NEXT UP CARD */
         .next-up-card { background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02)); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 20px; }
         .next-up-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a78bfa; font-weight: 600; }
         .next-up-card .task-name { font-size: 18px; font-weight: 600; color: #f1f5f9; margin: 4px 0; }
         .next-up-card .task-deadline { font-size: 13px; color: #94a3b8; }
 
-        /* SKELETON CARDS */
         .skeleton-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.04); }
         .skeleton-line { height: 12px; background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; margin-bottom: 8px; }
         .skeleton-line.short { width: 60%; }
         .skeleton-line.medium { width: 80%; }
+
+        .btn-test { background: #d97706; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-test:hover { background: #b45309; transform: translateY(-1px); }
+        .btn-test:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    CELEBRATION MODAL
-    ============================================================ -->
+    <!-- CELEBRATION MODAL -->
     <div id="celebration-modal" class="celebration-modal">
         <div class="celebration-card">
             <div class="text-6xl mb-4">🎉</div>
@@ -164,9 +150,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    ONBOARDING OVERLAY (PRESERVED)
-    ============================================================ -->
+    <!-- ONBOARDING OVERLAY -->
     <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
             <div class="step-indicator">
@@ -176,7 +160,6 @@
                 <div class="step-dot" id="step-dot-4"></div>
             </div>
 
-            <!-- STEP 1: QUIZ -->
             <div id="onboarding-step-1" class="onboarding-step active">
                 <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
@@ -211,7 +194,6 @@
                 </div>
             </div>
 
-            <!-- STEP 2: DOCUMENT -->
             <div id="onboarding-step-2" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📄</span><h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2></div>
                 <p class="text-slate-400 mb-4">Review your AI-generated strategy document.</p>
@@ -222,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- STEP 3: PROOF UPLOAD -->
             <div id="onboarding-step-3" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📸</span><h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2></div>
                 <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
@@ -238,7 +219,6 @@
                 </div>
             </div>
 
-            <!-- STEP 4: CONFIRMATION -->
             <div id="onboarding-step-4" class="onboarding-step">
                 <div class="text-center py-8">
                     <div class="text-6xl mb-4">🎉</div>
@@ -256,12 +236,9 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    MAIN APP
-    ============================================================ -->
+    <!-- MAIN APP -->
     <div id="app" class="flex flex-col h-screen hidden">
 
-        <!-- HEADER -->
         <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-4 md:px-6 py-4 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white text-xl"><i class="fas fa-bars"></i></button>
@@ -277,7 +254,6 @@
 
         <div class="flex flex-1 overflow-hidden">
 
-            <!-- SIDEBAR DESKTOP -->
             <nav class="sidebar-desktop w-56 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
                 <div class="space-y-1">
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active"><span class="icon">📊</span> Dashboard</button>
@@ -297,15 +273,12 @@
                 </div>
             </nav>
 
-            <!-- MAIN CONTENT -->
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0a0e1a]/30">
 
-                <!-- DASHBOARD TAB -->
                 <div id="tab-dashboard" class="tab-content">
                     <div id="dashboard-content" class="space-y-6"></div>
                 </div>
 
-                <!-- CHAT TAB -->
                 <div id="tab-chat" class="tab-content hidden">
                     <div class="flex flex-col h-full">
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
@@ -317,17 +290,15 @@
                     </div>
                 </div>
 
-                <!-- JOURNEY TAB -->
                 <div id="tab-journey" class="tab-content hidden">
                     <div id="journey-content" class="space-y-6"></div>
                 </div>
 
-                <!-- SETTINGS TAB -->
                 <div id="tab-settings" class="tab-content hidden">
                     <div class="max-w-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
                         <div class="space-y-6">
-                            <!-- Business Profile -->
+
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">Business Profile</h3>
                                 <div class="space-y-4">
@@ -337,12 +308,20 @@
                                     <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">💾 Save Profile</button>
                                 </div>
                             </div>
-                            <!-- Wins & Proof -->
+
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
                                 <button onclick="openWinModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition mb-4">➕ Record a Win</button>
                                 <div id="wins-list" class="space-y-2 text-sm"></div>
                             </div>
+
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">📨 Notifications</h3>
+                                <p class="text-sm text-slate-400 mb-4">Test the re-engagement notification system.</p>
+                                <button onclick="triggerReEngagement()" id="test-notif-btn" class="btn-test">🔔 Test Re-engagement Notification</button>
+                                <div id="notification-result" class="text-sm text-slate-400 mt-3"></div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -399,9 +378,6 @@
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
     <script>
         const API = window.location.origin;
         const MEMBER_ID = localStorage.getItem('e5_member_id') || 'default';
@@ -415,7 +391,7 @@
         let currentTab = 'dashboard';
 
         // ============================================================
-        // SIDEBAR FUNCTIONS (WORKING)
+        // SIDEBAR FUNCTIONS - THESE MAKE THE BUTTONS WORK
         // ============================================================
         function toggleSidebar() {
             document.getElementById('sidebar-mobile').classList.toggle('open');
@@ -425,22 +401,24 @@
         function switchTab(tab) {
             // Hide all tab content
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            
             // Show selected tab
             const targetTab = document.getElementById(`tab-${tab}`);
             if (targetTab) targetTab.classList.remove('hidden');
             
-            // Update sidebar active states
+            // Update desktop sidebar
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
             const nav = document.getElementById(`nav-${tab}`);
             if (nav) nav.classList.add('active');
             
+            // Update mobile sidebar
             document.querySelectorAll('#sidebar-mobile .nav-item').forEach(el => el.classList.remove('active'));
             const navMob = document.getElementById(`nav-${tab}-mob`);
             if (navMob) navMob.classList.add('active');
             
             currentTab = tab;
             
-            // Load content based on tab
+            // Load content
             if (tab === 'dashboard') loadDashboard();
             if (tab === 'journey') loadJourney();
             if (tab === 'settings') loadWins();
@@ -450,7 +428,7 @@
         }
 
         // ============================================================
-        // ONBOARDING FUNCTIONS
+        // ONBOARDING
         // ============================================================
         function showStep(step) {
             document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
@@ -601,15 +579,10 @@
         }
 
         async function completeOnboarding() {
-            // Hide the gatekeeper overlay
             const gatekeeper = document.getElementById('gatekeeper');
             if (gatekeeper) gatekeeper.style.display = 'none';
-            
-            // Show the main app
             const app = document.getElementById('app');
             if (app) app.classList.remove('hidden');
-            
-            // Load initial data
             await loadDashboard();
             await loadJourney();
             await loadWins();
@@ -625,9 +598,7 @@
             container.innerHTML = `
                 <div class="space-y-4">
                     <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${[...Array(4)].map(() => `<div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`).join('')}
-                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">${[...Array(4)].map(() => `<div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`).join('')}</div>
                     <div class="skeleton-card"><div class="skeleton-line"></div></div>
                     <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
                 </div>
@@ -643,99 +614,46 @@
                     'yellow': 'trajectory-banner-yellow',
                     'blue': 'trajectory-banner-blue'
                 }[traj.color] || 'trajectory-banner-blue';
-                const trajIcon = {
-                    'green': '🚀',
-                    'yellow': '⚠️',
-                    'blue': '✅'
-                }[traj.color] || '✅';
+                const trajIcon = { 'green': '🚀', 'yellow': '⚠️', 'blue': '✅' }[traj.color] || '✅';
 
                 const tasksDone = journeyData.tasks_completed_count || 0;
                 const totalTasks = 12;
                 const progress = Math.round((tasksDone / totalTasks) * 100);
 
-                // Recent activity
                 const activities = [];
                 if (journeyData.standup_count > 0) {
                     activities.push({ icon: '📝', color: 'purple', text: `<strong>Standup graded</strong> — ${journeyData.avg_score || 0}/10`, time: 'Today' });
                 }
                 if (tasksDone > 0) {
-                    const lastTask = journeyData.current_task.name;
-                    activities.push({ icon: '🎯', color: 'green', text: `<strong>Task completed</strong> — ${lastTask}`, time: 'Recently' });
+                    activities.push({ icon: '🎯', color: 'green', text: `<strong>Task completed</strong> — ${journeyData.current_task.name}`, time: 'Recently' });
                 }
                 if (journeyData.wins && journeyData.wins.length > 0) {
                     activities.push({ icon: '🏆', color: 'yellow', text: `<strong>Win recorded</strong> — ${journeyData.wins[0].win_text?.slice(0, 40) || 'New win!'}`, time: 'Recent' });
                 }
 
                 container.innerHTML = `
-                    <div class="${trajClass} rounded-lg p-4 border-l-4">
-                        <span class="text-sm font-medium">${trajIcon} ${traj.message}</span>
-                    </div>
-
+                    <div class="${trajClass} rounded-lg p-4 border-l-4"><span class="text-sm font-medium">${trajIcon} ${traj.message}</span></div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-purple-400">${journeyData.current_day}/90</div>
-                            <div class="stat-label">Day</div>
-                        </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-green-400">${tasksDone}/${totalTasks}</div>
-                            <div class="stat-label">Tasks</div>
-                        </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-yellow-400">${journeyData.xp || 0}</div>
-                            <div class="stat-label">XP</div>
-                        </div>
-                        <div class="stat-card text-center">
-                            <div class="stat-value text-orange-400">${journeyData.streak || 0}</div>
-                            <div class="stat-label">Streak</div>
-                        </div>
+                        <div class="stat-card text-center"><div class="stat-value text-purple-400">${journeyData.current_day}/90</div><div class="stat-label">Day</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-green-400">${tasksDone}/${totalTasks}</div><div class="stat-label">Tasks</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-yellow-400">${journeyData.xp || 0}</div><div class="stat-label">XP</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-orange-400">${journeyData.streak || 0}</div><div class="stat-label">Streak</div></div>
                     </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm text-slate-400 mb-1">
-                            <span>Journey Progress</span>
-                            <span>${progress}%</span>
-                        </div>
-                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div>
-                        </div>
-                    </div>
-
+                    <div><div class="flex justify-between text-sm text-slate-400 mb-1"><span>Journey Progress</span><span>${progress}%</span></div><div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div></div>
                     <div class="glass p-5 rounded-lg border-l-4 border-purple-500">
                         <div class="flex items-start justify-between">
-                            <div>
-                                <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">🎯 Current Task</div>
-                                <div class="text-lg font-semibold text-white">${journeyData.current_task.name}</div>
-                                <div class="text-sm text-slate-400">📅 Deadline: Day ${journeyData.current_task.deadline_day}</div>
-                            </div>
+                            <div><div class="text-xs text-purple-400 font-medium uppercase tracking-wider">🎯 Current Task</div><div class="text-lg font-semibold text-white">${journeyData.current_task.name}</div><div class="text-sm text-slate-400">📅 Deadline: Day ${journeyData.current_task.deadline_day}</div></div>
                             <span class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">${journeyData.current_phase}</span>
                         </div>
                         <div class="text-sm text-slate-400 mt-2">${journeyData.current_task.why}</div>
-                        <div class="flex flex-wrap gap-1 mt-2">
-                            ${journeyData.current_task.frameworks.map(f => `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`).join('')}
-                        </div>
-                        <div class="mt-3 space-y-1">
-                            ${journeyData.current_task.deliverables.map(d => `
-                                <div class="flex items-center gap-2 text-sm text-slate-300"><span class="text-slate-500">⬜</span> ${d}</div>
-                            `).join('')}
-                        </div>
+                        <div class="flex flex-wrap gap-1 mt-2">${journeyData.current_task.frameworks.map(f => `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`).join('')}</div>
+                        <div class="mt-3 space-y-1">${journeyData.current_task.deliverables.map(d => `<div class="flex items-center gap-2 text-sm text-slate-300"><span class="text-slate-500">⬜</span> ${d}</div>`).join('')}</div>
                         <div class="mt-3 text-xs text-slate-500">⚠️ Submit work in Daily Standup to unlock next step</div>
                     </div>
-
                     <div class="glass p-5 rounded-lg">
                         <h3 class="text-sm font-semibold text-slate-300 mb-3">📋 Recent Activity</h3>
-                        ${activities.length > 0 ? activities.map(a => `
-                            <div class="activity-item">
-                                <div class="activity-icon ${a.color}">${a.icon}</div>
-                                <div class="activity-content">
-                                    <div class="activity-text">${a.text}</div>
-                                    <div class="activity-time">${a.time}</div>
-                                </div>
-                            </div>
-                        `).join('') : `
-                            <div class="text-sm text-slate-400">No activity yet. Complete your first task to get started!</div>
-                        `}
+                        ${activities.length > 0 ? activities.map(a => `<div class="activity-item"><div class="activity-icon ${a.color}">${a.icon}</div><div class="activity-content"><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div></div>`).join('') : `<div class="text-sm text-slate-400">No activity yet. Complete your first task to get started!</div>`}
                     </div>
-
                     <div class="next-up-card">
                         <div class="label">🚀 Next Up</div>
                         <div class="task-name">${journeyData.current_task.name}</div>
@@ -745,13 +663,7 @@
                 `;
                 updateSidebarStats();
             } catch (e) {
-                container.innerHTML = `
-                    <div class="text-red-400 text-center p-8">
-                        <div class="text-4xl mb-2">⚠️</div>
-                        <p>Error loading dashboard</p>
-                        <button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button>
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-red-400 text-center p-8"><div class="text-4xl mb-2">⚠️</div><p>Error loading dashboard</p><button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button></div>`;
                 console.error(e);
             }
         }
@@ -838,19 +750,12 @@
                             <div class="flex flex-wrap gap-1 mt-2">${journeyData.current_task.frameworks.map(f => `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`).join('')}</div>
                             <div class="mt-3 space-y-1">${journeyData.current_task.deliverables.map(d => `<div class="flex items-center gap-2 text-sm text-slate-300"><span class="text-slate-500">⬜</span> ${d}</div>`).join('')}</div>
                         </div>
-                        <div class="space-y-2">
-                            ${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
-                                const done = phase.tasks.filter(t => t.completed).length;
-                                const total = phase.tasks.length;
-                                const isCurrent = key === journeyData.current_phase.replace(' ', '_');
-                                return `
-                                    <div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : ''}">
-                                        <div class="flex justify-between items-center"><span class="font-medium">${isCurrent ? '🔄' : '✅'} ${phase.name}</span><span class="text-sm text-slate-400">${done}/${total}</span></div>
-                                        <div class="mt-2 space-y-1">${phase.tasks.map(task => `<div class="flex items-center gap-2 text-sm ${task.completed ? 'text-slate-400 line-through' : isCurrent && !task.completed ? 'text-purple-400' : 'text-slate-500'}"><span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span><span>${task.name}</span></div>`).join('')}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
+                        <div class="space-y-2">${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
+                            const done = phase.tasks.filter(t => t.completed).length;
+                            const total = phase.tasks.length;
+                            const isCurrent = key === journeyData.current_phase.replace(' ', '_');
+                            return `<div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : ''}"><div class="flex justify-between items-center"><span class="font-medium">${isCurrent ? '🔄' : '✅'} ${phase.name}</span><span class="text-sm text-slate-400">${done}/${total}</span></div><div class="mt-2 space-y-1">${phase.tasks.map(task => `<div class="flex items-center gap-2 text-sm ${task.completed ? 'text-slate-400 line-through' : isCurrent && !task.completed ? 'text-purple-400' : 'text-slate-500'}"><span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span><span>${task.name}</span></div>`).join('')}</div></div>`;
+                        }).join('')}</div>
                     </div>
                 `;
             } catch (e) {
@@ -1051,6 +956,42 @@
             }
             btn.innerText = '🚀 Submit for Review';
             btn.disabled = false;
+        }
+
+        // ============================================================
+        // RE-ENGAGEMENT
+        // ============================================================
+        async function triggerReEngagement() {
+            const result = document.getElementById('notification-result');
+            const btn = document.getElementById('test-notif-btn');
+            if (!result) return;
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+            result.textContent = '⏳ Sending test notification...';
+            result.className = 'text-sm text-yellow-400 mt-3';
+
+            try {
+                const res = await fetch(`${API}/api/trigger-re-engagement?member_id=${MEMBER_ID}`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    result.textContent = '✅ Notification sent! Check your Telegram.';
+                    result.className = 'text-sm text-green-400 mt-3';
+                    showToast('📨 Test notification sent!', 'success');
+                } else {
+                    result.textContent = '⚠️ Failed: ' + (data.error || 'Unknown error');
+                    result.className = 'text-sm text-red-400 mt-3';
+                    showToast('⚠️ Failed to send notification', 'error');
+                }
+            } catch (e) {
+                result.textContent = '⚠️ Error: ' + e.message;
+                result.className = 'text-sm text-red-400 mt-3';
+                showToast('⚠️ Error: ' + e.message, 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = '🔔 Test Re-engagement Notification';
         }
 
         // ============================================================
