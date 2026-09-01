@@ -39,6 +39,60 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
         
+        /* SIDEBAR FIX - Make sure nav-item has correct styles */
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            background: transparent;
+            border: none;
+        }
+        .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
+        .sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+        .sidebar-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-item .badge { margin-left: auto; background: rgba(139, 92, 246, 0.2); color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+
+        /* Mobile sidebar */
+        .sidebar-mobile { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #0f172a; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
+        .sidebar-mobile.open { transform: translateX(0); }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-mobile .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: left;
+        }
+        .sidebar-mobile .nav-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
+        .sidebar-mobile .nav-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+
+        .char-counter { font-size: 12px; transition: color 0.2s; }
+        .char-counter.under { color: #ef4444; }
+        .char-counter.over { color: #22c55e; }
+        .char-counter.mid { color: #eab308; }
+
+        .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
+
         /* Celebration Modal */
         .celebration-modal {
             position: fixed;
@@ -69,65 +123,36 @@
         .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
         @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-        /* Skeleton loader */
         .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-        /* Mobile sidebar */
-        .sidebar-mobile { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #0f172a; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; }
-        .sidebar-mobile.open { transform: translateX(0); }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
-        .sidebar-overlay.show { display: block; }
-
-        /* Character counter */
-        .char-counter { font-size: 12px; transition: color 0.2s; }
-        .char-counter.under { color: #ef4444; }
-        .char-counter.over { color: #22c55e; }
-        .char-counter.mid { color: #eab308; }
-
-        /* Standup progress */
-        .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
-        .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
 
         @media (max-width: 768px) {
             .sidebar-desktop { display: none; }
         }
         @media (min-width: 769px) {
-            .sidebar-mobile { display: none; }
+            .sidebar-mobile { display: none !important; }
             .sidebar-overlay { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    CELEBRATION MODAL
-    ============================================================ -->
+    <!-- CELEBRATION MODAL -->
     <div id="celebration-modal" class="celebration-modal">
         <div class="celebration-card">
             <div class="text-6xl mb-4">🎉</div>
             <h2 class="text-3xl font-bold text-green-400 mb-2">Task Complete!</h2>
             <p id="celebration-message" class="text-slate-300 mb-4">+125 XP • 🔥 2 day streak</p>
             <div id="celebration-next-task" class="text-sm text-purple-400 mb-6">Next: Identify Target Avatar & Pain Points</div>
-            <button onclick="closeCelebration()" class="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3 rounded-lg font-bold transition">
-                Continue →
-            </button>
+            <button onclick="closeCelebration()" class="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3 rounded-lg font-bold transition">Continue →</button>
         </div>
     </div>
-
-    <!-- ============================================================
-    CONFETTI CONTAINER
-    ============================================================ -->
     <div id="confetti-container" class="confetti-container"></div>
 
-    <!-- ============================================================
-    SIDEBAR OVERLAY (Mobile)
-    ============================================================ -->
+    <!-- SIDEBAR OVERLAY (Mobile) -->
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <!-- ============================================================
-    SIDEBAR MOBILE
-    ============================================================ -->
+    <!-- SIDEBAR MOBILE -->
     <div id="sidebar-mobile" class="sidebar-mobile p-4">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-2">
@@ -137,17 +162,18 @@
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
         </div>
         <div class="space-y-2">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard-mob" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3 active">
-                <i class="fas fa-chart-pie"></i> Dashboard
+            <button onclick="switchTab('dashboard')" id="nav-dashboard-mob" class="nav-item active">
+                <span class="icon">📊</span> Dashboard
             </button>
-            <button onclick="switchTab('chat')" id="nav-chat-mob" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                <i class="fas fa-comments"></i> AI Coach
+            <button onclick="switchTab('chat')" id="nav-chat-mob" class="nav-item">
+                <span class="icon">💬</span> AI Coach
             </button>
-            <button onclick="switchTab('journey')" id="nav-journey-mob" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                <i class="fas fa-road"></i> My Journey
+            <button onclick="switchTab('journey')" id="nav-journey-mob" class="nav-item">
+                <span class="icon">🏔️</span> My Journey
+                <span class="badge" id="journey-badge-mob">0%</span>
             </button>
-            <button onclick="switchTab('settings')" id="nav-settings-mob" class="nav-item w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800/50 transition flex items-center gap-3">
-                <i class="fas fa-cog"></i> Settings
+            <button onclick="switchTab('settings')" id="nav-settings-mob" class="nav-item">
+                <span class="icon">⚙️</span> Settings
             </button>
         </div>
         <div class="mt-8 p-4 border-t border-slate-700">
@@ -241,7 +267,7 @@
                 </div>
                 <div id="proof-list" class="flex flex-wrap gap-2 mt-3"></div>
                 <div class="flex gap-3 mt-4">
-                    <button onclick="goToStep(4)" class="btn-secondary">⏭️ Skip & Continue</button>
+                    <button onclick="goToStep(4)" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">⏭️ Skip & Continue</button>
                     <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">🚀 Start My 90-Day Journey</button>
                 </div>
             </div>
@@ -272,7 +298,6 @@
         <!-- HEADER -->
         <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-4 md:px-6 py-4 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
-                <!-- Hamburger button (mobile) -->
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white text-xl">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -302,22 +327,21 @@
             <!-- SIDEBAR DESKTOP -->
             <nav class="sidebar-desktop w-56 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
                 <div class="space-y-1">
-                    <div onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
                         <span class="icon">📊</span> Dashboard
-                    </div>
-                    <div onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
+                    </button>
+                    <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
                         <span class="icon">💬</span> AI Coach
-                    </div>
-                    <div onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
+                    </button>
+                    <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
                         <span class="icon">🏔️</span> My Journey
                         <span class="badge" id="journey-badge">0%</span>
-                    </div>
-                    <div onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
+                    </button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
                         <span class="icon">⚙️</span> Settings
-                    </div>
+                    </button>
                 </div>
 
-                <!-- Stats Sidebar -->
                 <div class="mt-auto pt-4 border-t border-slate-800/50">
                     <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Progress</div>
                     <div class="space-y-2 text-sm">
@@ -337,17 +361,13 @@
 
                 <!-- DASHBOARD TAB -->
                 <div id="tab-dashboard" class="tab-content">
-                    <div id="dashboard-content" class="space-y-6">
-                        <!-- Rendered by JavaScript -->
-                    </div>
+                    <div id="dashboard-content" class="space-y-6"></div>
                 </div>
 
                 <!-- CHAT TAB -->
                 <div id="tab-chat" class="tab-content hidden">
                     <div class="flex flex-col h-full">
-                        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4">
-                            <!-- Chat messages rendered here -->
-                        </div>
+                        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
                         <div class="flex gap-3 pt-4 border-t border-slate-800/50">
                             <input type="text" id="chat-input" placeholder="Ask your AI Coach..." 
                                 class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
@@ -365,9 +385,7 @@
 
                 <!-- JOURNEY TAB -->
                 <div id="tab-journey" class="tab-content hidden">
-                    <div id="journey-content" class="space-y-6">
-                        <!-- Rendered by JavaScript -->
-                    </div>
+                    <div id="journey-content" class="space-y-6"></div>
                 </div>
 
                 <!-- SETTINGS TAB -->
@@ -406,9 +424,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    STANDUP MODAL (with Character Counter & Progress Bar)
-    ============================================================ -->
+    <!-- STANDUP MODAL -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
@@ -452,9 +468,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    WIN MODAL
-    ============================================================ -->
+    <!-- WIN MODAL -->
     <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
             <div class="flex justify-between items-center mb-4">
@@ -469,9 +483,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    TOAST CONTAINER
-    ============================================================ -->
+    <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- ============================================================
@@ -490,11 +502,13 @@
         let currentTab = 'dashboard';
 
         // ============================================================
-        // SIDEBAR TOGGLE (Mobile)
+        // SIDEBAR FUNCTIONS (FIXED)
         // ============================================================
         function toggleSidebar() {
-            document.getElementById('sidebar-mobile').classList.toggle('open');
-            document.getElementById('sidebar-overlay').classList.toggle('show');
+            const sidebar = document.getElementById('sidebar-mobile');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('show');
         }
 
         // ============================================================
@@ -530,21 +544,12 @@
         }
 
         // ============================================================
-        // CELEBRATION MODAL
+        // CELEBRATION
         // ============================================================
         function showCelebration(message, nextTask, xp, streak) {
             document.getElementById('celebration-message').textContent = `${message} • +${xp} XP • 🔥 ${streak} day streak`;
             document.getElementById('celebration-next-task').textContent = `Next: ${nextTask}`;
             document.getElementById('celebration-modal').classList.add('show');
-            launchConfetti();
-        }
-
-        function closeCelebration() {
-            document.getElementById('celebration-modal').classList.remove('show');
-            document.getElementById('confetti-container').innerHTML = '';
-        }
-
-        function launchConfetti() {
             const container = document.getElementById('confetti-container');
             const colors = ['#22c55e', '#8b5cf6', '#facc15', '#f472b6', '#60a5fa', '#fb923c'];
             for (let i = 0; i < 80; i++) {
@@ -561,6 +566,11 @@
             setTimeout(() => { container.innerHTML = ''; }, 4000);
         }
 
+        function closeCelebration() {
+            document.getElementById('celebration-modal').classList.remove('show');
+            document.getElementById('confetti-container').innerHTML = '';
+        }
+
         // ============================================================
         // CHARACTER COUNTER
         // ============================================================
@@ -573,7 +583,28 @@
         }
 
         // ============================================================
-        // STEP 1: GENERATE STRATEGY
+        // TAB SWITCHING (FIXED)
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            document.querySelectorAll('#sidebar-mobile .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tab}-mob`)?.classList.add('active');
+            currentTab = tab;
+            if (tab === 'dashboard') loadDashboard();
+            if (tab === 'journey') loadJourney();
+            if (tab === 'settings') loadWins();
+            
+            // Close mobile sidebar
+            if (window.innerWidth < 769) {
+                toggleSidebar();
+            }
+        }
+
+        // ============================================================
+        // GENERATE STRATEGY
         // ============================================================
         async function generateStrategy() {
             const stage = document.getElementById('onboarding-stage').value;
@@ -606,7 +637,7 @@
         async function regenerateStrategy() { await generateStrategy(); }
 
         // ============================================================
-        // STEP 3: PROOF UPLOAD
+        // PROOF UPLOAD
         // ============================================================
         function handleProofUpload(event) {
             const files = event.target.files;
@@ -621,7 +652,7 @@
         }
 
         // ============================================================
-        // STEP 4: SUBMIT ONBOARDING
+        // SUBMIT ONBOARDING
         // ============================================================
         async function submitOnboarding() {
             const btn = event.target;
@@ -667,23 +698,6 @@
             await loadWins();
             switchTab('dashboard');
             showToast('🚀 Welcome to your AI Coach!', 'success');
-        }
-
-        // ============================================================
-        // TAB SWITCHING
-        // ============================================================
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${tab}`).classList.add('active');
-            // Mobile nav
-            document.querySelectorAll('#sidebar-mobile .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${tab}-mob`)?.classList.add('active');
-            currentTab = tab;
-            if (tab === 'dashboard') loadDashboard();
-            if (tab === 'journey') loadJourney();
-            if (tab === 'settings') loadWins();
         }
 
         // ============================================================
@@ -997,7 +1011,7 @@
         }
 
         // ============================================================
-        // STANDUP (with Character Counter & Progress Bar)
+        // STANDUP
         // ============================================================
         function openStandup() {
             if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
@@ -1045,7 +1059,6 @@
             progress.style.display = 'block';
             progressBar.style.width = '0%';
 
-            // Simulate progress
             let p = 0;
             const interval = setInterval(() => {
                 p += 5;
@@ -1081,7 +1094,6 @@
                 await loadDashboard();
                 await loadJourney();
 
-                // Celebration if task unlocked and score >=7
                 if (data.task_unlocked && data.score >= 7) {
                     const nextTask = journeyData?.all_phases?.[journeyData.current_phase]?.tasks?.find(t => !t.completed);
                     const nextTaskName = nextTask ? nextTask.name : 'Phase 2 tasks unlocked!';
@@ -1122,6 +1134,7 @@
             document.getElementById('xp-display').textContent = `${xp} XP`;
             document.getElementById('side-progress').style.width = `${progress}%`;
             document.getElementById('journey-badge').textContent = `${progress}%`;
+            document.getElementById('journey-badge-mob').textContent = `${progress}%`;
         }
 
         // ============================================================
@@ -1149,7 +1162,6 @@
                     await loadProfile();
                     switchTab('dashboard');
 
-                    // Add welcome message to chat
                     setTimeout(() => {
                         const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
                         appendMessage('ai', welcome);
