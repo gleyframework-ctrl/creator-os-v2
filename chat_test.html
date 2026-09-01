@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ============================================================
-           BASE STYLES (ALL PRESERVED)
+           BASE STYLES
            ============================================================ */
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
@@ -43,9 +43,7 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 
-        /* ============================================================
-           CELEBRATION MODAL (PRESERVED)
-           ============================================================ */
+        /* CELEBRATION MODAL */
         .celebration-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
         .celebration-modal.show { display: flex; }
         .celebration-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(34, 197, 94, 0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -55,15 +53,11 @@
         .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
         @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-        /* ============================================================
-           SKELETON LOADER (PRESERVED)
-           ============================================================ */
+        /* SKELETON LOADER */
         .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-        /* ============================================================
-           SIDEBAR (PRESERVED)
-           ============================================================ */
+        /* SIDEBAR */
         .sidebar-mobile { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #0f172a; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
         .sidebar-mobile.open { transform: translateX(0); }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
@@ -80,18 +74,14 @@
         .sidebar-mobile .nav-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
         .sidebar-mobile .nav-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
 
-        /* ============================================================
-           STANDUP (PRESERVED)
-           ============================================================ */
+        /* STANDUP */
         .char-counter.under { color: #ef4444; }
         .char-counter.over { color: #22c55e; }
         .char-counter.mid { color: #eab308; }
         .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
         .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
 
-        /* ============================================================
-           NEW: BETTER EMPTY STATES
-           ============================================================ */
+        /* EMPTY STATES */
         .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.02); border: 2px dashed rgba(255,255,255,0.06); border-radius: 16px; }
         .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
         .empty-state .title { font-size: 18px; font-weight: 600; color: #f1f5f9; margin-bottom: 8px; }
@@ -100,11 +90,8 @@
         .empty-state .example strong { color: #a78bfa; }
         .empty-state .btn-primary { background: #8b5cf6; color: white; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
         .empty-state .btn-primary:hover { background: #7c3aed; transform: translateY(-1px); }
-        .empty-state .btn-secondary { background: rgba(255,255,255,0.06); color: #e2e8f0; padding: 10px 24px; border-radius: 10px; font-weight: 500; font-size: 14px; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
 
-        /* ============================================================
-           NEW: RECENT ACTIVITY
-           ============================================================ */
+        /* ACTIVITY */
         .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
         .activity-item:last-child { border-bottom: none; }
         .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
@@ -117,25 +104,19 @@
         .activity-text strong { color: #f1f5f9; }
         .activity-time { font-size: 11px; color: #64748b; }
 
-        /* ============================================================
-           NEW: DASHBOARD CARDS (Improved)
-           ============================================================ */
+        /* STAT CARDS */
         .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
         .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
         .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
 
-        /* ============================================================
-           NEW: NEXT UP CARD
-           ============================================================ */
+        /* NEXT UP CARD */
         .next-up-card { background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02)); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 20px; }
         .next-up-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a78bfa; font-weight: 600; }
         .next-up-card .task-name { font-size: 18px; font-weight: 600; color: #f1f5f9; margin: 4px 0; }
         .next-up-card .task-deadline { font-size: 13px; color: #94a3b8; }
 
-        /* ============================================================
-           NEW: BETTER LOADING STATES
-           ============================================================ */
+        /* SKELETON CARDS */
         .skeleton-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.04); }
         .skeleton-line { height: 12px; background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; margin-bottom: 8px; }
         .skeleton-line.short { width: 60%; }
@@ -145,7 +126,7 @@
 <body>
 
     <!-- ============================================================
-    CELEBRATION MODAL (PRESERVED)
+    CELEBRATION MODAL
     ============================================================ -->
     <div id="celebration-modal" class="celebration-modal">
         <div class="celebration-card">
@@ -158,14 +139,10 @@
     </div>
     <div id="confetti-container" class="confetti-container"></div>
 
-    <!-- ============================================================
-    SIDEBAR OVERLAY (Mobile - PRESERVED)
-    ============================================================ -->
+    <!-- SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <!-- ============================================================
-    SIDEBAR MOBILE (PRESERVED)
-    ============================================================ -->
+    <!-- SIDEBAR MOBILE -->
     <div id="sidebar-mobile" class="sidebar-mobile p-4">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-2"><div class="w-8 h-8 rounded bg-purple-600 flex items-center justify-center font-bold text-sm">E5</div><span class="font-semibold">E5 Coach</span></div>
@@ -188,7 +165,7 @@
     </div>
 
     <!-- ============================================================
-    ONBOARDING OVERLAY (PRESERVED - UNCHANGED)
+    ONBOARDING OVERLAY (PRESERVED)
     ============================================================ -->
     <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
@@ -280,11 +257,11 @@
     </div>
 
     <!-- ============================================================
-    MAIN APP (PRESERVED)
+    MAIN APP
     ============================================================ -->
     <div id="app" class="flex flex-col h-screen hidden">
 
-        <!-- HEADER (PRESERVED) -->
+        <!-- HEADER -->
         <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-4 md:px-6 py-4 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white text-xl"><i class="fas fa-bars"></i></button>
@@ -300,7 +277,7 @@
 
         <div class="flex flex-1 overflow-hidden">
 
-            <!-- SIDEBAR DESKTOP (PRESERVED) -->
+            <!-- SIDEBAR DESKTOP -->
             <nav class="sidebar-desktop w-56 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
                 <div class="space-y-1">
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active"><span class="icon">📊</span> Dashboard</button>
@@ -323,18 +300,12 @@
             <!-- MAIN CONTENT -->
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0a0e1a]/30">
 
-                <!-- ============================================================
-                DASHBOARD TAB (IMPROVED with Better UI)
-                ============================================================ -->
+                <!-- DASHBOARD TAB -->
                 <div id="tab-dashboard" class="tab-content">
-                    <div id="dashboard-content" class="space-y-6">
-                        <!-- Rendered by JavaScript -->
-                    </div>
+                    <div id="dashboard-content" class="space-y-6"></div>
                 </div>
 
-                <!-- ============================================================
-                CHAT TAB (PRESERVED - UNCHANGED)
-                ============================================================ -->
+                <!-- CHAT TAB -->
                 <div id="tab-chat" class="tab-content hidden">
                     <div class="flex flex-col h-full">
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
@@ -346,21 +317,17 @@
                     </div>
                 </div>
 
-                <!-- ============================================================
-                JOURNEY TAB (PRESERVED - UNCHANGED)
-                ============================================================ -->
+                <!-- JOURNEY TAB -->
                 <div id="tab-journey" class="tab-content hidden">
                     <div id="journey-content" class="space-y-6"></div>
                 </div>
 
-                <!-- ============================================================
-                SETTINGS TAB (IMPROVED with Better Empty States)
-                ============================================================ -->
+                <!-- SETTINGS TAB -->
                 <div id="tab-settings" class="tab-content hidden">
                     <div class="max-w-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
                         <div class="space-y-6">
-                            <!-- Business Profile (PRESERVED) -->
+                            <!-- Business Profile -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">Business Profile</h3>
                                 <div class="space-y-4">
@@ -370,13 +337,11 @@
                                     <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">💾 Save Profile</button>
                                 </div>
                             </div>
-                            <!-- Wins & Proof (IMPROVED with Better Empty State) -->
+                            <!-- Wins & Proof -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
                                 <button onclick="openWinModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition mb-4">➕ Record a Win</button>
-                                <div id="wins-list" class="space-y-2 text-sm">
-                                    <!-- Rendered by JavaScript with improved empty state -->
-                                </div>
+                                <div id="wins-list" class="space-y-2 text-sm"></div>
                             </div>
                         </div>
                     </div>
@@ -386,9 +351,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    STANDUP MODAL (PRESERVED - UNCHANGED)
-    ============================================================ -->
+    <!-- STANDUP MODAL -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
@@ -421,9 +384,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    WIN MODAL (PRESERVED - UNCHANGED)
-    ============================================================ -->
+    <!-- WIN MODAL -->
     <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
             <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">🏆 Record a Win</h3><button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
@@ -435,13 +396,11 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    TOAST CONTAINER (PRESERVED)
-    ============================================================ -->
+    <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- ============================================================
-    JAVASCRIPT (IMPROVED with Better UI Rendering)
+    JAVASCRIPT
     ============================================================ -->
     <script>
         const API = window.location.origin;
@@ -456,7 +415,7 @@
         let currentTab = 'dashboard';
 
         // ============================================================
-        // SIDEBAR FUNCTIONS (PRESERVED)
+        // SIDEBAR FUNCTIONS (WORKING)
         // ============================================================
         function toggleSidebar() {
             document.getElementById('sidebar-mobile').classList.toggle('open');
@@ -464,25 +423,39 @@
         }
 
         function switchTab(tab) {
+            // Hide all tab content
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            // Show selected tab
+            const targetTab = document.getElementById(`tab-${tab}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            
+            // Update sidebar active states
             document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${tab}`).classList.add('active');
+            const nav = document.getElementById(`nav-${tab}`);
+            if (nav) nav.classList.add('active');
+            
             document.querySelectorAll('#sidebar-mobile .nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${tab}-mob`)?.classList.add('active');
+            const navMob = document.getElementById(`nav-${tab}-mob`);
+            if (navMob) navMob.classList.add('active');
+            
             currentTab = tab;
+            
+            // Load content based on tab
             if (tab === 'dashboard') loadDashboard();
             if (tab === 'journey') loadJourney();
             if (tab === 'settings') loadWins();
+            
+            // Close mobile sidebar
             if (window.innerWidth < 769) toggleSidebar();
         }
 
         // ============================================================
-        // ONBOARDING (PRESERVED - UNCHANGED)
+        // ONBOARDING FUNCTIONS
         // ============================================================
         function showStep(step) {
             document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
-            document.getElementById(`onboarding-step-${step}`).classList.add('active');
+            const el = document.getElementById(`onboarding-step-${step}`);
+            if (el) el.classList.add('active');
             document.querySelectorAll('.step-dot').forEach((dot, i) => {
                 dot.classList.remove('active', 'done');
                 if (i + 1 === step) dot.classList.add('active');
@@ -494,7 +467,7 @@
         function goToStep(step) { showStep(step); }
 
         // ============================================================
-        // TOAST (PRESERVED - UNCHANGED)
+        // TOAST
         // ============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -510,7 +483,7 @@
         }
 
         // ============================================================
-        // CELEBRATION (PRESERVED - UNCHANGED)
+        // CELEBRATION
         // ============================================================
         function showCelebration(message, nextTask, xp, streak) {
             document.getElementById('celebration-message').textContent = `${message} • +${xp} XP • 🔥 ${streak} day streak`;
@@ -538,7 +511,7 @@
         }
 
         // ============================================================
-        // CHARACTER COUNTER (PRESERVED - UNCHANGED)
+        // CHARACTER COUNTER
         // ============================================================
         function updateCharCounter() {
             const text = document.getElementById('s-text').value;
@@ -549,7 +522,7 @@
         }
 
         // ============================================================
-        // GENERATE STRATEGY (PRESERVED - UNCHANGED)
+        // GENERATE STRATEGY
         // ============================================================
         async function generateStrategy() {
             const stage = document.getElementById('onboarding-stage').value;
@@ -579,7 +552,7 @@
         async function regenerateStrategy() { await generateStrategy(); }
 
         // ============================================================
-        // PROOF UPLOAD (PRESERVED - UNCHANGED)
+        // PROOF UPLOAD
         // ============================================================
         function handleProofUpload(event) {
             const files = event.target.files;
@@ -594,7 +567,7 @@
         }
 
         // ============================================================
-        // SUBMIT ONBOARDING (PRESERVED - UNCHANGED)
+        // SUBMIT ONBOARDING
         // ============================================================
         async function submitOnboarding() {
             const btn = event.target;
@@ -628,8 +601,15 @@
         }
 
         async function completeOnboarding() {
-            document.getElementById('gatekeeper').style.display = 'none';
-            document.getElementById('app').classList.remove('hidden');
+            // Hide the gatekeeper overlay
+            const gatekeeper = document.getElementById('gatekeeper');
+            if (gatekeeper) gatekeeper.style.display = 'none';
+            
+            // Show the main app
+            const app = document.getElementById('app');
+            if (app) app.classList.remove('hidden');
+            
+            // Load initial data
             await loadDashboard();
             await loadJourney();
             await loadWins();
@@ -638,7 +618,7 @@
         }
 
         // ============================================================
-        // DASHBOARD (IMPROVED with Better UI)
+        // DASHBOARD
         // ============================================================
         async function loadDashboard() {
             const container = document.getElementById('dashboard-content');
@@ -673,7 +653,7 @@
                 const totalTasks = 12;
                 const progress = Math.round((tasksDone / totalTasks) * 100);
 
-                // Calculate recent activity (mock)
+                // Recent activity
                 const activities = [];
                 if (journeyData.standup_count > 0) {
                     activities.push({ icon: '📝', color: 'purple', text: `<strong>Standup graded</strong> — ${journeyData.avg_score || 0}/10`, time: 'Today' });
@@ -687,12 +667,10 @@
                 }
 
                 container.innerHTML = `
-                    <!-- Trajectory Banner -->
                     <div class="${trajClass} rounded-lg p-4 border-l-4">
                         <span class="text-sm font-medium">${trajIcon} ${traj.message}</span>
                     </div>
 
-                    <!-- Stats Cards -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="stat-card text-center">
                             <div class="stat-value text-purple-400">${journeyData.current_day}/90</div>
@@ -712,7 +690,6 @@
                         </div>
                     </div>
 
-                    <!-- Progress Bar -->
                     <div>
                         <div class="flex justify-between text-sm text-slate-400 mb-1">
                             <span>Journey Progress</span>
@@ -723,7 +700,6 @@
                         </div>
                     </div>
 
-                    <!-- Current Task -->
                     <div class="glass p-5 rounded-lg border-l-4 border-purple-500">
                         <div class="flex items-start justify-between">
                             <div>
@@ -745,7 +721,6 @@
                         <div class="mt-3 text-xs text-slate-500">⚠️ Submit work in Daily Standup to unlock next step</div>
                     </div>
 
-                    <!-- Recent Activity (NEW) -->
                     <div class="glass p-5 rounded-lg">
                         <h3 class="text-sm font-semibold text-slate-300 mb-3">📋 Recent Activity</h3>
                         ${activities.length > 0 ? activities.map(a => `
@@ -761,7 +736,6 @@
                         `}
                     </div>
 
-                    <!-- Next Up (NEW) -->
                     <div class="next-up-card">
                         <div class="label">🚀 Next Up</div>
                         <div class="task-name">${journeyData.current_task.name}</div>
@@ -783,7 +757,7 @@
         }
 
         // ============================================================
-        // CHAT (PRESERVED - UNCHANGED)
+        // CHAT
         // ============================================================
         function getChatContainer() { return document.getElementById('chat-messages'); }
 
@@ -833,7 +807,7 @@
         }
 
         // ============================================================
-        // JOURNEY (PRESERVED - UNCHANGED)
+        // JOURNEY
         // ============================================================
         async function loadJourney() {
             const container = document.getElementById('journey-content');
@@ -850,27 +824,12 @@
                     <div class="space-y-4">
                         <div class="text-sm text-slate-400">All the details of your 90-day journey.</div>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="glass p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-purple-400">${journeyData.current_day}/90</div>
-                                <div class="text-xs text-slate-500 uppercase">Day</div>
-                            </div>
-                            <div class="glass p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-green-400">${tasksDone}/${totalTasks}</div>
-                                <div class="text-xs text-slate-500 uppercase">Tasks</div>
-                            </div>
-                            <div class="glass p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-yellow-400">${journeyData.xp || 0}</div>
-                                <div class="text-xs text-slate-500 uppercase">XP</div>
-                            </div>
-                            <div class="glass p-4 rounded-lg text-center">
-                                <div class="text-2xl font-bold text-orange-400">${journeyData.streak || 0}</div>
-                                <div class="text-xs text-slate-500 uppercase">Streak</div>
-                            </div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-purple-400">${journeyData.current_day}/90</div><div class="text-xs text-slate-500 uppercase">Day</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-green-400">${tasksDone}/${totalTasks}</div><div class="text-xs text-slate-500 uppercase">Tasks</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-yellow-400">${journeyData.xp || 0}</div><div class="text-xs text-slate-500 uppercase">XP</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-orange-400">${journeyData.streak || 0}</div><div class="text-xs text-slate-500 uppercase">Streak</div></div>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-sm text-slate-400 mb-1"><span>Progress</span><span>${progress}%</span></div>
-                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div>
-                        </div>
+                        <div><div class="flex justify-between text-sm text-slate-400 mb-1"><span>Progress</span><span>${progress}%</span></div><div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div></div>
                         <div class="glass p-5 rounded-lg border-l-4 border-purple-500">
                             <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Task</div>
                             <div class="text-lg font-semibold text-white">${journeyData.current_task.name}</div>
@@ -886,18 +845,8 @@
                                 const isCurrent = key === journeyData.current_phase.replace(' ', '_');
                                 return `
                                     <div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : ''}">
-                                        <div class="flex justify-between items-center">
-                                            <span class="font-medium">${isCurrent ? '🔄' : '✅'} ${phase.name}</span>
-                                            <span class="text-sm text-slate-400">${done}/${total}</span>
-                                        </div>
-                                        <div class="mt-2 space-y-1">
-                                            ${phase.tasks.map(task => `
-                                                <div class="flex items-center gap-2 text-sm ${task.completed ? 'text-slate-400 line-through' : isCurrent && !task.completed ? 'text-purple-400' : 'text-slate-500'}">
-                                                    <span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span>
-                                                    <span>${task.name}</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
+                                        <div class="flex justify-between items-center"><span class="font-medium">${isCurrent ? '🔄' : '✅'} ${phase.name}</span><span class="text-sm text-slate-400">${done}/${total}</span></div>
+                                        <div class="mt-2 space-y-1">${phase.tasks.map(task => `<div class="flex items-center gap-2 text-sm ${task.completed ? 'text-slate-400 line-through' : isCurrent && !task.completed ? 'text-purple-400' : 'text-slate-500'}"><span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span><span>${task.name}</span></div>`).join('')}</div>
                                     </div>
                                 `;
                             }).join('')}
@@ -910,7 +859,7 @@
         }
 
         // ============================================================
-        // SETTINGS / PROFILE / WINS (IMPROVED with Better Empty State)
+        // SETTINGS / PROFILE / WINS
         // ============================================================
         async function loadProfile() {
             try {
@@ -951,15 +900,12 @@
                 const container = document.getElementById('wins-list');
 
                 if (wins.length === 0) {
-                    // IMPROVED: Better empty state with examples and CTA
                     container.innerHTML = `
                         <div class="empty-state">
                             <div class="icon">🏆</div>
                             <div class="title">No Wins Recorded Yet</div>
                             <div class="subtitle">Every win starts with one step. Record your first win today!</div>
-                            <div class="example">
-                                💡 <strong>Example:</strong> "Got my first 100 YouTube subscribers!" or "Closed my first $497 client"
-                            </div>
+                            <div class="example">💡 <strong>Example:</strong> "Got my first 100 YouTube subscribers!" or "Closed my first $497 client"</div>
                             <button onclick="openWinModal()" class="btn-primary">💪 Record My First Win</button>
                         </div>
                     `;
@@ -1007,7 +953,7 @@
         }
 
         // ============================================================
-        // STANDUP (PRESERVED - UNCHANGED)
+        // STANDUP
         // ============================================================
         function openStandup() {
             if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
@@ -1108,7 +1054,7 @@
         }
 
         // ============================================================
-        // SIDEBAR STATS (PRESERVED - UNCHANGED)
+        // SIDEBAR STATS
         // ============================================================
         function updateSidebarStats() {
             if (!journeyData) return;
@@ -1133,7 +1079,7 @@
         }
 
         // ============================================================
-        // INIT (PRESERVED - UNCHANGED)
+        // INIT
         // ============================================================
         async function init() {
             try {
