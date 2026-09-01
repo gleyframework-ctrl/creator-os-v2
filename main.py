@@ -18,9 +18,9 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA NIM Configuration (ONLY NVIDIA — No Gemini)
+# NVIDIA NIM Configuration
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
-NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()
+NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
@@ -29,61 +29,110 @@ log.info(f"🔍 NVIDIA Model: {NVIDIA_MODEL}")
 # ============================================================
 # RAILWAY POSTGRESQL
 # ============================================================
-import psycopg2
-from psycopg2.extras import RealDictCursor
-
-PGHOST = os.environ.get("PGHOST", "").strip()
-PGDATABASE = os.environ.get("PGDATABASE", "").strip()
-PGUSER = os.environ.get("PGUSER", "").strip()
-PGPASSWORD = os.environ.get("PGPASSWORD", "").strip()
-PGPORT = os.environ.get("PGPORT", "5432").strip()
-
-DATABASE_CONNECTED = False
-
-def get_db_connection():
-    try:
-        if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
-            log.warning("⚠️ Missing PostgreSQL environment variables!")
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    
+    PGHOST = os.environ.get("PGHOST", "").strip()
+    PGDATABASE = os.environ.get("PGDATABASE", "").strip()
+    PGUSER = os.environ.get("PGUSER", "").strip()
+    PGPASSWORD = os.environ.get("PGPASSWORD", "").strip()
+    PGPORT = os.environ.get("PGPORT", "5432").strip()
+    
+    DATABASE_CONNECTED = False
+    
+    def get_db_connection():
+        try:
+            if not all([PGHOST, PGDATABASE, PGUSER, PGPASSWORD]):
+                log.warning("⚠️ Missing PostgreSQL environment variables!")
+                return None
+            log.info(f"🔍 Connecting to PostgreSQL: host={PGHOST}, db={PGDATABASE}, user={PGUSER}, port={PGPORT}")
+            conn = psycopg2.connect(
+                host=PGHOST,
+                database=PGDATABASE,
+                user=PGUSER,
+                password=PGPASSWORD,
+                port=PGPORT,
+                cursor_factory=RealDictCursor
+            )
+            log.info("✅ PostgreSQL connection established.")
+            return conn
+        except Exception as e:
+            log.error(f"❌ Database connection failed: {e}")
             return None
-        log.info(f"🔍 Connecting to PostgreSQL: host={PGHOST}, db={PGDATABASE}, user={PGUSER}, port={PGPORT}")
-        conn = psycopg2.connect(
-            host=PGHOST,
-            database=PGDATABASE,
-            user=PGUSER,
-            password=PGPASSWORD,
-            port=PGPORT,
-            cursor_factory=RealDictCursor
-        )
-        log.info("✅ PostgreSQL connection established.")
-        return conn
-    except Exception as e:
-        log.error(f"❌ Database connection failed: {e}")
+    
+    def init_db():
+        try:
+            conn = get_db_connection()
+            if not conn:
+                log.warning("⚠️ Could not connect to database. Using in-memory fallback.")
+                return
+            cur = conn.cursor()
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS profiles (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS journeys (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS standups (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS wins (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS scores (
+                    id SERIAL PRIMARY KEY,
+                    member_id TEXT,
+                    score INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS strategy_docs (
+                    member_id TEXT PRIMARY KEY,
+                    data JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            conn.commit()
+            cur.close()
+            conn.close()
+            log.info("✅ PostgreSQL tables initialized.")
+            global DATABASE_CONNECTED
+            DATABASE_CONNECTED = True
+        except Exception as e:
+            log.error(f"⚠️ Database initialization failed: {e}")
+            log.warning("️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
+    
+    init_db()
+except ImportError:
+    log.error("❌ psycopg2 not installed. Install it with: pip install psycopg2-binary")
+    DATABASE_CONNECTED = False
+    
+    def get_db_connection():
         return None
-
-def init_db():
-    try:
-        conn = get_db_connection()
-        if not conn:
-            log.warning("⚠️ Could not connect to database. Using in-memory fallback.")
-            return
-        cur = conn.cursor()
-        cur.execute("CREATE TABLE IF NOT EXISTS profiles (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        cur.execute("CREATE TABLE IF NOT EXISTS journeys (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        cur.execute("CREATE TABLE IF NOT EXISTS standups (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        cur.execute("CREATE TABLE IF NOT EXISTS wins (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        cur.execute("CREATE TABLE IF NOT EXISTS scores (id SERIAL PRIMARY KEY, member_id TEXT, score INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        cur.execute("CREATE TABLE IF NOT EXISTS strategy_docs (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
-        conn.commit()
-        cur.close()
-        conn.close()
-        log.info("✅ PostgreSQL tables initialized.")
-        global DATABASE_CONNECTED
-        DATABASE_CONNECTED = True
-    except Exception as e:
-        log.error(f"⚠️ Database initialization failed: {e}")
-        log.warning("⚠️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
-
-init_db()
 
 # ============================================================
 # IN-MEMORY FALLBACK
@@ -102,6 +151,7 @@ class RateLimiter:
         self.window = window_s
         self.hits = {}
         self.lock = threading.Lock()
+    
     def allow(self, key):
         now = time.time()
         with self.lock:
@@ -290,14 +340,14 @@ def db_get_scores(member_id):
         return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# NVIDIA LLM ENGINE — NVIDIA-ONLY WITH RETRY
+# NVIDIA LLM ENGINE — WITH BETTER ERROR HANDLING
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
     """Call NVIDIA NIM with simple retry logic."""
     
     if not NVIDIA_API_KEY:
         log.error("❌ NVIDIA_API_KEY is not set!")
-        return "Error: NVIDIA API key not configured."
+        return "Error: NVIDIA API key not configured in Railway environment variables."
     
     for attempt in range(3):
         try:
@@ -326,15 +376,22 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
                 return result["choices"][0]["message"]["content"]
                 
         except urllib.error.HTTPError as e:
-            error_body = e.read().decode('utf-8', errors='ignore')[:100]
-            log.warning(f"⚠️ NVIDIA HTTP {e.code}: {error_body}")
-            if e.code == 404:
-                return f"Error: Model '{NVIDIA_MODEL}' not found. Please update NVIDIA_MODEL in Railway variables."
-            if e.code in [503, 429, 502, 504]:
+            error_body = e.read().decode('utf-8', errors='ignore')[:200]
+            log.error(f"⚠️ NVIDIA HTTP {e.code}: {e.reason}")
+            log.error(f"Error body: {error_body}")
+            
+            if e.code == 410:
+                return f"Error: Model '{NVIDIA_MODEL}' is no longer available (HTTP 410). Please update NVIDIA_MODEL in Railway variables to a valid model like 'nvidia/nemotron-3-super-120b-a12b'."
+            elif e.code == 401:
+                return "Error: Invalid NVIDIA API key (HTTP 401). Please check your NVIDIA_API_KEY in Railway variables."
+            elif e.code == 404:
+                return f"Error: Model '{NVIDIA_MODEL}' not found (HTTP 404). Please check the model name."
+            elif e.code in [503, 429, 502, 504]:
+                log.warning(f"️ Retrying in 2 seconds...")
                 time.sleep(2)
                 continue
             else:
-                return f"Error: NVIDIA API failed ({e.code}). Check logs."
+                return f"Error: NVIDIA API failed ({e.code}). Check logs for details."
                 
         except Exception as e:
             log.warning(f"⚠️ NVIDIA attempt {attempt+1} failed: {e}")
@@ -342,7 +399,7 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
                 time.sleep(2)
                 continue
     
-    return "Error: NVIDIA service temporarily unavailable. Please try again in a few moments."
+    return "Error: NVIDIA service temporarily unavailable after 3 attempts. Please try again later."
 
 # ============================================================
 # PYDANTIC MODELS
@@ -413,6 +470,7 @@ def advance_journey(journey, member_id):
     phase_tasks = JOURNEY_MAP[phase]["tasks"]
     completed = journey.get("tasks_completed", [])
     completed_in_phase = [t for t in phase_tasks if t["id"] in completed]
+    
     if phase == "Phase 1" and len(completed_in_phase) >= 4:
         journey["current_phase"] = "Phase 2"
         journey["current_task_id"] = "p2_t1"
@@ -428,6 +486,7 @@ def calculate_trajectory(journey):
     current_day = journey.get("current_day", 1)
     tasks_completed = len(journey.get("tasks_completed", []))
     expected_tasks = max(1, current_day // 7)
+    
     if tasks_completed > expected_tasks:
         return {"status": "ahead", "message": f"🚀 You're {tasks_completed - expected_tasks} task(s) ahead of schedule!", "color": "green"}
     elif tasks_completed < expected_tasks:
@@ -461,7 +520,9 @@ def submit_onboarding(req: OnboardingRequest):
         starting_day = 15
     elif req.current_level == "advanced" and (req.offer_done and req.audience_done and req.sales_done):
         starting_day = 31
+    
     speed_profile = "accelerator" if req.weekly_hours == "8+" else "steady" if req.weekly_hours == "4-7" else "reflective"
+    
     profile_data = req.dict()
     profile_data["speed_profile"] = speed_profile
     db_upsert_profile(req.member_id, profile_data)
@@ -469,21 +530,26 @@ def submit_onboarding(req: OnboardingRequest):
         "current_day": starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1",
         "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []
     })
+    
     return {"success": True, "starting_day": starting_day, "speed_profile": speed_profile}
 
 @app.post("/api/generate-strategy")
 def generate_strategy(req: StrategyRequest):
     starting_day = 15 if req.stage == "product" else 31 if req.stage == "selling" else 1
     speed_profile = "accelerator" if req.hours == "8+" else "steady" if req.hours == "4-7" else "reflective"
+    
     bottleneck_map = {
         "traffic": "Module 3 — Attract", "conversion": "Module 4 — Convert", "content": "Module 3 — Attract",
         "community": "Module 5 — Automate", "offer": "Module 2 — Package", "time": "Module 5 — Automate", "other": "Module 1 — Position"
     }
     focus = bottleneck_map.get(req.bottleneck, "Module 1 — Position")
+    
     system_prompt = "You are a strategic business coach. Generate a personalized strategy document based on the member's answers. Include: Current Stage, Biggest Challenge, Recommended Focus Area, Starting Day, Speed Profile, Recommended First Task, and Next Steps. Use a clear, professional, and encouraging tone."
     user_prompt = f"Member answers:\n- Stage: {req.stage}\n- Biggest Challenge: {req.bottleneck}\n- Hours Available: {req.hours}/week\n\nCalculated:\n- Starting Day: {starting_day}\n- Speed Profile: {speed_profile}\n- Focus Area: {focus}\n\nGenerate a strategy document."
+    
     messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
     document = call_llm(messages)
+    
     try:
         conn = get_db_connection()
         if conn:
@@ -493,6 +559,7 @@ def generate_strategy(req: StrategyRequest):
             cur.close(); conn.close()
     except Exception as e:
         log.error(f"Error saving strategy doc: {e}")
+    
     return {"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "focus": focus}
 
 @app.post("/api/complete-onboarding")
@@ -502,9 +569,11 @@ def complete_onboarding(req: CompleteOnboardingRequest):
         db_upsert_profile(req.member_id, {"business_name": "New Member", "niche": "", "target_avatar": "", "biggest_bottleneck": req.bottleneck, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True})
     else:
         db_upsert_profile(req.member_id, {**profile, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True, "biggest_bottleneck": req.bottleneck})
+    
     journey = db_get_journey(req.member_id) or {"member_id": req.member_id, "current_day": req.starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
     journey["current_day"] = req.starting_day
     db_upsert_journey(req.member_id, journey)
+    
     try:
         conn = get_db_connection()
         if conn:
@@ -514,6 +583,7 @@ def complete_onboarding(req: CompleteOnboardingRequest):
             cur.close(); conn.close()
     except Exception as e:
         log.error(f"Error saving strategy doc: {e}")
+    
     return {"success": True, "message": "Onboarding complete", "starting_day": req.starting_day, "speed_profile": req.speed_profile}
 
 @app.get("/api/journey")
@@ -526,6 +596,7 @@ def get_journey_status(member_id: str = "default"):
     scores = db_get_scores(member_id)
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0
     wins = db_get_wins(member_id)
+    
     return {
         "current_day": journey.get("current_day", 1), "current_phase": phase_info["name"], "phase_days": phase_info["days"],
         "sub_coach": phase_info.get("sub_coach", "Strategist"), "focus": phase_info["focus"], "current_task": current_task,
@@ -541,11 +612,14 @@ def get_journey_status(member_id: str = "default"):
 def submit_standup(req: StandupRequest):
     profile = db_get_profile(req.member_id)
     if not profile: raise HTTPException(403, "Complete onboarding first.")
+    
     journey = db_get_journey(req.member_id)
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     task = next((t for t in phase_info["tasks"] if t["id"] == req.current_task_id), phase_info["tasks"][0])
+    
     frameworks_str = ", ".join(task.get("frameworks", []))
     deliverables_str = "\n".join([f"- {d}" for d in task.get("deliverables", [])])
+    
     system = f"""You are a STRICT Chief Operating Officer grading execution.
 TASK BEING GRADED: {task['name']}
 REQUIRED FRAMEWORKS: {frameworks_str}
@@ -553,19 +627,27 @@ REQUIRED DELIVERABLES:
 {deliverables_str}
 MEMBER CONTEXT: Niche: {profile.get('niche', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')}
 EVIDENCE-BASED GRADING RUBRIC: Link present? (+2), Specific metrics? (+2), Deliverables mentioned? (+2), Quality? (0-4). Grade STRICTLY.
-OUTPUT FORMAT: GRADE: [X]/10\nAUDIT: [2-3 specific things missing]\nWHAT TO FIX: [Exact fix if < 7]\nNEXT STEP: [Exact next task if >= 7]\nFRAMEWORK TIP: [One insight]"""
+OUTPUT FORMAT: GRADE: [X]/10
+AUDIT: [2-3 specific things missing]
+WHAT TO FIX: [Exact fix if < 7]
+NEXT STEP: [Exact next task if >= 7]
+FRAMEWORK TIP: [One insight]"""
+    
     prompt = f"Tasks completed: {req.tasks_completed}\nLinks: {req.asset_links}\nWork content: {req.asset_text}\nMetrics: {req.metrics}"
     messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
     review = call_llm(messages)
+    
     score = 5
     try:
         m = re.search(r'GRADE:\s*(\d+)', review)
         if m: score = int(m.group(1))
     except: pass
     score = min(10, max(0, score))
+    
     evidence = {"link_present": len(req.asset_links) > 0 and req.asset_links[0].strip(), "metrics_present": req.metrics.strip() != "", "deliverables_mentioned": len(req.tasks_completed) > 0, "evidence_score": score}
     today = date.today().isoformat()
     last_date = journey.get("last_standup_date")
+    
     if last_date != today:
         if last_date:
             try: days_since = (date.today() - date.fromisoformat(last_date)).days
@@ -573,6 +655,7 @@ OUTPUT FORMAT: GRADE: [X]/10\nAUDIT: [2-3 specific things missing]\nWHAT TO FIX:
             journey["streak"] = journey.get("streak", 0) + 1 if days_since <= 1 else 1
         else: journey["streak"] = 1
         journey["last_standup_date"] = today
+    
     if score >= 7 and req.current_task_id not in journey.get("tasks_completed", []):
         journey.setdefault("tasks_completed", []).append(req.current_task_id)
         journey["current_day"] = min(90, journey.get("current_day", 1) + 7)
@@ -581,9 +664,11 @@ OUTPUT FORMAT: GRADE: [X]/10\nAUDIT: [2-3 specific things missing]\nWHAT TO FIX:
         journey["xp_total"] = journey.get("xp_total", 0) + xp_gained
     else:
         xp_gained = 25
+    
     db_add_standup(req.member_id, req.current_task_id, ",".join(req.tasks_completed), ",".join(req.asset_links), req.asset_text, req.metrics, score, review, evidence)
     db_add_score(req.member_id, score)
     db_upsert_journey(req.member_id, journey)
+    
     return {"success": True, "review": review, "score": score, "task_unlocked": score >= 7, "streak": journey.get("streak", 0), "xp_gained": xp_gained, "xp_total": journey.get("xp_total", 0), "journey_updated": True}
 
 @app.post("/api/win")
@@ -596,8 +681,10 @@ def submit_win(req: WinRequest):
 def chat(req: ChatRequest):
     if not req.message: raise HTTPException(400, "empty message")
     if not CHAT_LIMIT.allow(req.member_id or "default"): raise HTTPException(429, "Rate limit reached")
+    
     profile = db_get_profile(req.member_id or "default")
     if not profile: raise HTTPException(403, "GATEKEEPER: Complete onboarding first.")
+    
     journey = db_get_journey(req.member_id or "default")
     phase_info = JOURNEY_MAP[journey["current_phase"]]
     current_task = get_current_task(journey)
@@ -607,6 +694,7 @@ def chat(req: ChatRequest):
     wins = db_get_wins(req.member_id or "default")
     scores = db_get_scores(req.member_id or "default")
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+    
     if not task_completed:
         return {"reply": f"""**ACCOUNTABILITY GATE**
 You are Day {journey.get('current_day', 1)} — {phase_info['name']} phase.
@@ -618,12 +706,15 @@ Deliverables needed:
 {chr(10).join(['— ' + d for d in current_task.get('deliverables', [])])}
 
 Submit your work using the 'Submit Daily Work' button. I will grade it and unlock the next step."""}
+    
     wins_text = "No wins recorded yet."
     if wins: wins_text = f"{len(wins)} wins recorded. Latest: {wins[0]['win_text'][:100]}"
+    
     system_prompt = f"""You are the E5 AI Coach — an elite, proactive Chief Operating Officer.
 CURRENT MEMBER CONTEXT: Business: {profile.get('business_name', 'N/A')} | Niche: {profile.get('niche', 'N/A')} | Avatar: {profile.get('target_avatar', 'N/A')} | Bottleneck: {profile.get('biggest_bottleneck', 'N/A')} | Speed: {profile.get('speed_profile', 'steady')} | Day: {journey.get('current_day', 1)}/90 | Phase: {phase_info['name']} | Task: {current_task['name']} | Completed: {task_completed} | Streak: {streak} | Avg score: {avg_score}/10 | Wins: {wins_text} | Frameworks: {frameworks_str}
 COACHING RULES: 1. Diagnose Before Prescribing. 2. Personalize with Memory. 3. One Insight Per Response. 4. Apply, Don't Recite. 5. 60% Questions / 40% Insight. 6. Rewrite Together. 7. Short & Human (150-250 words). 8. Never Invent. 9. Language Matching (EN/AR).
 TONE: Calm. Authoritative. Short punchy sentences. Think McKinsey Partner meets Alex Hormozi."""
+    
     messages = [{"role": "system", "content": system_prompt}] + [{"role": m.role, "content": m.content} for m in req.history[-10:]] + [{"role": "user", "content": req.message}]
     reply = call_llm(messages)
     return {"reply": reply}
