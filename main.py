@@ -18,9 +18,9 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA NIM Configuration
+# NVIDIA NIM Configuration — FIXED to 128b (your Railway variable)
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
-NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b").strip()
+NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-128b-a12b").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 log.info(f"🔍 NVIDIA API Key: {'Set' if NVIDIA_API_KEY else 'MISSING'}")
@@ -124,7 +124,7 @@ try:
             DATABASE_CONNECTED = True
         except Exception as e:
             log.error(f"⚠️ Database initialization failed: {e}")
-            log.warning("️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
+            log.warning("⚠️ Using in-memory storage (DATA WILL BE LOST ON RESTART)")
     
     init_db()
 except ImportError:
@@ -340,7 +340,7 @@ def db_get_scores(member_id):
         return SCORES_DB.get(member_id, [])
 
 # ============================================================
-# NVIDIA LLM ENGINE — WITH BETTER ERROR HANDLING
+# NVIDIA LLM ENGINE — WITH BETTER ERROR HANDLING & RETRY
 # ============================================================
 def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
     """Call NVIDIA NIM with simple retry logic."""
@@ -381,13 +381,13 @@ def call_llm(messages: List[Dict], temperature: float = 0.3) -> str:
             log.error(f"Error body: {error_body}")
             
             if e.code == 410:
-                return f"Error: Model '{NVIDIA_MODEL}' is no longer available (HTTP 410). Please update NVIDIA_MODEL in Railway variables to a valid model like 'nvidia/nemotron-3-super-120b-a12b'."
+                return f"Error: Model '{NVIDIA_MODEL}' is no longer available (HTTP 410). Please update NVIDIA_MODEL in Railway variables to a valid model like 'nvidia/nemotron-3-super-128b-a12b'."
             elif e.code == 401:
                 return "Error: Invalid NVIDIA API key (HTTP 401). Please check your NVIDIA_API_KEY in Railway variables."
             elif e.code == 404:
-                return f"Error: Model '{NVIDIA_MODEL}' not found (HTTP 404). Please check the model name."
+                return f"Error: Model '{NVIDIA_MODEL}' not found (HTTP 404). Please check the model name. Currently using: {NVIDIA_MODEL}"
             elif e.code in [503, 429, 502, 504]:
-                log.warning(f"️ Retrying in 2 seconds...")
+                log.warning(f"⚠️ Retrying in 2 seconds...")
                 time.sleep(2)
                 continue
             else:
