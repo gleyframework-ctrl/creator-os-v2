@@ -134,6 +134,13 @@
         .proof-file { display: inline-flex; align-items: center; gap: 6px; background: rgba(139,92,246,0.15); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(139,92,246,0.2); }
         .proof-file .remove { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
         .proof-file .remove:hover { opacity: 1; }
+
+        /* Drop zone */
+        #drop-zone { transition: all 0.3s; }
+        #drop-zone.dragover { border-color: #8b5cf6; background: rgba(139,92,246,0.05); }
+
+        /* Funnel SVG */
+        #funnel-visualization svg { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
@@ -161,6 +168,7 @@
             <button onclick="switchTab('dashboard')" id="nav-dashboard-mob" class="nav-item active"><i class="fas fa-chart-bar"></i> Dashboard</button>
             <button onclick="switchTab('chat')" id="nav-chat-mob" class="nav-item"><i class="fas fa-comments"></i> AI Coach</button>
             <button onclick="switchTab('journey')" id="nav-journey-mob" class="nav-item"><i class="fas fa-mountain"></i> My Journey <span class="badge ml-auto bg-purple-500/20 text-purple-300 text-xs px-2 py-0.5 rounded-full" id="journey-badge-mob">0%</span></button>
+            <button onclick="switchTab('funnel')" id="nav-funnel-mob" class="nav-item"><i class="fas fa-filter"></i> Funnel Map</button>
             <button onclick="switchTab('settings')" id="nav-settings-mob" class="nav-item"><i class="fas fa-cog"></i> Settings</button>
         </div>
     </div>
@@ -175,7 +183,7 @@
                 <div class="step-dot" id="step-dot-4"></div>
             </div>
 
-            <!-- STEP 1: QUIZ -->
+            <!-- STEP 1 -->
             <div id="onboarding-step-1" class="onboarding-step active">
                 <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
@@ -223,7 +231,7 @@
                 </div>
             </div>
 
-            <!-- STEP 2: STRATEGY DOCUMENT -->
+            <!-- STEP 2 -->
             <div id="onboarding-step-2" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📄</span><h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2></div>
                 <p class="text-slate-400 mb-4">Review your AI‑generated strategy document.</p>
@@ -234,7 +242,7 @@
                 </div>
             </div>
 
-            <!-- STEP 3: PROOF UPLOAD -->
+            <!-- STEP 3 -->
             <div id="onboarding-step-3" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📸</span><h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2></div>
                 <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
@@ -250,7 +258,7 @@
                 </div>
             </div>
 
-            <!-- STEP 4: CONFIRMATION -->
+            <!-- STEP 4 -->
             <div id="onboarding-step-4" class="onboarding-step">
                 <div class="text-center py-8">
                     <div class="text-6xl mb-4">🎉</div>
@@ -294,6 +302,7 @@
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active"><i class="fas fa-chart-bar"></i> Dashboard</button>
                     <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item"><i class="fas fa-comments"></i> AI Coach</button>
                     <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item"><i class="fas fa-mountain"></i> My Journey <span class="badge" id="journey-badge">0%</span></button>
+                    <button onclick="switchTab('funnel')" id="nav-funnel" class="sidebar-item"><i class="fas fa-filter"></i> Funnel Map</button>
                     <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item"><i class="fas fa-cog"></i> Settings</button>
                 </div>
                 <div class="mt-auto pt-4 border-t border-slate-800/50">
@@ -314,6 +323,17 @@
                 <!-- DASHBOARD TAB -->
                 <div id="tab-dashboard" class="tab-content active">
                     <div id="dashboard-content" class="space-y-6"></div>
+                    <!-- Proactive suggestion card placed inside dashboard -->
+                    <div id="proactive-suggestion" class="glass p-5 rounded-lg border-l-4 border-purple-500 hidden mt-6">
+                        <div class="flex items-start gap-3">
+                            <div class="text-purple-400 text-xl">💡</div>
+                            <div>
+                                <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">Proactive Suggestion</div>
+                                <div id="suggestion-text" class="text-sm text-slate-300 mt-1"></div>
+                                <button onclick="dismissSuggestion()" class="text-xs text-slate-500 hover:text-white mt-2">Dismiss</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- CHAT TAB -->
@@ -322,7 +342,6 @@
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
                         <div class="flex gap-3 pt-4 border-t border-slate-800/50">
                             <input type="text" id="chat-input" placeholder="Ask your AI Coach..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') sendMessage()">
-                            <!-- VOICE BUTTON -->
                             <button onclick="startVoiceInput()" id="voice-btn" class="bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-lg text-white font-medium transition" title="Speak your question">
                                 <i class="fas fa-microphone"></i>
                             </button>
@@ -340,11 +359,31 @@
                     <div id="journey-content" class="space-y-6"></div>
                 </div>
 
+                <!-- FUNNEL MAP TAB -->
+                <div id="tab-funnel" class="tab-content">
+                    <div class="max-w-3xl mx-auto">
+                        <h2 class="text-2xl font-bold text-white mb-6">🗺️ Visual Funnel Map</h2>
+                        <div class="glass rounded-xl p-6">
+                            <p class="text-slate-400 mb-4">Map out your customer journey stages visually.</p>
+                            <div id="funnel-visualization" class="w-full overflow-x-auto py-4">
+                                <div class="text-slate-400 text-center">Loading your funnel...</div>
+                            </div>
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <button onclick="addFunnelStage()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">➕ Add Stage</button>
+                                <button onclick="saveFunnel()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">💾 Save Funnel</button>
+                                <button onclick="loadFunnel()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">🔄 Refresh</button>
+                            </div>
+                            <div id="funnel-status" class="text-sm text-slate-500 mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SETTINGS TAB -->
                 <div id="tab-settings" class="tab-content">
                     <div class="max-w-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
                         <div class="space-y-6">
+
                             <!-- Profile -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">Business Profile</h3>
@@ -363,7 +402,7 @@
                                 <div id="wins-list" class="space-y-2 text-sm"></div>
                             </div>
 
-                            <!-- Re-engagement -->
+                            <!-- Notifications -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">📨 Notifications</h3>
                                 <p class="text-sm text-slate-400 mb-4">Test the re‑engagement notification system.</p>
@@ -371,7 +410,7 @@
                                 <div id="notification-result" class="text-sm text-slate-400 mt-3"></div>
                             </div>
 
-                            <!-- NEW: FUNNEL ANALYZER -->
+                            <!-- Funnel Analyzer -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">🔍 Funnel Analyzer</h3>
                                 <p class="text-sm text-slate-400 mb-4">Paste a competitor's URL and get a full funnel analysis with actionable insights.</p>
@@ -381,6 +420,33 @@
                                     <div id="funnel-analysis" class="mt-4 text-sm text-slate-300 whitespace-pre-wrap"></div>
                                 </div>
                             </div>
+
+                            <!-- Social Media Connect -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">📱 Social Media</h3>
+                                <p class="text-sm text-slate-400 mb-4">Connect your social accounts for AI‑powered performance analysis.</p>
+                                <div class="space-y-3">
+                                    <div class="flex flex-wrap gap-3 items-center">
+                                        <select id="social-platform" class="flex-1 min-w-[120px] px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                            <option value="tiktok">TikTok</option>
+                                            <option value="youtube">YouTube</option>
+                                            <option value="instagram">Instagram</option>
+                                        </select>
+                                        <input type="text" id="social-username" placeholder="Username" class="flex-1 min-w-[120px] px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                        <button onclick="connectSocial()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">Connect</button>
+                                    </div>
+                                    <div id="social-status" class="text-sm text-slate-400"></div>
+                                </div>
+                            </div>
+
+                            <!-- Whop Membership -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">🔐 Membership</h3>
+                                <p class="text-sm text-slate-400 mb-4">Check your Whop membership status.</p>
+                                <button onclick="verifyWhopMembership()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">Verify Membership</button>
+                                <div id="whop-status" class="text-sm text-slate-400 mt-2"></div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -401,9 +467,19 @@
                     <div class="flex justify-between text-xs mt-1"><span class="text-slate-500">Minimum 100 characters</span><span id="char-counter" class="char-counter mid">0/100</span></div>
                 </div>
                 <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label><input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
-                <div><label class="block text-sm text-slate-400 mb-1">Upload Proof (Screenshot, PDF, Document)</label>
-                    <input type="file" id="s-proof" multiple accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500" onchange="handleStandupProof(event)">
-                    <div id="s-proof-list" class="flex flex-wrap gap-2 mt-2"></div>
+                <!-- Drag & Drop Upload -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Upload Proof (Screenshot, PDF, Document)</label>
+                    <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition cursor-pointer"
+                         id="drop-zone"
+                         ondragover="event.preventDefault(); this.classList.add('border-purple-500')"
+                         ondrop="handleDrop(event)">
+                        <input type="file" id="s-proof" multiple accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" class="hidden" onchange="handleStandupProof(event)">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-slate-500 mb-2 block"></i>
+                        <p class="text-slate-400">Drag & drop files here, or <span class="text-purple-400 cursor-pointer" onclick="document.getElementById('s-proof').click()">browse</span></p>
+                        <p class="text-xs text-slate-500 mt-1">PNG, JPG, PDF, DOC — Max 10MB</p>
+                    </div>
+                    <div id="s-proof-list" class="flex flex-wrap gap-2 mt-3"></div>
                 </div>
                 <div><label class="block text-sm text-slate-400 mb-1">Confirm all deliverables</label>
                     <div id="deliverable-checklist" class="deliverable-checklist"></div>
@@ -448,6 +524,7 @@
         let strategyDocument = '';
         let uploadedFiles = [];
         let standupProofFiles = [];
+        let funnelStages = [];
         let currentStep = 1;
 
         // ===== SAFE DOM HELPERS =====
@@ -475,6 +552,7 @@
             if (navMob) navMob.classList.add('active');
             if (tabName === 'dashboard') { loadDashboard(); setTimeout(loadProactiveSuggestion, 1500); }
             if (tabName === 'journey') loadJourney();
+            if (tabName === 'funnel') loadFunnel();
             if (tabName === 'settings') { loadProfile(); loadWins(); }
             if (window.innerWidth < 769) toggleSidebar();
         }
@@ -683,7 +761,6 @@
                     </div>
                 `;
                 updateSidebarStats();
-                // Load proactive suggestion after dashboard loads
                 setTimeout(loadProactiveSuggestion, 1000);
             } catch (e) {
                 container.innerHTML = `<div class="text-red-400 text-center p-8"><div class="text-4xl mb-2">⚠️</div><p>Error loading dashboard</p><p class="text-sm text-slate-500">${e.message}</p><button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button></div>`;
@@ -770,7 +847,6 @@
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     chatHistory.push({ role: 'user', content: text });
                     chatHistory.push({ role: 'assistant', content: data.reply });
-                    // Play voice response
                     playAudioResponse(data.reply);
                 } else {
                     showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
@@ -783,7 +859,6 @@
 
         // ===== VOICE INPUT =====
         let isListening = false;
-
         function startVoiceInput() {
             const btn = getEl('voice-btn');
             const indicator = getEl('voice-indicator');
@@ -893,13 +968,108 @@
                 }
             } catch (e) { console.log('Proactive suggestion not available'); }
         }
-
         function dismissSuggestion() {
             const div = getEl('proactive-suggestion');
             if (div) div.classList.add('hidden');
         }
 
+        // ===== FUNNEL MAP =====
+        async function loadFunnel() {
+            try {
+                const res = await fetch(`${API}/api/funnel?member_id=${MEMBER_ID}`);
+                const data = await res.json();
+                if (data.success && data.funnel) {
+                    funnelStages = data.funnel.stages || [];
+                    renderFunnel(funnelStages);
+                    getEl('funnel-status').textContent = '✅ Funnel loaded';
+                } else {
+                    funnelStages = [];
+                    renderFunnel([]);
+                    getEl('funnel-status').textContent = '⚠️ No funnel found, create one!';
+                }
+            } catch (e) {
+                console.error('Funnel load error:', e);
+                getEl('funnel-status').textContent = '❌ Error loading funnel';
+            }
+        }
+
+        function renderFunnel(stages) {
+            const container = getEl('funnel-visualization');
+            if (!container) return;
+            if (!stages || stages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🗺️</div>
+                        <div class="title">No Funnel Stages Yet</div>
+                        <div class="subtitle">Start mapping your customer journey. Add your first stage!</div>
+                        <button onclick="addFunnelStage()" class="btn-primary">➕ Add First Stage</button>
+                    </div>
+                `;
+                return;
+            }
+            const totalWidth = 600;
+            const heightPerStage = 80;
+            const totalHeight = stages.length * heightPerStage + 40;
+            let svg = `<svg width="${totalWidth}" height="${totalHeight}" xmlns="http://www.w3.org/2000/svg" class="w-full">`;
+            stages.forEach((stage, index) => {
+                const y = index * heightPerStage + 20;
+                const width = 600 - (index * 60);
+                const x = (totalWidth - width) / 2;
+                svg += `
+                    <rect x="${x}" y="${y}" width="${width}" height="50" rx="8" fill="rgba(139,92,246,0.15)" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="${totalWidth/2}" y="${y + 30}" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="600">${stage.name || 'Stage ' + (index+1)}</text>
+                    <text x="${totalWidth/2}" y="${y + 48}" text-anchor="middle" fill="#94a3b8" font-size="11">${stage.metric || ''}</text>
+                    ${index < stages.length - 1 ? `<line x1="${totalWidth/2}" y1="${y + 50}" x2="${totalWidth/2}" y2="${y + heightPerStage}" stroke="#334155" stroke-width="2" stroke-dasharray="4"/>` : ''}
+                `;
+            });
+            svg += '</svg>';
+            container.innerHTML = svg;
+        }
+
+        function addFunnelStage() {
+            const name = prompt('Enter stage name (e.g., "Awareness"):');
+            if (!name) return;
+            const metric = prompt('Enter key metric for this stage (e.g., "1,200 visitors"):') || '';
+            funnelStages.push({ name, metric });
+            renderFunnel(funnelStages);
+            getEl('funnel-status').textContent = '📝 Stage added — click "Save Funnel" to persist';
+        }
+
+        async function saveFunnel() {
+            try {
+                const res = await fetch(`${API}/api/funnel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID, funnel: { stages: funnelStages } })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    getEl('funnel-status').textContent = '✅ Funnel saved!';
+                    showToast('Funnel saved successfully', 'success');
+                } else {
+                    getEl('funnel-status').textContent = '❌ Error saving funnel';
+                    showToast('Error saving funnel', 'error');
+                }
+            } catch (e) {
+                getEl('funnel-status').textContent = '❌ Error saving funnel';
+                showToast('Error saving funnel', 'error');
+            }
+        }
+
         // ===== STANDUP =====
+        function handleDrop(event) {
+            event.preventDefault();
+            const zone = getEl('drop-zone');
+            if (zone) zone.classList.remove('border-purple-500');
+            const files = event.dataTransfer.files;
+            const input = getEl('s-proof');
+            if (!input) return;
+            const dt = new DataTransfer();
+            for (let file of files) dt.items.add(file);
+            input.files = dt.files;
+            handleStandupProof({ target: input });
+        }
+
         function handleStandupProof(event) {
             const files = event.target.files;
             const list = getEl('s-proof-list');
@@ -1125,6 +1295,57 @@
             } catch (e) { showToast('Error saving profile', 'error'); }
         }
 
+        // ===== SOCIAL MEDIA CONNECT =====
+        async function connectSocial() {
+            const platform = getEl('social-platform')?.value;
+            const username = getEl('social-username')?.value.trim();
+            if (!username) { showToast('Please enter a username', 'warning'); return; }
+            try {
+                const res = await fetch(`${API}/api/social/connect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID, platform, username })
+                });
+                const data = await res.json();
+                const status = getEl('social-status');
+                if (data.success) {
+                    if (status) status.textContent = `✅ Connected to ${platform} as @${username}`;
+                    showToast(`Connected to ${platform}`, 'success');
+                } else {
+                    if (status) status.textContent = '❌ Error: ' + (data.error || 'Unknown');
+                    showToast('Error connecting', 'error');
+                }
+            } catch (e) {
+                const status = getEl('social-status');
+                if (status) status.textContent = '❌ Error: ' + e.message;
+                showToast('Error connecting', 'error');
+            }
+        }
+
+        // ===== WHOP MEMBERSHIP =====
+        async function verifyWhopMembership() {
+            const status = getEl('whop-status');
+            if (status) status.textContent = '⏳ Checking membership...';
+            try {
+                const res = await fetch(`${API}/api/whop/verify?member_id=${MEMBER_ID}`);
+                const data = await res.json();
+                if (status) {
+                    if (data.active) {
+                        status.textContent = '✅ Active member!';
+                        status.className = 'text-sm text-green-400 mt-2';
+                    } else if (data.error) {
+                        status.textContent = '⚠️ ' + data.error;
+                        status.className = 'text-sm text-yellow-400 mt-2';
+                    } else {
+                        status.textContent = '⚠️ No active membership found.';
+                        status.className = 'text-sm text-yellow-400 mt-2';
+                    }
+                }
+            } catch (e) {
+                if (status) { status.textContent = '❌ Error: ' + e.message; status.className = 'text-sm text-red-400 mt-2'; }
+            }
+        }
+
         // ===== RE-ENGAGEMENT =====
         async function triggerReEngagement() {
             const result = getEl('notification-result');
@@ -1202,10 +1423,6 @@
             counter.className = 'char-counter ' + (count < 100 ? 'under' : count < 200 ? 'mid' : 'over');
         }
 
-        // ===== PROACTIVE SUGGESTION DIV (Add to Dashboard) =====
-        // The div is already in the HTML, but we need to ensure it's there
-        // It's rendered in the Dashboard tab via the HTML above.
-
         // ===== INIT =====
         async function init() {
             try {
@@ -1234,7 +1451,6 @@
                     await loadJourney();
                     await loadWins();
                     switchTab('dashboard');
-
                     setTimeout(() => {
                         const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\nYour primary traffic source: **${data.profile?.primary_traffic_source || 'mixed'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
                         appendMessage('ai', welcome);
