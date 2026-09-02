@@ -7,86 +7,122 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; color: #94a3b8; font-size: 14px; font-weight: 500; width: 100%; background: transparent; border: none; }
+        /* ===== RESET & BASE ===== */
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #020617; color: #f8fafc; margin: 0; }
+        .glass { background: rgba(30,41,59,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass-dark { background: rgba(15,23,42,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
+
+        /* ===== TAB SYSTEM ===== */
+        .tab-content { display: none !important; }
+        .tab-content.active { display: block !important; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s;
+            color: #94a3b8; font-size: 14px; font-weight: 500;
+            width: 100%; background: transparent; border: none;
+        }
         .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
-        .sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
-        .sidebar-item .badge { margin-left: auto; background: rgba(139, 92, 246, 0.2); color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 16px 20px; border-radius: 12px; color: white; font-size: 14px; max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; }
-        .toast-success { background: rgba(34, 197, 94, 0.9); border: 1px solid #22c55e; }
-        .toast-warning { background: rgba(234, 179, 8, 0.9); border: 1px solid #eab308; }
-        .toast-error { background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; }
-        .toast-info { background: rgba(59, 130, 246, 0.9); border: 1px solid #3b82f6; }
-        .toast-close { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; margin-left: auto; font-size: 18px; }
-        .toast-close:hover { opacity: 1; }
+        .sidebar-item.active { background: rgba(139,92,246,0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+        .sidebar-item .badge {
+            margin-left: auto; background: rgba(139,92,246,0.2);
+            color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            padding: 16px 20px; border-radius: 12px; color: white; font-size: 14px;
+            max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast-success { background: rgba(34,197,94,0.9); }
+        .toast-warning { background: rgba(234,179,8,0.9); }
+        .toast-error { background: rgba(239,68,68,0.9); }
+        .toast-info { background: rgba(59,130,246,0.9); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        .celebration-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; }
-        .celebration-modal.show { display: flex; }
-        .celebration-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(34, 197, 94, 0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10001; overflow: hidden; }
-        .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
-        @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
-        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
-        .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
-        .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
-        .trajectory-banner-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 12px 16px; border-radius: 8px; }
-        .trajectory-banner-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); color: #eab308; padding: 12px 16px; border-radius: 8px; }
-        .trajectory-banner-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 12px 16px; border-radius: 8px; }
-        .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
-        .activity-icon.purple { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
-        .activity-icon.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
-        .activity-icon.yellow { background: rgba(234, 179, 8, 0.15); color: #facc15; }
-        .btn-test { background: #d97706; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
-        .btn-test:hover { background: #b45309; transform: translateY(-1px); }
-        .btn-test:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== ONBOARDING ===== */
         .onboarding-step { display: none; }
         .onboarding-step.active { display: block; }
         .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
         .step-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: all 0.3s; }
         .step-dot.active { background: #9333ea; width: 24px; border-radius: 10px; }
         .step-dot.done { background: #22c55e; }
+
+        /* ===== STATS ===== */
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
+        .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+        .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
+
+        .trajectory-banner-green { border-left: 4px solid #22c55e; background: rgba(34,197,94,0.15); color: #22c55e; padding: 12px 16px; border-radius: 8px; }
+        .trajectory-banner-yellow { border-left: 4px solid #eab308; background: rgba(234,179,8,0.15); color: #eab308; padding: 12px 16px; border-radius: 8px; }
+        .trajectory-banner-blue { border-left: 4px solid #3b82f6; background: rgba(59,130,246,0.15); color: #3b82f6; padding: 12px 16px; border-radius: 8px; }
+
+        .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .activity-icon.purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .activity-icon.green { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .activity-icon.yellow { background: rgba(234,179,8,0.15); color: #facc15; }
+
+        .btn-test { background: #d97706; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn-test:hover { background: #b45309; transform: translateY(-1px); }
+        .btn-test:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .char-counter.under { color: #ef4444; }
         .char-counter.over { color: #22c55e; }
         .char-counter.mid { color: #eab308; }
-        .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
-        .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
+
+        .celebration-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .celebration-modal.show { display: flex; }
+        .celebration-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(34,197,94,0.3); animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10001; overflow: hidden; }
+        .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
+        @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
         .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.02); border: 2px dashed rgba(255,255,255,0.06); border-radius: 16px; }
         .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
         .empty-state .title { font-size: 18px; font-weight: 600; color: #f1f5f9; margin-bottom: 8px; }
         .empty-state .subtitle { font-size: 14px; color: #94a3b8; max-width: 400px; margin-bottom: 20px; line-height: 1.6; }
-        .empty-state .example { font-size: 13px; color: #64748b; background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px; max-width: 400px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.04); }
-        .empty-state .example strong { color: #a78bfa; }
-        .empty-state .btn-primary { background: #8b5cf6; color: white; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
-        .empty-state .btn-primary:hover { background: #7c3aed; transform: translateY(-1px); }
-        .next-up-card { background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02)); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 20px; }
+
+        .next-up-card { background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02)); border: 1px solid rgba(139,92,246,0.15); border-radius: 12px; padding: 20px; }
         .next-up-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a78bfa; font-weight: 600; }
         .next-up-card .task-name { font-size: 18px; font-weight: 600; color: #f1f5f9; margin: 4px 0; }
         .next-up-card .task-deadline { font-size: 13px; color: #94a3b8; }
-        .skeleton-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.04); }
-        .skeleton-line { height: 12px; background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; margin-bottom: 8px; }
-        .skeleton-line.short { width: 60%; }
-        .skeleton-line.medium { width: 80%; }
+
+        .typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%,80%,100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Mobile sidebar */
+        .sidebar-mobile { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #0f172a; z-index: 100; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; padding: 16px; }
+        .sidebar-mobile.open { transform: translateX(0); }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
+        .sidebar-overlay.show { display: block; }
+        @media (max-width: 768px) { .sidebar-desktop { display: none; } }
+        @media (min-width: 769px) { .sidebar-mobile, .sidebar-overlay { display: none !important; } }
+        .sidebar-mobile .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; cursor: pointer; color: #94a3b8; font-size: 14px; font-weight: 500; width: 100%; background: transparent; border: none; text-align: left; }
+        .sidebar-mobile .nav-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
+        .sidebar-mobile .nav-item.active { background: rgba(139,92,246,0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+
+        .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-    CELEBRATION MODAL
-    ============================================================ -->
+    <!-- CELEBRATION MODAL -->
     <div id="celebration-modal" class="celebration-modal">
         <div class="celebration-card">
             <div class="text-6xl mb-4">🎉</div>
@@ -98,9 +134,22 @@
     </div>
     <div id="confetti-container" class="confetti-container"></div>
 
-    <!-- ============================================================
-    ONBOARDING OVERLAY
-    ============================================================ -->
+    <!-- SIDEBAR OVERLAY (mobile) -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar-mobile" class="sidebar-mobile">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded bg-purple-600 flex items-center justify-center font-bold text-sm">E5</div><span class="font-semibold">E5 Coach</span></div>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="space-y-2">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard-mob" class="nav-item active"><i class="fas fa-chart-bar"></i> Dashboard</button>
+            <button onclick="switchTab('chat')" id="nav-chat-mob" class="nav-item"><i class="fas fa-comments"></i> AI Coach</button>
+            <button onclick="switchTab('journey')" id="nav-journey-mob" class="nav-item"><i class="fas fa-mountain"></i> My Journey <span class="badge ml-auto bg-purple-500/20 text-purple-300 text-xs px-2 py-0.5 rounded-full" id="journey-badge-mob">0%</span></button>
+            <button onclick="switchTab('settings')" id="nav-settings-mob" class="nav-item"><i class="fas fa-cog"></i> Settings</button>
+        </div>
+    </div>
+
+    <!-- ONBOARDING OVERLAY -->
     <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
             <div class="step-indicator">
@@ -110,7 +159,7 @@
                 <div class="step-dot" id="step-dot-4"></div>
             </div>
 
-            <!-- STEP 1: QUIZ -->
+            <!-- STEP 1 -->
             <div id="onboarding-step-1" class="onboarding-step active">
                 <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
@@ -145,10 +194,10 @@
                 </div>
             </div>
 
-            <!-- STEP 2: DOCUMENT -->
+            <!-- STEP 2 -->
             <div id="onboarding-step-2" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📄</span><h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2></div>
-                <p class="text-slate-400 mb-4">Review your AI-generated strategy document.</p>
+                <p class="text-slate-400 mb-4">Review your AI‑generated strategy document.</p>
                 <div id="strategy-document-container" class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">Loading...</div>
                 <div class="mt-4 flex gap-3">
                     <button onclick="regenerateStrategy()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">🔄 Regenerate</button>
@@ -156,7 +205,7 @@
                 </div>
             </div>
 
-            <!-- STEP 3: PROOF UPLOAD -->
+            <!-- STEP 3 -->
             <div id="onboarding-step-3" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📸</span><h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2></div>
                 <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
@@ -168,11 +217,11 @@
                 <div id="proof-list" class="flex flex-wrap gap-2 mt-3"></div>
                 <div class="flex gap-3 mt-4">
                     <button onclick="goToStep(4)" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">⏭️ Skip & Continue</button>
-                    <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">🚀 Start My 90-Day Journey</button>
+                    <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">🚀 Start My 90‑Day Journey</button>
                 </div>
             </div>
 
-            <!-- STEP 4: CONFIRMATION -->
+            <!-- STEP 4 -->
             <div id="onboarding-step-4" class="onboarding-step">
                 <div class="text-center py-8">
                     <div class="text-6xl mb-4">🎉</div>
@@ -190,50 +239,31 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    MAIN APP
-    ============================================================ -->
+    <!-- MAIN APP -->
     <div id="app" class="flex flex-col h-screen hidden">
 
         <!-- HEADER -->
-        <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-6 flex items-center justify-between flex-shrink-0">
-            <div class="flex items-center gap-4">
+        <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-4 md:px-6 py-4 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white text-xl"><i class="fas fa-bars"></i></button>
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm">E5</div>
-                <div>
-                    <h1 class="font-semibold text-white text-lg">Whop Creator OS</h1>
-                    <p id="header-context" class="text-xs text-slate-500">Loading context...</p>
-                </div>
+                <div><h1 class="font-semibold text-white text-lg">Whop Creator OS</h1><p id="header-context" class="text-xs text-slate-500">Loading context...</p></div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 text-sm"><span class="text-orange-500">🔥</span><span id="streak-display" class="font-medium text-slate-300">0 days</span></div>
                 <div class="flex items-center gap-2 text-sm"><span class="text-yellow-500">⭐</span><span id="xp-display" class="font-medium text-slate-300">0 XP</span></div>
-                <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                    <i class="fas fa-clipboard-check"></i> Submit Work
-                </button>
+                <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"><i class="fas fa-clipboard-check"></i><span class="hidden sm:inline">Submit Work</span></button>
             </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
-            <!-- SIDEBAR -->
-            <nav class="w-64 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
+            <!-- SIDEBAR DESKTOP -->
+            <nav class="sidebar-desktop w-64 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
                 <div class="space-y-1">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
-                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                        <span>Dashboard</span>
-                    </button>
-                    <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
-                        <span class="icon"><i class="fas fa-comments"></i></span>
-                        <span>AI Coach</span>
-                    </button>
-                    <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
-                        <span class="icon"><i class="fas fa-mountain"></i></span>
-                        <span>My Journey</span>
-                        <span class="badge" id="journey-badge">0%</span>
-                    </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
-                        <span class="icon"><i class="fas fa-cog"></i></span>
-                        <span>Settings</span>
-                    </button>
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active"><i class="fas fa-chart-bar"></i> Dashboard</button>
+                    <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item"><i class="fas fa-comments"></i> AI Coach</button>
+                    <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item"><i class="fas fa-mountain"></i> My Journey <span class="badge" id="journey-badge">0%</span></button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item"><i class="fas fa-cog"></i> Settings</button>
                 </div>
                 <div class="mt-auto pt-4 border-t border-slate-800/50">
                     <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Progress</div>
@@ -248,64 +278,37 @@
             </nav>
 
             <!-- MAIN CONTENT -->
-            <main class="flex-1 overflow-y-auto p-6 bg-[#0a0e1a]/30">
-                <!-- DASHBOARD -->
-                <div id="tab-dashboard" class="tab-content active">
-                    <div id="dashboard-content" class="space-y-6"></div>
-                </div>
-
-                <!-- CHAT -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0a0e1a]/30">
+                <div id="tab-dashboard" class="tab-content active"><div id="dashboard-content" class="space-y-6"></div></div>
                 <div id="tab-chat" class="tab-content">
                     <div class="flex flex-col h-full">
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
                         <div class="flex gap-3 pt-4 border-t border-slate-800/50">
                             <input type="text" id="chat-input" placeholder="Ask your AI Coach..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') sendMessage()">
-                            <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-lg text-white font-medium transition">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                            <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-lg text-white font-medium transition"><i class="fas fa-paper-plane"></i></button>
                         </div>
-                        <div id="typing-indicator" class="hidden py-2">
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                            <span class="typing-dot"></span>
-                            <span class="text-slate-400 text-sm ml-2">AI is thinking...</span>
-                        </div>
+                        <div id="typing-indicator" class="hidden py-2"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span><span class="text-slate-400 text-sm ml-2">AI is thinking...</span></div>
                     </div>
                 </div>
-
-                <!-- JOURNEY -->
-                <div id="tab-journey" class="tab-content">
-                    <div id="journey-content" class="space-y-6"></div>
-                </div>
-
-                <!-- SETTINGS -->
+                <div id="tab-journey" class="tab-content"><div id="journey-content" class="space-y-6"></div></div>
                 <div id="tab-settings" class="tab-content">
                     <div class="max-w-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
                         <div class="space-y-6">
-                            <!-- Profile -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">Business Profile</h3>
                                 <div class="space-y-4">
-                                    <div><label class="block text-sm text-slate-400 mb-1">Business Name</label>
-                                        <input type="text" id="profile-business" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                                    </div>
-                                    <div><label class="block text-sm text-slate-400 mb-1">Niche</label>
-                                        <input type="text" id="profile-niche" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                                    </div>
-                                    <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label>
-                                        <input type="text" id="profile-avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                                    </div>
+                                    <div><label class="block text-sm text-slate-400 mb-1">Business Name</label><input type="text" id="profile-business" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                                    <div><label class="block text-sm text-slate-400 mb-1">Niche</label><input type="text" id="profile-niche" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                                    <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label><input type="text" id="profile-avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
                                     <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition"><i class="fas fa-save"></i> Save Profile</button>
                                 </div>
                             </div>
-                            <!-- Wins -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
                                 <button onclick="openWinModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition mb-4">➕ Record a Win</button>
                                 <div id="wins-list" class="space-y-2 text-sm"></div>
                             </div>
-                            <!-- RE-ENGAGEMENT NOTIFICATIONS -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">📨 Notifications</h3>
                                 <p class="text-sm text-slate-400 mb-4">Test the re‑engagement notification system.</p>
@@ -319,34 +322,18 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    STANDUP MODAL
-    ============================================================ -->
+    <!-- MODALS -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
-                <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">📋 Daily Standup</h3><button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
             <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
             <div class="space-y-3">
-                <div><label class="block text-sm text-slate-400 mb-1">Tasks completed today</label>
-                    <input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                <div><label class="block text-sm text-slate-400 mb-1">Tasks completed today</label><input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-sm text-slate-400 mb-1">Links to your work</label><input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-sm text-slate-400 mb-1">Paste your work content</label><textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
+                    <div class="flex justify-between text-xs mt-1"><span class="text-slate-500">Minimum 100 characters</span><span id="char-counter" class="char-counter mid">0/100</span></div>
                 </div>
-                <div><label class="block text-sm text-slate-400 mb-1">Links to your work</label>
-                    <input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Paste your work content</label>
-                    <textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
-                    <div class="flex justify-between text-xs mt-1">
-                        <span class="text-slate-500">Minimum 100 characters</span>
-                        <span id="char-counter" class="char-counter mid">0/100</span>
-                    </div>
-                </div>
-                <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label>
-                    <input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                </div>
+                <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label><input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
                 <div id="standup-progress" class="standup-progress" style="display:none;"><div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div></div>
                 <button onclick="submitStandup()" id="standup-submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Submit for Review</button>
                 <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
@@ -358,7 +345,6 @@
         </div>
     </div>
 
-    <!-- WIN MODAL -->
     <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
             <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">🏆 Record a Win</h3><button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
@@ -370,7 +356,6 @@
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
     <script>
@@ -385,16 +370,32 @@
         let currentStep = 1;
 
         // ============================================================
-        // SIDEBAR NAVIGATION
+        // SIDEBAR
         // ============================================================
+        function toggleSidebar() {
+            document.getElementById('sidebar-mobile').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('show');
+        }
+
         function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).classList.add('active');
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Show selected
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) target.classList.add('active');
+            // Update desktop sidebar
             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-            document.getElementById(`nav-${tabName}`).classList.add('active');
+            const nav = document.getElementById(`nav-${tabName}`);
+            if (nav) nav.classList.add('active');
+            // Update mobile sidebar
+            document.querySelectorAll('#sidebar-mobile .nav-item').forEach(item => item.classList.remove('active'));
+            const navMob = document.getElementById(`nav-${tabName}-mob`);
+            if (navMob) navMob.classList.add('active');
+            // Load content
             if (tabName === 'dashboard') loadDashboard();
             if (tabName === 'journey') loadJourney();
             if (tabName === 'settings') { loadProfile(); loadWins(); }
+            if (window.innerWidth < 769) toggleSidebar();
         }
 
         // ============================================================
@@ -445,11 +446,12 @@
         // ============================================================
         function showStep(step) {
             document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
-            document.getElementById(`onboarding-step-${step}`).classList.add('active');
+            const el = document.getElementById(`onboarding-step-${step}`);
+            if (el) el.classList.add('active');
             document.querySelectorAll('.step-dot').forEach((dot, i) => {
-                dot.classList.remove('active', 'done');
-                if (i + 1 === step) dot.classList.add('active');
-                else if (i + 1 < step) dot.classList.add('done');
+                dot.classList.remove('active','done');
+                if (i+1 === step) dot.classList.add('active');
+                else if (i+1 < step) dot.classList.add('done');
             });
             currentStep = step;
         }
@@ -534,14 +536,17 @@
             const container = document.getElementById('dashboard-content');
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">${[...Array(4)].map(() => `<div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`).join('')}</div>
-                    <div class="skeleton-card"><div class="skeleton-line"></div></div>
-                    <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
+                    <div class="skeleton h-12 w-full"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${[...Array(4)].map(() => `<div class="skeleton h-20 w-full"></div>`).join('')}
+                    </div>
+                    <div class="skeleton h-8 w-full"></div>
+                    <div class="skeleton h-32 w-full"></div>
                 </div>
             `;
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 journeyData = await res.json();
                 const traj = journeyData.trajectory || { status: 'on_track', message: 'Loading...', color: 'blue' };
                 const trajClass = { green: 'trajectory-banner-green', yellow: 'trajectory-banner-yellow', blue: 'trajectory-banner-blue' }[traj.color] || 'trajectory-banner-blue';
@@ -552,7 +557,7 @@
                 const activities = [];
                 if (journeyData.standup_count > 0) activities.push({ icon: '📝', color: 'purple', text: `<strong>Standup graded</strong> — ${journeyData.avg_score || 0}/10`, time: 'Today' });
                 if (tasksDone > 0) activities.push({ icon: '🎯', color: 'green', text: `<strong>Task completed</strong> — ${journeyData.current_task.name}`, time: 'Recently' });
-                if (journeyData.wins && journeyData.wins.length > 0) activities.push({ icon: '🏆', color: 'yellow', text: `<strong>Win recorded</strong> — ${journeyData.wins[0].win_text?.slice(0, 40) || 'New win!'}`, time: 'Recent' });
+                if (journeyData.wins && journeyData.wins.length > 0) activities.push({ icon: '🏆', color: 'yellow', text: `<strong>Win recorded</strong> — ${journeyData.wins[0].win_text?.slice(0,40) || 'New win!'}`, time: 'Recent' });
 
                 container.innerHTML = `
                     <div class="${trajClass} rounded-lg p-4"><span class="text-sm font-medium">${trajIcon} ${traj.message}</span></div>
@@ -586,8 +591,15 @@
                 `;
                 updateSidebarStats();
             } catch (e) {
-                container.innerHTML = `<div class="text-red-400 text-center">Error loading dashboard</div>`;
-                console.error(e);
+                console.error('Dashboard error:', e);
+                container.innerHTML = `
+                    <div class="text-red-400 text-center p-8">
+                        <div class="text-4xl mb-2">⚠️</div>
+                        <p>Error loading dashboard</p>
+                        <p class="text-sm text-slate-500">${e.message}</p>
+                        <button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button>
+                    </div>
+                `;
             }
         }
 
@@ -596,9 +608,10 @@
         // ============================================================
         async function loadJourney() {
             const container = document.getElementById('journey-content');
-            container.innerHTML = '<div class="text-slate-400">Loading journey...</div>';
+            container.innerHTML = '<div class="skeleton h-64 w-full"></div>';
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 journeyData = await res.json();
                 const tasksDone = journeyData.tasks_completed_count || 0;
                 const totalTasks = 12;
@@ -631,7 +644,7 @@
                 `;
                 updateSidebarStats();
             } catch (e) {
-                container.innerHTML = `<div class="text-red-400">Error loading journey</div>`;
+                container.innerHTML = `<div class="text-red-400">Error loading journey: ${e.message}</div>`;
             }
         }
 
@@ -644,6 +657,9 @@
             if (!text) return;
             switchTab('chat');
             const messagesDiv = document.getElementById('chat-messages');
+            // Remove empty placeholder if present
+            const empty = messagesDiv.querySelector('.text-center');
+            if (empty) empty.remove();
             const userDiv = document.createElement('div');
             userDiv.className = 'flex gap-3 flex-row-reverse';
             userDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">You</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${text}</div>`;
@@ -811,9 +827,15 @@
                     document.getElementById('profile-business').value = data.profile.business_name || '';
                     document.getElementById('profile-niche').value = data.profile.niche || '';
                     document.getElementById('profile-avatar').value = data.profile.target_avatar || '';
+                    document.getElementById('header-context').textContent = `${data.profile.target_avatar || ''} | Bottleneck: ${data.profile.biggest_bottleneck || ''}`;
+                } else {
+                    // Force show onboarding if profile missing
+                    document.getElementById('gatekeeper').style.display = 'flex';
+                    document.getElementById('app').classList.add('hidden');
                 }
             } catch (e) { console.error(e); }
         }
+
         async function saveProfile() {
             const payload = {
                 member_id: MEMBER_ID,
@@ -882,6 +904,35 @@
             document.getElementById('header-xp').textContent = `${xp} XP`;
             document.getElementById('side-progress').style.width = `${progress}%`;
             document.getElementById('journey-badge').textContent = `${progress}%`;
+            document.getElementById('journey-badge-mob').textContent = `${progress}%`;
+        }
+
+        // ============================================================
+        // APPEND MESSAGE (used by init)
+        // ============================================================
+        function appendMessage(role, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const empty = messagesDiv.querySelector('.text-center');
+            if (empty) empty.remove();
+            const div = document.createElement('div');
+            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            const avatar = role === 'ai' ? 'AI' : 'You';
+            const avatarClass = role === 'ai' ? 'bg-purple-600' : 'bg-blue-600';
+            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            div.innerHTML = `<div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center font-bold text-xs flex-shrink-0">${avatar}</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${formatted}</div>`;
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ============================================================
+        // CHARACTER COUNTER
+        // ============================================================
+        function updateCharCounter() {
+            const text = document.getElementById('s-text').value;
+            const count = text.length;
+            const counter = document.getElementById('char-counter');
+            counter.textContent = `${count}/100`;
+            counter.className = 'char-counter ' + (count < 100 ? 'under' : count < 200 ? 'mid' : 'over');
         }
 
         // ============================================================
@@ -912,29 +963,19 @@
                         appendMessage('ai', welcome);
                     }, 500);
                 }
-            } catch (e) { console.error('Init error:', e); }
-        }
-
-        // ===== Wrapper for chat appendMessage (needed for init welcome) =====
-        function appendMessage(role, text) {
-            const messagesDiv = document.getElementById('chat-messages');
-            const div = document.createElement('div');
-            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
-            const avatar = role === 'ai' ? 'AI' : 'You';
-            const avatarClass = role === 'ai' ? 'bg-purple-600' : 'bg-blue-600';
-            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-            div.innerHTML = `<div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center font-bold text-xs flex-shrink-0">${avatar}</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${formatted}</div>`;
-            messagesDiv.appendChild(div);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // ===== char counter for standup =====
-        function updateCharCounter() {
-            const text = document.getElementById('s-text').value;
-            const count = text.length;
-            const counter = document.getElementById('char-counter');
-            counter.textContent = `${count}/100`;
-            counter.className = 'char-counter ' + (count < 100 ? 'under' : count < 200 ? 'mid' : 'over');
+            } catch (e) {
+                console.error('Init error:', e);
+                // Show a retry button if init fails
+                document.getElementById('gatekeeper').style.display = 'flex';
+                document.getElementById('gatekeeper').innerHTML = `
+                    <div class="glass rounded-2xl p-8 text-center">
+                        <div class="text-4xl mb-4">⚠️</div>
+                        <h2 class="text-2xl font-bold text-red-400 mb-2">Connection Error</h2>
+                        <p class="text-slate-400 mb-6">Could not connect to the server. Please check your internet or try again later.</p>
+                        <button onclick="location.reload()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg transition">🔄 Retry</button>
+                    </div>
+                `;
+            }
         }
 
         init();
