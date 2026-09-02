@@ -30,14 +30,14 @@
             color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px;
         }
 
-        /* ===== TOAST (IMPROVED) ===== */
+        /* ===== TOAST ===== */
         .toast-container {
             position: fixed; bottom: 24px; right: 24px; z-index: 9999;
             display: flex; flex-direction: column; gap: 12px;
-            pointer-events: none; /* allows clicks to pass through container */
+            pointer-events: none;
         }
         .toast {
-            pointer-events: auto; /* allow clicking close button */
+            pointer-events: auto;
             padding: 14px 20px; border-radius: 12px; color: white; font-size: 14px;
             max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
             animation: slideInRight 0.35s ease forwards;
@@ -47,13 +47,8 @@
             opacity: 0;
             position: relative;
         }
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        .toast.hide {
-            animation: slideOutRight 0.3s ease forwards;
-        }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        .toast.hide { animation: slideOutRight 0.3s ease forwards; }
         .toast-success { background: rgba(34,197,94,0.95); border-left-color: #22c55e; }
         .toast-warning { background: rgba(234,179,8,0.95); border-left-color: #eab308; }
         .toast-error { background: rgba(239,68,68,0.95); border-left-color: #ef4444; }
@@ -145,6 +140,17 @@
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .skeleton-line { height: 12px; margin-bottom: 8px; }
         .skeleton-line.short { width: 60%; }
+
+        /* Deliverable checklist */
+        .deliverable-checklist { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.06); }
+        .deliverable-checklist label { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: #cbd5e1; cursor: pointer; }
+        .deliverable-checklist label:hover { color: #f1f5f9; }
+        .deliverable-checklist input[type="checkbox"] { accent-color: #8b5cf6; width: 16px; height: 16px; cursor: pointer; }
+
+        /* Proof files list */
+        .proof-file { display: inline-flex; align-items: center; gap: 6px; background: rgba(139,92,246,0.15); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(139,92,246,0.2); }
+        .proof-file .remove { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+        .proof-file .remove:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -190,16 +196,18 @@
             <div id="onboarding-step-1" class="onboarding-step active">
                 <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
-                <p class="text-slate-400 mb-6">3 quick questions to personalize your journey.</p>
+                <p class="text-slate-400 mb-6">4 quick questions to personalize your journey.</p>
                 <div class="space-y-4">
-                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
                         <select id="onboarding-stage" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
                             <option value="idea">💡 Just an idea</option>
                             <option value="product" selected>📦 I have a product/offer</option>
                             <option value="selling">💰 I'm already selling</option>
                         </select>
                     </div>
-                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge?</label>
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge?</label>
                         <select id="onboarding-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
                             <option value="traffic">📢 Getting traffic / leads</option>
                             <option value="conversion">🔄 Converting leads to sales</option>
@@ -210,11 +218,23 @@
                             <option value="other">❓ Other</option>
                         </select>
                     </div>
-                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
                         <select id="onboarding-hours" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
                             <option value="1-3">🕐 1-3 hours (Reflective)</option>
                             <option value="4-7" selected>🕒 4-7 hours (Steady)</option>
                             <option value="8+">⚡ 8+ hours (Accelerator)</option>
+                        </select>
+                    </div>
+                    <!-- NEW: Primary Traffic Source -->
+                    <div>
+                        <label class="block text-sm text-slate-300 mb-2 font-medium">4. What's your primary traffic source?</label>
+                        <select id="onboarding-traffic" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="content">📝 Content (YouTube, TikTok, Blog, Podcast)</option>
+                            <option value="dms">💬 Direct Messages / Outbound</option>
+                            <option value="paid">💰 Paid Ads</option>
+                            <option value="partnerships">🤝 Partnerships & Referrals</option>
+                            <option value="mixed" selected>🔀 Mixed (all of the above)</option>
                         </select>
                     </div>
                     <button onclick="generateStrategy()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Generate My Strategy Document</button>
@@ -258,6 +278,7 @@
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Stage:</span> <span id="confirm-stage">—</span></div>
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Bottleneck:</span> <span id="confirm-bottleneck">—</span></div>
                         <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Speed:</span> <span id="confirm-speed">—</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Traffic:</span> <span id="confirm-traffic">—</span></div>
                         <div class="flex justify-between py-1"><span class="text-slate-500">Starting Day:</span> <span id="confirm-day">—</span></div>
                     </div>
                     <button onclick="completeOnboarding()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg transition mt-6">🚀 Enter Your AI Coach</button>
@@ -349,20 +370,62 @@
         </div>
     </div>
 
-    <!-- STANDUP MODAL -->
+    <!-- STANDUP MODAL (with File Upload & Deliverable Checklist) -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">📋 Daily Standup</h3><button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
+                <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
             <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
             <div class="space-y-3">
-                <div><label class="block text-sm text-slate-400 mb-1">Tasks completed today</label><input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
-                <div><label class="block text-sm text-slate-400 mb-1">Links to your work</label><input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
-                <div><label class="block text-sm text-slate-400 mb-1">Paste your work content</label><textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
-                    <div class="flex justify-between text-xs mt-1"><span class="text-slate-500">Minimum 100 characters</span><span id="char-counter" class="char-counter mid">0/100</span></div>
+                <!-- Tasks completed -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Tasks completed today</label>
+                    <input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
                 </div>
-                <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label><input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
-                <div id="standup-progress" class="standup-progress" style="display:none;"><div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div></div>
+                <!-- Links -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Links to your work</label>
+                    <input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <!-- Work content -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Paste your work content</label>
+                    <textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
+                    <div class="flex justify-between text-xs mt-1">
+                        <span class="text-slate-500">Minimum 100 characters</span>
+                        <span id="char-counter" class="char-counter mid">0/100</span>
+                    </div>
+                </div>
+                <!-- Metrics -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label>
+                    <input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <!-- NEW: File Upload -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Upload Proof (Screenshot, PDF, Document)</label>
+                    <input type="file" id="s-proof" multiple accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500" onchange="handleStandupProof(event)">
+                    <div id="s-proof-list" class="flex flex-wrap gap-2 mt-2"></div>
+                </div>
+                <!-- NEW: Deliverable Checklist -->
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Confirm all deliverables</label>
+                    <div id="deliverable-checklist" class="deliverable-checklist">
+                        <!-- Will be dynamically filled from current task -->
+                    </div>
+                    <div id="deliverable-missing" style="display:none" class="text-red-400 text-sm mt-2">
+                        ⚠️ You must check all deliverables before submitting.
+                    </div>
+                </div>
+                <!-- Progress -->
+                <div id="standup-progress" class="standup-progress" style="display:none;">
+                    <div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div>
+                </div>
+                <!-- Submit -->
                 <button onclick="submitStandup()" id="standup-submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Submit for Review</button>
+                <!-- Review result -->
                 <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                     <div id="review-score" class="text-2xl font-bold text-center"></div>
                     <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
@@ -396,6 +459,7 @@
         let journeyData = null;
         let strategyDocument = '';
         let uploadedFiles = [];
+        let proofFiles = [];
         let currentStep = 1;
 
         // ===== SAFE DOM HELPERS =====
@@ -429,18 +493,11 @@
             if (window.innerWidth < 769) toggleSidebar();
         }
 
-        // ===== NEW & IMPROVED TOAST SYSTEM =====
+        // ===== TOAST SYSTEM =====
         function showToast(message, type = 'success') {
             const container = getEl('toast-container');
             if (!container) return;
-
-            const icons = {
-                success: '✅',
-                warning: '⚠️',
-                error: '❌',
-                info: 'ℹ️'
-            };
-
+            const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `
@@ -448,30 +505,14 @@
                 <span class="toast-content">${message}</span>
                 <button class="toast-close" aria-label="Close notification">×</button>
             `;
-
-            // Add to container
             container.appendChild(toast);
-
-            // Trigger entrance animation
-            requestAnimationFrame(() => {
-                toast.classList.add('show');
-            });
-
-            // Close button
+            requestAnimationFrame(() => { toast.classList.add('show'); });
             const closeBtn = toast.querySelector('.toast-close');
             if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    dismissToast(toast);
-                });
+                closeBtn.addEventListener('click', () => { dismissToast(toast); });
             }
-
-            // Auto-dismiss after 4 seconds (or 6 for errors)
             const delay = type === 'error' ? 6000 : 4000;
-            const timer = setTimeout(() => {
-                dismissToast(toast);
-            }, delay);
-
-            // Store timer so we can clear it if manually dismissed
+            const timer = setTimeout(() => { dismissToast(toast); }, delay);
             toast._timer = timer;
         }
 
@@ -481,9 +522,7 @@
             clearTimeout(toast._timer);
             toast.classList.remove('show');
             toast.classList.add('hide');
-            setTimeout(() => {
-                if (toast.parentNode) toast.parentNode.removeChild(toast);
-            }, 400);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
         }
 
         // ===== CELEBRATION =====
@@ -535,12 +574,13 @@
             const stage = getEl('onboarding-stage')?.value || 'product';
             const bottleneck = getEl('onboarding-bottleneck')?.value || 'traffic';
             const hours = getEl('onboarding-hours')?.value || '4-7';
+            const traffic = getEl('onboarding-traffic')?.value || 'mixed';
             const btn = event.target;
             if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating...'; }
             try {
                 const res = await fetch(`${API}/api/generate-strategy`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours })
+                    body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours, primary_traffic_source: traffic })
                 });
                 const data = await res.json();
                 strategyDocument = data.document;
@@ -549,6 +589,7 @@
                 localStorage.setItem('strategy_document', data.document);
                 localStorage.setItem('starting_day', data.starting_day);
                 localStorage.setItem('speed_profile', data.speed_profile);
+                localStorage.setItem('primary_traffic_source', traffic);
                 showStep(2);
                 showToast('✅ Strategy document generated!', 'success');
             } catch (error) {
@@ -565,8 +606,8 @@
             for (let file of files) {
                 uploadedFiles.push(file);
                 const div = document.createElement('div');
-                div.className = 'bg-slate-800 text-xs text-slate-300 px-3 py-1 rounded-full flex items-center gap-2';
-                div.innerHTML = `📎 ${file.name} <span class="text-green-400">✅</span>`;
+                div.className = 'proof-file';
+                div.innerHTML = `📎 ${file.name} <span class="remove" onclick="this.parentElement.remove()">×</span>`;
                 list.appendChild(div);
             }
         }
@@ -578,19 +619,22 @@
                 const stage = getEl('onboarding-stage')?.value || 'product';
                 const bottleneck = getEl('onboarding-bottleneck')?.value || 'traffic';
                 const hours = getEl('onboarding-hours')?.value || '4-7';
+                const traffic = getEl('onboarding-traffic')?.value || 'mixed';
                 const res = await fetch(`${API}/api/complete-onboarding`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         member_id: MEMBER_ID, stage, bottleneck, hours,
                         strategy_document: strategyDocument,
                         starting_day: parseInt(localStorage.getItem('starting_day')) || 1,
-                        speed_profile: localStorage.getItem('speed_profile') || 'steady'
+                        speed_profile: localStorage.getItem('speed_profile') || 'steady',
+                        primary_traffic_source: traffic
                     })
                 });
                 const data = await res.json();
                 setText('confirm-stage', stage);
                 setText('confirm-bottleneck', bottleneck);
                 setText('confirm-speed', localStorage.getItem('speed_profile') || 'steady');
+                setText('confirm-traffic', traffic);
                 setText('confirm-day', localStorage.getItem('starting_day') || 1);
                 showStep(4);
                 showToast('🎉 Onboarding complete!', 'success');
@@ -772,7 +816,22 @@
             }
         }
 
-        // ===== STANDUP (with auto-toast) =====
+        // ===== STANDUP (with deliverable checklist & file upload) =====
+        let standupProofFiles = [];
+
+        function handleStandupProof(event) {
+            const files = event.target.files;
+            const list = getEl('s-proof-list');
+            if (!list) return;
+            for (let file of files) {
+                standupProofFiles.push(file);
+                const div = document.createElement('div');
+                div.className = 'proof-file';
+                div.innerHTML = `📎 ${file.name} <span class="remove" onclick="this.parentElement.remove(); standupProofFiles = standupProofFiles.filter(f => f.name !== '${file.name}')">×</span>`;
+                list.appendChild(div);
+            }
+        }
+
         function openStandup() {
             if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
             const modal = getEl('standup-modal');
@@ -789,13 +848,38 @@
             if (progress) progress.style.display = 'none';
             const btn = getEl('standup-submit-btn');
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Submit for Review'; }
+            // Reset proof files list
+            const proofList = getEl('s-proof-list');
+            if (proofList) proofList.innerHTML = '';
+            standupProofFiles = [];
+            // Reset deliverable checklist
+            const checklist = getEl('deliverable-checklist');
+            if (checklist && journeyData) {
+                const deliverables = journeyData.current_task.deliverables || [];
+                checklist.innerHTML = deliverables.map(d => `
+                    <label><input type="checkbox" class="deliverable-check" value="${d.replace(/"/g, '&quot;')}"> ${d}</label>
+                `).join('');
+            }
+            const missing = getEl('deliverable-missing');
+            if (missing) missing.style.display = 'none';
         }
+
         function closeStandup() {
             const modal = getEl('standup-modal');
             if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
         }
 
         async function submitStandup() {
+            // Validate deliverables
+            const checks = document.querySelectorAll('.deliverable-check');
+            let allChecked = true;
+            checks.forEach(c => { if (!c.checked) allChecked = false; });
+            if (!allChecked) {
+                const missing = getEl('deliverable-missing');
+                if (missing) missing.style.display = 'block';
+                showToast('⚠️ Please check all deliverables before submitting.', 'warning');
+                return;
+            }
             const textArea = getEl('s-text');
             const textContent = textArea ? textArea.value.trim() : '';
             if (textContent.length < 100) { showToast('⚠️ Please add at least 100 characters.', 'warning'); return; }
@@ -803,13 +887,16 @@
             const tasksEl = getEl('s-tasks');
             const linksEl = getEl('s-links');
             const metricsEl = getEl('s-metrics');
+            // Convert proof files to base64 or just track filenames (simplified)
+            const proofData = standupProofFiles.map(f => ({ filename: f.name, data: 'file' }));
             const payload = {
                 member_id: MEMBER_ID,
                 current_task_id: journeyData.current_task.id,
                 tasks_completed: tasksEl ? tasksEl.value.split(',').filter(s => s.trim()) : [],
                 asset_links: linksEl ? linksEl.value.split(',').filter(s => s.trim()) : [],
                 asset_text: textContent,
-                metrics: metricsEl ? metricsEl.value : ''
+                metrics: metricsEl ? metricsEl.value : '',
+                proof_files: proofData
             };
             const btn = getEl('standup-submit-btn');
             if (btn) { btn.innerText = '⏳ Grading...'; btn.disabled = true; }
@@ -845,29 +932,22 @@
                 if (metricsEl) metricsEl.value = '';
                 const counter = getEl('char-counter');
                 if (counter) { counter.textContent = '0/100'; counter.className = 'char-counter under'; }
+                // Clear proof list
+                const proofList = getEl('s-proof-list');
+                if (proofList) proofList.innerHTML = '';
+                standupProofFiles = [];
                 await loadDashboard();
                 await loadJourney();
-
-                // ---- AUTO-TOAST NOTIFICATIONS ----
                 if (data.task_unlocked && data.score >= 7) {
-                    // Task approved → celebration + toast
                     const nextTask = journeyData?.all_phases?.[journeyData.current_phase]?.tasks?.find(t => !t.completed);
                     const nextTaskName = nextTask ? nextTask.name : 'Phase 2 unlocked!';
                     showCelebration(`✅ Score: ${data.score}/10! Task complete!`, nextTaskName, data.xp_gained || 125, data.streak || 0);
                     showToast(`🎉 Task complete! +${data.xp_gained} XP`, 'success');
-                    // Also show next task in toast after celebration
-                    setTimeout(() => {
-                        showToast(`Next: ${nextTaskName}`, 'info');
-                    }, 2000);
+                    setTimeout(() => { showToast(`Next: ${nextTaskName}`, 'info'); }, 2000);
                 } else if (data.score >= 7) {
-                    // Good grade, no task unlock yet (might be a resubmission)
                     showToast(`✅ Score: ${data.score}/10! +${data.xp_gained} XP`, 'success');
-                    // Streak at risk? Check if streak is 0 or low? We can show if streak is 1 and score < 7, but let's just show warning if score < 7.
                 } else {
-                    // Score < 7 → warning
                     showToast(`📝 Score: ${data.score}/10. Review the feedback.`, 'warning');
-                    // If streak is about to reset (streak=0 and they had previous streak), but we don't track that easily.
-                    // We can show a generic "keep going" message.
                     if (data.streak === 0 && journeyData.streak > 0) {
                         showToast(`⚠️ Your streak reset! Stay consistent.`, 'warning');
                     }
@@ -880,7 +960,7 @@
             if (btn) { btn.innerText = '🚀 Submit for Review'; btn.disabled = false; }
         }
 
-        // ===== WINS (with auto-toast) =====
+        // ===== WINS =====
         function openWinModal() {
             const modal = getEl('win-modal');
             if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
@@ -967,6 +1047,7 @@
                 target_avatar: avatar ? avatar.value : '',
                 core_offer: '', current_revenue: 0, revenue_goal: 10000,
                 biggest_bottleneck: '', current_level: 'beginner', weekly_hours: '4-7',
+                primary_traffic_source: 'mixed',
                 offer_done: false, audience_done: false, sales_done: false, launch_done: false
             };
             try {
@@ -1018,7 +1099,6 @@
             const sideProgress = getEl('side-progress');
             const badge = getEl('journey-badge');
             const badgeMob = getEl('journey-badge-mob');
-
             if (sideStreak) sideStreak.textContent = `${streak} days`;
             if (headerStreak) headerStreak.textContent = `${streak} days`;
             if (sideScore) sideScore.textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
@@ -1084,9 +1164,8 @@
                     await loadJourney();
                     await loadWins();
                     switchTab('dashboard');
-
                     setTimeout(() => {
-                        const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
+                        const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\nYour primary traffic source: **${data.profile?.primary_traffic_source || 'mixed'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
                         appendMessage('ai', welcome);
                     }, 500);
                 }
