@@ -5,12 +5,13 @@ import threading
 import urllib.request
 import json
 import re
+import base64
 from typing import List, Optional, Dict
 from datetime import datetime, date
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 # ============================================================
 # LOGGING & ENV
@@ -18,7 +19,7 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA — use the working model
+# NVIDIA — using the proven working model
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -82,11 +83,11 @@ WINS_DB = {}
 SCORES_DB = {}
 PROOF_DB = {}
 
-app = FastAPI(title="E5 AI Coach OS", version="5.4")
+app = FastAPI(title="E5 AI Coach OS", version="5.5")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # ============================================================
-# JOURNEY MAP (12 tasks)
+# JOURNEY MAP (12 tasks) — UNCHANGED
 # ============================================================
 JOURNEY_MAP = {
     "Phase 1": {
@@ -119,7 +120,7 @@ JOURNEY_MAP = {
 }
 
 # ============================================================
-# DATABASE HELPERS
+# DATABASE HELPERS — UNCHANGED
 # ============================================================
 def db_get_profile(member_id):
     try:
@@ -315,7 +316,7 @@ def send_re_engagement_notification(member):
     return False
 
 # ============================================================
-# NVIDIA LLM
+# NVIDIA LLM — UNCHANGED
 # ============================================================
 def call_llm(messages, temperature=0.3):
     if not NVIDIA_API_KEY: return "Error: No NVIDIA API key"
@@ -332,7 +333,7 @@ def call_llm(messages, temperature=0.3):
     return "Error: Service unavailable"
 
 # ============================================================
-# PYDANTIC MODELS
+# PYDANTIC MODELS — UNCHANGED
 # ============================================================
 class ChatMessage(BaseModel): role: str; content: str
 class ChatRequest(BaseModel): message: str = ""; history: List[ChatMessage] = []; mode: str = "coach"; member_id: Optional[str] = "default"
@@ -356,7 +357,7 @@ class StrategyRequest(BaseModel): member_id: str; stage: str; bottleneck: str; h
 class CompleteOnboardingRequest(BaseModel): member_id: str; stage: str; bottleneck: str; hours: str; strategy_document: str; starting_day: int; speed_profile: str; primary_traffic_source: str = "content"
 
 # ============================================================
-# HELPERS
+# HELPERS — UNCHANGED
 # ============================================================
 def get_current_task(journey):
     phase_info = JOURNEY_MAP[journey["current_phase"]]
@@ -384,16 +385,14 @@ def calculate_trajectory(journey):
     else: return {"status": "on_track", "message": "✅ You're on track.", "color": "blue"}
 
 # ============================================================
-# ROUTES
+# EXISTING ROUTES — UNCHANGED
 # ============================================================
 
 # --- LANDING PAGE AND APP ---
 @app.get("/")
 async def landing_page():
-    """Serve the landing page at the root."""
     if os.path.exists("index.html"):
         return FileResponse("index.html")
-    # Fallback: if index.html doesn't exist, serve the app
     if os.path.exists("chat_test.html"):
         return FileResponse("chat_test.html")
     return {"status": "ok", "message": "Welcome to E5 AI Coach OS"}
@@ -402,12 +401,10 @@ async def landing_page():
 @app.get("/chat.html")
 @app.get("/app")
 async def serve_app():
-    """Serve the main app at /chat."""
     if os.path.exists("chat_test.html"):
         return FileResponse("chat_test.html")
     return {"status": "ok", "message": "App not found"}
 
-# Keep legacy route for backward compatibility
 @app.get("/onboarding.html")
 async def onboarding_page():
     if os.path.exists("chat_test.html"):
@@ -417,7 +414,7 @@ async def onboarding_page():
 # --- API HEALTH ---
 @app.get("/api/health")
 def health():
-    return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.4"}
+    return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.5"}
 
 # --- ONBOARDING ---
 @app.get("/api/check-onboarding")
@@ -626,6 +623,196 @@ def check_inactive():
 @app.post("/api/trigger-re-engagement")
 def trigger_re_engagement(member_id: str):
     return {"success": True, "member_id": member_id, "message": "Test notification triggered."}
+
+# ============================================================
+# NEW: VOICE AI COACH (TTS)
+# ============================================================
+import edge_tts
+import base64
+from fastapi.responses import JSONResponse
+
+@app.post("/api/tts")
+async def text_to_speech(request: Request):
+    """Convert text to speech using edge_tts (free)."""
+    try:
+        data = await request.json()
+        text = data.get("text", "")
+        if not text:
+            return JSONResponse({"error": "No text provided"}, status_code=400)
+        
+        voice = data.get("voice", "en-US-AriaNeural")
+        communicate = edge_tts.Communicate(text, voice)
+        
+        # Generate audio
+        audio_data = b""
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_data += chunk["data"]
+        
+        # Encode as base64 for frontend
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        return JSONResponse({"audio": audio_base64})
+    except Exception as e:
+        log.error(f"TTS Error: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ============================================================
+# NEW: FUNNEL ANALYZER
+# ============================================================
+@app.post("/api/analyze-funnel")
+async def analyze_funnel(request: Request):
+    """Analyze a competitor's funnel using AI."""
+    try:
+        data = await request.json()
+        url = data.get("url", "")
+        member_id = data.get("member_id", "default")
+        
+        if not url:
+            return JSONResponse({"error": "No URL provided"}, status_code=400)
+        
+        # Get member profile for context
+        profile = db_get_profile(member_id) or {}
+        niche = profile.get("niche", "digital products")
+        business_name = profile.get("business_name", "your business")
+        
+        # Enhanced AI prompt for funnel analysis
+        prompt = f"""
+        You are a funnel hacking expert. Analyze this competitor's funnel:
+        
+        URL: {url}
+        Member's Niche: {niche}
+        Member's Business: {business_name}
+        
+        Provide a detailed analysis with these sections:
+        
+        1. 🎯 HEADLINE ANALYSIS
+        - What's the headline?
+        - What emotion does it trigger?
+        - What could be improved?
+        
+        2. 📢 CALL-TO-ACTION (CTA)
+        - What's the CTA?
+        - Is it clear and compelling?
+        - Suggestions for improvement
+        
+        3. 💰 PRICING STRATEGY
+        - What's the pricing model?
+        - How is it positioned?
+        - What could you learn from this?
+        
+        4. 📊 SOCIAL PROOF
+        - What testimonials or numbers are shown?
+        - How credible are they?
+        - How can you use similar social proof?
+        
+        5. 🔥 3 ACTIONABLE IMPROVEMENTS
+        - Specific things you can steal and implement in YOUR funnel
+        - Why each works
+        
+        Format with clear headings and bullet points.
+        Make it practical and actionable.
+        """
+        
+        analysis = call_llm([{"role": "system", "content": "You are a world-class funnel hacker and conversion expert."}, {"role": "user", "content": prompt}])
+        return {"analysis": analysis}
+        
+    except Exception as e:
+        log.error(f"Funnel Analysis Error: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ============================================================
+# NEW: PROACTIVE SUGGESTIONS
+# ============================================================
+@app.post("/api/proactive-suggest")
+async def proactive_suggest(request: Request):
+    """Generate proactive suggestions based on member's progress."""
+    try:
+        data = await request.json()
+        member_id = data.get("member_id", "default")
+        
+        # Get member's journey and profile
+        journey = db_get_journey(member_id)
+        profile = db_get_profile(member_id) or {}
+        
+        if not journey:
+            return JSONResponse({"error": "Member not found"}, status_code=404)
+        
+        # Calculate days since last standup
+        last_date = journey.get("last_standup_date")
+        days_since = 0
+        if last_date:
+            try:
+                days_since = (date.today() - date.fromisoformat(last_date)).days
+            except:
+                days_since = 0
+        
+        # Get current task
+        current_task = get_current_task(journey)
+        task_name = current_task.get("name", "your current task")
+        
+        # Get streak
+        streak = journey.get("streak", 0)
+        
+        # Build context for AI
+        tasks_completed = len(journey.get("tasks_completed", []))
+        total_tasks = 12
+        phase = journey.get("current_phase", "Phase 1")
+        
+        context = f"""
+        Member Progress:
+        - Phase: {phase}
+        - Day: {journey.get('current_day', 1)}/90
+        - Tasks completed: {tasks_completed}/{total_tasks}
+        - Current task: {task_name}
+        - Streak: {streak} days
+        - Days since last standup: {days_since}
+        - Niche: {profile.get('niche', 'Unknown')}
+        - Bottleneck: {profile.get('biggest_bottleneck', 'Unknown')}
+        - Traffic source: {profile.get('primary_traffic_source', 'Unknown')}
+        """
+        
+        # Determine urgency based on days since last standup
+        urgency = "normal"
+        if days_since >= 14:
+            urgency = "critical"
+        elif days_since >= 7:
+            urgency = "warning"
+        elif days_since >= 3:
+            urgency = "gentle"
+        
+        prompt = f"""
+        You are a proactive business coach. Based on this member's progress, provide ONE specific, actionable suggestion.
+        
+        {context}
+        
+        Urgency level: {urgency}
+        
+        Guidelines:
+        - If streak is low or days_since is high: Focus on re-engagement
+        - If tasks_completed is low: Focus on getting started
+        - If days_since is normal: Provide a "quick win" tip for their current task
+        - Be encouraging but direct
+        - Keep it under 150 words
+        - Include a specific call to action
+        
+        Format: Just the suggestion text, no extra commentary.
+        """
+        
+        suggestion = call_llm([{"role": "system", "content": "You are a proactive, encouraging business coach who gives specific, actionable advice."}, {"role": "user", "content": prompt}])
+        
+        return {
+            "suggestion": suggestion,
+            "urgency": urgency,
+            "days_since": days_since,
+            "streak": streak
+        }
+        
+    except Exception as e:
+        log.error(f"Proactive Suggestion Error: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 
 # ============================================================
 # MAIN
