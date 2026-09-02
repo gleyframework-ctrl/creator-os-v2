@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>E5 AI Coach OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         /* ===== BASE ===== */
         * { box-sizing: border-box; }
@@ -25,27 +25,21 @@
         }
         .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
         .sidebar-item.active { background: rgba(139,92,246,0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
-        .sidebar-item .badge {
-            margin-left: auto; background: rgba(139,92,246,0.2);
-            color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px;
-        }
+        .sidebar-item .badge { margin-left: auto; background: rgba(139,92,246,0.2); color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
 
         /* ===== TOAST ===== */
         .toast-container {
             position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 12px;
-            pointer-events: none;
+            display: flex; flex-direction: column; gap: 12px; pointer-events: none;
         }
         .toast {
-            pointer-events: auto;
-            padding: 14px 20px; border-radius: 12px; color: white; font-size: 14px;
+            pointer-events: auto; padding: 14px 20px; border-radius: 12px; color: white; font-size: 14px;
             max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
             animation: slideInRight 0.35s ease forwards;
             display: flex; align-items: center; gap: 12px;
             border-left: 5px solid rgba(255,255,255,0.2);
             transform: translateX(calc(100% + 40px));
-            opacity: 0;
-            position: relative;
+            opacity: 0; position: relative;
         }
         .toast.show { transform: translateX(0); opacity: 1; }
         .toast.hide { animation: slideOutRight 0.3s ease forwards; }
@@ -55,20 +49,11 @@
         .toast-info { background: rgba(59,130,246,0.95); border-left-color: #3b82f6; }
         .toast-icon { font-size: 20px; flex-shrink: 0; }
         .toast-content { flex: 1; line-height: 1.4; }
-        .toast-close {
-            cursor: pointer; opacity: 0.6; font-size: 18px; margin-left: auto;
-            transition: opacity 0.2s; background: none; border: none; color: white; padding: 0 4px;
-        }
+        .toast-close { cursor: pointer; opacity: 0.6; font-size: 18px; margin-left: auto; transition: opacity 0.2s; background: none; border: none; color: white; padding: 0 4px; }
         .toast-close:hover { opacity: 1; }
 
-        @keyframes slideInRight {
-            0% { transform: translateX(calc(100% + 40px)); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOutRight {
-            0% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(calc(100% + 40px)); opacity: 0; }
-        }
+        @keyframes slideInRight { 0% { transform: translateX(calc(100% + 40px)); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutRight { 0% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(calc(100% + 40px)); opacity: 0; } }
 
         /* ===== ONBOARDING ===== */
         .onboarding-step { display: none; }
@@ -141,13 +126,11 @@
         .skeleton-line { height: 12px; margin-bottom: 8px; }
         .skeleton-line.short { width: 60%; }
 
-        /* Deliverable checklist */
         .deliverable-checklist { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.06); }
         .deliverable-checklist label { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; color: #cbd5e1; cursor: pointer; }
         .deliverable-checklist label:hover { color: #f1f5f9; }
         .deliverable-checklist input[type="checkbox"] { accent-color: #8b5cf6; width: 16px; height: 16px; cursor: pointer; }
 
-        /* Proof files list */
         .proof-file { display: inline-flex; align-items: center; gap: 6px; background: rgba(139,92,246,0.15); color: #a78bfa; padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(139,92,246,0.2); }
         .proof-file .remove { cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
         .proof-file .remove:hover { opacity: 1; }
@@ -155,7 +138,7 @@
 </head>
 <body>
 
-    <!-- CELEBRATION MODAL -->
+    <!-- ===== CELEBRATION MODAL ===== -->
     <div id="celebration-modal" class="celebration-modal">
         <div class="celebration-card">
             <div class="text-6xl mb-4">🎉</div>
@@ -167,7 +150,7 @@
     </div>
     <div id="confetti-container" class="confetti-container"></div>
 
-    <!-- SIDEBAR OVERLAY (mobile) -->
+    <!-- ===== SIDEBAR OVERLAY (mobile) ===== -->
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-mobile" class="sidebar-mobile">
         <div class="flex justify-between items-center mb-6">
@@ -182,7 +165,7 @@
         </div>
     </div>
 
-    <!-- ONBOARDING OVERLAY -->
+    <!-- ===== ONBOARDING OVERLAY ===== -->
     <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
             <div class="step-indicator">
@@ -192,7 +175,7 @@
                 <div class="step-dot" id="step-dot-4"></div>
             </div>
 
-            <!-- STEP 1 -->
+            <!-- STEP 1: QUIZ -->
             <div id="onboarding-step-1" class="onboarding-step active">
                 <div class="text-4xl mb-4">🚀</div>
                 <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
@@ -226,7 +209,6 @@
                             <option value="8+">⚡ 8+ hours (Accelerator)</option>
                         </select>
                     </div>
-                    <!-- NEW: Primary Traffic Source -->
                     <div>
                         <label class="block text-sm text-slate-300 mb-2 font-medium">4. What's your primary traffic source?</label>
                         <select id="onboarding-traffic" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
@@ -241,7 +223,7 @@
                 </div>
             </div>
 
-            <!-- STEP 2 -->
+            <!-- STEP 2: STRATEGY DOCUMENT -->
             <div id="onboarding-step-2" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📄</span><h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2></div>
                 <p class="text-slate-400 mb-4">Review your AI‑generated strategy document.</p>
@@ -252,7 +234,7 @@
                 </div>
             </div>
 
-            <!-- STEP 3 -->
+            <!-- STEP 3: PROOF UPLOAD -->
             <div id="onboarding-step-3" class="onboarding-step">
                 <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📸</span><h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2></div>
                 <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
@@ -268,7 +250,7 @@
                 </div>
             </div>
 
-            <!-- STEP 4 -->
+            <!-- STEP 4: CONFIRMATION -->
             <div id="onboarding-step-4" class="onboarding-step">
                 <div class="text-center py-8">
                     <div class="text-6xl mb-4">🎉</div>
@@ -287,7 +269,7 @@
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- ===== MAIN APP ===== -->
     <div id="app" class="flex flex-col h-screen hidden">
 
         <!-- HEADER -->
@@ -305,6 +287,7 @@
         </header>
 
         <div class="flex flex-1 overflow-hidden">
+
             <!-- SIDEBAR DESKTOP -->
             <nav class="sidebar-desktop w-64 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
                 <div class="space-y-1">
@@ -327,22 +310,42 @@
 
             <!-- MAIN CONTENT -->
             <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0a0e1a]/30">
-                <div id="tab-dashboard" class="tab-content active"><div id="dashboard-content" class="space-y-6"></div></div>
+
+                <!-- DASHBOARD TAB -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <div id="dashboard-content" class="space-y-6"></div>
+                </div>
+
+                <!-- CHAT TAB -->
                 <div id="tab-chat" class="tab-content">
                     <div class="flex flex-col h-full">
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
                         <div class="flex gap-3 pt-4 border-t border-slate-800/50">
                             <input type="text" id="chat-input" placeholder="Ask your AI Coach..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') sendMessage()">
+                            <!-- VOICE BUTTON -->
+                            <button onclick="startVoiceInput()" id="voice-btn" class="bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-lg text-white font-medium transition" title="Speak your question">
+                                <i class="fas fa-microphone"></i>
+                            </button>
                             <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-lg text-white font-medium transition"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <div id="voice-indicator" style="display:none" class="text-center py-2">
+                            <span class="text-purple-400 animate-pulse">🎤 Listening... Speak now</span>
                         </div>
                         <div id="typing-indicator" class="hidden py-2"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span><span class="text-slate-400 text-sm ml-2">AI is thinking...</span></div>
                     </div>
                 </div>
-                <div id="tab-journey" class="tab-content"><div id="journey-content" class="space-y-6"></div></div>
+
+                <!-- JOURNEY TAB -->
+                <div id="tab-journey" class="tab-content">
+                    <div id="journey-content" class="space-y-6"></div>
+                </div>
+
+                <!-- SETTINGS TAB -->
                 <div id="tab-settings" class="tab-content">
                     <div class="max-w-2xl">
                         <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
                         <div class="space-y-6">
+                            <!-- Profile -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">Business Profile</h3>
                                 <div class="space-y-4">
@@ -352,80 +355,62 @@
                                     <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition"><i class="fas fa-save"></i> Save Profile</button>
                                 </div>
                             </div>
+
+                            <!-- Wins -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
                                 <button onclick="openWinModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition mb-4">➕ Record a Win</button>
                                 <div id="wins-list" class="space-y-2 text-sm"></div>
                             </div>
+
+                            <!-- Re-engagement -->
                             <div class="glass rounded-xl p-6">
                                 <h3 class="font-semibold text-white mb-4">📨 Notifications</h3>
                                 <p class="text-sm text-slate-400 mb-4">Test the re‑engagement notification system.</p>
                                 <button onclick="triggerReEngagement()" id="test-notif-btn" class="btn-test">🔔 Test Re-engagement Notification</button>
                                 <div id="notification-result" class="text-sm text-slate-400 mt-3"></div>
                             </div>
+
+                            <!-- NEW: FUNNEL ANALYZER -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">🔍 Funnel Analyzer</h3>
+                                <p class="text-sm text-slate-400 mb-4">Paste a competitor's URL and get a full funnel analysis with actionable insights.</p>
+                                <div class="space-y-3">
+                                    <input type="url" id="funnel-url" placeholder="https://competitor.com/landing-page" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                    <button onclick="analyzeFunnel()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition">🔍 Analyze Funnel</button>
+                                    <div id="funnel-analysis" class="mt-4 text-sm text-slate-300 whitespace-pre-wrap"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
 
-    <!-- STANDUP MODAL (with File Upload & Deliverable Checklist) -->
+    <!-- ===== STANDUP MODAL ===== -->
     <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
-                <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">📋 Daily Standup</h3><button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
             <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
             <div class="space-y-3">
-                <!-- Tasks completed -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Tasks completed today</label>
-                    <input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                <div><label class="block text-sm text-slate-400 mb-1">Tasks completed today</label><input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-sm text-slate-400 mb-1">Links to your work</label><input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-sm text-slate-400 mb-1">Paste your work content</label><textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
+                    <div class="flex justify-between text-xs mt-1"><span class="text-slate-500">Minimum 100 characters</span><span id="char-counter" class="char-counter mid">0/100</span></div>
                 </div>
-                <!-- Links -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Links to your work</label>
-                    <input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <!-- Work content -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Paste your work content</label>
-                    <textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
-                    <div class="flex justify-between text-xs mt-1">
-                        <span class="text-slate-500">Minimum 100 characters</span>
-                        <span id="char-counter" class="char-counter mid">0/100</span>
-                    </div>
-                </div>
-                <!-- Metrics -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label>
-                    <input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                </div>
-                <!-- NEW: File Upload -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Upload Proof (Screenshot, PDF, Document)</label>
+                <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label><input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-sm text-slate-400 mb-1">Upload Proof (Screenshot, PDF, Document)</label>
                     <input type="file" id="s-proof" multiple accept=".png,.jpg,.jpeg,.pdf,.doc,.docx" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500" onchange="handleStandupProof(event)">
                     <div id="s-proof-list" class="flex flex-wrap gap-2 mt-2"></div>
                 </div>
-                <!-- NEW: Deliverable Checklist -->
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1">Confirm all deliverables</label>
-                    <div id="deliverable-checklist" class="deliverable-checklist">
-                        <!-- Will be dynamically filled from current task -->
-                    </div>
-                    <div id="deliverable-missing" style="display:none" class="text-red-400 text-sm mt-2">
-                        ⚠️ You must check all deliverables before submitting.
-                    </div>
+                <div><label class="block text-sm text-slate-400 mb-1">Confirm all deliverables</label>
+                    <div id="deliverable-checklist" class="deliverable-checklist"></div>
+                    <div id="deliverable-missing" style="display:none" class="text-red-400 text-sm mt-2">⚠️ You must check all deliverables before submitting.</div>
                 </div>
-                <!-- Progress -->
-                <div id="standup-progress" class="standup-progress" style="display:none;">
-                    <div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div>
-                </div>
-                <!-- Submit -->
+                <div id="standup-progress" class="standup-progress" style="display:none;"><div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div></div>
                 <button onclick="submitStandup()" id="standup-submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Submit for Review</button>
-                <!-- Review result -->
                 <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                     <div id="review-score" class="text-2xl font-bold text-center"></div>
                     <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
@@ -435,7 +420,7 @@
         </div>
     </div>
 
-    <!-- WIN MODAL -->
+    <!-- ===== WIN MODAL ===== -->
     <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
             <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">🏆 Record a Win</h3><button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
@@ -447,9 +432,12 @@
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
+    <!-- ===== TOAST CONTAINER ===== -->
     <div id="toast-container" class="toast-container"></div>
 
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
     <script>
         const API = window.location.origin;
         const MEMBER_ID = localStorage.getItem('e5_member_id') || 'default';
@@ -459,15 +447,13 @@
         let journeyData = null;
         let strategyDocument = '';
         let uploadedFiles = [];
-        let proofFiles = [];
+        let standupProofFiles = [];
         let currentStep = 1;
 
         // ===== SAFE DOM HELPERS =====
         function getEl(id) { return document.getElementById(id); }
         function setText(id, text) { const el = getEl(id); if (el) el.textContent = text; }
         function setHtml(id, html) { const el = getEl(id); if (el) el.innerHTML = html; }
-        function show(id) { const el = getEl(id); if (el) el.style.display = 'flex'; }
-        function hide(id) { const el = getEl(id); if (el) el.style.display = 'none'; }
 
         // ===== SIDEBAR =====
         function toggleSidebar() {
@@ -487,32 +473,26 @@
             document.querySelectorAll('#sidebar-mobile .nav-item').forEach(item => item.classList.remove('active'));
             const navMob = getEl(`nav-${tabName}-mob`);
             if (navMob) navMob.classList.add('active');
-            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'dashboard') { loadDashboard(); setTimeout(loadProactiveSuggestion, 1500); }
             if (tabName === 'journey') loadJourney();
             if (tabName === 'settings') { loadProfile(); loadWins(); }
             if (window.innerWidth < 769) toggleSidebar();
         }
 
-        // ===== TOAST SYSTEM =====
+        // ===== TOAST =====
         function showToast(message, type = 'success') {
             const container = getEl('toast-container');
             if (!container) return;
             const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerHTML = `
-                <span class="toast-icon">${icons[type] || ''}</span>
-                <span class="toast-content">${message}</span>
-                <button class="toast-close" aria-label="Close notification">×</button>
-            `;
+            toast.innerHTML = `<span class="toast-icon">${icons[type] || ''}</span><span class="toast-content">${message}</span><button class="toast-close" aria-label="Close">×</button>`;
             container.appendChild(toast);
-            requestAnimationFrame(() => { toast.classList.add('show'); });
+            requestAnimationFrame(() => toast.classList.add('show'));
             const closeBtn = toast.querySelector('.toast-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => { dismissToast(toast); });
-            }
+            if (closeBtn) closeBtn.addEventListener('click', () => dismissToast(toast));
             const delay = type === 'error' ? 6000 : 4000;
-            const timer = setTimeout(() => { dismissToast(toast); }, delay);
+            const timer = setTimeout(() => dismissToast(toast), delay);
             toast._timer = timer;
         }
 
@@ -592,9 +572,7 @@
                 localStorage.setItem('primary_traffic_source', traffic);
                 showStep(2);
                 showToast('✅ Strategy document generated!', 'success');
-            } catch (error) {
-                showToast('Error generating strategy: ' + error.message, 'error');
-            }
+            } catch (error) { showToast('Error generating strategy: ' + error.message, 'error'); }
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Generate My Strategy Document'; }
         }
         async function regenerateStrategy() { await generateStrategy(); }
@@ -638,9 +616,7 @@
                 setText('confirm-day', localStorage.getItem('starting_day') || 1);
                 showStep(4);
                 showToast('🎉 Onboarding complete!', 'success');
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-            }
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Start My 90-Day Journey'; }
         }
 
@@ -660,14 +636,7 @@
         async function loadDashboard() {
             const container = getEl('dashboard-content');
             if (!container) return;
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="skeleton h-12 w-full"></div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">${[...Array(4)].map(() => `<div class="skeleton h-20 w-full"></div>`).join('')}</div>
-                    <div class="skeleton h-8 w-full"></div>
-                    <div class="skeleton h-32 w-full"></div>
-                </div>
-            `;
+            container.innerHTML = `<div class="space-y-4"><div class="skeleton h-12 w-full"></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${[...Array(4)].map(() => `<div class="skeleton h-20 w-full"></div>`).join('')}</div><div class="skeleton h-8 w-full"></div><div class="skeleton h-32 w-full"></div></div>`;
             try {
                 const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -714,16 +683,10 @@
                     </div>
                 `;
                 updateSidebarStats();
+                // Load proactive suggestion after dashboard loads
+                setTimeout(loadProactiveSuggestion, 1000);
             } catch (e) {
-                console.error('Dashboard error:', e);
-                container.innerHTML = `
-                    <div class="text-red-400 text-center p-8">
-                        <div class="text-4xl mb-2">⚠️</div>
-                        <p>Error loading dashboard</p>
-                        <p class="text-sm text-slate-500">${e.message}</p>
-                        <button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button>
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-red-400 text-center p-8"><div class="text-4xl mb-2">⚠️</div><p>Error loading dashboard</p><p class="text-sm text-slate-500">${e.message}</p><button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button></div>`;
                 showToast('Failed to load dashboard', 'error');
             }
         }
@@ -807,6 +770,8 @@
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                     chatHistory.push({ role: 'user', content: text });
                     chatHistory.push({ role: 'assistant', content: data.reply });
+                    // Play voice response
+                    playAudioResponse(data.reply);
                 } else {
                     showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
                 }
@@ -816,9 +781,125 @@
             }
         }
 
-        // ===== STANDUP (with deliverable checklist & file upload) =====
-        let standupProofFiles = [];
+        // ===== VOICE INPUT =====
+        let isListening = false;
 
+        function startVoiceInput() {
+            const btn = getEl('voice-btn');
+            const indicator = getEl('voice-indicator');
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast('Voice input not supported in this browser.', 'warning');
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            isListening = true;
+            if (btn) btn.innerHTML = '<i class="fas fa-circle text-red-500"></i>';
+            if (indicator) indicator.style.display = 'block';
+            recognition.start();
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                const input = getEl('chat-input');
+                if (input) input.value = text;
+                if (btn) btn.innerHTML = '<i class="fas fa-microphone"></i>';
+                if (indicator) indicator.style.display = 'none';
+                isListening = false;
+                sendMessage();
+            };
+            recognition.onerror = function(event) {
+                if (btn) btn.innerHTML = '<i class="fas fa-microphone"></i>';
+                if (indicator) indicator.style.display = 'none';
+                isListening = false;
+                showToast('Voice error: ' + (event.error === 'not-allowed' ? 'Please allow microphone access.' : event.error), 'warning');
+            };
+            recognition.onend = function() {
+                if (btn) btn.innerHTML = '<i class="fas fa-microphone"></i>';
+                if (indicator) indicator.style.display = 'none';
+                isListening = false;
+            };
+        }
+
+        // ===== TEXT-TO-SPEECH =====
+        async function playAudioResponse(text) {
+            try {
+                const res = await fetch(`${API}/api/tts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, voice: 'en-US-AriaNeural' })
+                });
+                const data = await res.json();
+                if (res.ok && data.audio) {
+                    const audioData = atob(data.audio);
+                    const arrayBuffer = new ArrayBuffer(audioData.length);
+                    const view = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < audioData.length; i++) view[i] = audioData.charCodeAt(i);
+                    const blob = new Blob([arrayBuffer], { type: 'audio/mp3' });
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.play();
+                }
+            } catch (e) { console.log('TTS error:', e); }
+        }
+
+        // ===== FUNNEL ANALYZER =====
+        async function analyzeFunnel() {
+            const url = getEl('funnel-url')?.value.trim();
+            const resultDiv = getEl('funnel-analysis');
+            if (!url) { showToast('Please enter a URL to analyze.', 'warning'); return; }
+            if (resultDiv) resultDiv.innerHTML = '<div class="text-purple-400">⏳ Analyzing funnel...</div>';
+            try {
+                const res = await fetch(`${API}/api/analyze-funnel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, member_id: MEMBER_ID })
+                });
+                const data = await res.json();
+                if (res.ok && resultDiv) {
+                    const formatted = data.analysis.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                    resultDiv.innerHTML = `<div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700 text-slate-300">${formatted}</div>`;
+                    showToast('✅ Funnel analysis complete!', 'success');
+                } else if (resultDiv) {
+                    resultDiv.innerHTML = `<div class="text-red-400">Error: ${data.error || 'Unknown error'}</div>`;
+                    showToast('Error analyzing funnel', 'error');
+                }
+            } catch (e) {
+                if (resultDiv) resultDiv.innerHTML = `<div class="text-red-400">Error: ${e.message}</div>`;
+                showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        // ===== PROACTIVE SUGGESTIONS =====
+        async function loadProactiveSuggestion() {
+            try {
+                const res = await fetch(`${API}/api/proactive-suggest`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID })
+                });
+                const data = await res.json();
+                if (res.ok && data.suggestion) {
+                    const suggestionDiv = getEl('proactive-suggestion');
+                    const textDiv = getEl('suggestion-text');
+                    if (suggestionDiv && textDiv) {
+                        textDiv.textContent = data.suggestion;
+                        suggestionDiv.classList.remove('hidden');
+                        const urgency = data.urgency || 'normal';
+                        const borderClass = urgency === 'critical' ? 'border-red-500' : urgency === 'warning' ? 'border-yellow-500' : 'border-purple-500';
+                        suggestionDiv.className = `glass p-5 rounded-lg border-l-4 ${borderClass}`;
+                    }
+                }
+            } catch (e) { console.log('Proactive suggestion not available'); }
+        }
+
+        function dismissSuggestion() {
+            const div = getEl('proactive-suggestion');
+            if (div) div.classList.add('hidden');
+        }
+
+        // ===== STANDUP =====
         function handleStandupProof(event) {
             const files = event.target.files;
             const list = getEl('s-proof-list');
@@ -848,17 +929,13 @@
             if (progress) progress.style.display = 'none';
             const btn = getEl('standup-submit-btn');
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Submit for Review'; }
-            // Reset proof files list
             const proofList = getEl('s-proof-list');
             if (proofList) proofList.innerHTML = '';
             standupProofFiles = [];
-            // Reset deliverable checklist
             const checklist = getEl('deliverable-checklist');
             if (checklist && journeyData) {
                 const deliverables = journeyData.current_task.deliverables || [];
-                checklist.innerHTML = deliverables.map(d => `
-                    <label><input type="checkbox" class="deliverable-check" value="${d.replace(/"/g, '&quot;')}"> ${d}</label>
-                `).join('');
+                checklist.innerHTML = deliverables.map(d => `<label><input type="checkbox" class="deliverable-check" value="${d.replace(/"/g, '&quot;')}"> ${d}</label>`).join('');
             }
             const missing = getEl('deliverable-missing');
             if (missing) missing.style.display = 'none';
@@ -870,7 +947,6 @@
         }
 
         async function submitStandup() {
-            // Validate deliverables
             const checks = document.querySelectorAll('.deliverable-check');
             let allChecked = true;
             checks.forEach(c => { if (!c.checked) allChecked = false; });
@@ -887,7 +963,6 @@
             const tasksEl = getEl('s-tasks');
             const linksEl = getEl('s-links');
             const metricsEl = getEl('s-metrics');
-            // Convert proof files to base64 or just track filenames (simplified)
             const proofData = standupProofFiles.map(f => ({ filename: f.name, data: 'file' }));
             const payload = {
                 member_id: MEMBER_ID,
@@ -932,7 +1007,6 @@
                 if (metricsEl) metricsEl.value = '';
                 const counter = getEl('char-counter');
                 if (counter) { counter.textContent = '0/100'; counter.className = 'char-counter under'; }
-                // Clear proof list
                 const proofList = getEl('s-proof-list');
                 if (proofList) proofList.innerHTML = '';
                 standupProofFiles = [];
@@ -961,14 +1035,8 @@
         }
 
         // ===== WINS =====
-        function openWinModal() {
-            const modal = getEl('win-modal');
-            if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
-        }
-        function closeWinModal() {
-            const modal = getEl('win-modal');
-            if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
-        }
+        function openWinModal() { const modal = getEl('win-modal'); if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); } }
+        function closeWinModal() { const modal = getEl('win-modal'); if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } }
         async function submitWin() {
             const textEl = getEl('win-text');
             const revenueEl = getEl('win-revenue');
@@ -987,9 +1055,7 @@
                 loadWins();
                 loadDashboard();
                 showToast(`🏆 Win recorded! (${data.total_wins} total)`, 'success');
-            } catch (e) {
-                showToast('Error recording win', 'error');
-            }
+            } catch (e) { showToast('Error recording win', 'error'); }
         }
 
         async function loadWins() {
@@ -1136,6 +1202,10 @@
             counter.className = 'char-counter ' + (count < 100 ? 'under' : count < 200 ? 'mid' : 'over');
         }
 
+        // ===== PROACTIVE SUGGESTION DIV (Add to Dashboard) =====
+        // The div is already in the HTML, but we need to ensure it's there
+        // It's rendered in the Dashboard tab via the HTML above.
+
         // ===== INIT =====
         async function init() {
             try {
@@ -1164,6 +1234,7 @@
                     await loadJourney();
                     await loadWins();
                     switchTab('dashboard');
+
                     setTimeout(() => {
                         const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\nYour primary traffic source: **${data.profile?.primary_traffic_source || 'mixed'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
                         appendMessage('ai', welcome);
@@ -1174,14 +1245,7 @@
                 const gatekeeper = getEl('gatekeeper');
                 if (gatekeeper) {
                     gatekeeper.style.display = 'flex';
-                    gatekeeper.innerHTML = `
-                        <div class="glass rounded-2xl p-8 text-center">
-                            <div class="text-4xl mb-4">⚠️</div>
-                            <h2 class="text-2xl font-bold text-red-400 mb-2">Connection Error</h2>
-                            <p class="text-slate-400 mb-6">Could not connect to the server. Please check your internet or try again later.</p>
-                            <button onclick="location.reload()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg transition">🔄 Retry</button>
-                        </div>
-                    `;
+                    gatekeeper.innerHTML = `<div class="glass rounded-2xl p-8 text-center"><div class="text-4xl mb-4">⚠️</div><h2 class="text-2xl font-bold text-red-400 mb-2">Connection Error</h2><p class="text-slate-400 mb-6">Could not connect to the server. Please check your internet or try again later.</p><button onclick="location.reload()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg transition">🔄 Retry</button></div>`;
                 }
                 showToast('Failed to initialize app. Please refresh.', 'error');
             }
