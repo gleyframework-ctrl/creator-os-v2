@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("e5-coach")
 
-# NVIDIA – use the working model
+# NVIDIA — using the proven working model
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "").strip()
 NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct").strip()
 NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
@@ -61,6 +61,7 @@ def init_db():
         cur.execute("CREATE TABLE IF NOT EXISTS wins (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
         cur.execute("CREATE TABLE IF NOT EXISTS scores (id SERIAL PRIMARY KEY, member_id TEXT, score INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
         cur.execute("CREATE TABLE IF NOT EXISTS strategy_docs (member_id TEXT PRIMARY KEY, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+        cur.execute("CREATE TABLE IF NOT EXISTS proof_files (id SERIAL PRIMARY KEY, member_id TEXT, data JSONB, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
         cur.execute("CREATE TABLE IF NOT EXISTS member_notifications (id SERIAL PRIMARY KEY, member_id TEXT, notification_type TEXT, message TEXT, sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, read_at TIMESTAMP, action_taken BOOLEAN DEFAULT FALSE)")
         conn.commit()
         cur.close(); conn.close()
@@ -76,8 +77,9 @@ PROFILES_DB = {}
 JOURNEY_DB = {}
 WINS_DB = {}
 SCORES_DB = {}
+PROOF_DB = {}
 
-app = FastAPI(title="E5 AI Coach OS", version="5.2")
+app = FastAPI(title="E5 AI Coach OS", version="5.3")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # JOURNEY MAP (12 tasks)
@@ -111,7 +113,7 @@ JOURNEY_MAP = {
     }
 }
 
-# ---- DATABASE HELPERS (with null safety) ----
+# ---- DATABASE HELPERS ----
 def db_get_profile(member_id):
     try:
         conn = get_db_connection()
@@ -155,16 +157,44 @@ def db_upsert_journey(member_id, data):
         return True
     except: JOURNEY_DB[member_id] = data; return True
 
-def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text, metrics, score, review, evidence):
+def db_add_standup(member_id, task_id, tasks_completed, asset_links, asset_text, metrics, score, review, evidence, proof_files=None):
     try:
         conn = get_db_connection()
         if not conn: return True
         cur = conn.cursor()
-        data = {"task_id": task_id, "tasks_completed": tasks_completed, "asset_links": asset_links, "asset_text": asset_text, "metrics": metrics, "score": score, "review": review, "evidence": evidence}
+        data = {
+            "task_id": task_id, "tasks_completed": tasks_completed,
+            "asset_links": asset_links, "asset_text": asset_text,
+            "metrics": metrics, "score": score, "review": review,
+            "evidence": evidence, "proof_files": proof_files or []
+        }
         cur.execute("INSERT INTO standups (member_id, data) VALUES (%s, %s)", (member_id, json.dumps(data)))
         conn.commit(); cur.close(); conn.close()
     except: pass
     return True
+
+def db_add_proof(member_id, filename, file_data):
+    try:
+        conn = get_db_connection()
+        if not conn:
+            PROOF_DB.setdefault(member_id, []).append({"filename": filename, "data": file_data})
+            return True
+        cur = conn.cursor()
+        cur.execute("INSERT INTO proof_files (member_id, data) VALUES (%s, %s)", (member_id, json.dumps({"filename": filename, "data": file_data})))
+        conn.commit(); cur.close(); conn.close()
+    except: pass
+    return True
+
+def db_get_proofs(member_id):
+    try:
+        conn = get_db_connection()
+        if not conn: return PROOF_DB.get(member_id, [])
+        cur = conn.cursor()
+        cur.execute("SELECT data FROM proof_files WHERE member_id = %s ORDER BY created_at DESC", (member_id,))
+        results = cur.fetchall()
+        cur.close(); conn.close()
+        return [r['data'] for r in results] if results else PROOF_DB.get(member_id, [])
+    except: return PROOF_DB.get(member_id, [])
 
 def db_add_win(member_id, win_text, revenue):
     try:
@@ -208,7 +238,6 @@ def db_get_scores(member_id):
         return [r['score'] for r in results] if results else SCORES_DB.get(member_id, [])
     except: return SCORES_DB.get(member_id, [])
 
-# ---- RE-ENGAGEMENT HELPERS (minimal) ----
 def db_get_inactive_members():
     try:
         conn = get_db_connection()
@@ -269,7 +298,6 @@ def send_telegram_message(chat_id, message):
 def send_re_engagement_notification(member):
     days = member.get("days_inactive", 0)
     if days < 3: return False
-    # Simple message
     msg = f"⚠️ You haven't submitted a standup in {days} days. Your streak is at risk!"
     contact = db_get_profile(member['member_id']) or {}
     if contact.get('telegram_id'):
@@ -297,11 +325,24 @@ def call_llm(messages, temperature=0.3):
 # ---- PYDANTIC MODELS ----
 class ChatMessage(BaseModel): role: str; content: str
 class ChatRequest(BaseModel): message: str = ""; history: List[ChatMessage] = []; mode: str = "coach"; member_id: Optional[str] = "default"
-class OnboardingRequest(BaseModel): member_id: str = "default"; business_name: str; niche: str; target_avatar: str; core_offer: str; current_revenue: float = 0; revenue_goal: float = 10000; biggest_bottleneck: str; current_level: str = "beginner"; weekly_hours: str = "4-7"; offer_done: bool = False; audience_done: bool = False; sales_done: bool = False; launch_done: bool = False
-class StandupRequest(BaseModel): member_id: str = "default"; current_task_id: str; tasks_completed: List[str] = []; asset_links: List[str] = []; asset_text: str = ""; metrics: str = ""
+class OnboardingRequest(BaseModel):
+    member_id: str = "default"
+    business_name: str; niche: str; target_avatar: str
+    core_offer: str; current_revenue: float = 0; revenue_goal: float = 10000
+    biggest_bottleneck: str; current_level: str = "beginner"; weekly_hours: str = "4-7"
+    primary_traffic_source: str = "content"  # NEW FIELD
+    offer_done: bool = False; audience_done: bool = False
+    sales_done: bool = False; launch_done: bool = False
+class StandupRequest(BaseModel):
+    member_id: str = "default"; current_task_id: str
+    tasks_completed: List[str] = []
+    asset_links: List[str] = []
+    asset_text: str = ""
+    metrics: str = ""
+    proof_files: List[dict] = []  # NEW
 class WinRequest(BaseModel): member_id: str = "default"; win_text: str; revenue_amount: Optional[float] = None
-class StrategyRequest(BaseModel): member_id: str; stage: str; bottleneck: str; hours: str
-class CompleteOnboardingRequest(BaseModel): member_id: str; stage: str; bottleneck: str; hours: str; strategy_document: str; starting_day: int; speed_profile: str
+class StrategyRequest(BaseModel): member_id: str; stage: str; bottleneck: str; hours: str; primary_traffic_source: str = "content"
+class CompleteOnboardingRequest(BaseModel): member_id: str; stage: str; bottleneck: str; hours: str; strategy_document: str; starting_day: int; speed_profile: str; primary_traffic_source: str = "content"
 
 # ---- HELPERS ----
 def get_current_task(journey):
@@ -337,7 +378,7 @@ def root():
     return {"status": "ok"}
 
 @app.get("/api/health")
-def health(): return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.2"}
+def health(): return {"ok": True, "database": DATABASE_CONNECTED, "version": "5.3"}
 
 @app.get("/api/check-onboarding")
 def check_onboarding(member_id: str = "default"):
@@ -350,7 +391,8 @@ def submit_onboarding(req: OnboardingRequest):
     if req.current_level == "intermediate" and (req.offer_done and req.audience_done): starting_day = 15
     elif req.current_level == "advanced" and (req.offer_done and req.audience_done and req.sales_done): starting_day = 31
     speed_profile = "accelerator" if req.weekly_hours == "8+" else "steady" if req.weekly_hours == "4-7" else "reflective"
-    profile_data = req.dict(); profile_data["speed_profile"] = speed_profile
+    profile_data = req.dict()
+    profile_data["speed_profile"] = speed_profile
     db_upsert_profile(req.member_id, profile_data)
     db_upsert_journey(req.member_id, {"current_day": starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []})
     return {"success": True, "starting_day": starting_day, "speed_profile": speed_profile}
@@ -364,14 +406,18 @@ def generate_strategy(req: StrategyRequest):
         "content": "Module 3 — Attract", "community": "Module 5 — Automate",
         "offer": "Module 2 — Package", "time": "Module 5 — Automate", "other": "Module 1 — Position"
     }.get(req.bottleneck, "Module 1 — Position")
-    system = "You are a strategic coach. Generate a strategy document based on the member's answers. Include: Current Stage, Biggest Challenge, Recommended Focus, Starting Day, Speed Profile, Recommended First Task, and Next Steps."
-    user = f"Stage: {req.stage}, Challenge: {req.bottleneck}, Hours: {req.hours}. Starting Day: {starting_day}, Speed: {speed_profile}, Focus: {focus}"
+    traffic_source = req.primary_traffic_source or "content"
+    system = f"""You are a strategic coach. Generate a personalized strategy document.
+The member's primary traffic source is: {traffic_source}.
+Customize advice accordingly (e.g., if content, focus on viral hooks; if DMs, focus on sequences; if paid, focus on ads).
+Include: Current Stage, Biggest Challenge, Recommended Focus, Starting Day, Speed Profile, Recommended First Task, and Next Steps."""
+    user = f"Stage: {req.stage}, Challenge: {req.bottleneck}, Hours: {req.hours}, Traffic: {traffic_source}. Starting Day: {starting_day}, Speed: {speed_profile}, Focus: {focus}"
     document = call_llm([{"role": "system", "content": system}, {"role": "user", "content": user}])
     try:
         conn = get_db_connection()
         if conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "bottleneck": req.bottleneck})))
+            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "bottleneck": req.bottleneck, "primary_traffic_source": traffic_source})))
             conn.commit(); cur.close(); conn.close()
     except: pass
     return {"document": document, "starting_day": starting_day, "speed_profile": speed_profile, "focus": focus}
@@ -380,9 +426,9 @@ def generate_strategy(req: StrategyRequest):
 def complete_onboarding(req: CompleteOnboardingRequest):
     profile = db_get_profile(req.member_id)
     if not profile:
-        db_upsert_profile(req.member_id, {"business_name": "New Member", "niche": "", "target_avatar": "", "biggest_bottleneck": req.bottleneck, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True})
+        db_upsert_profile(req.member_id, {"business_name": "New Member", "niche": "", "target_avatar": "", "biggest_bottleneck": req.bottleneck, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "primary_traffic_source": req.primary_traffic_source, "onboarding_complete": True})
     else:
-        db_upsert_profile(req.member_id, {**profile, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "onboarding_complete": True, "biggest_bottleneck": req.bottleneck})
+        db_upsert_profile(req.member_id, {**profile, "current_level": req.stage, "weekly_hours": req.hours, "speed_profile": req.speed_profile, "primary_traffic_source": req.primary_traffic_source, "onboarding_complete": True, "biggest_bottleneck": req.bottleneck})
     journey = db_get_journey(req.member_id) or {"member_id": req.member_id, "current_day": req.starting_day, "current_phase": "Phase 1", "current_task_id": "p1_t1", "tasks_completed": [], "streak": 0, "last_standup_date": None, "xp_total": 0, "badges": []}
     journey["current_day"] = req.starting_day
     db_upsert_journey(req.member_id, journey)
@@ -390,7 +436,7 @@ def complete_onboarding(req: CompleteOnboardingRequest):
         conn = get_db_connection()
         if conn:
             cur = conn.cursor()
-            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck})))
+            cur.execute("INSERT INTO strategy_docs (member_id, data) VALUES (%s, %s) ON CONFLICT (member_id) DO UPDATE SET data = EXCLUDED.data", (req.member_id, json.dumps({"document": req.strategy_document, "starting_day": req.starting_day, "speed_profile": req.speed_profile, "bottleneck": req.bottleneck, "primary_traffic_source": req.primary_traffic_source})))
             conn.commit(); cur.close(); conn.close()
     except: pass
     return {"success": True, "message": "Onboarding complete", "starting_day": req.starting_day, "speed_profile": req.speed_profile}
@@ -405,6 +451,7 @@ def get_journey_status(member_id: str = "default"):
     scores = db_get_scores(member_id)
     avg_score = round(sum(scores)/len(scores),1) if scores else 0
     wins = db_get_wins(member_id)
+    proofs = db_get_proofs(member_id)
     return {
         "current_day": journey.get("current_day",1),
         "current_phase": phase_info["name"],
@@ -420,8 +467,15 @@ def get_journey_status(member_id: str = "default"):
         "avg_score": avg_score,
         "standup_count": len(scores),
         "wins": wins,
+        "proofs": proofs,
         "trajectory": calculate_trajectory(journey),
-        "profile": {"business_name": profile.get("business_name",""), "niche": profile.get("niche",""), "bottleneck": profile.get("biggest_bottleneck",""), "speed_profile": profile.get("speed_profile","steady")},
+        "profile": {
+            "business_name": profile.get("business_name",""),
+            "niche": profile.get("niche",""),
+            "bottleneck": profile.get("biggest_bottleneck",""),
+            "speed_profile": profile.get("speed_profile","steady"),
+            "primary_traffic_source": profile.get("primary_traffic_source","content")
+        },
         "all_phases": {k: {"name": v["name"], "sub_coach": v.get("sub_coach","Strategist"), "tasks": [{"id": t["id"], "name": t["name"], "deadline_day": t["deadline_day"], "completed": t["id"] in journey.get("tasks_completed",[]), "why": t.get("why",""), "frameworks": t.get("frameworks",[]), "deliverables": t.get("deliverables",[])} for t in v["tasks"]]} for k,v in JOURNEY_MAP.items()}
     }
 
@@ -438,7 +492,7 @@ def submit_standup(req: StandupRequest):
 TASK: {task['name']}
 FRAMEWORKS: {frameworks_str}
 DELIVERABLES:\n{deliverables_str}
-MEMBER: Niche={profile.get('niche','N/A')} | Speed={profile.get('speed_profile','steady')}
+MEMBER: Niche={profile.get('niche','N/A')} | Speed={profile.get('speed_profile','steady')} | Traffic Source={profile.get('primary_traffic_source','content')}
 RUBRIC: Link(+2), Metrics(+2), Deliverables(+2), Quality(0-4).
 OUTPUT: GRADE: [X]/10
 AUDIT: [2-3 issues]
@@ -469,7 +523,10 @@ FRAMEWORK TIP: [insight]"""
         journey["xp_total"] = journey.get("xp_total",0) + xp_gained
     else:
         xp_gained = 25
-    db_add_standup(req.member_id, req.current_task_id, ",".join(req.tasks_completed), ",".join(req.asset_links), req.asset_text, req.metrics, score, review, evidence)
+    # Save proof files
+    for pf in req.proof_files or []:
+        db_add_proof(req.member_id, pf.get("filename", "unknown"), pf.get("data", ""))
+    db_add_standup(req.member_id, req.current_task_id, ",".join(req.tasks_completed), ",".join(req.asset_links), req.asset_text, req.metrics, score, review, evidence, req.proof_files)
     db_add_score(req.member_id, score)
     db_upsert_journey(req.member_id, journey)
     return {"success": True, "review": review, "score": score, "task_unlocked": score >= 7, "streak": journey.get("streak",0), "xp_gained": xp_gained, "xp_total": journey.get("xp_total",0), "journey_updated": True}
@@ -504,10 +561,12 @@ Submit your work using the 'Submit Daily Work' button."""}
     if wins: wins_text = f"{len(wins)} wins. Latest: {wins[0]['win_text'][:100]}"
     scores = db_get_scores(req.member_id or "default")
     avg_score = round(sum(scores)/len(scores),1) if scores else 0
+    traffic_source = profile.get('primary_traffic_source', 'content')
     system_prompt = f"""You are the E5 AI Coach.
-MEMBER: {profile.get('business_name','N/A')} | Niche: {profile.get('niche','N/A')} | Bottleneck: {profile.get('biggest_bottleneck','N/A')} | Speed: {profile.get('speed_profile','steady')}
+MEMBER: {profile.get('business_name','N/A')} | Niche: {profile.get('niche','N/A')} | Bottleneck: {profile.get('biggest_bottleneck','N/A')} | Speed: {profile.get('speed_profile','steady')} | Traffic Source: {traffic_source}
 Day: {journey.get('current_day',1)}/90 | Phase: {phase_info['name']} | Task: {current_task['name']} | Streak: {journey.get('streak',0)} | Avg score: {avg_score}/10 | Wins: {wins_text}
-RULES: Diagnose first, personalize, one insight, apply frameworks, 60% questions/40% insight, short (150-250 words), never invent."""
+RULES: Diagnose first, personalize, one insight, apply frameworks, 60% questions/40% insight, short (150-250 words), never invent.
+Tailor your advice to their primary traffic source ({traffic_source})."""
     messages = [{"role": "system", "content": system_prompt}] + [{"role": m.role, "content": m.content} for m in req.history[-10:]] + [{"role": "user", "content": req.message}]
     reply = call_llm(messages)
     return {"reply": reply}
@@ -522,7 +581,6 @@ def check_inactive():
 
 @app.post("/api/trigger-re-engagement")
 def trigger_re_engagement(member_id: str):
-    # Just simulate sending for now
     return {"success": True, "member_id": member_id, "message": "Test notification triggered."}
 
 if __name__ == "__main__":
