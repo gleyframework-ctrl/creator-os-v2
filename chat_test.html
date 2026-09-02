@@ -9,155 +9,369 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
         .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; color: #94a3b8; font-size: 14px; font-weight: 500; width: 100%; background: transparent; border: none; }
         .sidebar-item:hover { background: rgba(255,255,255,0.05); color: #f1f5f9; }
+        .sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-left: 3px solid #8b5cf6; }
+        .sidebar-item .badge { margin-left: auto; background: rgba(139, 92, 246, 0.2); color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 16px 20px; border-radius: 12px; color: white; font-size: 14px; max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; }
+        .toast-success { background: rgba(34, 197, 94, 0.9); border: 1px solid #22c55e; }
+        .toast-warning { background: rgba(234, 179, 8, 0.9); border: 1px solid #eab308; }
+        .toast-error { background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; }
+        .toast-info { background: rgba(59, 130, 246, 0.9); border: 1px solid #3b82f6; }
+        .toast-close { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; margin-left: auto; font-size: 18px; }
+        .toast-close:hover { opacity: 1; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .celebration-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .celebration-modal.show { display: flex; }
+        .celebration-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #22c55e; border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 0 60px rgba(34, 197, 94, 0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 10001; overflow: hidden; }
+        .confetti { position: absolute; width: 10px; height: 10px; border-radius: 2px; animation: confettiFall linear forwards; }
+        @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; transition: all 0.3s; }
+        .stat-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+        .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-top: 2px; }
+        .trajectory-banner-green { border-left: 4px solid #22c55e; background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 12px 16px; border-radius: 8px; }
+        .trajectory-banner-yellow { border-left: 4px solid #eab308; background: rgba(234, 179, 8, 0.15); color: #eab308; padding: 12px 16px; border-radius: 8px; }
+        .trajectory-banner-blue { border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 12px 16px; border-radius: 8px; }
+        .activity-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .activity-icon.purple { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+        .activity-icon.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+        .activity-icon.yellow { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+        .btn-test { background: #d97706; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-test:hover { background: #b45309; transform: translateY(-1px); }
+        .btn-test:disabled { opacity: 0.5; cursor: not-allowed; }
+        .onboarding-step { display: none; }
+        .onboarding-step.active { display: block; }
+        .step-indicator { display: flex; justify-content: center; gap: 8px; margin: 16px 0; }
+        .step-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; transition: all 0.3s; }
+        .step-dot.active { background: #9333ea; width: 24px; border-radius: 10px; }
+        .step-dot.done { background: #22c55e; }
+        .char-counter.under { color: #ef4444; }
+        .char-counter.over { color: #22c55e; }
+        .char-counter.mid { color: #eab308; }
+        .standup-progress { height: 4px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .standup-progress-bar { height: 100%; background: linear-gradient(90deg, #8b5cf6, #22c55e); transition: width 0.5s; border-radius: 4px; width: 0%; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.02); border: 2px dashed rgba(255,255,255,0.06); border-radius: 16px; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state .title { font-size: 18px; font-weight: 600; color: #f1f5f9; margin-bottom: 8px; }
+        .empty-state .subtitle { font-size: 14px; color: #94a3b8; max-width: 400px; margin-bottom: 20px; line-height: 1.6; }
+        .empty-state .example { font-size: 13px; color: #64748b; background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 8px; max-width: 400px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.04); }
+        .empty-state .example strong { color: #a78bfa; }
+        .empty-state .btn-primary { background: #8b5cf6; color: white; padding: 10px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; }
+        .empty-state .btn-primary:hover { background: #7c3aed; transform: translateY(-1px); }
+        .next-up-card { background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02)); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 20px; }
+        .next-up-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a78bfa; font-weight: 600; }
+        .next-up-card .task-name { font-size: 18px; font-weight: 600; color: #f1f5f9; margin: 4px 0; }
+        .next-up-card .task-deadline { font-size: 13px; color: #94a3b8; }
+        .skeleton-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.04); }
+        .skeleton-line { height: 12px; background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; margin-bottom: 8px; }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.medium { width: 80%; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
+<body>
 
-    <!-- SIDEBAR -->
-    <nav class="w-64 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
-        <div class="flex items-center gap-3 mb-8 px-2">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm">E5</div>
-            <div>
-                <h1 class="font-semibold text-white text-lg">Whop Creator OS</h1>
-                <p class="text-xs text-slate-500">Loading context...</p>
+    <!-- ============================================================
+    CELEBRATION MODAL
+    ============================================================ -->
+    <div id="celebration-modal" class="celebration-modal">
+        <div class="celebration-card">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-green-400 mb-2">Task Complete!</h2>
+            <p id="celebration-message" class="text-slate-300 mb-4">+125 XP • 🔥 2 day streak</p>
+            <div id="celebration-next-task" class="text-sm text-purple-400 mb-6">Next: Identify Target Avatar & Pain Points</div>
+            <button onclick="closeCelebration()" class="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3 rounded-lg font-bold transition">Continue →</button>
+        </div>
+    </div>
+    <div id="confetti-container" class="confetti-container"></div>
+
+    <!-- ============================================================
+    ONBOARDING OVERLAY
+    ============================================================ -->
+    <div id="gatekeeper" class="fixed inset-0 bg-[#020617]/95 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass rounded-2xl p-8 w-full max-w-2xl shadow-2xl border border-purple-500/30 max-h-[95vh] overflow-y-auto">
+            <div class="step-indicator">
+                <div class="step-dot active" id="step-dot-1"></div>
+                <div class="step-dot" id="step-dot-2"></div>
+                <div class="step-dot" id="step-dot-3"></div>
+                <div class="step-dot" id="step-dot-4"></div>
+            </div>
+
+            <!-- STEP 1: QUIZ -->
+            <div id="onboarding-step-1" class="onboarding-step active">
+                <div class="text-4xl mb-4">🚀</div>
+                <h2 class="text-2xl font-bold text-purple-400 mb-2">Initialize Your AI Coach OS</h2>
+                <p class="text-slate-400 mb-6">3 quick questions to personalize your journey.</p>
+                <div class="space-y-4">
+                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">1. What stage are you at?</label>
+                        <select id="onboarding-stage" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="idea">💡 Just an idea</option>
+                            <option value="product" selected>📦 I have a product/offer</option>
+                            <option value="selling">💰 I'm already selling</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">2. What's your biggest challenge?</label>
+                        <select id="onboarding-bottleneck" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="traffic">📢 Getting traffic / leads</option>
+                            <option value="conversion">🔄 Converting leads to sales</option>
+                            <option value="content">✍️ Creating consistent content</option>
+                            <option value="community">👥 Growing my community</option>
+                            <option value="offer">📦 Building my offer</option>
+                            <option value="time">⏰ Not enough time</option>
+                            <option value="other">❓ Other</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm text-slate-300 mb-2 font-medium">3. How many hours can you commit weekly?</label>
+                        <select id="onboarding-hours" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-purple-500 outline-none">
+                            <option value="1-3">🕐 1-3 hours (Reflective)</option>
+                            <option value="4-7" selected>🕒 4-7 hours (Steady)</option>
+                            <option value="8+">⚡ 8+ hours (Accelerator)</option>
+                        </select>
+                    </div>
+                    <button onclick="generateStrategy()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Generate My Strategy Document</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: DOCUMENT -->
+            <div id="onboarding-step-2" class="onboarding-step">
+                <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📄</span><h2 class="text-2xl font-bold text-purple-400">Your Strategy Document</h2></div>
+                <p class="text-slate-400 mb-4">Review your AI-generated strategy document.</p>
+                <div id="strategy-document-container" class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap font-mono">Loading...</div>
+                <div class="mt-4 flex gap-3">
+                    <button onclick="regenerateStrategy()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">🔄 Regenerate</button>
+                    <button onclick="goToStep(3)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition text-sm">✅ Looks Good → Next</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: PROOF UPLOAD -->
+            <div id="onboarding-step-3" class="onboarding-step">
+                <div class="flex items-center gap-3 mb-2"><span class="text-2xl">📸</span><h2 class="text-2xl font-bold text-purple-400">Upload Proof (Optional)</h2></div>
+                <p class="text-slate-400 mb-4">Upload screenshots to help your AI Coach give specific advice.</p>
+                <div class="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center hover:border-purple-500 transition">
+                    <input type="file" id="proof-upload" multiple accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="handleProofUpload(event)">
+                    <button onclick="document.getElementById('proof-upload').click()" class="text-slate-400 hover:text-white"><i class="fas fa-cloud-upload-alt text-3xl block mb-2"></i>Click to upload screenshots</button>
+                    <p class="text-xs text-slate-500 mt-2">PNG, JPG, PDF • Multiple files allowed</p>
+                </div>
+                <div id="proof-list" class="flex flex-wrap gap-2 mt-3"></div>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="goToStep(4)" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition text-sm">⏭️ Skip & Continue</button>
+                    <button onclick="submitOnboarding()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition text-sm">🚀 Start My 90-Day Journey</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: CONFIRMATION -->
+            <div id="onboarding-step-4" class="onboarding-step">
+                <div class="text-center py-8">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-2xl font-bold text-green-400 mb-2">You're All Set!</h2>
+                    <p class="text-slate-400 mb-6">Your AI Coach is now personalized for your business.</p>
+                    <div class="bg-slate-800/50 rounded-lg p-4 text-left text-sm text-slate-300 max-w-md mx-auto border border-slate-700">
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Stage:</span> <span id="confirm-stage">—</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Bottleneck:</span> <span id="confirm-bottleneck">—</span></div>
+                        <div class="flex justify-between py-1 border-b border-slate-700"><span class="text-slate-500">Speed:</span> <span id="confirm-speed">—</span></div>
+                        <div class="flex justify-between py-1"><span class="text-slate-500">Starting Day:</span> <span id="confirm-day">—</span></div>
+                    </div>
+                    <button onclick="completeOnboarding()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-lg transition mt-6">🚀 Enter Your AI Coach</button>
+                </div>
             </div>
         </div>
-        
-        <div class="space-y-1">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
-                <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                <span>Dashboard</span>
-            </button>
-            <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
-                <span class="icon"><i class="fas fa-comments"></i></span>
-                <span>AI Coach</span>
-            </button>
-            <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
-                <span class="icon"><i class="fas fa-mountain"></i></span>
-                <span>My Journey</span>
-                <span class="badge ml-auto bg-purple-500/20 text-purple-300 text-xs px-2 py-0.5 rounded-full">0%</span>
-            </button>
-            <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-                <span>Settings</span>
-            </button>
-        </div>
-        
-        <div class="mt-auto pt-4 border-t border-slate-800/50">
-            <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Progress</div>
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-slate-400">Streak</span><span id="side-streak" class="text-orange-400 font-medium">0 days</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Avg Score</span><span id="side-score" class="text-purple-400 font-medium">—</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Standups</span><span id="side-standups" class="text-slate-300 font-medium">0</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">XP</span><span id="side-xp" class="text-yellow-400 font-medium">0</span></div>
-            </div>
-        </div>
-    </nav>
+    </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- ============================================================
+    MAIN APP
+    ============================================================ -->
+    <div id="app" class="flex flex-col h-screen hidden">
+
         <!-- HEADER -->
         <header class="h-16 border-b border-slate-800/50 bg-[#0a0e1a]/80 backdrop-blur-sm px-6 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-4">
-                <h2 id="page-title" class="text-xl font-semibold text-white">Dashboard</h2>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm">E5</div>
+                <div>
+                    <h1 class="font-semibold text-white text-lg">Whop Creator OS</h1>
+                    <p id="header-context" class="text-xs text-slate-500">Loading context...</p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 text-sm">
-                    <span class="text-orange-500"><i class="fas fa-fire"></i></span>
-                    <span id="header-streak" class="font-medium text-slate-300">0 days</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm">
-                    <span class="text-yellow-500"><i class="fas fa-star"></i></span>
-                    <span id="header-xp" class="font-medium text-slate-300">0 XP</span>
-                </div>
+                <div class="flex items-center gap-2 text-sm"><span class="text-orange-500">🔥</span><span id="streak-display" class="font-medium text-slate-300">0 days</span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="text-yellow-500">⭐</span><span id="xp-display" class="font-medium text-slate-300">0 XP</span></div>
                 <button onclick="openStandup()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Submit Work</span>
+                    <i class="fas fa-clipboard-check"></i> Submit Work
                 </button>
             </div>
         </header>
 
-        <!-- CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto p-6 bg-[#0a0e1a]/30">
-            <!-- DASHBOARD TAB -->
-            <div id="tab-dashboard" class="tab-content active">
-                <div id="dashboard-content" class="space-y-6">
-                    <div class="text-center text-slate-400 py-12">
-                        <i class="fas fa-chart-bar text-4xl mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">Dashboard</h3>
-                        <p>Your progress overview will appear here.</p>
-                    </div>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- SIDEBAR -->
+            <nav class="w-64 border-r border-slate-800/50 bg-[#0a0e1a]/50 p-4 flex flex-col flex-shrink-0 overflow-y-auto">
+                <div class="space-y-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
+                        <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('chat')" id="nav-chat" class="sidebar-item">
+                        <span class="icon"><i class="fas fa-comments"></i></span>
+                        <span>AI Coach</span>
+                    </button>
+                    <button onclick="switchTab('journey')" id="nav-journey" class="sidebar-item">
+                        <span class="icon"><i class="fas fa-mountain"></i></span>
+                        <span>My Journey</span>
+                        <span class="badge" id="journey-badge">0%</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
+                        <span class="icon"><i class="fas fa-cog"></i></span>
+                        <span>Settings</span>
+                    </button>
                 </div>
-            </div>
+                <div class="mt-auto pt-4 border-t border-slate-800/50">
+                    <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Progress</div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-400">Streak</span><span id="side-streak" class="text-orange-400 font-medium">0 days</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Avg Score</span><span id="side-score" class="text-purple-400 font-medium">—</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Standups</span><span id="side-standups" class="text-slate-300 font-medium">0</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">XP</span><span id="side-xp" class="text-yellow-400 font-medium">0</span></div>
+                    </div>
+                    <div class="mt-3 h-1 w-full bg-slate-800 rounded-full overflow-hidden"><div id="side-progress" class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:0%"></div></div>
+                </div>
+            </nav>
 
-            <!-- AI COACH TAB -->
-            <div id="tab-chat" class="tab-content">
-                <div class="flex flex-col h-full">
-                    <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4">
-                        <div class="text-center text-slate-400 py-12">
-                            <i class="fas fa-comments text-4xl mb-4"></i>
-                            <h3 class="text-lg font-semibold mb-2">AI Coach</h3>
-                            <p>Start a conversation with your AI Coach.</p>
+            <!-- MAIN CONTENT -->
+            <main class="flex-1 overflow-y-auto p-6 bg-[#0a0e1a]/30">
+                <!-- DASHBOARD -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <div id="dashboard-content" class="space-y-6"></div>
+                </div>
+
+                <!-- CHAT -->
+                <div id="tab-chat" class="tab-content">
+                    <div class="flex flex-col h-full">
+                        <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pb-4"></div>
+                        <div class="flex gap-3 pt-4 border-t border-slate-800/50">
+                            <input type="text" id="chat-input" placeholder="Ask your AI Coach..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') sendMessage()">
+                            <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-lg text-white font-medium transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div id="typing-indicator" class="hidden py-2">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="text-slate-400 text-sm ml-2">AI is thinking...</span>
                         </div>
                     </div>
-                    <div class="flex gap-3 pt-4 border-t border-slate-800/50">
-                        <input type="text" id="chat-input" placeholder="Ask your AI Coach..." class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" onkeydown="if(event.key==='Enter') sendMessage()">
-                        <button onclick="sendMessage()" class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-lg text-white font-medium transition">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
                 </div>
-            </div>
 
-            <!-- JOURNEY TAB -->
-            <div id="tab-journey" class="tab-content">
-                <div id="journey-content" class="space-y-6">
-                    <div class="text-center text-slate-400 py-12">
-                        <i class="fas fa-mountain text-4xl mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">My Journey</h3>
-                        <p>Your 90-day journey progress will appear here.</p>
-                    </div>
+                <!-- JOURNEY -->
+                <div id="tab-journey" class="tab-content">
+                    <div id="journey-content" class="space-y-6"></div>
                 </div>
-            </div>
 
-            <!-- SETTINGS TAB -->
-            <div id="tab-settings" class="tab-content">
-                <div class="max-w-2xl">
-                    <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
-                    <div class="space-y-6">
-                        <div class="glass rounded-xl p-6">
-                            <h3 class="font-semibold text-white mb-4">Business Profile</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Business Name</label>
-                                    <input type="text" id="profile-business" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                <!-- SETTINGS -->
+                <div id="tab-settings" class="tab-content">
+                    <div class="max-w-2xl">
+                        <h2 class="text-2xl font-bold text-white mb-6">⚙️ Settings & Profile</h2>
+                        <div class="space-y-6">
+                            <!-- Profile -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">Business Profile</h3>
+                                <div class="space-y-4">
+                                    <div><label class="block text-sm text-slate-400 mb-1">Business Name</label>
+                                        <input type="text" id="profile-business" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                    </div>
+                                    <div><label class="block text-sm text-slate-400 mb-1">Niche</label>
+                                        <input type="text" id="profile-niche" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                    </div>
+                                    <div><label class="block text-sm text-slate-400 mb-1">Target Avatar</label>
+                                        <input type="text" id="profile-avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                                    </div>
+                                    <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition"><i class="fas fa-save"></i> Save Profile</button>
                                 </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Niche</label>
-                                    <input type="text" id="profile-niche" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Target Avatar</label>
-                                    <input type="text" id="profile-avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
-                                </div>
-                                <button onclick="saveProfile()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">
-                                    <i class="fas fa-save"></i> Save Profile
-                                </button>
+                            </div>
+                            <!-- Wins -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">🏆 Wins & Proof</h3>
+                                <button onclick="openWinModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition mb-4">➕ Record a Win</button>
+                                <div id="wins-list" class="space-y-2 text-sm"></div>
+                            </div>
+                            <!-- RE-ENGAGEMENT NOTIFICATIONS -->
+                            <div class="glass rounded-xl p-6">
+                                <h3 class="font-semibold text-white mb-4">📨 Notifications</h3>
+                                <p class="text-sm text-slate-400 mb-4">Test the re‑engagement notification system.</p>
+                                <button onclick="triggerReEngagement()" id="test-notif-btn" class="btn-test">🔔 Test Re-engagement Notification</button>
+                                <div id="notification-result" class="text-sm text-slate-400 mt-3"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    STANDUP MODAL
+    ============================================================ -->
+    <div id="standup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-purple-500/30 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">📋 Daily Standup</h3>
+                <button onclick="closeStandup()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-        </main>
+            <p class="text-sm text-purple-300 mb-4">Submitting work for: <span id="standup-task-name" class="font-bold text-white">Loading...</span></p>
+            <div class="space-y-3">
+                <div><label class="block text-sm text-slate-400 mb-1">Tasks completed today</label>
+                    <input type="text" id="s-tasks" placeholder="e.g., Wrote offer, created avatar" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div><label class="block text-sm text-slate-400 mb-1">Links to your work</label>
+                    <input type="text" id="s-links" placeholder="e.g., https://docs.google.com/..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Paste your work content</label>
+                    <textarea id="s-text" rows="4" placeholder="Paste your work content for grading..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" oninput="updateCharCounter()"></textarea>
+                    <div class="flex justify-between text-xs mt-1">
+                        <span class="text-slate-500">Minimum 100 characters</span>
+                        <span id="char-counter" class="char-counter mid">0/100</span>
+                    </div>
+                </div>
+                <div><label class="block text-sm text-slate-400 mb-1">Metrics (views, clicks, sales...)</label>
+                    <input type="text" id="s-metrics" placeholder="e.g., 500 views, 12 clicks, 2 sales" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div id="standup-progress" class="standup-progress" style="display:none;"><div id="standup-progress-bar" class="standup-progress-bar" style="width:0%"></div></div>
+                <button onclick="submitStandup()" id="standup-submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition">🚀 Submit for Review</button>
+                <div id="review-result" style="display:none" class="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                    <div id="review-score" class="text-2xl font-bold text-center"></div>
+                    <div id="review-xp" class="text-sm text-purple-400 text-center mt-1"></div>
+                    <div id="review-text" class="text-sm text-slate-300 mt-3 whitespace-pre-wrap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIN MODAL -->
+    <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl p-6 w-full max-w-lg border border-green-500/30">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-white">🏆 Record a Win</h3><button onclick="closeWinModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button></div>
+            <div class="space-y-3">
+                <textarea id="win-text" rows="3" placeholder="Describe your win..." class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500"></textarea>
+                <input type="number" id="win-revenue" placeholder="Revenue generated (optional)" class="w-full px-4 py-2 bg-slate-900/80 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-purple-500">
+                <button onclick="submitWin()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition">💾 Save Win</button>
+            </div>
+        </div>
     </div>
 
     <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+    <div id="toast-container" class="toast-container"></div>
 
     <script>
         const API = window.location.origin;
@@ -166,118 +380,429 @@
 
         let chatHistory = [];
         let journeyData = null;
+        let strategyDocument = '';
+        let uploadedFiles = [];
+        let currentStep = 1;
 
         // ============================================================
         // SIDEBAR NAVIGATION
         // ============================================================
         function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`tab-${tabName}`).classList.add('active');
-            
-            // Update sidebar active state
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
             document.getElementById(`nav-${tabName}`).classList.add('active');
-            
-            // Update page title
-            const titles = {
-                'dashboard': 'Dashboard',
-                'chat': 'AI Coach',
-                'journey': 'My Journey',
-                'settings': 'Settings'
-            };
-            document.getElementById('page-title').textContent = titles[tabName];
-            
-            // Load data for specific tabs
-            if (tabName === 'journey') {
-                loadJourney();
-            } else if (tabName === 'settings') {
-                loadProfile();
-            }
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'journey') loadJourney();
+            if (tabName === 'settings') { loadProfile(); loadWins(); }
         }
 
         // ============================================================
-        // TOAST NOTIFICATIONS
+        // TOAST
         // ============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
-            const colors = {
-                success: 'bg-green-600 border-green-500',
-                warning: 'bg-yellow-600 border-yellow-500',
-                error: 'bg-red-600 border-red-500',
-                info: 'bg-blue-600 border-blue-500'
-            };
-            
             const toast = document.createElement('div');
-            toast.className = `${colors[type]} text-white px-4 py-3 rounded-lg border text-sm shadow-lg flex items-center gap-2`;
-            toast.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
-            
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
+                toast.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 4000);
         }
 
         // ============================================================
-        // LOAD DATA
+        // CELEBRATION
         // ============================================================
-        async function loadJourney() {
+        function showCelebration(message, nextTask, xp, streak) {
+            document.getElementById('celebration-message').textContent = `${message} • +${xp} XP • 🔥 ${streak} day streak`;
+            document.getElementById('celebration-next-task').textContent = `Next: ${nextTask}`;
+            document.getElementById('celebration-modal').classList.add('show');
+            const container = document.getElementById('confetti-container');
+            const colors = ['#22c55e','#8b5cf6','#facc15','#f472b6','#60a5fa','#fb923c'];
+            for (let i = 0; i < 80; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.width = Math.random() * 8 + 4 + 'px';
+                el.style.height = Math.random() * 8 + 4 + 'px';
+                el.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                el.style.animationDelay = (Math.random() * 1.5) + 's';
+                container.appendChild(el);
+            }
+            setTimeout(() => container.innerHTML = '', 4000);
+        }
+        function closeCelebration() {
+            document.getElementById('celebration-modal').classList.remove('show');
+            document.getElementById('confetti-container').innerHTML = '';
+        }
+
+        // ============================================================
+        // ONBOARDING
+        // ============================================================
+        function showStep(step) {
+            document.querySelectorAll('.onboarding-step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`onboarding-step-${step}`).classList.add('active');
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'done');
+                if (i + 1 === step) dot.classList.add('active');
+                else if (i + 1 < step) dot.classList.add('done');
+            });
+            currentStep = step;
+        }
+        function goToStep(step) { showStep(step); }
+
+        async function generateStrategy() {
+            const stage = document.getElementById('onboarding-stage').value;
+            const bottleneck = document.getElementById('onboarding-bottleneck').value;
+            const hours = document.getElementById('onboarding-hours').value;
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '⏳ Generating...';
             try {
-                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
-                journeyData = await res.json();
-                
-                const content = document.getElementById('journey-content');
-                content.innerHTML = `
-                    <div class="glass rounded-xl p-6">
-                        <h3 class="text-xl font-bold mb-4">Your 90-Day Journey</h3>
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="text-slate-400 text-sm">Current Phase</div>
-                                <div class="text-xl font-bold text-purple-400">${journeyData.current_phase}</div>
-                            </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="text-slate-400 text-sm">Day</div>
-                                <div class="text-xl font-bold">${journeyData.current_day}/90</div>
-                            </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="text-slate-400 text-sm">Focus</div>
-                                <div class="text-sm">${journeyData.focus}</div>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-slate-400 mb-1">
-                                <span>Progress</span>
-                                <span>${journeyData.progress_percent}%</span>
-                            </div>
-                            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full" style="width: ${journeyData.progress_percent}%"></div>
-                            </div>
-                        </div>
-                        <div class="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg">
-                            <div class="text-sm text-purple-300 font-medium mb-1">Current Task</div>
-                            <div class="text-lg font-bold text-white">${journeyData.current_task.name}</div>
-                            <div class="text-sm text-slate-400 mt-1">${journeyData.current_task.why}</div>
-                        </div>
-                    </div>
-                `;
-                
-                updateSidebarStats();
-            } catch (e) {
-                console.error('Error loading journey:', e);
-                showToast('Error loading journey data', 'error');
+                const res = await fetch(`${API}/api/generate-strategy`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID, stage, bottleneck, hours })
+                });
+                const data = await res.json();
+                strategyDocument = data.document;
+                document.getElementById('strategy-document-container').textContent = data.document;
+                localStorage.setItem('strategy_document', data.document);
+                localStorage.setItem('starting_day', data.starting_day);
+                localStorage.setItem('speed_profile', data.speed_profile);
+                showStep(2);
+            } catch (error) { showToast('Error generating strategy: ' + error.message, 'error'); }
+            btn.disabled = false; btn.textContent = '🚀 Generate My Strategy Document';
+        }
+        async function regenerateStrategy() { await generateStrategy(); }
+
+        function handleProofUpload(event) {
+            const files = event.target.files;
+            const list = document.getElementById('proof-list');
+            for (let file of files) {
+                uploadedFiles.push(file);
+                const div = document.createElement('div');
+                div.className = 'bg-slate-800 text-xs text-slate-300 px-3 py-1 rounded-full flex items-center gap-2';
+                div.innerHTML = `📎 ${file.name} <span class="text-green-400">✅</span>`;
+                list.appendChild(div);
             }
         }
 
+        async function submitOnboarding() {
+            const btn = event.target;
+            btn.disabled = true; btn.textContent = '⏳ Submitting...';
+            try {
+                const stage = document.getElementById('onboarding-stage').value;
+                const bottleneck = document.getElementById('onboarding-bottleneck').value;
+                const hours = document.getElementById('onboarding-hours').value;
+                const res = await fetch(`${API}/api/complete-onboarding`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        member_id: MEMBER_ID, stage, bottleneck, hours,
+                        strategy_document: strategyDocument,
+                        starting_day: parseInt(localStorage.getItem('starting_day')) || 1,
+                        speed_profile: localStorage.getItem('speed_profile') || 'steady'
+                    })
+                });
+                const data = await res.json();
+                document.getElementById('confirm-stage').textContent = stage;
+                document.getElementById('confirm-bottleneck').textContent = bottleneck;
+                document.getElementById('confirm-speed').textContent = localStorage.getItem('speed_profile') || 'steady';
+                document.getElementById('confirm-day').textContent = localStorage.getItem('starting_day') || 1;
+                showStep(4);
+                showToast('🎉 Onboarding complete!', 'success');
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+            btn.disabled = false; btn.textContent = '🚀 Start My 90-Day Journey';
+        }
+
+        async function completeOnboarding() {
+            document.getElementById('gatekeeper').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
+            await loadDashboard();
+            await loadJourney();
+            await loadWins();
+            switchTab('dashboard');
+            showToast('🚀 Welcome to your AI Coach!', 'success');
+        }
+
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
+        async function loadDashboard() {
+            const container = document.getElementById('dashboard-content');
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">${[...Array(4)].map(() => `<div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`).join('')}</div>
+                    <div class="skeleton-card"><div class="skeleton-line"></div></div>
+                    <div class="skeleton-card"><div class="skeleton-line"></div><div class="skeleton-line medium"></div></div>
+                </div>
+            `;
+            try {
+                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                journeyData = await res.json();
+                const traj = journeyData.trajectory || { status: 'on_track', message: 'Loading...', color: 'blue' };
+                const trajClass = { green: 'trajectory-banner-green', yellow: 'trajectory-banner-yellow', blue: 'trajectory-banner-blue' }[traj.color] || 'trajectory-banner-blue';
+                const trajIcon = { green: '🚀', yellow: '⚠️', blue: '✅' }[traj.color] || '✅';
+                const tasksDone = journeyData.tasks_completed_count || 0;
+                const totalTasks = 12;
+                const progress = Math.round((tasksDone / totalTasks) * 100);
+                const activities = [];
+                if (journeyData.standup_count > 0) activities.push({ icon: '📝', color: 'purple', text: `<strong>Standup graded</strong> — ${journeyData.avg_score || 0}/10`, time: 'Today' });
+                if (tasksDone > 0) activities.push({ icon: '🎯', color: 'green', text: `<strong>Task completed</strong> — ${journeyData.current_task.name}`, time: 'Recently' });
+                if (journeyData.wins && journeyData.wins.length > 0) activities.push({ icon: '🏆', color: 'yellow', text: `<strong>Win recorded</strong> — ${journeyData.wins[0].win_text?.slice(0, 40) || 'New win!'}`, time: 'Recent' });
+
+                container.innerHTML = `
+                    <div class="${trajClass} rounded-lg p-4"><span class="text-sm font-medium">${trajIcon} ${traj.message}</span></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="stat-card text-center"><div class="stat-value text-purple-400">${journeyData.current_day}/90</div><div class="stat-label">Day</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-green-400">${tasksDone}/${totalTasks}</div><div class="stat-label">Tasks</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-yellow-400">${journeyData.xp || 0}</div><div class="stat-label">XP</div></div>
+                        <div class="stat-card text-center"><div class="stat-value text-orange-400">${journeyData.streak || 0}</div><div class="stat-label">Streak</div></div>
+                    </div>
+                    <div><div class="flex justify-between text-sm text-slate-400 mb-1"><span>Journey Progress</span><span>${progress}%</span></div><div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div></div>
+                    <div class="glass p-5 rounded-lg border-l-4 border-purple-500">
+                        <div class="flex items-start justify-between">
+                            <div><div class="text-xs text-purple-400 font-medium uppercase tracking-wider">🎯 Current Task</div><div class="text-lg font-semibold text-white">${journeyData.current_task.name}</div><div class="text-sm text-slate-400">📅 Deadline: Day ${journeyData.current_task.deadline_day}</div></div>
+                            <span class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">${journeyData.current_phase}</span>
+                        </div>
+                        <div class="text-sm text-slate-400 mt-2">${journeyData.current_task.why}</div>
+                        <div class="flex flex-wrap gap-1 mt-2">${journeyData.current_task.frameworks.map(f => `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`).join('')}</div>
+                        <div class="mt-3 space-y-1">${journeyData.current_task.deliverables.map(d => `<div class="flex items-center gap-2 text-sm text-slate-300"><span class="text-slate-500">⬜</span> ${d}</div>`).join('')}</div>
+                        <div class="mt-3 text-xs text-slate-500">⚠️ Submit work in Daily Standup to unlock next step</div>
+                    </div>
+                    <div class="glass p-5 rounded-lg">
+                        <h3 class="text-sm font-semibold text-slate-300 mb-3">📋 Recent Activity</h3>
+                        ${activities.length > 0 ? activities.map(a => `<div class="activity-item"><div class="activity-icon ${a.color}">${a.icon}</div><div class="activity-content"><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div></div>`).join('') : '<div class="text-sm text-slate-400">No activity yet. Complete your first task!</div>'}
+                    </div>
+                    <div class="next-up-card">
+                        <div class="label">🚀 Next Up</div>
+                        <div class="task-name">${journeyData.current_task.name}</div>
+                        <div class="task-deadline">Deadline: Day ${journeyData.current_task.deadline_day} • ${progress}% complete</div>
+                        <button onclick="switchTab('journey')" class="mt-3 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">View Journey →</button>
+                    </div>
+                `;
+                updateSidebarStats();
+            } catch (e) {
+                container.innerHTML = `<div class="text-red-400 text-center">Error loading dashboard</div>`;
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // JOURNEY
+        // ============================================================
+        async function loadJourney() {
+            const container = document.getElementById('journey-content');
+            container.innerHTML = '<div class="text-slate-400">Loading journey...</div>';
+            try {
+                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                journeyData = await res.json();
+                const tasksDone = journeyData.tasks_completed_count || 0;
+                const totalTasks = 12;
+                const progress = Math.round((tasksDone / totalTasks) * 100);
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="text-sm text-slate-400">All the details of your 90-day journey.</div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-purple-400">${journeyData.current_day}/90</div><div class="text-xs text-slate-500 uppercase">Day</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-green-400">${tasksDone}/${totalTasks}</div><div class="text-xs text-slate-500 uppercase">Tasks</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-yellow-400">${journeyData.xp || 0}</div><div class="text-xs text-slate-500 uppercase">XP</div></div>
+                            <div class="glass p-4 rounded-lg text-center"><div class="text-2xl font-bold text-orange-400">${journeyData.streak || 0}</div><div class="text-xs text-slate-500 uppercase">Streak</div></div>
+                        </div>
+                        <div><div class="flex justify-between text-sm text-slate-400 mb-1"><span>Progress</span><span>${progress}%</span></div><div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full transition-all duration-500" style="width:${progress}%"></div></div></div>
+                        <div class="glass p-5 rounded-lg border-l-4 border-purple-500">
+                            <div class="text-xs text-purple-400 font-medium uppercase tracking-wider">Current Task</div>
+                            <div class="text-lg font-semibold text-white">${journeyData.current_task.name}</div>
+                            <div class="text-sm text-slate-400">📅 Day ${journeyData.current_task.deadline_day}</div>
+                            <div class="text-sm text-slate-400 mt-1">${journeyData.current_task.why}</div>
+                            <div class="flex flex-wrap gap-1 mt-2">${journeyData.current_task.frameworks.map(f => `<span class="px-2 py-1 bg-purple-900/50 rounded text-xs text-purple-300">${f}</span>`).join('')}</div>
+                            <div class="mt-3 space-y-1">${journeyData.current_task.deliverables.map(d => `<div class="flex items-center gap-2 text-sm text-slate-300"><span class="text-slate-500">⬜</span> ${d}</div>`).join('')}</div>
+                        </div>
+                        <div class="space-y-2">${Object.entries(journeyData.all_phases || {}).map(([key, phase]) => {
+                            const done = phase.tasks.filter(t => t.completed).length;
+                            const total = phase.tasks.length;
+                            const isCurrent = key === journeyData.current_phase.replace(' ', '_');
+                            return `<div class="glass p-4 rounded-lg ${isCurrent ? 'border border-purple-500' : ''}"><div class="flex justify-between items-center"><span class="font-medium">${isCurrent ? '🔄' : '✅'} ${phase.name}</span><span class="text-sm text-slate-400">${done}/${total}</span></div><div class="mt-2 space-y-1">${phase.tasks.map(task => `<div class="flex items-center gap-2 text-sm ${task.completed ? 'text-slate-400 line-through' : isCurrent && !task.completed ? 'text-purple-400' : 'text-slate-500'}"><span>${task.completed ? '✅' : isCurrent && !task.completed ? '⏳' : '⬜'}</span><span>${task.name}</span></div>`).join('')}</div></div>`;
+                        }).join('')}</div>
+                    </div>
+                `;
+                updateSidebarStats();
+            } catch (e) {
+                container.innerHTML = `<div class="text-red-400">Error loading journey</div>`;
+            }
+        }
+
+        // ============================================================
+        // CHAT
+        // ============================================================
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            switchTab('chat');
+            const messagesDiv = document.getElementById('chat-messages');
+            const userDiv = document.createElement('div');
+            userDiv.className = 'flex gap-3 flex-row-reverse';
+            userDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">You</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${text}</div>`;
+            messagesDiv.appendChild(userDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            input.value = '';
+            document.getElementById('typing-indicator').classList.remove('hidden');
+            try {
+                const res = await fetch(`${API}/api/chat`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, member_id: MEMBER_ID, history: chatHistory.slice(-10) })
+                });
+                const data = await res.json();
+                document.getElementById('typing-indicator').classList.add('hidden');
+                if (res.ok) {
+                    const aiDiv = document.createElement('div');
+                    aiDiv.className = 'flex gap-3';
+                    aiDiv.innerHTML = `<div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0">AI</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${data.reply}</div>`;
+                    messagesDiv.appendChild(aiDiv);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    chatHistory.push({ role: 'user', content: text });
+                    chatHistory.push({ role: 'assistant', content: data.reply });
+                } else {
+                    showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
+                }
+            } catch (e) {
+                document.getElementById('typing-indicator').classList.add('hidden');
+                showToast('Network error: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        // STANDUP
+        // ============================================================
+        function openStandup() {
+            if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
+            document.getElementById('standup-modal').classList.remove('hidden');
+            document.getElementById('standup-modal').classList.add('flex');
+            document.getElementById('review-result').style.display = 'none';
+            document.getElementById('standup-task-name').textContent = journeyData.current_task.name;
+            document.getElementById('s-text').value = '';
+            document.getElementById('char-counter').textContent = '0/100';
+            document.getElementById('char-counter').className = 'char-counter under';
+            document.getElementById('standup-progress').style.display = 'none';
+            document.getElementById('standup-submit-btn').disabled = false;
+            document.getElementById('standup-submit-btn').textContent = '🚀 Submit for Review';
+        }
+        function closeStandup() {
+            document.getElementById('standup-modal').classList.add('hidden');
+            document.getElementById('standup-modal').classList.remove('flex');
+        }
+
+        async function submitStandup() {
+            const textContent = document.getElementById('s-text').value.trim();
+            if (textContent.length < 100) { showToast('⚠️ Please add at least 100 characters.', 'warning'); return; }
+            if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
+            const payload = {
+                member_id: MEMBER_ID,
+                current_task_id: journeyData.current_task.id,
+                tasks_completed: document.getElementById('s-tasks').value.split(',').filter(s => s.trim()),
+                asset_links: document.getElementById('s-links').value.split(',').filter(s => s.trim()),
+                asset_text: textContent,
+                metrics: document.getElementById('s-metrics').value
+            };
+            const btn = document.getElementById('standup-submit-btn');
+            btn.innerText = '⏳ Grading...';
+            btn.disabled = true;
+            const progress = document.getElementById('standup-progress');
+            const progressBar = document.getElementById('standup-progress-bar');
+            progress.style.display = 'block';
+            progressBar.style.width = '0%';
+            let p = 0;
+            const interval = setInterval(() => { p += 5; if (p > 90) clearInterval(interval); progressBar.style.width = p + '%'; }, 200);
+            try {
+                const res = await fetch(`${API}/api/standup`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                setTimeout(() => progress.style.display = 'none', 500);
+                document.getElementById('review-result').style.display = 'block';
+                const scoreEl = document.getElementById('review-score');
+                scoreEl.textContent = `${data.score}/10`;
+                scoreEl.className = `text-2xl font-bold text-center ${data.score >= 7 ? 'text-green-400' : data.score >= 5 ? 'text-yellow-400' : 'text-red-400'}`;
+                document.getElementById('review-xp').textContent = `+${data.xp_gained || 25} XP • 🔥 ${data.streak || 0} day streak`;
+                document.getElementById('review-text').textContent = data.review || 'No review provided.';
+                document.getElementById('s-tasks').value = '';
+                document.getElementById('s-links').value = '';
+                document.getElementById('s-text').value = '';
+                document.getElementById('s-metrics').value = '';
+                document.getElementById('char-counter').textContent = '0/100';
+                await loadDashboard();
+                await loadJourney();
+                if (data.task_unlocked && data.score >= 7) {
+                    const nextTask = journeyData?.all_phases?.[journeyData.current_phase]?.tasks?.find(t => !t.completed);
+                    const nextTaskName = nextTask ? nextTask.name : 'Phase 2 unlocked!';
+                    showCelebration(`✅ Score: ${data.score}/10! Task complete!`, nextTaskName, data.xp_gained || 125, data.streak || 0);
+                } else if (data.score >= 7) {
+                    showToast(`✅ Score: ${data.score}/10! +${data.xp_gained} XP`, 'success');
+                } else {
+                    showToast(`📝 Score: ${data.score}/10. Review feedback.`, 'warning');
+                }
+            } catch (e) {
+                clearInterval(interval);
+                progress.style.display = 'none';
+                showToast('Error submitting standup', 'error');
+            }
+            btn.innerText = '🚀 Submit for Review';
+            btn.disabled = false;
+        }
+
+        // ============================================================
+        // WINS
+        // ============================================================
+        function openWinModal() { document.getElementById('win-modal').classList.remove('hidden'); document.getElementById('win-modal').classList.add('flex'); }
+        function closeWinModal() { document.getElementById('win-modal').classList.add('hidden'); document.getElementById('win-modal').classList.remove('flex'); }
+        async function submitWin() {
+            const text = document.getElementById('win-text').value.trim();
+            const revenue = parseFloat(document.getElementById('win-revenue').value) || null;
+            if (!text) { showToast('Please describe your win.', 'warning'); return; }
+            try {
+                await fetch(`${API}/api/win`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_id: MEMBER_ID, win_text: text, revenue_amount: revenue })
+                });
+                closeWinModal();
+                document.getElementById('win-text').value = '';
+                document.getElementById('win-revenue').value = '';
+                loadWins();
+                loadDashboard();
+                showToast('🏆 Win recorded!', 'success');
+            } catch (e) { showToast('Error recording win', 'error'); }
+        }
+
+        async function loadWins() {
+            try {
+                const res = await fetch(`${API}/api/journey?member_id=${MEMBER_ID}`);
+                const data = await res.json();
+                const wins = data.wins || [];
+                const container = document.getElementById('wins-list');
+                if (wins.length === 0) {
+                    container.innerHTML = '<div class="text-sm text-slate-400">No wins recorded yet.</div>';
+                } else {
+                    container.innerHTML = wins.slice(0, 5).map(w => `
+                        <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                            <div class="text-sm text-slate-300">🏆 ${w.win_text}</div>
+                            ${w.revenue_amount ? `<div class="text-xs text-green-400">+$${w.revenue_amount}</div>` : ''}
+                            <div class="text-xs text-slate-500 mt-1">${new Date(w.created_at).toLocaleDateString()}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // ============================================================
+        // PROFILE
+        // ============================================================
         async function loadProfile() {
             try {
                 const res = await fetch(`${API}/api/check-onboarding?member_id=${MEMBER_ID}`);
@@ -287,99 +812,76 @@
                     document.getElementById('profile-niche').value = data.profile.niche || '';
                     document.getElementById('profile-avatar').value = data.profile.target_avatar || '';
                 }
-            } catch (e) {
-                console.error('Error loading profile:', e);
-            }
+            } catch (e) { console.error(e); }
         }
-
         async function saveProfile() {
+            const payload = {
+                member_id: MEMBER_ID,
+                business_name: document.getElementById('profile-business').value,
+                niche: document.getElementById('profile-niche').value,
+                target_avatar: document.getElementById('profile-avatar').value,
+                core_offer: '', current_revenue: 0, revenue_goal: 10000,
+                biggest_bottleneck: '', current_level: 'beginner', weekly_hours: '4-7',
+                offer_done: false, audience_done: false, sales_done: false, launch_done: false
+            };
             try {
                 await fetch(`${API}/api/onboarding`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        member_id: MEMBER_ID,
-                        business_name: document.getElementById('profile-business').value,
-                        niche: document.getElementById('profile-niche').value,
-                        target_avatar: document.getElementById('profile-avatar').value,
-                        core_offer: '', current_revenue: 0, revenue_goal: 10000,
-                        biggest_bottleneck: '', current_level: 'beginner', weekly_hours: '4-7',
-                        offer_done: false, audience_done: false, sales_done: false, launch_done: false
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-                showToast('Profile saved successfully!', 'success');
-            } catch (e) {
-                showToast('Error saving profile', 'error');
-            }
-        }
-
-        function updateSidebarStats() {
-            if (!journeyData) return;
-            document.getElementById('side-streak').textContent = `${journeyData.streak || 0} days`;
-            document.getElementById('header-streak').textContent = `${journeyData.streak || 0} days`;
-            document.getElementById('side-score').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
-            document.getElementById('side-standups').textContent = journeyData.standup_count || 0;
-            document.getElementById('side-xp').textContent = journeyData.xp || 0;
-            document.getElementById('header-xp').textContent = `${journeyData.xp || 0} XP`;
+                showToast('✅ Profile saved!', 'success');
+            } catch (e) { showToast('Error saving profile', 'error'); }
         }
 
         // ============================================================
-        // CHAT FUNCTIONS
+        // RE-ENGAGEMENT
         // ============================================================
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Switch to chat tab if not already there
-            switchTab('chat');
-
-            const messagesDiv = document.getElementById('chat-messages');
-            
-            // Add user message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'flex gap-3 flex-row-reverse';
-            userDiv.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">You</div>
-                <div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${text}</div>
-            `;
-            messagesDiv.appendChild(userDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            input.value = '';
-
+        async function triggerReEngagement() {
+            const result = document.getElementById('notification-result');
+            const btn = document.getElementById('test-notif-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+            result.textContent = '⏳ Sending test notification...';
+            result.className = 'text-sm text-yellow-400 mt-3';
             try {
-                const res = await fetch(`${API}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, member_id: MEMBER_ID, history: chatHistory.slice(-10) })
-                });
+                const res = await fetch(`${API}/api/trigger-re-engagement?member_id=${MEMBER_ID}`, { method: 'POST' });
                 const data = await res.json();
-                
-                if (res.ok) {
-                    const aiDiv = document.createElement('div');
-                    aiDiv.className = 'flex gap-3';
-                    aiDiv.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0">AI</div>
-                        <div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${data.reply}</div>
-                    `;
-                    messagesDiv.appendChild(aiDiv);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    chatHistory.push({ role: 'user', content: text });
-                    chatHistory.push({ role: 'assistant', content: data.reply });
+                if (data.success) {
+                    result.textContent = '✅ Notification sent! Check your Telegram.';
+                    result.className = 'text-sm text-green-400 mt-3';
+                    showToast('📨 Test notification sent!', 'success');
                 } else {
-                    showToast('Error: ' + (data.detail || 'Unknown error'), 'error');
+                    result.textContent = '⚠️ Failed: ' + (data.error || 'Unknown error');
+                    result.className = 'text-sm text-red-400 mt-3';
+                    showToast('⚠️ Failed to send notification', 'error');
                 }
             } catch (e) {
-                showToast('Network error: ' + e.message, 'error');
+                result.textContent = '⚠️ Error: ' + e.message;
+                result.className = 'text-sm text-red-400 mt-3';
+                showToast('⚠️ Error: ' + e.message, 'error');
             }
+            btn.disabled = false;
+            btn.textContent = '🔔 Test Re-engagement Notification';
         }
 
         // ============================================================
-        // STANDUP MODAL
+        // SIDEBAR STATS
         // ============================================================
-        function openStandup() {
-            showToast('Standup feature coming soon!', 'info');
+        function updateSidebarStats() {
+            if (!journeyData) return;
+            const streak = journeyData.streak || 0;
+            const xp = journeyData.xp || 0;
+            const tasksDone = journeyData.tasks_completed_count || 0;
+            const totalTasks = 12;
+            const progress = Math.round((tasksDone / totalTasks) * 100);
+            document.getElementById('side-streak').textContent = `${streak} days`;
+            document.getElementById('header-streak').textContent = `${streak} days`;
+            document.getElementById('side-score').textContent = journeyData.avg_score ? `${journeyData.avg_score}/10` : '—';
+            document.getElementById('side-standups').textContent = journeyData.standup_count || 0;
+            document.getElementById('side-xp').textContent = xp;
+            document.getElementById('header-xp').textContent = `${xp} XP`;
+            document.getElementById('side-progress').style.width = `${progress}%`;
+            document.getElementById('journey-badge').textContent = `${progress}%`;
         }
 
         // ============================================================
@@ -389,22 +891,50 @@
             try {
                 const res = await fetch(`${API}/api/check-onboarding?member_id=${MEMBER_ID}`);
                 const data = await res.json();
-                
                 if (!data.onboarded) {
-                    window.location.href = '/onboarding.html';
-                    return;
+                    showStep(1);
+                    document.getElementById('gatekeeper').style.display = 'flex';
+                    document.getElementById('app').classList.add('hidden');
+                } else {
+                    document.getElementById('gatekeeper').style.display = 'none';
+                    document.getElementById('app').classList.remove('hidden');
+                    document.getElementById('header-context').textContent = `${data.profile?.target_avatar || ''} | Bottleneck: ${data.profile?.biggest_bottleneck || ''}`;
+                    document.getElementById('profile-business').value = data.profile?.business_name || '';
+                    document.getElementById('profile-niche').value = data.profile?.niche || '';
+                    document.getElementById('profile-avatar').value = data.profile?.target_avatar || '';
+                    await loadDashboard();
+                    await loadJourney();
+                    await loadWins();
+                    switchTab('dashboard');
+
+                    setTimeout(() => {
+                        const welcome = `**System Initialized.** I am your proactive COO.\n\nBased on your profile, you are a **${data.profile?.current_level || 'beginner'}** level business.\nYour starting point: Day **${localStorage.getItem('starting_day') || 1}** of the 90-day journey.\nYour speed profile: **${localStorage.getItem('speed_profile') || 'steady'}**.\n\nCheck the **Dashboard** to see your current task and progress.`;
+                        appendMessage('ai', welcome);
+                    }, 500);
                 }
-                
-                // Load initial data
-                await loadJourney();
-                await loadProfile();
-                
-                // Show dashboard by default
-                switchTab('dashboard');
-                
-            } catch (e) {
-                console.error('Init error:', e);
-            }
+            } catch (e) { console.error('Init error:', e); }
+        }
+
+        // ===== Wrapper for chat appendMessage (needed for init welcome) =====
+        function appendMessage(role, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            const avatar = role === 'ai' ? 'AI' : 'You';
+            const avatarClass = role === 'ai' ? 'bg-purple-600' : 'bg-blue-600';
+            const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            div.innerHTML = `<div class="w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center font-bold text-xs flex-shrink-0">${avatar}</div><div class="glass p-4 rounded-lg max-w-3xl text-sm text-slate-300 leading-relaxed">${formatted}</div>`;
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ===== char counter for standup =====
+        function updateCharCounter() {
+            const text = document.getElementById('s-text').value;
+            const count = text.length;
+            const counter = document.getElementById('char-counter');
+            counter.textContent = `${count}/100`;
+            counter.className = 'char-counter ' + (count < 100 ? 'under' : count < 200 ? 'mid' : 'over');
         }
 
         init();
