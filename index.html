@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Income Engine — Growth Lab | Build Your Acquisition System</title>
+    <meta name="description" content="AI-powered business coach that helps digital entrepreneurs build their customer acquisition system in 90 days." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ============================================================
+           ROOT
+           ============================================================ */
+        :root {
+            --bg: #020617;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-glow: rgba(139, 92, 246, 0.3);
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --text-muted: #64748b;
+            --green: #22c55e;
+            --orange: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+           UTILITY
+           ============================================================ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.5);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 0;
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled {
+            background: rgba(2, 6, 23, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 0;
+        }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 20px;
+            text-decoration: none;
+            color: white;
+        }
+        .navbar .logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+        .navbar .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .navbar .nav-links a:hover {
+            color: white;
+        }
+        .navbar .nav-links .btn-nav {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white !important;
+            font-weight: 600;
+        }
+        .navbar .nav-links .btn-nav:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile menu */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .navbar .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(2, 6, 23, 0.98);
+                backdrop-filter: blur(16px);
+                flex-direction: column;
+                padding: 24px;
+                gap: 16px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .navbar .nav-links.open {
+                display: flex;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+        }
+
+        /* ============================================================
+           HERO
+           ============================================================ */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero .hero-badge {
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 20px;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: clamp(16px, 1.5vw, 20px);
+            color: var(--text-dim);
+            max-width: 640px;
+            margin: 0 auto 36px;
+            line-height: 1.8;
+        }
+        .hero .cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+        }
+        .hero .trust-badge {
+            margin-top: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .hero .trust-badge span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hero .trust-badge .num {
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* ============================================================
+           FEATURES
+           ============================================================ */
+        .features {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .features .feature-card {
+            padding: 32px 24px;
+            border-radius: 16px;
+            text-align: left;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .features .feature-card:hover {
+            border-color: rgba(139, 92, 246, 0.2);
+            transform: translateY(-4px);
+            background: rgba(139, 92, 246, 0.04);
+        }
+        .features .feature-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .features .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .features .feature-card p {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* ============================================================
+           HOW IT WORKS
+           ============================================================ */
+        .how-it-works {
+            padding: 80px 0;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.01);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .how-it-works .step {
+            text-align: left;
+            padding: 24px;
+        }
+        .how-it-works .step .step-num {
+            font-size: 48px;
+            font-weight: 900;
+            color: rgba(139, 92, 246, 0.15);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .how-it-works .step h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .how-it-works .step p {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        /* ============================================================
+           PRICING
+           ============================================================ */
+        .pricing {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .pricing .pricing-card {
+            padding: 40px 32px;
+            border-radius: 16px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .pricing .pricing-card.featured {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.04);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.05);
+        }
+        .pricing .pricing-card .price {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 12px 0 4px;
+        }
+        .pricing .pricing-card .price span {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-dim);
+        }
+        .pricing .pricing-card .plan-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .pricing .pricing-card .description {
+            color: var(--text-dim);
+            font-size: 14px;
+            margin: 8px 0 20px;
+        }
+        .pricing .pricing-card .feature-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+        .pricing .pricing-card .feature-list li {
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pricing .pricing-card .feature-list li .check {
+            color: var(--green);
+        }
+        .pricing .pricing-card .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ============================================================
+           TESTIMONIALS
+           ============================================================ */
+        .testimonials {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .testimonials .testimonial-card {
+            padding: 28px 24px;
+            border-radius: 16px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .testimonials .testimonial-card .stars {
+            color: var(--orange);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .testimonials .testimonial-card blockquote {
+            font-size: 15px;
+            color: var(--text);
+            font-style: italic;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .testimonials .testimonial-card .author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .testimonials .testimonial-card .author .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .testimonials .testimonial-card .author .name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .testimonials .testimonial-card .author .role {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* ============================================================
+           FAQ
+           ============================================================ */
+        .faq {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .faq .faq-item {
+            text-align: left;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .faq .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq .faq-item .question {
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq .faq-item .question .toggle {
+            font-size: 20px;
+            color: var(--text-dim);
+            transition: transform 0.3s;
+        }
+        .faq .faq-item .question .toggle.open {
+            transform: rotate(180deg);
+        }
+        .faq .faq-item .answer {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.7;
+            padding-top: 8px;
+            display: none;
+        }
+        .faq .faq-item .answer.open {
+            display: block;
+        }
+
+        /* ============================================================
+           CTA
+           ============================================================ */
+        .cta-section {
+            padding: 80px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .cta-section .cta-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02));
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 24px;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.05), transparent 70%);
+            pointer-events: none;
+        }
+        .cta-section h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .cta-section p {
+            color: var(--text-dim);
+            font-size: 18px;
+            max-width: 540px;
+            margin: 0 auto 32px;
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .footer .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer .footer-links a:hover {
+            color: white;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-in {
+            animation: fadeUp 0.6s ease forwards;
+        }
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 640px) {
+            .hero {
+                padding: 120px 0 60px;
+            }
+            .hero .cta-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .cta-section .cta-box {
+                padding: 40px 20px;
+            }
+            .pricing .pricing-card.featured {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    NAVBAR
+    ============================================================ -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="#" class="logo">
+                <span class="logo-icon">E5</span>
+                Income Engine
+            </a>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#cta" class="btn-nav">Join Now →</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+    HERO
+    ============================================================ -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge animate-in">
+                <span class="badge">🚀 AI-Powered Business Coach</span>
+            </div>
+            <h1 class="animate-in delay-1">
+                Build Your <br /><span class="highlight">Customer Acquisition</span> System
+            </h1>
+            <p class="animate-in delay-2">
+                An AI-powered coach that guides you step-by-step through building a
+                complete acquisition system for your digital product or community —
+                in just 90 days.
+            </p>
+            <div class="cta-group animate-in delay-3">
+                <a href="#pricing" class="btn-primary">
+                    Start Your 90-Day Journey →
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor"/></svg>
+                    Watch Overview
+                </a>
+            </div>
+            <div class="trust-badge animate-in delay-3">
+                <span>👥 <span class="num">152+</span> Members</span>
+                <span>⭐ <span class="num">4.8</span> Rating</span>
+                <span>📈 <span class="num">$370+</span> Revenue Generated</span>
+                <span>🔥 <span class="num">90-Day</span> Proven Framework</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    FEATURES
+    ============================================================ -->
+    <section class="features" id="features">
+        <div class="container">
+            <span class="badge" style="margin-bottom:12px;">The 6-Engine Method</span>
+            <h2 class="section-title">Everything You Need to <br /><span class="gradient-text">Build, Acquire & Convert</span></h2>
+            <p class="section-subtitle">
+                A complete operating system for digital entrepreneurs — from offer creation
+                to full-scale launch.
+            </p>
+            <div class="grid-3">
+                <div class="feature-card glass">
+                    <div class="icon">🎯</div>
+                    <h3>Position &amp; Package</h3>
+                    <p>Define your offer, target avatar, and value stack. Build an irresistible offer that people actually want to buy.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="icon">📢</div>
+                    <h3>Attract &amp; Convert</h3>
+                    <p>Get consistent traffic through content, DMs, or paid ads. Turn attention into customers with proven funnels.</p>
+                </div>
+                <div class="feature-card glass">
+                    <div class="icon">⚙️</div>
+                    <h3>Automate &amp; Optimize</h3>
+                    <p>Hand over repetitive tasks to AI and systems. Continuously improve your CAC, conversion rate, and retention.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    HOW IT WORKS
+    ============================================================ -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <span class="badge" style="margin-bottom:12px;">90-Day Journey</span>
+            <h2 class="section-title">Your Path to <span class="gradient-text">$10K+ Months</span></h2>
+            <p class="section-subtitle">
+                Three phases. Twelve tasks. One AI coach guiding you every step of the way.
+            </p>
+            <div class="grid-3">
+                <div class="step glass">
+                    <div class="step-num">01</div>
+                    <h4>Foundation</h4>
+                    <p>Define your offer, identify your avatar, create your first content piece, and test DM outreach. Days 1–30.</p>
+                </div>
+                <div class="step glass">
+                    <div class="step-num">02</div>
+                    <h4>Traffic</h4>
+                    <p>Double your content volume, build inbound and outbound systems, and track your traffic metrics. Days 31–60.</p>
+                </div>
+                <div class="step glass">
+                    <div class="step-num">03</div>
+                    <h4>Conversion</h4>
+                    <p>Funnel hack competitors, rebuild your offer, optimize your landing page, and execute your full launch. Days 61–90.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    TESTIMONIALS
+    ============================================================ -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <span class="badge" style="margin-bottom:12px;">Real Results</span>
+            <h2 class="section-title">What Members Are <span class="gradient-text">Saying</span></h2>
+            <div class="grid-3">
+                <div class="testimonial-card glass">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>"This system gave me the structure I needed. I went from 0 to my first $497 client in 14 days."</blockquote>
+                    <div class="author">
+                        <div class="avatar">A</div>
+                        <div>
+                            <div class="name">Ahmed</div>
+                            <div class="role">Course Creator</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card glass">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>"The AI coach is like having a strategist in my pocket. It caught things I would have missed."</blockquote>
+                    <div class="author">
+                        <div class="avatar">S</div>
+                        <div>
+                            <div class="name">Sara</div>
+                            <div class="role">SaaS Founder</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card glass">
+                    <div class="stars">★★★★★</div>
+                    <blockquote>"I've tried every course out there. This is different — it's an operating system, not just information."</blockquote>
+                    <div class="author">
+                        <div class="avatar">K</div>
+                        <div>
+                            <div class="name">Khalid</div>
+                            <div class="role">Community Builder</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    PRICING
+    ============================================================ -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <span class="badge" style="margin-bottom:12px;">Simple Pricing</span>
+            <h2 class="section-title">Choose Your <span class="gradient-text">Growth Path</span></h2>
+            <p class="section-subtitle">
+                Start with the Growth Lab. Cancel anytime. All plans include the AI Coach.
+            </p>
+            <div class="grid-2" style="max-width:800px;margin:0 auto;">
+                <!-- Standard Plan -->
+                <div class="pricing-card glass">
+                    <div class="plan-name">Growth Lab</div>
+                    <div class="price">$39<span>/mo</span></div>
+                    <div class="description">Everything you need to build your acquisition system.</div>
+                    <ul class="feature-list">
+                        <li><span class="check">✅</span> 90-Day AI‑Powered Journey</li>
+                        <li><span class="check">✅</span> 12 Tasks with Frameworks</li>
+                        <li><span class="check">✅</span> Daily Standup &amp; Grading</li>
+                        <li><span class="check">✅</span> XP, Streaks &amp; Wins</li>
+                        <li><span class="check">✅</span> Proof Uploads &amp; Feedback</li>
+                        <li><span class="check">✅</span> Weekly Live Calls</li>
+                        <li><span class="check">✅</span> Community Access</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Join Now →</a>
+                </div>
+                <!-- Pro Plan (Featured) -->
+                <div class="pricing-card featured">
+                    <div style="position:absolute;top:-12px;right:20px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:600;">Most Popular</div>
+                    <div class="plan-name">Growth Lab Pro</div>
+                    <div class="price">$99<span>/mo</span></div>
+                    <div class="description">Everything in Growth Lab + premium tools &amp; support.</div>
+                    <ul class="feature-list">
+                        <li><span class="check">✅</span> All Growth Lab Features</li>
+                        <li><span class="check">✅</span> 1‑on‑1 Hot Seats</li>
+                        <li><span class="check">✅</span> Funnel Hacking Reviews</li>
+                        <li><span class="check">✅</span> AI‑Powered Funnel Analysis</li>
+                        <li><span class="check">✅</span> Priority Support</li>
+                        <li><span class="check">✅</span> Private Implementation Group</li>
+                        <li><span class="check">✅</span> Monthly Strategy Session</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Join Pro →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    FAQ
+    ============================================================ -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <span class="badge" style="margin-bottom:12px;">FAQ</span>
+            <h2 class="section-title">Frequently Asked <span class="gradient-text">Questions</span></h2>
+            <div style="max-width:720px;margin:0 auto;text-align:left;">
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        What is the Growth Lab?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">The Growth Lab is an AI‑powered business coach that guides you through building a complete customer acquisition system for your digital product or community.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        Who is this for?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">Digital entrepreneurs who have a product, offer, or community and are ready to actively acquire customers. Ideal for course creators, coaches, SaaS founders, and community builders.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        How does the AI Coach work?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">The AI Coach adapts to your business, gives personalized feedback, grades your work, and guides you through 12 tasks across 3 phases. It's like having a full‑time COO.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        Can I cancel anytime?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">Yes. You can cancel your membership at any time through your Whop account. No lock‑in contracts.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        What's included in the 90‑day journey?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">12 tasks across 3 phases: Foundation (offer, avatar, content, DMs), Traffic (content volume, inbound, outbound), and Conversion (funnel hacking, offer rebuild, landing page, launch).</div>
+                </div>
+                <div class="faq-item">
+                    <div class="question" onclick="toggleFaq(this)">
+                        Is this a course or a community?
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="answer">Both. You get a structured course (the 90‑day journey), an AI coach that guides you, and a community of fellow builders.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    CTA SECTION
+    ============================================================ -->
+    <section class="cta-section" id="cta">
+        <div class="container">
+            <div class="cta-box">
+                <span class="badge" style="margin-bottom:16px;">🚀 Join Today</span>
+                <h2>Ready to Build Your <br /><span class="gradient-text">Acquisition System?</span></h2>
+                <p>Start your 90‑day journey with an AI coach that actually holds you accountable.</p>
+                <a href="#pricing" class="btn-primary" style="font-size:18px;padding:18px 48px;">
+                    Get Started Now →
+                </a>
+                <p style="margin-top:16px;font-size:13px;color:var(--text-muted);">
+                    ⚡ Join 152+ members already building their empire
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Home</a>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms</a>
+            </div>
+            <p>© 2026 Income Engine — Growth Lab. Built with ❤️ by E5 AI Coach OS.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== NAVBAR SCROLL EFFECT =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ===== MOBILE MENU =====
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+        });
+
+        // Close mobile menu on link click
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+            });
+        });
+
+        // ===== FAQ TOGGLE =====
+        function toggleFaq(el) {
+            const answer = el.nextElementSibling;
+            const toggle = el.querySelector('.toggle');
+            if (answer.classList.contains('open')) {
+                answer.classList.remove('open');
+                toggle.classList.remove('open');
+            } else {
+                answer.classList.add('open');
+                toggle.classList.add('open');
+            }
+        }
+
+        // ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ===== ANIMATE IN ELEMENTS ON SCROLL =====
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .step, .testimonial-card, .pricing-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
