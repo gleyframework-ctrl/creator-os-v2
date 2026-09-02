@@ -30,23 +30,50 @@
             color: #a78bfa; font-size: 10px; padding: 2px 8px; border-radius: 20px;
         }
 
-        /* ===== TOAST ===== */
+        /* ===== TOAST (IMPROVED) ===== */
         .toast-container {
-            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 10px;
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 12px;
+            pointer-events: none; /* allows clicks to pass through container */
         }
         .toast {
-            padding: 16px 20px; border-radius: 12px; color: white; font-size: 14px;
-            max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-            animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: auto; /* allow clicking close button */
+            padding: 14px 20px; border-radius: 12px; color: white; font-size: 14px;
+            max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            animation: slideInRight 0.35s ease forwards;
+            display: flex; align-items: center; gap: 12px;
+            border-left: 5px solid rgba(255,255,255,0.2);
+            transform: translateX(calc(100% + 40px));
+            opacity: 0;
+            position: relative;
         }
-        .toast-success { background: rgba(34,197,94,0.9); }
-        .toast-warning { background: rgba(234,179,8,0.9); }
-        .toast-error { background: rgba(239,68,68,0.9); }
-        .toast-info { background: rgba(59,130,246,0.9); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .toast.hide {
+            animation: slideOutRight 0.3s ease forwards;
+        }
+        .toast-success { background: rgba(34,197,94,0.95); border-left-color: #22c55e; }
+        .toast-warning { background: rgba(234,179,8,0.95); border-left-color: #eab308; }
+        .toast-error { background: rgba(239,68,68,0.95); border-left-color: #ef4444; }
+        .toast-info { background: rgba(59,130,246,0.95); border-left-color: #3b82f6; }
+        .toast-icon { font-size: 20px; flex-shrink: 0; }
+        .toast-content { flex: 1; line-height: 1.4; }
+        .toast-close {
+            cursor: pointer; opacity: 0.6; font-size: 18px; margin-left: auto;
+            transition: opacity 0.2s; background: none; border: none; color: white; padding: 0 4px;
+        }
+        .toast-close:hover { opacity: 1; }
+
+        @keyframes slideInRight {
+            0% { transform: translateX(calc(100% + 40px)); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(calc(100% + 40px)); opacity: 0; }
+        }
 
         /* ===== ONBOARDING ===== */
         .onboarding-step { display: none; }
@@ -387,39 +414,76 @@
         }
 
         function switchTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            // Show selected
             const target = getEl(`tab-${tabName}`);
             if (target) target.classList.add('active');
-            // Update desktop sidebar
             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
             const nav = getEl(`nav-${tabName}`);
             if (nav) nav.classList.add('active');
-            // Update mobile sidebar
             document.querySelectorAll('#sidebar-mobile .nav-item').forEach(item => item.classList.remove('active'));
             const navMob = getEl(`nav-${tabName}-mob`);
             if (navMob) navMob.classList.add('active');
-            // Load content
             if (tabName === 'dashboard') loadDashboard();
             if (tabName === 'journey') loadJourney();
             if (tabName === 'settings') { loadProfile(); loadWins(); }
             if (window.innerWidth < 769) toggleSidebar();
         }
 
-        // ===== TOAST =====
+        // ===== NEW & IMPROVED TOAST SYSTEM =====
         function showToast(message, type = 'success') {
             const container = getEl('toast-container');
             if (!container) return;
-            const icons = { success: '✅', warning: '⚠️', error: '❌', info: 'ℹ️' };
+
+            const icons = {
+                success: '✅',
+                warning: '⚠️',
+                error: '❌',
+                info: 'ℹ️'
+            };
+
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerHTML = `<span>${icons[type] || ''}</span><span>${message}</span>`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || ''}</span>
+                <span class="toast-content">${message}</span>
+                <button class="toast-close" aria-label="Close notification">×</button>
+            `;
+
+            // Add to container
             container.appendChild(toast);
+
+            // Trigger entrance animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Close button
+            const closeBtn = toast.querySelector('.toast-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    dismissToast(toast);
+                });
+            }
+
+            // Auto-dismiss after 4 seconds (or 6 for errors)
+            const delay = type === 'error' ? 6000 : 4000;
+            const timer = setTimeout(() => {
+                dismissToast(toast);
+            }, delay);
+
+            // Store timer so we can clear it if manually dismissed
+            toast._timer = timer;
+        }
+
+        function dismissToast(toast) {
+            if (toast._dismissed) return;
+            toast._dismissed = true;
+            clearTimeout(toast._timer);
+            toast.classList.remove('show');
+            toast.classList.add('hide');
             setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 400);
         }
 
         // ===== CELEBRATION =====
@@ -486,7 +550,10 @@
                 localStorage.setItem('starting_day', data.starting_day);
                 localStorage.setItem('speed_profile', data.speed_profile);
                 showStep(2);
-            } catch (error) { showToast('Error generating strategy: ' + error.message, 'error'); }
+                showToast('✅ Strategy document generated!', 'success');
+            } catch (error) {
+                showToast('Error generating strategy: ' + error.message, 'error');
+            }
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Generate My Strategy Document'; }
         }
         async function regenerateStrategy() { await generateStrategy(); }
@@ -527,7 +594,9 @@
                 setText('confirm-day', localStorage.getItem('starting_day') || 1);
                 showStep(4);
                 showToast('🎉 Onboarding complete!', 'success');
-            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
             if (btn) { btn.disabled = false; btn.textContent = '🚀 Start My 90-Day Journey'; }
         }
 
@@ -611,6 +680,7 @@
                         <button onclick="loadDashboard()" class="mt-4 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm transition">🔄 Retry</button>
                     </div>
                 `;
+                showToast('Failed to load dashboard', 'error');
             }
         }
 
@@ -655,6 +725,7 @@
                 updateSidebarStats();
             } catch (e) {
                 container.innerHTML = `<div class="text-red-400">Error loading journey: ${e.message}</div>`;
+                showToast('Failed to load journey', 'error');
             }
         }
 
@@ -701,7 +772,7 @@
             }
         }
 
-        // ===== STANDUP =====
+        // ===== STANDUP (with auto-toast) =====
         function openStandup() {
             if (!journeyData) { showToast('Loading journey data...', 'info'); return; }
             const modal = getEl('standup-modal');
@@ -776,14 +847,30 @@
                 if (counter) { counter.textContent = '0/100'; counter.className = 'char-counter under'; }
                 await loadDashboard();
                 await loadJourney();
+
+                // ---- AUTO-TOAST NOTIFICATIONS ----
                 if (data.task_unlocked && data.score >= 7) {
+                    // Task approved → celebration + toast
                     const nextTask = journeyData?.all_phases?.[journeyData.current_phase]?.tasks?.find(t => !t.completed);
                     const nextTaskName = nextTask ? nextTask.name : 'Phase 2 unlocked!';
                     showCelebration(`✅ Score: ${data.score}/10! Task complete!`, nextTaskName, data.xp_gained || 125, data.streak || 0);
+                    showToast(`🎉 Task complete! +${data.xp_gained} XP`, 'success');
+                    // Also show next task in toast after celebration
+                    setTimeout(() => {
+                        showToast(`Next: ${nextTaskName}`, 'info');
+                    }, 2000);
                 } else if (data.score >= 7) {
+                    // Good grade, no task unlock yet (might be a resubmission)
                     showToast(`✅ Score: ${data.score}/10! +${data.xp_gained} XP`, 'success');
+                    // Streak at risk? Check if streak is 0 or low? We can show if streak is 1 and score < 7, but let's just show warning if score < 7.
                 } else {
-                    showToast(`📝 Score: ${data.score}/10. Review feedback.`, 'warning');
+                    // Score < 7 → warning
+                    showToast(`📝 Score: ${data.score}/10. Review the feedback.`, 'warning');
+                    // If streak is about to reset (streak=0 and they had previous streak), but we don't track that easily.
+                    // We can show a generic "keep going" message.
+                    if (data.streak === 0 && journeyData.streak > 0) {
+                        showToast(`⚠️ Your streak reset! Stay consistent.`, 'warning');
+                    }
                 }
             } catch (e) {
                 clearInterval(interval);
@@ -793,7 +880,7 @@
             if (btn) { btn.innerText = '🚀 Submit for Review'; btn.disabled = false; }
         }
 
-        // ===== WINS =====
+        // ===== WINS (with auto-toast) =====
         function openWinModal() {
             const modal = getEl('win-modal');
             if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
@@ -809,17 +896,20 @@
             const revenue = revenueEl ? parseFloat(revenueEl.value) || null : null;
             if (!text) { showToast('Please describe your win.', 'warning'); return; }
             try {
-                await fetch(`${API}/api/win`, {
+                const res = await fetch(`${API}/api/win`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ member_id: MEMBER_ID, win_text: text, revenue_amount: revenue })
                 });
+                const data = await res.json();
                 closeWinModal();
                 if (textEl) textEl.value = '';
                 if (revenueEl) revenueEl.value = '';
                 loadWins();
                 loadDashboard();
-                showToast('🏆 Win recorded!', 'success');
-            } catch (e) { showToast('Error recording win', 'error'); }
+                showToast(`🏆 Win recorded! (${data.total_wins} total)`, 'success');
+            } catch (e) {
+                showToast('Error recording win', 'error');
+            }
         }
 
         async function loadWins() {
@@ -1014,10 +1104,10 @@
                         </div>
                     `;
                 }
+                showToast('Failed to initialize app. Please refresh.', 'error');
             }
         }
 
-        // Start the app
         init();
     </script>
 </body>
