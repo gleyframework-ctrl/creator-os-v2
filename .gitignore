@@ -1,0 +1,64 @@
+# Secrets
+.env
+.env.*
+.env.save
+.env.bak*
+*.env
+!.env.example
+
+# All backups (any style)
+*.bak
+*.bak*
+*.bak_*
+*.bak-*
+*.bak-brick*
+*.save
+backups/
+*.corrupted*
+
+# Python
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives & binaries
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.db
+*.sqlite*
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Staging files
+app_staging.html
+app_staging.html.bak*
+main_sanitized.py
+main_patched.py
+agentic_sanitized.py
+
+# Docker overrides
+docker-compose.override.yml
+
+# Old patch scripts that aren't part of the brick history
+patch_backend.py
+patch_groq.py
+patch_ratelimit*.py
+patch_sidebar*.py
+patch_sprint15_ab.py
+patch_daily_quota.py

@@ -1,0 +1,18 @@
+CHUNK: Digital Alchemy — The Zero-Edit Zoom Studio & Master Template Rules
+CATEGORY: builder
+SOURCE: Digital Alchemy Engine
+---
+Zoom here is not a call tool — it is a closed-loop, live-to-tape broadcast suite. The MP4 Zoom exports is the final flawless deliverable: zero editing, ready to publish.
+GOLDEN RULE OF CAPTURE — isolate the window: share WINDOW ONLY, never the entire screen. Isolating guarantees studio-grade output immune to desktop clutter, menus, notifications.
+SECRET WEAPON — internal audio routing: check 'Share Sound' so Zoom captures digital audio directly from the source file (e.g., a Telegram voice note played on the computer). Playing audio over speakers and recording via microphone sounds muffled and amateur; Share Sound gives perfect fidelity, zero room noise.
+THE ZERO-EDIT CHOREOGRAPHY (pause/resume cycle):
+1) THE DOWNBEAT: start Zoom recording + play the original audio file for Slide 1.
+2) THE CATCH: audio ends → instantly click Pause Recording.
+3) THE BREATH: (not recorded) change the slide.
+4) THE RELEASE: click Resume Recording.
+5) THE NEXT DOWNBEAT: play audio for Slide 2. Repeat.
+Result: a single uninterrupted MP4 that jumps seamlessly slide-to-slide with ZERO trimming.
+MASTER TEMPLATE GOLDEN RULES: 1. Never start from scratch. 2. Always duplicate the Master Template. 3. Change only the text title per new module. Result: massive time savings, unshakeable consistency, instant authority.
+---
+DIAGNOSTIC QUESTION
+Which friction is the member feeling — visual (no template), audio (muffled mic recording), or choreography (pause/resume confusion) — and which single rule do they keep breaking?

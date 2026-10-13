@@ -1,0 +1,53 @@
+SOURCE: E5 C.A.M.P. Masterclass — Module 1, Lessons 2-3 (Competitor & Product Analysis)
+FRAMEWORK: MARKET RESEARCH TRINITY — Prospect → Competitors → Product
+WHEN TO USE: After Prospect Analysis (e5_m1_p1), BEFORE crafting the Big Idea / unique mechanism / offer. When a member says "the market is saturated" or "my offer doesn't stand out."
+
+--- LESSON 2: 11-POINT COMPETITOR ANALYSIS ---
+WHEN TO USE: To find the gap in a crowded market; to craft the Unique Selling Proposition and unique mechanism.
+STEPS: Pick the top 5-7 DIRECT RESPONSE competitors (not famous brands). For EACH record:
+1. HOOK — what grabs attention first
+2. PRIMARY MARKETING PROMISE — the #1 outcome they promise
+3. DELIVERY MECHANISM — the vehicle they claim (method, system, product type)
+4. GENERAL MARKETING CLAIMS — supporting claims
+5. PROOF POINTS — evidence used (results, testimonials, data)
+6. BENEFIT STATEMENTS — how benefits are phrased
+7. FEATURES/DELIVERABLES — what is actually delivered
+8. PRICE & TERMS — price model, terms, payment plans
+9. UNIQUE SELLING PROPOSITION — what they claim makes them different
+10. BONUSES/PREMIUMS — what they stack
+11. RISK-REVERSAL — guarantee; who carries the risk
+DECISION RULE FOR THE COACH: After the member fills the 11 points for 5-7 competitors, output: (a) the promise everyone repeats (the noise), (b) the 2-3 proof/benefit gaps nobody owns, (c) ONE zig recommendation: a promise+mechanism angle competitors cannot honestly copy.
+COMMON MISTAKES: Analyzing famous brands instead of direct-response competitors; doing 1-2 competitors instead of 5-7; collecting data without a gap conclusion.
+
+--- LESSON 3: PRODUCT ANALYSIS (8 POINTS) ---
+WHEN TO USE: Before writing the offer/sales page; when the offer feels generic or weak.
+STEPS: Document for YOUR product:
+1. PRIMARY PROMISE — the single outcome you promise
+2. CREDIBILITY FACTORS — why you can be trusted to deliver
+3. DELIVERY MECHANISM — your vehicle/method (becomes the unique mechanism)
+4. BONUSES/PREMIUMS — the value stack beyond the core
+5. PERFORMANCE METRICS — measurable results produced
+6. TRACK RECORD — history, case studies, numbers
+7. INTEREST POINTS — curious/fascinating angles of the product
+8. PROOF POINTS — evidence: results, testimonials, demos
+COMMON MISTAKES: Promise without proof; mechanism without metrics; stacking bonuses to hide a weak primary promise.
+
+--- LESSON 3: FEATURE→BENEFIT LADDER (RANKING) ---
+FRAMEWORK: Every feature must be climbed to emotion, then ranked.
+STEPS: For each feature write:
+1. FEATURE — what it is
+2. FUNCTIONAL BENEFIT — what it does
+3. DIMENSIONALIZED BENEFIT — what it means in real life (specific: time saved, money gained, exact situation)
+4. EMOTIONAL BENEFIT — what the prospect FEELS
+5. RANK — order by emotional power; the #1 emotional benefit leads the message.
+EXAMPLE: Feature "weekly group calls" → functional "get answers" → dimensionalized "never stuck for more than 7 days" → emotional "feel supported, not alone." Lead with the feeling, not the call.
+COMMON MISTAKES: Stopping at functional benefits; vague dimensionalization ("save time" instead of "3 hours every Sunday"); leading with features instead of the #1 emotional benefit.
+
+--- PROSPECT ADDENDUM (Lesson 1 worksheet) ---
+Full Schwab axes: prospect wants to GAIN / BE / DO / SAVE / AVOID. AVOID = pain, loss, risk, worry, doubt, embarrassment, discomfort (mirror of SAVE). Use AVOID for fear-based angles.
+
+MODULE 1 DECISION FLOW FOR THE COACH:
+1. Prospect Analysis (p1) → secret desire + Now & After Grid.
+2. Competitor Analysis (p2) → gap + zig.
+3. Product Analysis (p2) → promise + proof + #1 emotional benefit from the ladder.
+Then (Module 2+) craft the Big Idea & unique mechanism on these three legs.
