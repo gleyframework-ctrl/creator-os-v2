@@ -1,12 +1,94 @@
+# Secrets
 .env
 .env.*
-__pycache__/
+.env.save
+.env.bak*
+*.env
+!.env.example
+
+# All backups (any style)
+*.bak
+*.bak*
+*.bak_*
+*.bak-*
+*.bak-brick*
+*.save
+backups/
+*.corrupted*
+
+# Python
 *.pyc
-.pythonlibs/
-attached_assets/
-artifacts/
-ai-coach/
-node_modules/
-.local/
-.cache/
-lib/
+__pycache__/
+.pytest_cache/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives & binaries
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.db
+*.sqlite*
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Staging files
+app_staging.html
+app_staging.html.bak*
+main_sanitized.py
+main_patched.py
+agentic_sanitized.py
+
+# Docker overrides
+docker-compose.override.yml
+
+# Old patch scripts that aren't part of the brick history
+patch_backend.py
+patch_groq.py
+patch_ratelimit*.py
+patch_sidebar*.py
+patch_sprint15_ab.py
+patch_daily_quota.py
+
+# Knowledge binaries — source files, not needed in repo (MD versions exist)
+knowledge/**/*.pdf
+knowledge/**/*.docx
+knowledge/**/*.xlsx
+knowledge/**/*.jpg
+knowledge/**/*.png
+
+# Local junk
+main.py.landingbak
+*.landingbak
+backend-integration.patch
+review.patch
+current_day
+xp_total
+
+# Knowledge binaries — source files, not needed in repo (MD versions exist)
+knowledge/**/*.pdf
+knowledge/**/*.docx
+knowledge/**/*.xlsx
+knowledge/**/*.jpg
+knowledge/**/*.png
+
+# Local junk
+main.py.landingbak
+*.landingbak
+backend-integration.patch
+review.patch
+current_day
+xp_total
