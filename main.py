@@ -265,6 +265,10 @@ JOURNEY_MAP = {
 }
 # ===== end BRICK G map =====
 
+# ===== BRICK K.3: task study routing data (journey content unchanged) =====
+TASK_STUDY_MAP = {'p1_t1': {'mode': 'offer', 'tool': 'dna'}, 'p1_t2': {'mode': 'positioning', 'tool': 'dna'}, 'p1_position': {'mode': 'positioning', 'tool': 'dna'}, 'p2_presell': {'mode': 'sales_page', 'tool': 'funnel'}, 'p2_walkthrough': {'mode': 'vsl_script', 'tool': None}, 'p2_signals': {'mode': 'dm_script', 'tool': 'dm'}, 'p3_create': {'mode': 'community_structure', 'tool': 'community'}, 'p3_welcome': {'mode': 'welcome_flow', 'tool': 'community'}, 'p3_channels': {'mode': 'community_structure', 'tool': 'community'}, 'p3_pricing': {'mode': 'community_pricing', 'tool': 'community'}, 'p4_diagnostic': {'mode': 'content_strategy', 'tool': 'content'}, 'p4_method': {'mode': 'ad_creative', 'tool': 'content'}, 'p4_launch': {'mode': 'landing_page', 'tool': 'funnel'}, 'p4_first_sale': {'mode': 'sales_page', 'tool': 'dm'}, 'p5_engagement': {'mode': 'nurture_sequence', 'tool': 'content'}, 'p5_audit': {'mode': 'upsell_path', 'tool': 'community'}, 'p5_upsell': {'mode': 'upsell_path', 'tool': 'community'}, 'p5_workshop': {'mode': 'webinar', 'tool': None}}
+# ===== end BRICK K.3 task map =====
+
 # ============================================================
 # DATABASE HELPERS
 # ============================================================
@@ -776,6 +780,7 @@ def get_journey_status(request: Request, member_id: str = "default"):
         "phase_days": phase_info["days"],
         "sub_coach": phase_info.get("sub_coach","Strategist"),
         "focus": phase_info["focus"],
+        "task_study_map": TASK_STUDY_MAP,  # BRICK K.3
         "current_task": current_task,
         "standup_rubric": _e3_rubric(current_task) if isinstance(current_task, dict) else None,  # BRICK E3
         "tasks_completed": journey.get("tasks_completed",[]),
